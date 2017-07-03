@@ -8,19 +8,26 @@ Refactor: 1 - Little Bouncing Ball
 local DefaultBall = {}
 
 function DefaultBall:onPaddle(nrm)
+    local p = self.game.paddle
     local nx, ny = unpack(nrm)
+
+    -- relative velocity
+    local rvx = self.vx - p.vx
+    local rvy = self.vy - p.vy
 
     -- calculate the perpendicular projection of our reversed velocity vector onto the reflection normal
     local mag = math.sqrt(nx*nx + ny*ny)
-    local dot = nx*self.vx + ny*self.vy
+    local dot = nx*rvx + ny*rvy
     local px = -nx*dot/mag
     local py = -ny*dot/mag
 
+    -- move the ball to avoid recollision
     self.x = self.x + nx
     self.y = self.y + ny
 
-    self.vx = self.vx + 2*px + self.game.paddle.vx*0.05
-    self.vy = self.vy + 2*py + self.game.paddle.vy*0.05
+    -- reflect the velocity vector, and adjust back to absolute with a bit extra
+    self.vx = rvx + 2*px + 1.1*p.vx
+    self.vy = rvy + 2*py + 1.1*p.vy
 end
 
 function DefaultBall:update(dt)

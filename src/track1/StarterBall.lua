@@ -15,18 +15,6 @@ function StarterBall:start_update(dt)
     self.vx = self.vx + dt*(p.x - self.x)
     self.vy = self.vy + dt*(p.y - self.y)
 
-    -- make the ball always seek directly to the paddle
-    if false then
-        local vel = math.sqrt(self.vx * self.vx + self.vy * self.vy)
-        local nvx = p.x - self.x
-        local nvy = p.y - self.y
-        local v2 = math.sqrt(nvx * nvx + nvy * nvy)
-        if v2 > 0 then
-            self.vx = nvx * vel / v2
-            self.vy = nvy * vel / v2
-        end
-    end
-
     self.x = self.x + dt*self.vx
     self.y = self.y + dt*self.vy
 
