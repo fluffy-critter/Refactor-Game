@@ -20,7 +20,7 @@ end
 
 function Game:init()
     print("1.load")
-    self.music = love.audio.newSource('Refactor/01 little bouncing ball.mp3')
+    self.music = love.audio.newSource('Refactor/01-little-bouncing-ball.mp3')
 
     self.canvas = love.graphics.newCanvas(320, 240)
     self.canvas:setFilter("nearest", "nearest")
