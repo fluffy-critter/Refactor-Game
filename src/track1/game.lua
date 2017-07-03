@@ -5,25 +5,34 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
+local StarterBall = require('track1.StarterBall')
+local geom = require('geom')
+
 local Game = {}
 
-local StarterBall = require 'track1.StarterBall'
+function Game.new()
+    local o = {}
+    setmetatable(o, {__index=Game})
 
-local function load()
+    o:init()
+    return o
+end
+
+function Game:init()
     print("1.load")
-    Game.music = love.audio.newSource('Refactor/01 little bouncing ball.mp3')
+    self.music = love.audio.newSource('Refactor/01 little bouncing ball.mp3')
 
-    Game.canvas = love.graphics.newCanvas(320, 240)
-    Game.canvas:setFilter("nearest", "nearest")
+    self.canvas = love.graphics.newCanvas(320, 240)
+    self.canvas:setFilter("nearest", "nearest")
 
-    Game.board = {
+    self.board = {
         left = 8,
         right = 320 - 8,
         top = 8,
         bottom = 240
     }
 
-    Game.paddle = {
+    self.paddle = {
         x = 160,
         y = 220,
         w = 20,
@@ -32,10 +41,10 @@ local function load()
         vx = 0,
         vy = 0,
 
-        speed = 100,
-        friction = 0.8,
+        speed = 6000,
+        friction = 0.001,
         rebound = 0.5,
-        tiltFactor = 0.05,
+        tiltFactor = 0.01,
 
         -- get the upward vector for the paddle
         tiltVector = function(self)
@@ -55,107 +64,44 @@ local function load()
                 self.x - up.x*self.h + rt.x*self.w, self.y - up.y*self.h + rt.y*self.w,
                 self.x - up.x*self.h - rt.x*self.w, self.y - up.y*self.h - rt.y*self.w
             }
-        end
+        end,
     }
 
-    Game.balls = {}
-    table.insert(Game.balls, StarterBall.new(Game))
+    self.balls = {}
+    table.insert(self.balls, StarterBall.new(self))
 end
 
 function Game:setPhase(phase)
+    print("setting phase to " .. phase)
     if phase == 0 then
         self.music:play()
+        self.musicPos = 0
     end
 
     self.phase = phase
 end
 
--- Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with sign based on winding
-local function linePointDistance(x0, y0, x1, y1, x2, y2)
-    -- adapted from https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
-    local dx = x2 - x1
-    local dy = y2 - y1
-    return ((y2 - y1)*x0 - (x2 - x1)*y0 + x2*y1 - y2*x1)/math.sqrt(dx*dx + dy*dy)
-end
+function Game:update(dt)
+    local p = self.paddle
+    local b = self.board
 
--- check to see if a ball collides with a polygon; returns false if it's not collided, collision normal as {x,y} if it is
-local function pointPolyCollision(x, y, r, poly)
-    local npoints = #poly / 2
-    local x1, y1, x2, y2
-    local centerOutside = {}
-    local nearest
-    local nx, ny
-    local edgeCount = 0
+    if self.music:isPlaying() then
+        self.musicPos = self.musicPos + self.music:getPitch() * dt
 
-    x2 = poly[npoints*2 - 1]
-    y2 = poly[npoints*2]
-    for i = 1, npoints do
-        x1 = x2
-        y1 = y2
-        x2 = poly[i*2 - 1]
-        y2 = poly[i*2]
-
-        local d = linePointDistance(x, y, x1, y1, x2, y2)
-        if d > r then
-            -- We are fully outside on this side, so we are outside
-            return false
-        end
-
-        print("collided on side " .. i)
-
-        if d > 0 then
-            -- the center is outside on this side
-            edgeCount = edgeCount + 1
-            print("centroid outside")
-        end
-
-        if nearest == nil or d > nearest then
-            -- this is the closest edge so far
-            nx = y2 - y1
-            ny = x1 - x2
-            nearest = d
-
-            print("nearest, normal = ", nx, ny)
+        local phase = math.floor(self.musicPos/30)
+        if phase > self.phase then
+            self:setPhase(phase)
         end
     end
 
-    -- if we were outside on multiple sides, we need to check corners instead
-    if edgeCount > 1 then
-        local minD, minX, minY
-        for i = 1, npoints do
-            x1 = poly[i*2 - 1]
-            y1 = poly[i*2]
-
-            local dx = x - x1
-            local dy = y - y1
-            local d = dx*dx + dy*dy
-            if not minD or d < minD then
-                nx = dx
-                ny = dy
-                minD = d
-            end
-        end
-    end
-
-    local mag = math.sqrt(nx*nx + ny*ny)
-    if mag then
-        return { nx / mag, ny / mag }
-    end
-
-    return { 0, 0 }
-end
-
-local function update(dt)
-    local p = Game.paddle
-    local b = Game.board
 
     if love.keyboard.isDown("right") then
-        p.vx = p.vx + p.speed
+        p.vx = p.vx + p.speed*dt
     end
     if love.keyboard.isDown("left") then
-        p.vx = p.vx - p.speed
+        p.vx = p.vx - p.speed*dt
     end
-    p.vx = p.vx * p.friction
+    p.vx = p.vx * math.pow(p.friction, dt)
 
     p.x = p.x + dt * p.vx
     p.y = p.y + dt * p.vy
@@ -172,7 +118,7 @@ local function update(dt)
     local paddlePoly = p:getPolygon()
 
     local nextBalls = {}
-    for _,ball in pairs(Game.balls) do
+    for _,ball in pairs(self.balls) do
         local remove
 
         if ball:update(dt) == false then
@@ -180,7 +126,7 @@ local function update(dt)
         end
 
         -- check for collision with the paddle
-        local c = pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly)
+        local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly)
         if c then
             if ball:onPaddle(c) == false then
                 remove = true
@@ -191,30 +137,32 @@ local function update(dt)
             table.insert(nextBalls, ball)
         end
     end
-    Game.balls = nextBalls
-
-
+    self.balls = nextBalls
 end
 
-local function draw()
-    Game.canvas:renderTo(function()
+local function update(dt)
+    Game:update(dt)
+end
+
+function Game:draw()
+    self.canvas:renderTo(function()
         love.graphics.clear(0, 0, 0)
 
         -- draw the paddle
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.polygon("fill", Game.paddle:getPolygon())
+        love.graphics.polygon("fill", self.paddle:getPolygon())
 
         -- draw the balls
-        for k,ball in pairs(Game.balls) do
+        for k,ball in pairs(self.balls) do
             love.graphics.setColor(unpack(ball.color))
             love.graphics.circle("fill", ball.x, ball.y, ball.r)
         end
     end)
-    return Game.canvas
+    return self.canvas
 end
 
-return {
-    load=load,
-    update=update,
-    draw=draw
-}
+local function draw()
+    Game:draw()
+end
+
+return Game
