@@ -7,12 +7,15 @@ Refactor: 1 - Little Bouncing Ball
 
 local Game = {}
 
+local StarterBall = require 'track1.StarterBall'
+
 local function load()
     print("1.load")
     Game = {}
     Game.music = love.audio.newSource('Refactor/01 little bouncing ball.mp3')
 
     Game.canvas = love.graphics.newCanvas(320, 240)
+    Game.canvas:setFilter("nearest", "nearest")
 
     Game.board = {
         left = 8,
@@ -34,7 +37,32 @@ local function load()
         friction = 0.8,
         rebound = 0.5,
         tilt_factor = 0.05,
+
+        -- get the upward vector for the paddle
+        get_tilt_vector = function(self)
+            local x = self.vx * self.tilt_factor
+            local y = -60
+            local d = math.sqrt(x * x + y * y)
+            return { x = x / d, y = y / d }
+        end,
+
+        get_polygon = function(self)
+            local up = self:get_tilt_vector()
+            local rt = { x = -up.y, y = up.x }
+
+            return {
+                self.x + up.x*self.h + rt.x*self.w, self.y + up.y*self.h + rt.y*self.w,
+                self.x + up.x*self.h - rt.x*self.w, self.y + up.y*self.h - rt.y*self.w,
+                self.x - up.x*self.h - rt.x*self.w, self.y - up.y*self.h - rt.y*self.w,
+                self.x - up.x*self.h + rt.x*self.w, self.y - up.y*self.h + rt.y*self.w
+            }
+        end
     }
+
+    Game.phase = 0
+
+    Game.balls = {}
+    table.insert(Game.balls, StarterBall.new(Game))
 end
 
 local function update(dt)
@@ -60,14 +88,11 @@ local function update(dt)
         p.x = b.left + p.w
         p.vx = -p.vx * p.rebound
     end
-end
 
--- Given a paddle object, return the up-vector for its tilt
-local function get_tilt_vector(paddle)
-    local x = paddle.vx * paddle.tilt_factor
-    local y = -60
-    local d = math.sqrt(x * x + y * y)
-    return { x = x / d, y = y / d }
+    for k,ball in pairs(Game.balls) do
+        ball:update(dt)
+    end
+
 end
 
 local function draw()
@@ -75,21 +100,14 @@ local function draw()
         love.graphics.clear(0,0,0)
 
         -- draw the paddle
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.polygon("fill", Game.paddle:get_polygon())
 
-        -- up vector = vx*tilt,1 normalized
-        local up = get_tilt_vector(Game.paddle)
-        local rt = { x = -up.y, y = up.x }
-
-        local pos = { x = Game.paddle.x, y = Game.paddle.y }
-        local sz = { w = Game.paddle.w, h = Game.paddle.h }
-
-        love.graphics.polygon("fill",
-            pos.x + up.x*sz.h + rt.x*sz.w, pos.y + up.y*sz.h + rt.y*sz.w,
-            pos.x + up.x*sz.h - rt.x*sz.w, pos.y + up.y*sz.h - rt.y*sz.w,
-            pos.x - up.x*sz.h - rt.x*sz.w, pos.y - up.y*sz.h - rt.y*sz.w,
-            pos.x - up.x*sz.h + rt.x*sz.w, pos.y - up.y*sz.h + rt.y*sz.w
-            )
+        -- draw the balls
+        for k,ball in pairs(Game.balls) do
+            love.graphics.setColor(unpack(ball.color))
+            love.graphics.circle("fill", ball.x, ball.y, ball.r)
+        end
     end)
     return Game.canvas
 end
