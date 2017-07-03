@@ -11,7 +11,6 @@ local StarterBall = require 'track1.StarterBall'
 
 local function load()
     print("1.load")
-    Game = {}
     Game.music = love.audio.newSource('Refactor/01 little bouncing ball.mp3')
 
     Game.canvas = love.graphics.newCanvas(320, 240)
@@ -36,33 +35,114 @@ local function load()
         speed = 100,
         friction = 0.8,
         rebound = 0.5,
-        tilt_factor = 0.05,
+        tiltFactor = 0.05,
 
         -- get the upward vector for the paddle
-        get_tilt_vector = function(self)
-            local x = self.vx * self.tilt_factor
+        tiltVector = function(self)
+            local x = self.vx * self.tiltFactor
             local y = -60
             local d = math.sqrt(x * x + y * y)
             return { x = x / d, y = y / d }
         end,
 
-        get_polygon = function(self)
-            local up = self:get_tilt_vector()
+        getPolygon = function(self)
+            local up = self:tiltVector()
             local rt = { x = -up.y, y = up.x }
 
             return {
-                self.x + up.x*self.h + rt.x*self.w, self.y + up.y*self.h + rt.y*self.w,
                 self.x + up.x*self.h - rt.x*self.w, self.y + up.y*self.h - rt.y*self.w,
-                self.x - up.x*self.h - rt.x*self.w, self.y - up.y*self.h - rt.y*self.w,
-                self.x - up.x*self.h + rt.x*self.w, self.y - up.y*self.h + rt.y*self.w
+                self.x + up.x*self.h + rt.x*self.w, self.y + up.y*self.h + rt.y*self.w,
+                self.x - up.x*self.h + rt.x*self.w, self.y - up.y*self.h + rt.y*self.w,
+                self.x - up.x*self.h - rt.x*self.w, self.y - up.y*self.h - rt.y*self.w
             }
         end
     }
 
-    Game.phase = 0
-
     Game.balls = {}
     table.insert(Game.balls, StarterBall.new(Game))
+end
+
+function Game:setPhase(phase)
+    if phase == 0 then
+        self.music:play()
+    end
+
+    self.phase = phase
+end
+
+-- Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with sign based on winding
+local function linePointDistance(x0, y0, x1, y1, x2, y2)
+    -- adapted from https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
+    local dx = x2 - x1
+    local dy = y2 - y1
+    return ((y2 - y1)*x0 - (x2 - x1)*y0 + x2*y1 - y2*x1)/math.sqrt(dx*dx + dy*dy)
+end
+
+-- check to see if a ball collides with a polygon; returns false if it's not collided, collision normal as {x,y} if it is
+local function pointPolyCollision(x, y, r, poly)
+    local npoints = #poly / 2
+    local x1, y1, x2, y2
+    local centerOutside = {}
+    local nearest
+    local nx, ny
+    local edgeCount = 0
+
+    x2 = poly[npoints*2 - 1]
+    y2 = poly[npoints*2]
+    for i = 1, npoints do
+        x1 = x2
+        y1 = y2
+        x2 = poly[i*2 - 1]
+        y2 = poly[i*2]
+
+        local d = linePointDistance(x, y, x1, y1, x2, y2)
+        if d > r then
+            -- We are fully outside on this side, so we are outside
+            return false
+        end
+
+        print("collided on side " .. i)
+
+        if d > 0 then
+            -- the center is outside on this side
+            edgeCount = edgeCount + 1
+            print("centroid outside")
+        end
+
+        if nearest == nil or d > nearest then
+            -- this is the closest edge so far
+            nx = y2 - y1
+            ny = x1 - x2
+            nearest = d
+
+            print("nearest, normal = ", nx, ny)
+        end
+    end
+
+    -- if we were outside on multiple sides, we need to check corners instead
+    if edgeCount > 1 then
+        local minD, minX, minY
+        for i = 1, npoints do
+            x1 = poly[i*2 - 1]
+            y1 = poly[i*2]
+
+            local dx = x - x1
+            local dy = y - y1
+            local d = dx*dx + dy*dy
+            if not minD or d < minD then
+                nx = dx
+                ny = dy
+                minD = d
+            end
+        end
+    end
+
+    local mag = math.sqrt(nx*nx + ny*ny)
+    if mag then
+        return { nx / mag, ny / mag }
+    end
+
+    return { 0, 0 }
 end
 
 local function update(dt)
@@ -89,19 +169,40 @@ local function update(dt)
         p.vx = -p.vx * p.rebound
     end
 
-    for k,ball in pairs(Game.balls) do
-        ball:update(dt)
+    local paddlePoly = p:getPolygon()
+
+    local nextBalls = {}
+    for _,ball in pairs(Game.balls) do
+        local remove
+
+        if ball:update(dt) == false then
+            remove = true
+        end
+
+        -- check for collision with the paddle
+        local c = pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly)
+        if c then
+            if ball:onPaddle(c) == false then
+                remove = true
+            end
+        end
+
+        if not remove then
+            table.insert(nextBalls, ball)
+        end
     end
+    Game.balls = nextBalls
+
 
 end
 
 local function draw()
     Game.canvas:renderTo(function()
-        love.graphics.clear(0,0,0)
+        love.graphics.clear(0, 0, 0)
 
         -- draw the paddle
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.polygon("fill", Game.paddle:get_polygon())
+        love.graphics.polygon("fill", Game.paddle:getPolygon())
 
         -- draw the balls
         for k,ball in pairs(Game.balls) do
