@@ -10,7 +10,7 @@ local function linePointDistance(x0, y0, x1, y1, x2, y2)
     -- adapted from https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
     local dx = x2 - x1
     local dy = y2 - y1
-    return ((y2 - y1)*x0 - (x2 - x1)*y0 + x2*y1 - y2*x1)/math.sqrt(dx*dx + dy*dy)
+    return (dy*x0 - dx*y0 + x2*y1 - y2*x1)/math.sqrt(dx*dx + dy*dy)
 end
 
 -- check to see if a ball collides with a polygon; returns false if it's not collided, displacement vector as {x,y} if it is
