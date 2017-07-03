@@ -45,6 +45,8 @@ end
 function love.keypressed(key, code, isrepeat)
     if key == 'p' then
         onPause()
+    elseif currentGame.keypressed then
+        currentGame:keypressed(key, code, isrepeat)
     end
 end
 
@@ -56,7 +58,7 @@ end
 
 function love.update(dt)
     if state == "pausing" then
-        speed = speed - dt*2
+        speed = speed - dt*3
         if speed <= 0 then
             speed = 0
             currentGame.music:pause()
@@ -65,12 +67,11 @@ function love.update(dt)
             currentGame.music:setPitch(speed)
         end
     elseif state == "resuming" then
-        speed = speed + dt*2
+        speed = speed + dt*3
         if speed >= 1 then
             speed = 1
             state = "playing"
         end
-        print("speed=" .. speed)
         currentGame.music:setPitch(speed)
     end
 
