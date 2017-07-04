@@ -21,12 +21,9 @@ end
 
 local BPM = 132
 
--- returns music position as {phase, measure, beat, timeOfs}
+-- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    local timeOfs = self.music:tell()
-
-    local beat = math.floor(timeOfs*BPM/60)
-    timeOfs = timeOfs - beat*60/BPM
+    local beat = self.music:tell()*BPM/60
 
     local measure = math.floor(beat/4)
     beat = beat - measure*4
@@ -37,7 +34,7 @@ function Game:musicPos()
     return {phase, measure, beat, timeOfs}
 end
 
--- seeks the music to a particular spot, using the same format as musicPos()
+-- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
 function Game:seekMusic(phase, measure, beat, timeOfs)
     local time = (phase or 0)
     time = time*16 + (measure or 0)
@@ -183,6 +180,7 @@ function Game:update(dt)
         end
     end
 
+    local pax = 0
     if love.keyboard.isDown("right") then
         p.vx = p.vx + p.speed*dt
     end
@@ -202,6 +200,8 @@ function Game:update(dt)
         p.x = b.left + p.w
         p.vx = -p.vx * p.rebound
     end
+
+    -- TODO: timeline judder
 
     local paddlePoly = p:getPolygon()
 
@@ -233,9 +233,21 @@ function Game:update(dt)
         if c then
             ball:onHitPaddle(c, self.paddle)
         end
+    end
 
-        -- TODO test against actors
+    -- TODO preupdate actors
 
+    -- TODO test balls against actors
+    --[[ note to self: loop should be something like:
+        foreach ball:
+            foreach actor:
+                nrm = collision(ball, actorPoly)
+                if nrm:
+                    ball:onHitActor(nrm, actor)
+                    actor:onHitBall(nrm, ball)
+    ]]
+
+    for _,ball in pairs(self.balls) do
         ball:postUpdate(dt)
 
         if ball:isAlive() then
@@ -243,6 +255,8 @@ function Game:update(dt)
         end
     end
     self.balls = nextBalls
+
+    -- TODO postupdate actors
 
     local nextParticles = {}
     for _,particle in pairs(self.particles) do

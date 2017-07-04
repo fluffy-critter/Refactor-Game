@@ -24,7 +24,7 @@ end
 
 function HitParticle:update(dt)
     self.time = self.time + dt
-    return self.time < self.duration
+    return self.time >= 0 and self.time < self.duration
 end
 
 function HitParticle:draw()
