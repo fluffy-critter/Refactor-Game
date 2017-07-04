@@ -133,7 +133,6 @@ end
 function Ball:onHitPaddle(nrm, paddle)
     local nx, ny = unpack(nrm)
 
-    print("got normal", nx, ny)
     self:applyReflection(nrm, paddle.vx, paddle.vy)
 
     if self.timeSinceLastHit > self.scoreCooldown then
@@ -196,10 +195,6 @@ function Ball:applyReflection(nrm, vx, vy)
     -- reflect the velocity vector
     self.dvx = self.dvx + (1 + self.elasticity)*px
     self.dvy = self.dvy + (1 + self.elasticity)*py
-
-    print("velocity:", self.vx, self.vy)
-    print("position impuse:", self.dx, self.dy)
-    print("velocity impulse:", self.dvx, self.dvy)
 end
 
 function Ball:draw()

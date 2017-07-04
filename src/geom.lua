@@ -115,7 +115,6 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     -- is our center inside the nearest segment? If so, we just use its normal
     if maxSideProj >= 0 and maxSideProj <= 1 then
-        print("face impact", maxSideDist, unpack(maxSideNormal))
         return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
