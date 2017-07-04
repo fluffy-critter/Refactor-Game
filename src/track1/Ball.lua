@@ -12,6 +12,9 @@ Properties:
     vx, vy: velocity
     ax, ay: acceleration
 
+    paddleScore: score for touching the paddle
+    paddleScoreInc: increment for each time the paddle gets touched
+
     spawnVelocity: velocity at spawn time
     elasticity: how much rebound force the ball gets
 
@@ -57,10 +60,6 @@ function Ball.new(game, o)
     self:onInit()
     self:onStart()
 
-    for k,_ in pairs(self) do
-        print(k)
-    end
-
     return self
 end
 
@@ -73,7 +72,9 @@ function Ball:onInit()
         ay = 0,
         spawnVelocity = 100,
         lives = 1,
-        elasticity = 1
+        elasticity = 1,
+        paddleScore = 1,
+        paddleScoreInc = 1
     }
 
     for k,v in pairs(defaults) do
@@ -88,20 +89,14 @@ function Ball:onStart()
     self.y = math.random(self.game.bounds.top + self.r, (self.game.bounds.top + self.game.bounds.bottom)/2)
     self.vx = math.random(-300, 300)
     self.vy = math.random(-300, 300)
-    self.ax = 0
-    self.ay = 0
 
     local mag = math.sqrt(self.vx*self.vx + self.vy*self.vy)
     if mag and self.spawnVelocity then
         self.vx = self.spawnVelocity*self.vx/mag
         self.vy = self.spawnVelocity*self.vy/mag
     end
-end
 
-function Ball:onHitPaddle(nrm, paddle)
-    local nx, ny = unpack(nrm)
-
-    self:applyReflection(nrm, paddle.vx, paddle.vy)
+    self.paddleScoreVal = self.paddleScore
 end
 
 function Ball:preUpdate(dt)
@@ -109,6 +104,8 @@ function Ball:preUpdate(dt)
     self.dy = 0
     self.dvx = 0
     self.dvy = 0
+
+    self.hasHit = {}
 end
 
 function Ball:onUpdate(dt)
@@ -128,7 +125,19 @@ function Ball:postUpdate(dt)
 end
 
 function Ball:onHitPaddle(nrm, paddle)
+    if self.hasHit[paddle] then
+        return
+    end
+    self.hasHit[paddle] = true
+
+    local nx, ny = unpack(nrm)
+
     self:applyReflection(nrm, paddle.vx, paddle.vy)
+
+    self.game.score = self.game.score + self.paddleScoreVal
+    self.paddleScoreVal = self.paddleScoreVal + self.paddleScoreInc
+
+    print(self.paddleScoreVal, self.paddleScoreInc)
 end
 
 --[[
@@ -141,16 +150,20 @@ function Ball:onHitWall(nrm, x, y)
     local nx, ny = unpack(nrm)
 
     local particles = self.game.particles
-    table.insert(particles, HitParticle.new(x, y, math.abs(ny)*12 + 1, math.abs(nx)*12 + 1, self.hitColor, 0.3))
+    table.insert(particles, HitParticle.new(x, y, math.abs(ny)*self.r*4 + 1, math.abs(nx)*self.r*4 + 1, self.hitColor, 0.3))
 end
 
 function Ball:onHitActor(nrm, actor)
+    if self.hasHit[actor] then
+        return
+    end
+    self.hasHit[actor] = true
+
     self:applyReflection(nrm)
 end
 
 function Ball:onLost()
     self.lives = self.lives - 1
-    self:onStart()
 end
 
 function Ball:isAlive()

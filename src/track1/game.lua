@@ -48,8 +48,9 @@ end
 
 function Game:init()
     print("1.load")
-    self.music = love.audio.newSource('Refactor/01-little-bouncing-ball.mp3')
+    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3')
     self.phase = -1
+    self.score = 0
 
     self.canvas = love.graphics.newCanvas(320, 240)
     self.canvas:setFilter("nearest", "nearest")
@@ -114,7 +115,6 @@ function Game:init()
                 self.onUpdate = Ball.onUpdate
                 self.onHitPaddle = Ball.onHitPaddle
                 self.onStart = Ball.onStart
-                self.onLost = Ball.onLost
                 self:onHitPaddle(nrm, paddle)
                 self.game:setPhase(0)
             end,
@@ -124,12 +124,10 @@ function Game:init()
                 self.vy = 0
             end,
             onLost = function(self)
-                self:onStart()
+                self.ay = self.ay + 10
             end
         })
     }
-
-    print("ball count:" .. #self.balls)
 end
 
 function Game:setPhase(phase)
@@ -225,6 +223,9 @@ function Game:update(dt)
         end
         if ball.y - ball.r > self.bounds.bottom then
             ball:onLost()
+            if ball:isAlive() then
+                ball:onStart()
+            end
         end
 
         -- test against paddle
@@ -257,7 +258,7 @@ function Game:draw()
         love.graphics.clear(0, 0, 0)
         love.graphics.setBlendMode("alpha")
 
-        love.graphics.print("phase=" .. self.phase .. " time=" .. table.concat(self:musicPos(), ':'), 0, 0)
+        love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
 
         -- draw the particle effects
         for _,particle in pairs(self.particles) do
