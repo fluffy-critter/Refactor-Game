@@ -118,10 +118,11 @@ function Ball:postUpdate(dt)
     self.vx = self.vx + self.dvx
     self.vy = self.vy + self.dvy
 
-    self.x = self.x + self.vx*dt
-    self.y = self.y + self.vy*dt
+    -- apply acceleration first so that position includes the integration of acceleration
     self.vx = self.vx + self.ax*dt
     self.vy = self.vy + self.ay*dt
+    self.x = self.x + self.vx*dt
+    self.y = self.y + self.vy*dt
 end
 
 function Ball:onHitPaddle(nrm, paddle)
@@ -132,12 +133,11 @@ function Ball:onHitPaddle(nrm, paddle)
 
     local nx, ny = unpack(nrm)
 
+    print("got normal", nx, ny)
     self:applyReflection(nrm, paddle.vx, paddle.vy)
 
     self.game.score = self.game.score + self.paddleScoreVal
     self.paddleScoreVal = self.paddleScoreVal + self.paddleScoreInc
-
-    print(self.paddleScoreVal, self.paddleScoreInc)
 end
 
 --[[
@@ -181,10 +181,10 @@ function Ball:applyReflection(nrm, vx, vy)
     local nx, ny = unpack(nrm)
 
     -- calculate the perpendicular projection of our reversed velocity vector onto the reflection normal
-    local mag = math.sqrt(nx*nx + ny*ny)
+    local mag2 = nx*nx + ny*ny
     local dot = nx*rvx + ny*rvy
-    local px = -nx*dot/mag
-    local py = -ny*dot/mag
+    local px = -nx*dot/mag2
+    local py = -ny*dot/mag2
 
     -- move the ball to avoid recollision
     self.dx = self.dx + nx
@@ -193,6 +193,10 @@ function Ball:applyReflection(nrm, vx, vy)
     -- reflect the velocity vector
     self.dvx = self.dvx + (1 + self.elasticity)*px
     self.dvy = self.dvy + (1 + self.elasticity)*py
+
+    print("velocity:", self.vx, self.vy)
+    print("position impuse:", self.dx, self.dy)
+    print("velocity impulse:", self.dvx, self.dvy)
 end
 
 function Ball:draw()

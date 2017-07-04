@@ -5,57 +5,137 @@ Refactor
 
 ]]
 
--- Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with sign based on winding
-local function linePointDistance(x0, y0, x1, y1, x2, y2)
+local geom = {}
+
+-- Check if two rectangles overlap (note: x2 must be >= x1, same for y)
+function geom.quadsOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
+    return (
+        (ax1 < bx2) and
+        (bx1 < ax2) and
+        (ay1 < by2) and
+        (by1 < ay2))
+end
+
+--[[ Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with sign based on winding.
+Outside (positive) is considered to the left of the line (i.e. clockwise winding)
+]]
+function geom.linePointDistance(x0, y0, x1, y1, x2, y2)
     -- adapted from https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
     local dx = x2 - x1
     local dy = y2 - y1
     return (dy*x0 - dx*y0 + x2*y1 - y2*x1)/math.sqrt(dx*dx + dy*dy)
 end
 
--- check to see if a ball collides with a polygon; returns false if it's not collided, displacement vector as {x,y} if it is
-local function pointPolyCollision(x, y, r, poly)
-    local npoints = #poly / 2
-    local x1, y1, x2, y2
-    local centerOutside = {}
-    local nx = 0
-    local ny = 0
+-- Project a point onto the line segment, and return where it is relative to x1,y1=0 x2,x2=1
+function geom.projectPointToLine(x, y, x1, y1, x2, y2)
+    local dx = x2 - x1
+    local dy = y2 - y1
 
+    local xo = x - x1
+    local yo = y - y1
+
+    return (xo*dx + yo*dy)/(dx*dx + dy*dy)
+end
+
+-- Get the perpendicular line - NOT NORMALIZED
+function geom.getNormal(x1, y1, x2, y2)
+    return { y2 - y1, x1 - x2 }
+end
+
+-- Normalize a vector to a particular length
+function geom.normalize(nrm, len)
+    if len == nil then
+        len = 1
+    end
+
+    local x, y = unpack(nrm)
+    local d = math.sqrt(x*x + y*y)
+    return {x*len/d, y*len/d}
+end
+
+-- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
+function geom.pointPolyCollision(x, y, r, poly)
+    local npoints = #poly / 2
+
+    local minx = poly[1]
+    local maxx = poly[1]
+    local miny = poly[2]
+    local maxy = poly[2]
+    for i = 2, npoints do
+        local px = poly[i*2 - 1]
+        local py = poly[i*2]
+        minx = math.min(minx, px)
+        maxx = math.max(maxx, px)
+        miny = math.min(miny, py)
+        maxy = math.max(maxy, py)
+    end
+
+    -- do the fast AABB test
+    if not geom.quadsOverlap(minx, miny, maxx, maxy, x - r, y - r, x + r, y + r) then
+        return false
+    end
+
+    local x1, y1, x2, y2
     x2 = poly[npoints*2 - 1]
     y2 = poly[npoints*2]
+
+    local dist = {}
+    local proj = {}
+
+    local maxSide
+    local maxSideDist
+    local maxSideNormal
+    local maxSideProj
+
     for i = 1, npoints do
         x1 = x2
         y1 = y2
         x2 = poly[i*2 - 1]
         y2 = poly[i*2]
 
-        local d = linePointDistance(x, y, x1, y1, x2, y2)
-        if d > r then
+        dist[i] = geom.linePointDistance(x, y, x1, y1, x2, y2)
+        proj[i] = geom.projectPointToLine(x, y, x1, y1, x2, y2)
+
+        if dist[i] >= r then
             -- We are fully outside on this side, so we are outside
             return false
         end
 
-        if d > -r then
-            -- we are only partially intersecting on this wall, so we use this to apply the normal force
-            local depth = r - d
-            local px = y2 - y1
-            local py = x1 - x2
-            local mag = math.sqrt(px*px + py*py)
-            nx = nx + px*depth/mag
-            ny = ny + py*depth/mag
+        -- find the closest side
+        if maxSide == nil or dist[i] > maxSideDist then
+            maxSide = i
+            maxSideDist = dist[i]
+            maxSideNormal = geom.getNormal(x1, y1, x2, y2)
+            maxSideProj = geom.projectPointToLine(x, y, x1, y1, x2, y2)
         end
     end
 
-    local mag = math.sqrt(nx*nx + ny*ny)
-    if mag then
-        return { nx / mag, ny / mag }
+    -- is our center inside the nearest segment? If so, we just use its normal
+    if maxSideProj >= 0 and maxSideProj <= 1 then
+        print("face impact", maxSideDist, unpack(maxSideNormal))
+        return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
-    -- uh oh, we're fully embedded in the object... TODO: handle this
-    return { 0, 0 }
+    -- we are using the nearest corner instead; fortunately in this case the center of the circle is going to be outside the poly
+    local cornerX, cornerY
+    local cornerDist2
+    for i = 1, npoints do
+        local cx = x - poly[i*2 - 1]
+        local cy = y - poly[i*2]
+        local cd = cx*cx + cy*cy
+        if cornerDist2 == nil or cd < cornerDist2 then
+            cornerDist2 = cd
+            cornerX = cx
+            cornerY = cy
+        end
+    end
+
+    if cornerDist2 >= r*r then
+        -- oops, after all that work it turns out we're not actually intersecting
+        return false
+    end
+
+    return geom.normalize({cornerX, cornerY}, r - math.sqrt(cornerDist2))
 end
 
-return {
-    linePointDistance = linePointDistance,
-    pointPolyCollision = pointPolyCollision
-}
+return geom
