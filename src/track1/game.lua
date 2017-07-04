@@ -146,6 +146,7 @@ function Game:setPhase(phase)
         for i=1,5 do
             table.insert(self.balls, Ball.new(self, {
                 r = 1.5,
+                elasticity = 0.9,
                 color = {255, 255, 128, 255},
                 hitColor = {255, 255, 0, 128},
                 onStart = function(self)
