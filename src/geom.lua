@@ -70,8 +70,11 @@ function geom.pointPolyCollision(x, y, r, poly)
         maxy = math.max(maxy, py)
     end
 
-    -- do the fast AABB test
-    if not geom.quadsOverlap(minx, miny, maxx, maxy, x - r, y - r, x + r, y + r) then
+    -- do the fast AABB test (no need to do it as quads)
+    if ((x + r <= minx) or
+        (x - r >= maxx) or
+        (y + r <= miny) or
+        (y - r >= maxy)) then
         return false
     end
 
