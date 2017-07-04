@@ -26,6 +26,8 @@ Properties:
 
     lives: number of times it can be lost
 
+    scoreCooldown: how long to wait from the last paddle hit before it becomes eligible for scoring again
+
 Methods:
 
     onInit() - called when the ball is first initialized
@@ -74,7 +76,8 @@ function Ball:onInit()
         lives = 1,
         elasticity = 1,
         paddleScore = 1,
-        paddleScoreInc = 1
+        paddleScoreInc = 1,
+        scoreCooldown = 0.5
     }
 
     for k,v in pairs(defaults) do
@@ -97,6 +100,7 @@ function Ball:onStart()
     end
 
     self.paddleScoreVal = self.paddleScore
+    self.timeSinceLastHit = 0
 end
 
 function Ball:preUpdate(dt)
@@ -105,8 +109,9 @@ function Ball:preUpdate(dt)
     self.dvx = 0
     self.dvy = 0
 
-    self.hasHit = {}
+    self.timeSinceLastHit = self.timeSinceLastHit + dt
 end
+
 
 function Ball:onUpdate(dt)
     -- do nothing by default
@@ -126,18 +131,16 @@ function Ball:postUpdate(dt)
 end
 
 function Ball:onHitPaddle(nrm, paddle)
-    if self.hasHit[paddle] then
-        return
-    end
-    self.hasHit[paddle] = true
-
     local nx, ny = unpack(nrm)
 
     print("got normal", nx, ny)
     self:applyReflection(nrm, paddle.vx, paddle.vy)
 
-    self.game.score = self.game.score + self.paddleScoreVal
-    self.paddleScoreVal = self.paddleScoreVal + self.paddleScoreInc
+    if self.timeSinceLastHit > self.scoreCooldown then
+        self.game.score = self.game.score + self.paddleScoreVal
+        self.paddleScoreVal = self.paddleScoreVal + self.paddleScoreInc
+    end
+    self.timeSinceLastHit = 0
 end
 
 --[[
