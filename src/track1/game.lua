@@ -190,14 +190,14 @@ function Game:setPhase(phase)
             -- TODO alternate directions per row?
             for j=1,18 + i%2 do
                 table.insert(bricks, {
-                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
                     x = j * 16 + xofs,
                     y = i * 8,
                     w = 16,
                     h = 8
                 })
                 table.insert(bricks, {
-                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
                     x = 320 - j * 16 + xofs,
                     y = (12 - i) * 8,
                     w = 16,
@@ -209,7 +209,7 @@ function Game:setPhase(phase)
             local i = 6
             local xofs = 0
             table.insert(bricks, {
-                color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
                 x = j * 16 + xofs,
                 y = i * 8,
                 w = 16,
@@ -217,7 +217,7 @@ function Game:setPhase(phase)
             })
             if j < 10 then
                 table.insert(bricks, {
-                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
                     x = 320 - j * 16 + xofs,
                     y = (12 - i) * 8,
                     w = 16,

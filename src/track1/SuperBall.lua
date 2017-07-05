@@ -36,7 +36,8 @@ function SuperBall:onInit()
         scoreCooldown = 0.5,
         particleInterval = 0.01,
         particleLifetime = 0.3,
-        particleVelocity = 50
+        particleVelocity = 50,
+        particleCount = 3
     })
 
     Ball.onInit(self)
@@ -67,7 +68,7 @@ function SuperBall:preUpdate(dt)
 
     self.particleTime = self.particleTime + dt
     if self.particleTime > self.particleInterval then
-        local particleCount = math.floor(self.particleTime/self.particleInterval)
+        local particleCount = math.floor(self.particleTime/self.particleInterval)*self.particleCount
         for i=1,particleCount do
             local vx = math.random(-300, 300)
             local vy = math.random(-300, 300)
