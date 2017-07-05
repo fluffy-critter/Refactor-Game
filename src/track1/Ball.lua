@@ -51,9 +51,10 @@ Methods:
 
 ]]
 
-local Ball = {}
-
 local HitParticle = require('track1.HitParticle')
+local util = require('util')
+
+local Ball = {}
 
 function Ball.new(game, o)
     local self = o or {}
@@ -67,7 +68,7 @@ function Ball.new(game, o)
 end
 
 function Ball:onInit()
-    local defaults = {
+    util.applyDefaults(self, {
         r = 2,
         color = {255, 192, 192, 255},
         hitColor = {255, 64, 64, 192},
@@ -78,14 +79,9 @@ function Ball:onInit()
         elasticity = 1,
         paddleScore = 1,
         paddleScoreInc = 1,
-        scoreCooldown = 0.5
-    }
-
-    for k,v in pairs(defaults) do
-        if self[k] == nil then
-            self[k] = v
-        end
-    end
+        scoreCooldown = 0.5,
+        blendMode = "alpha"
+    })
 end
 
 function Ball:onStart()
@@ -151,7 +147,16 @@ function Ball:onHitWall(nrm, x, y)
     local nx, ny = unpack(nrm)
 
     local particles = self.game.particles
-    table.insert(particles, HitParticle.new(x, y, math.abs(ny)*self.r*4 + 1, math.abs(nx)*self.r*4 + 1, self.hitColor, 0.3))
+    local w = math.abs(ny)*self.r*4 + 1
+    local h = math.abs(nx)*self.r*4 + 1
+    table.insert(particles, HitParticle.new({
+        x = x - w/2,
+        y = y - w/2,
+        w = w/2,
+        h = h/2,
+        color = self.hitColor,
+        lifetime = 0.3
+    }))
 end
 
 function Ball:onHitActor(nrm, actor)
@@ -198,6 +203,7 @@ function Ball:applyImpulse(dx, dy, dvx, dvy)
 end
 
 function Ball:draw()
+    love.graphics.setBlendMode(self.blendMode)
     love.graphics.setColor(unpack(self.color))
     love.graphics.circle("fill", self.x, self.y, self.r)
 end

@@ -6,6 +6,7 @@ Refactor: 1 - Little Bouncing Ball
 ]]
 
 local Ball = require('track1.Ball')
+local SuperBall = require('track1.SuperBall')
 local HitParticle = require('track1.HitParticle')
 local Brick = require('track1.Brick')
 local Spawner = require('track1.Spawner')
@@ -107,6 +108,7 @@ function Game:init()
             color = {128, 255, 255, 255},
             lives = 3,
             hitColor = {0, 128, 128, 255},
+            ay = 10,
             preUpdate = function(self, dt)
                 Ball.preUpdate(self, dt)
                 self.vx = self.vx + dt*(paddle.x - self.x)
@@ -141,6 +143,8 @@ function Game:defer(item)
 end
 
 function Game:setPhase(phase)
+    print("setting phase to " .. phase)
+
     -- TODO this should really just be an event queue thing (which will be useful for the other games too)
 
     for _,brick in pairs(self.toKill) do
@@ -148,16 +152,20 @@ function Game:setPhase(phase)
     end
     self.toKill = {}
 
-    print("setting phase to " .. phase)
+    if phase == 3 or phase == 4 or phase == 5 or phase == 7 or phase == 9 then
+        -- spawn a superball
+        table.insert(self.balls, SuperBall.new(self))
+    end
+
     if phase == 0 then
         self.music:play()
     elseif phase == 1 then
-        table.insert(self.particles, HitParticle.new(160, 120, 320, 240, {255, 0, 0}, 0.1))
+        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={255, 0, 0}, lifetime=0.1}))
         for i=1,5 do
             table.insert(self.balls, Ball.new(self))
         end
     elseif phase == 2 then
-        table.insert(self.particles, HitParticle.new(160, 120, 320, 240, {255, 255, 0}, 0.1))
+        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={255, 255, 0}, lifetime=0.1}))
         for i=1,5 do
             table.insert(self.balls, Ball.new(self, {
                 r = 1.5,
@@ -174,7 +182,7 @@ function Game:setPhase(phase)
             }))
         end
     elseif phase == 3 then
-        -- table.insert(self.balls, SuperBall.new(self))
+        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={0, 0, 255}, lifetime=0.1}))
 
         local bricks = {}
         for i=1,5 do
@@ -347,7 +355,6 @@ end
 function Game:draw()
     self.canvas:renderTo(function()
         love.graphics.clear(0, 0, 0)
-        love.graphics.setBlendMode("alpha")
 
         love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
 
@@ -357,6 +364,7 @@ function Game:draw()
         end
 
         -- draw the paddle
+        love.graphics.setBlendMode("alpha")
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.polygon("fill", self.paddle:getPolygon())
 

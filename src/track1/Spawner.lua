@@ -25,6 +25,7 @@ end
 
 function Spawner:onInit()
     self.time = 0
+    self.nextEvent = nil
     self.queue = {}
 end
 
@@ -38,6 +39,10 @@ delay - how long to wait before spawning these objects (optional)
 ]]
 function Spawner:spawn(targets, class, items, interval, count, delay)
     local time = self.time + (delay or 0)
+    if not self.nextEvent or time < self.nextEvent then
+        self.nextEvent = time
+    end
+
     local n = 0
     for _,item in pairs(items) do
         table.insert(self.queue, {when = time, targets = targets, class = class, item = item})
@@ -52,7 +57,13 @@ end
 function Spawner:update(dt)
     self.time = self.time + dt
 
+    if not self.nextEvent or self.nextEvent >= self.time then
+        return
+    end
+
     local removes = {}
+    self.nextEvent = nil
+
     for idx,spawn in pairs(self.queue) do
         if spawn.when <= self.time then
             local obj = spawn.class.new(self.game, spawn.item)
@@ -60,6 +71,8 @@ function Spawner:update(dt)
                 table.insert(tgt, obj)
             end
             table.insert(removes, idx)
+        elseif not self.nextEvent or spawn.when < self.nextEvent then
+            self.nextEvent = spawn.when
         end
     end
     for _,r in pairs(removes) do

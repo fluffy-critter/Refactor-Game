@@ -17,4 +17,8 @@ function util.applyDefaults(dest, defaults)
     end
 end
 
+function util.clamp(n, low, high)
+    return math.max(low, math.min(n, high))
+end
+
 return util

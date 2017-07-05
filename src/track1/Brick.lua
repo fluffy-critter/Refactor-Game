@@ -39,7 +39,8 @@ function Brick:onInit()
         hitColor = {255, 255, 255, 255},
         lives = 1,
         scoreValue = 100,
-        elasticity = 1
+        elasticity = 1,
+        blendMode = "alpha"
     })
 
     self.state = Brick.states.spawning
@@ -97,6 +98,8 @@ function Brick:onHitBall(nrm, ball)
 end
 
 function Brick:draw()
+    love.graphics.setBlendMode(self.blendMode)
+
     if self.state == Brick.states.spawning then
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], (self.color[4] or 255) * self.stateAge / self.spawnTime)
     elseif self.state == Brick.states.alive then
@@ -109,6 +112,8 @@ function Brick:draw()
     end
 
     love.graphics.polygon("fill", self:getPolygon())
+
+    -- TODO draw into ripple layer on spawning
 end
 
 return Brick
