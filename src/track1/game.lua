@@ -177,7 +177,7 @@ function Game:setPhase(phase)
         -- table.insert(self.balls, SuperBall.new(self))
 
         local bricks = {}
-        for i=1,6 do
+        for i=1,5 do
             local xofs = 8 - (i%2) * 8
             -- TODO alternate directions per row?
             for j=1,18 + i%2 do
@@ -197,7 +197,27 @@ function Game:setPhase(phase)
                 })
             end
         end
-        self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2, 0)
+        for j = 1,10 do
+            local i = 6
+            local xofs = 0
+            table.insert(bricks, {
+                color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                x = j * 16 + xofs,
+                y = i * 8,
+                w = 16,
+                h = 8
+            })
+            if j < 10 then
+                table.insert(bricks, {
+                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    x = 320 - j * 16 + xofs,
+                    y = (12 - i) * 8,
+                    w = 16,
+                    h = 8
+                })
+            end
+        end
+        self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 1, 0)
     elseif phase == 4 then
 
         -- spawn aliens
