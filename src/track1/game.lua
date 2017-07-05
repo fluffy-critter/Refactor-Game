@@ -8,6 +8,7 @@ Refactor: 1 - Little Bouncing Ball
 local Ball = require('track1.Ball')
 local HitParticle = require('track1.HitParticle')
 local Brick = require('track1.Brick')
+local Spawner = require('track1.Spawner')
 local geom = require('geom')
 
 local Game = {}
@@ -128,9 +129,25 @@ function Game:init()
             end
         })
     }
+
+    self.deferred = {}
+
+    self.spawner = Spawner.new(self)
+    self.toKill = {}
+end
+
+function Game:defer(item)
+    tables.insert(self.deferred, item)
 end
 
 function Game:setPhase(phase)
+    -- TODO this should really just be an event queue thing (which will be useful for the other games too)
+
+    for _,brick in pairs(self.toKill) do
+        brick:kill()
+    end
+    self.toKill = {}
+
     print("setting phase to " .. phase)
     if phase == 0 then
         self.music:play()
@@ -159,20 +176,30 @@ function Game:setPhase(phase)
     elseif phase == 3 then
         -- table.insert(self.balls, SuperBall.new(self))
 
-        -- TODO make a spawner actor that does this in sequence
-        for i=1,5 do
+        local bricks = {}
+        for i=1,6 do
             local xofs = 8 - (i%2) * 8
+            -- TODO alternate directions per row?
             for j=1,18 + i%2 do
-                table.insert(self.actors, Brick.new(self, {
+                table.insert(bricks, {
                     color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
                     x = j * 16 + xofs,
-                    y = i*8,
+                    y = i * 8,
                     w = 16,
                     h = 8
-                }))
+                })
+                table.insert(bricks, {
+                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    x = 320 - j * 16 + xofs,
+                    y = (12 - i) * 8,
+                    w = 16,
+                    h = 8
+                })
             end
         end
+        self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2, 0)
     elseif phase == 4 then
+
         -- spawn aliens
     end
 
@@ -221,6 +248,8 @@ function Game:update(dt)
 
     local paddlePoly = p:getPolygon()
 
+    self.spawner:update(dt)
+
     for _,ball in pairs(self.balls) do
 
         ball:preUpdate(dt)
@@ -264,27 +293,28 @@ function Game:update(dt)
         end
     end
 
-    local function mapPostUpdate(cur)
-        next = {}
-        for _,thing in pairs(cur) do
+    local function doPostUpdates(cur)
+        for idx,thing in pairs(cur) do
             thing:postUpdate(dt)
-            if thing:isAlive() then
-                table.insert(next, thing)
+            if not thing:isAlive() then
+                cur[idx] = nil
             end
         end
-        return next
     end
 
-    self.balls = mapPostUpdate(self.balls)
-    self.actors = mapPostUpdate(self.actors)
+    doPostUpdates(self.balls)
+    doPostUpdates(self.actors)
 
-    local nextParticles = {}
-    for _,particle in pairs(self.particles) do
-        if particle:update(dt) then
-            table.insert(nextParticles, particle)
+    for idx,particle in pairs(self.particles) do
+        if not particle:update(dt) then
+            self.particles[idx] = nil
         end
     end
-    self.particles = nextParticles
+
+    for _,item in pairs(self.deferred) do
+        item(self)
+    end
+    self.deferred = {}
 end
 
 function Game:draw()

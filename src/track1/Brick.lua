@@ -5,6 +5,7 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
+local util = require('util')
 local Actor = require('track1.Actor')
 
 local Brick = {}
@@ -28,32 +29,28 @@ function Brick.new(game, o)
     return self
 end
 
-function Brick:kill()
-    self.stateAge = 0
-    self.state = Brick.states.dying
-end
-
 function Brick:onInit()
-    local defaults = {
+    util.applyDefaults(self, {
         color = {127, 127, 0, 255},
         spawnTime = 0.1,
-        deathTime = 0.1,
+        deathTime = 0.2,
         hitTime = 0.1,
         deathColor = {255, 255, 255, 255},
         hitColor = {255, 255, 255, 255},
         lives = 1,
         scoreValue = 100,
         elasticity = 1
-    }
-
-    for k,v in pairs(defaults) do
-        if self[k] == nil then
-            self[k] = v
-        end
-    end
+    })
 
     self.state = Brick.states.spawning
     self.stateAge = 0
+end
+
+function Brick:kill()
+    if self.state ~= dying and self.state ~= dead then
+        self.stateAge = 0
+        self.state = Brick.states.dying
+    end
 end
 
 function Brick:getPolygon()
@@ -99,14 +96,14 @@ end
 
 function Brick:draw()
     if self.state == Brick.states.spawning then
-        love.graphics.setColor(self.color[1], self.color[2], self.color[3], self.color[4] * 255 * self.stateAge / self.spawnTime)
+        love.graphics.setColor(self.color[1], self.color[2], self.color[3], (self.color[4] or 255) * self.stateAge / self.spawnTime)
     elseif self.state == Brick.states.alive then
         love.graphics.setColor(unpack(self.color))
     elseif self.state == Brick.states.hit then
         -- TODO fade back to live color
         love.graphics.setColor(unpack(self.deathColor))
     elseif self.state == Brick.states.dying then
-        love.graphics.setColor(self.deathColor[1], self.deathColor[2], self.deathColor[3], self.color[4] * 255 * (1 - self.stateAge / self.spawnTime))
+        love.graphics.setColor(self.deathColor[1], self.deathColor[2], self.deathColor[3], (self.color[4] or 255) * (1 - self.stateAge / self.spawnTime))
     end
 
     love.graphics.polygon("fill", self:getPolygon())
