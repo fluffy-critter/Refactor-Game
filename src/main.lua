@@ -5,6 +5,8 @@ Refactor
 
 ]]
 
+local shaders = require('shaders')
+
 local function blitCanvas(canvas)
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
@@ -86,5 +88,16 @@ function love.draw()
     local canvas = currentGame:draw()
 
     love.graphics.setColor(255, 255, 255)
+
+    if state ~= "playing" then
+        love.graphics.setShader(shaders.hueshift)
+        local saturation = speed*.75 + .25
+        local shift = (1 - speed)*math.pi/2
+        shaders.hueshift:send("basis", {
+            saturation * math.cos(shift),
+            saturation * math.sin(shift)
+        })
+    end
     blitCanvas(canvas)
+    love.graphics.setShader()
 end
