@@ -7,6 +7,7 @@ Refactor: 1 - Little Bouncing Ball
 
 local Ball = require('track1.Ball')
 local HitParticle = require('track1.HitParticle')
+local Brick = require('track1.Brick')
 local geom = require('geom')
 
 local Game = {}
@@ -96,6 +97,7 @@ function Game:init()
     local paddle = self.paddle
 
     self.particles = {}
+    self.actors = {}
 
     -- initialize with the starter ball
     self.balls = {
@@ -104,12 +106,13 @@ function Game:init()
             color = {128, 255, 255, 255},
             lives = 3,
             hitColor = {0, 128, 128, 255},
-            onUpdate = function(self, dt)
+            preUpdate = function(self, dt)
+                Ball.preUpdate(self, dt)
                 self.vx = self.vx + dt*(paddle.x - self.x)
                 self.vy = self.vy + dt*(paddle.y - self.y)
             end,
             onHitPaddle = function(self, nrm, paddle)
-                self.onUpdate = Ball.onUpdate
+                self.preUpdate = Ball.preUpdate
                 self.onHitPaddle = Ball.onHitPaddle
                 self.onStart = Ball.onStart
                 self:onHitPaddle(nrm, paddle)
@@ -155,7 +158,20 @@ function Game:setPhase(phase)
         end
     elseif phase == 3 then
         -- table.insert(self.balls, SuperBall.new(self))
-        -- TODO spawn bricks
+
+        -- TODO make a spawner actor that does this in sequence
+        for i=1,5 do
+            local xofs = 8 - (i%2) * 8
+            for j=1,18 + i%2 do
+                table.insert(self.actors, Brick.new(self, {
+                    color = {math.random(127,255), math.random(127,255), math.random(127,255), 255},
+                    x = j * 16 + xofs,
+                    y = i*8,
+                    w = 16,
+                    h = 8
+                }))
+            end
+        end
     elseif phase == 4 then
         -- spawn aliens
     end
@@ -205,11 +221,9 @@ function Game:update(dt)
 
     local paddlePoly = p:getPolygon()
 
-    local nextBalls = {}
     for _,ball in pairs(self.balls) do
 
         ball:preUpdate(dt)
-        ball:onUpdate(dt)
 
         -- test against walls
         if ball.x - ball.r < self.bounds.left then
@@ -235,28 +249,34 @@ function Game:update(dt)
         end
     end
 
-    -- TODO preupdate actors
+    for _,actor in pairs(self.actors) do
+        actor:preUpdate(dt)
+    end
 
-    -- TODO test balls against actors
-    --[[ note to self: loop should be something like:
-        foreach ball:
-            foreach actor:
-                nrm = collision(ball, actorPoly)
-                if nrm:
-                    ball:onHitActor(nrm, actor)
-                    actor:onHitBall(nrm, ball)
-    ]]
-
-    for _,ball in pairs(self.balls) do
-        ball:postUpdate(dt)
-
-        if ball:isAlive() then
-            table.insert(nextBalls, ball)
+    for _,actor in pairs(self.actors) do
+        local poly = actor:getPolygon()
+        for _,ball in pairs(self.balls) do
+            nrm = actor:isTangible(ball) and geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
+            if nrm then
+                ball:onHitActor(nrm, actor)
+                actor:onHitBall(nrm, ball)
+            end
         end
     end
-    self.balls = nextBalls
 
-    -- TODO postupdate actors
+    local function mapPostUpdate(cur)
+        next = {}
+        for _,thing in pairs(cur) do
+            thing:postUpdate(dt)
+            if thing:isAlive() then
+                table.insert(next, thing)
+            end
+        end
+        return next
+    end
+
+    self.balls = mapPostUpdate(self.balls)
+    self.actors = mapPostUpdate(self.actors)
 
     local nextParticles = {}
     for _,particle in pairs(self.particles) do
@@ -283,8 +303,13 @@ function Game:draw()
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.polygon("fill", self.paddle:getPolygon())
 
+        -- draw the actors
+        for _,actor in pairs(self.actors) do
+            actor:draw()
+        end
+
         -- draw the balls
-        for k,ball in pairs(self.balls) do
+        for _,ball in pairs(self.balls) do
             ball:draw()
         end
     end)
