@@ -107,15 +107,18 @@ function Ball:preUpdate(dt)
     self.dy = 0
     self.dvx = 0
     self.dvy = 0
+    self.dcount = 0
 
     self.timeSinceLastHit = self.timeSinceLastHit + dt
 end
 
 function Ball:postUpdate(dt)
-    self.x = self.x + self.dx
-    self.y = self.y + self.dy
-    self.vx = self.vx + self.dvx
-    self.vy = self.vy + self.dvy
+    if self.dcount > 0 then
+        self.x = self.x + self.dx/self.dcount
+        self.y = self.y + self.dy/self.dcount
+        self.vx = self.vx + self.dvx/self.dcount
+        self.vy = self.vy + self.dvy/self.dcount
+    end
 
     -- apply acceleration first so that position includes the integration of acceleration
     self.vx = self.vx + self.ax*dt
@@ -184,6 +187,8 @@ function Ball:applyReflection(nrm, vx, vy)
     -- reflect the velocity vector
     self.dvx = self.dvx + (1 + self.elasticity)*px
     self.dvy = self.dvy + (1 + self.elasticity)*py
+
+    self.dcount = self.dcount + 1
 end
 
 function Ball:draw()
