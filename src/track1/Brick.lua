@@ -92,6 +92,8 @@ function Brick:onHitBall(nrm, ball)
     else
         self.state = Brick.states.hit
     end
+
+    ball:onHitActor(nrm, self)
 end
 
 function Brick:draw()

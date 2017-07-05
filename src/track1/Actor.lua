@@ -14,6 +14,7 @@ isTangible(ball) - return whether this actor is tangible to the specified ball
 isAlive() - return whether this actor should still persist
 
 onHitBall(nrm, ball) - did a ball hit us?
+    NOTE - it is up to us to apply any forces to the ball. ball:onHitActor(nrm,self) is a convenience method for this.
 
 draw() - render the actor
 

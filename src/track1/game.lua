@@ -287,28 +287,35 @@ function Game:update(dt)
         for _,ball in pairs(self.balls) do
             nrm = actor:isTangible(ball) and geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
             if nrm then
-                ball:onHitActor(nrm, actor)
                 actor:onHitBall(nrm, ball)
             end
         end
     end
 
     local function doPostUpdates(cur)
+        local removes = {}
         for idx,thing in pairs(cur) do
             thing:postUpdate(dt)
             if not thing:isAlive() then
-                cur[idx] = nil
+                table.insert(removes, idx)
             end
+        end
+        for _,r in pairs(removes) do
+            cur[r] = nil
         end
     end
 
     doPostUpdates(self.balls)
     doPostUpdates(self.actors)
 
+    local removes = {}
     for idx,particle in pairs(self.particles) do
         if not particle:update(dt) then
-            self.particles[idx] = nil
+            table.insert(removes, idx)
         end
+    end
+    for _,r in pairs(removes) do
+        self.particles[r] = nil
     end
 
     for _,item in pairs(self.deferred) do

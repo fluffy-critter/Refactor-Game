@@ -52,14 +52,18 @@ end
 function Spawner:update(dt)
     self.time = self.time + dt
 
+    local removes = {}
     for idx,spawn in pairs(self.queue) do
         if spawn.when <= self.time then
             local obj = spawn.class.new(self.game, spawn.item)
             for _,tgt in pairs(spawn.targets) do
                 table.insert(tgt, obj)
             end
-            self.queue[idx] = nil
+            table.insert(removes, idx)
         end
+    end
+    for _,r in pairs(removes) do
+        self.queue[r] = nil
     end
 end
 

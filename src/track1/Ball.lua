@@ -38,7 +38,7 @@ Methods:
 
     onHitPaddle(nrm, paddle) - called when the ball hits a paddle
     onHitWall(nrm, x, y) - called when the ball hits a wall
-    onHitActor(nrm, actor) - called when the ball hits an actor
+    onHitActor(nrm, actor) - called BY THE ACTOR when the ball hits it
     onLost() - called when the ball is lost from the arena
 
     isAlive() - returns whether the ball is still alive
@@ -46,6 +46,8 @@ Methods:
     applyReflection(nrm, vx, vy) - apply a surface normal reflection to our velocity, with optional velocity offset
 
     draw() - render the ball
+
+    applyImpulse(dx, dy, dvx, dvy) - apply an impulse to the ball, in terms of displacement and delta-V
 
 ]]
 
@@ -180,13 +182,17 @@ function Ball:applyReflection(nrm, vx, vy)
     local px = -nx*dot/mag2
     local py = -ny*dot/mag2
 
+    self:applyImpulse(nx, ny, (1 + self.elasticity)*px, (1 + self.elasticity)*py)
+end
+
+function Ball:applyImpulse(dx, dy, dvx, dvy)
     -- move the ball to avoid recollision
-    self.dx = self.dx + nx
-    self.dy = self.dy + ny
+    self.dx = self.dx + dx
+    self.dy = self.dy + dy
 
     -- reflect the velocity vector
-    self.dvx = self.dvx + (1 + self.elasticity)*px
-    self.dvy = self.dvy + (1 + self.elasticity)*py
+    self.dvx = self.dvx + dvx
+    self.dvy = self.dvy + dvy
 
     self.dcount = self.dcount + 1
 end
