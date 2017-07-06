@@ -7,6 +7,15 @@ Refactor
 
 local shaders = require('shaders')
 
+local PROFILE = false
+
+local Pie
+if PROFILE then
+    local piefiller = require('thirdparty.Piefiller.piefiller')
+    Pie = piefiller:new()
+    Pie:setKey("save_to_file","w")
+end
+
 local function blitCanvas(canvas)
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
@@ -44,12 +53,21 @@ local function onPause()
     end
 end
 
-function love.keypressed(key, code, isrepeat)
+function love.keypressed(...)
+    local key, code, isrepeat = ...
     if key == 'p' then
         onPause()
     elseif currentGame.keypressed then
-        currentGame:keypressed(key, code, isrepeat)
+        currentGame:keypressed(...)
     end
+
+    if Pie then Pie:keypressed(...) end
+end
+
+function love.mousepressed(...)
+    local x, y, button, istouch = ...
+
+    if Pie then Pie:mousepressed(...) end
 end
 
 function love.load()
@@ -59,6 +77,8 @@ function love.load()
 end
 
 function love.update(dt)
+    if Pie then Pie:attach() end
+
     if state == "pausing" then
         speed = speed - dt*3
         if speed <= 0 then
@@ -85,16 +105,20 @@ function love.update(dt)
     if state ~= "paused" then
         currentGame:update(dt*mul)
     end
+
+    if Pie then Pie:detach() end
 end
 
 function love.draw()
+    if Pie then Pie:attach() end
+
     local canvas = currentGame:draw()
 
     love.graphics.setColor(255, 255, 255)
 
     if state ~= "playing" then
         love.graphics.setShader(shaders.hueshift)
-        local saturation = speed*.75 + .25
+        local saturation = speed*.85 + .15
         local shift = (1 - speed)*math.pi
         if state == "resuming" then
             shift = -shift
@@ -106,4 +130,7 @@ function love.draw()
     end
     blitCanvas(canvas)
     love.graphics.setShader()
+    if Pie then Pie:detach() end
+
+    if Pie then Pie:draw() end
 end

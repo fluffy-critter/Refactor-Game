@@ -48,11 +48,11 @@ end
 function SuperBall:onStart()
     Ball.onStart(self)
 
-    local tilt = self.game.paddle:tiltVector()
-    self.vx = tilt.x*self.spawnVelocity
-    self.vy = tilt.y*self.spawnVelocity
-    self.x = self.game.paddle.x + tilt.x*(self.r + self.game.paddle.h)
-    self.y = self.game.paddle.y + tilt.y*(self.r + self.game.paddle.h)
+    local tx, ty = unpack(self.game.paddle:tiltVector())
+    self.vx = tx*self.spawnVelocity
+    self.vy = ty*self.spawnVelocity
+    self.x = self.game.paddle.x + tx*(self.r + self.game.paddle.h)
+    self.y = self.game.paddle.y + ty*(self.r + self.game.paddle.h)
 end
 
 function SuperBall:onHitActor(nrm, actor)

@@ -5,6 +5,7 @@ Refactor: 1 - Little Bouncing Ball
 
 Actor functions:
 
+getBoundingCircle() - get the bounding circle, in the form of {x, y, r}
 getPolygon() - get the collision poly, in the form of {x1, y1, x2, y2, ...}, clockwise winding
 
 preUpdate(dt) - prepare for the frame
@@ -21,6 +22,10 @@ draw() - render the actor
 ]]
 
 local Actor = {}
+
+function Actor:getBoundingCircle()
+    -- no default
+end
 
 function Actor:getPolygon()
     return {}

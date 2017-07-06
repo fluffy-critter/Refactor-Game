@@ -62,6 +62,7 @@ function Game:init()
         bottom = 720
     }
 
+    -- TODO - make it an actor?
     self.paddle = {
         x = 480,
         y = 660,
@@ -81,19 +82,22 @@ function Game:init()
             local x = self.vx * self.tiltFactor
             local y = -100
             local d = math.sqrt(x * x + y * y)
-            return { x = x / d, y = y / d }
+            return { x / d, y / d }
         end,
 
         getPolygon = function(self)
-            local up = self:tiltVector()
-            local rt = { x = -up.y, y = up.x }
+            if not self.cachedPoly then
+                local ux, uy = unpack(self:tiltVector())
+                local rx, ry = -uy, ux
 
-            return {
-                self.x + up.x*self.h - rt.x*self.w, self.y + up.y*self.h - rt.y*self.w,
-                self.x + up.x*self.h + rt.x*self.w, self.y + up.y*self.h + rt.y*self.w,
-                self.x - up.x*self.h + rt.x*self.w, self.y - up.y*self.h + rt.y*self.w,
-                self.x - up.x*self.h - rt.x*self.w, self.y - up.y*self.h - rt.y*self.w
-            }
+                self.cachedPoly = {
+                    self.x + ux*self.h - rx*self.w, self.y + uy*self.h - ry*self.w,
+                    self.x + ux*self.h + rx*self.w, self.y + uy*self.h + ry*self.w,
+                    self.x - ux*self.h + rx*self.w, self.y - uy*self.h + ry*self.w,
+                    self.x - ux*self.h - rx*self.w, self.y - uy*self.h - ry*self.w
+                }
+            end
+            return self.cachedPoly
         end,
     }
     local paddle = self.paddle
@@ -245,6 +249,10 @@ function Game:setPhase(phase)
     end
 
     self.phase = phase
+
+    for k,v in pairs(geom.collision_stats) do
+        print(k,v)
+    end
 end
 
 function Game:keypressed(key, code, isrepeat)
@@ -309,9 +317,9 @@ function Game:update(dt)
         p.vx = -p.vx * p.rebound
     end
 
-    -- TODO: timeline judder
+    p.cachedPoly = nil
 
-    local paddlePoly = p:getPolygon()
+    -- TODO: timeline judder
 
     self.spawner:update(dt)
 
@@ -336,10 +344,12 @@ function Game:update(dt)
             end
         end
 
-        -- test against paddle
-        local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly)
-        if c then
-            ball:onHitPaddle(c, self.paddle)
+        -- test against paddle (if we're within range)
+        if math.abs(ball.x - p.x) < p.w and math.abs(ball.y - p.y) < p.w then
+            local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon())
+            if c then
+                ball:onHitPaddle(c, self.paddle)
+            end
         end
     end
 
@@ -348,11 +358,32 @@ function Game:update(dt)
     end
 
     for _,actor in pairs(self.actors) do
-        local poly = actor:getPolygon()
+        local poly
+        local bcircle = actor:getBoundingCircle()
+        local bx, by, br = unpack(bcircle or {})
+
         for _,ball in pairs(self.balls) do
-            nrm = actor:isTangible(ball) and geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
-            if nrm then
-                actor:onHitBall(nrm, ball)
+            if actor:isTangible(ball) then
+                local boundcheck
+
+                -- quick check, if bounding radius is available
+                if bcircle then
+                    local dx = ball.x - bx
+                    local dy = ball.y - by
+                    boundcheck = math.sqrt(dx*dx + dy*dy) < ball.r + br
+                else
+                    boundcheck = true
+                end
+
+                if boundcheck then
+                    if not poly then
+                        poly = actor:getPolygon()
+                    end
+                    nrm = geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
+                    if nrm then
+                        actor:onHitBall(nrm, ball)
+                    end
+                end
             end
         end
     end

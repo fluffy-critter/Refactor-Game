@@ -1,3 +1,10 @@
+/* hueshift.fs
+
+Hue/saturation shift shader. (Use setColor() to further attenuate the brightness or whatever.)
+
+See https://beesbuzz.biz/code/hsv_color_transforms.php for an explanation of the math.
+*/
+
 uniform vec2 basis; // transform basis; {saturation*cos(theta), saturation*sin(theta)}
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {

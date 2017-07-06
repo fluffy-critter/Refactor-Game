@@ -7,6 +7,14 @@ Refactor
 
 local geom = {}
 
+geom.collision_stats = {
+    tests = 0,
+    fail_aabb = 0,
+    fail_face_inclusion = 0,
+    pass_face_projection = 0,
+    fail_corner_inclusion = 0
+}
+
 -- Check if two rectangles overlap (note: x2 must be >= x1, same for y)
 function geom.quadsOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
     return (
@@ -55,6 +63,10 @@ end
 
 -- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
 function geom.pointPolyCollision(x, y, r, poly)
+    local cs = geom.collision_stats
+
+    cs.tests = cs.tests + 1
+
     local npoints = #poly / 2
 
     local minx = poly[1]
@@ -75,6 +87,8 @@ function geom.pointPolyCollision(x, y, r, poly)
         (x - r >= maxx) or
         (y + r <= miny) or
         (y - r >= maxy)) then
+
+        cs.fail_aabb = cs.fail_aabb + 1
         return false
     end
 
@@ -101,6 +115,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
         if dist[i] >= r then
             -- We are fully outside on this side, so we are outside
+            cs.fail_face_inclusion = cs.fail_face_inclusion + 1
             return false
         end
 
@@ -115,6 +130,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     -- is our center inside the nearest segment? If so, we just use its normal
     if maxSideProj >= 0 and maxSideProj <= 1 then
+        cs.pass_face_projection = cs.pass_face_projection + 1
         return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
@@ -134,6 +150,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     if cornerDist2 >= r*r then
         -- oops, after all that work it turns out we're not actually intersecting
+        cs.fail_corner_inclusion = cs.fail_corner_inclusion + 1
         return false
     end
 

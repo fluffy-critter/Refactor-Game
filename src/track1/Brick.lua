@@ -55,12 +55,24 @@ function Brick:kill()
 end
 
 function Brick:getPolygon()
-    return {
-        self.x - self.w/2, self.y - self.h/2,
-        self.x + self.w/2, self.y - self.h/2,
-        self.x + self.w/2, self.y + self.h/2,
-        self.x - self.w/2, self.y + self.h/2,
-    }
+    if not self.cachedPolygon then
+        self.cachedPolygon =  {
+            self.x - self.w/2, self.y - self.h/2,
+            self.x + self.w/2, self.y - self.h/2,
+            self.x + self.w/2, self.y + self.h/2,
+            self.x - self.w/2, self.y + self.h/2,
+        }
+    end
+    return self.cachedPolygon
+end
+
+function Brick:getBoundingCircle()
+    if not self.cachedBoundingCircle then
+        self.cachedBoundingCircle = {
+            self.x, self.y, math.sqrt(self.w*self.w/4 + self.h*self.h/4)
+        }
+    end
+    return self.cachedBoundingCircle
 end
 
 function Brick:preUpdate(dt)

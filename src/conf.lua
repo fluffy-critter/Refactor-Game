@@ -13,7 +13,10 @@ function love.conf(t)
     t.window.resizable = true
     t.window.width = 1280
     t.window.height = 720
+    t.window.vsync = true
+
     t.version = "0.10.2"
 
+    t.identity = "Sockpuppet-Refactor"
     t.window.title = "Sockpuppet - Refactor"
 end
