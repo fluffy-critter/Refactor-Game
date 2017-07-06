@@ -157,4 +157,11 @@ function geom.pointPolyCollision(x, y, r, poly)
     return geom.normalize({cornerX, cornerY}, r - math.sqrt(cornerDist2))
 end
 
+-- Generate a random vector of a given length (default=1)
+function geom.randomVector(length)
+    local vx = math.random() - 0.5
+    local vy = math.random() - 0.5
+    return geom.normalize({vx, vy}, length)
+end
+
 return geom

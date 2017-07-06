@@ -29,6 +29,9 @@ Properties:
 
     scoreCooldown: how long to wait from the last paddle hit before it becomes eligible for scoring again
 
+    isBullet: it is a bullet, and thus actors shouldn't respond to it (unless they want to)
+    parent: reference to the actor that spawned it, if applicable
+
 Methods:
 
     onInit() - called when the ball is first initialized
@@ -73,6 +76,8 @@ function Ball:onInit()
         r = 6,
         color = {255, 192, 192, 255},
         hitColor = {255, 64, 64, 192},
+        vx = 0,
+        vy = 0,
         ax = 0,
         ay = 0,
         spawnVelocity = 240,
@@ -84,6 +89,9 @@ function Ball:onInit()
         recoil = 0,
         blendMode = "alpha"
     })
+
+    self.paddleScoreVal = self.paddleScore
+    self.timeSinceLastHit = 0
 end
 
 function Ball:onStart()
@@ -216,6 +224,10 @@ function Ball:draw()
     love.graphics.setBlendMode(self.blendMode)
     love.graphics.setColor(unpack(self.color))
     love.graphics.circle("fill", self.x, self.y, self.r)
+
+    if self.isBullet then
+        love.graphics.circle("line", self.x, self.y, self.r + 3)
+    end
 end
 
 return Ball

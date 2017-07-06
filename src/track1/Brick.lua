@@ -70,7 +70,7 @@ end
 function Brick:getBoundingCircle()
     if not self.cachedBoundingCircle then
         self.cachedBoundingCircle = {
-            self.x, self.y, math.sqrt(self.w*self.w/4 + self.h*self.h/4)
+            self.x, self.y, math.sqrt((self.w*self.w + self.h*self.h)/4)
         }
     end
     return self.cachedBoundingCircle
@@ -89,7 +89,7 @@ function Brick:preUpdate(dt)
 end
 
 function Brick:isTangible(ball)
-    return self.state == Brick.states.alive or self.state == Brick.states.hit
+    return (self.state == Brick.states.alive or self.state == Brick.states.hit) and not ball.isBullet
 end
 
 function Brick:isAlive()

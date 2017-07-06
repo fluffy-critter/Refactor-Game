@@ -9,6 +9,7 @@ local Ball = require('track1.Ball')
 local SuperBall = require('track1.SuperBall')
 local HitParticle = require('track1.HitParticle')
 local SparkParticle = require('track1.SparkParticle')
+local Randomizer = require('track1.Randomizer')
 local Brick = require('track1.Brick')
 local Spawner = require('track1.Spawner')
 local geom = require('geom')
@@ -65,6 +66,8 @@ function Game:init()
 
     -- TODO - make it an actor?
     self.paddleDefaults = {
+        color = {255, 255, 255, 255},
+
         w = 60,
         h = 6,
 
@@ -82,6 +85,7 @@ function Game:init()
     self.paddle = {
         x = 1280 / 2,
         y = 660,
+        restY = 660,
 
         -- get the upward vector for the paddle
         tiltVector = function(self)
@@ -154,7 +158,7 @@ function Game:init()
 end
 
 function Game:defer(item)
-    tables.insert(self.deferred, item)
+    table.insert(self.deferred, item)
 end
 
 function Game:setGameEvents()
@@ -208,7 +212,12 @@ function Game:setGameEvents()
     table.insert(self.eventQueue, {
         when = {7},
         what = function()
-            -- TODO
+            local randomizer = Randomizer.new(self, {
+                spawnInterval = 60/BPM,
+                lives = 20
+            })
+            table.insert(self.actors, randomizer)
+            table.insert(self.toKill, randomizer)
         end
     })
     table.insert(self.eventQueue, {
@@ -242,7 +251,7 @@ function Game:setGameEvents()
                     end
                     for x = left - (row % 2)*w/2, last, w do
                         table.insert(bricks, {
-                            color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
+                            color = {math.random(200,220), math.random(127,200), math.random(127,200), 255},
                                 x = x, y = y, w = w, h = h, lives = 3
                         })
                         table.insert(bricks, {
@@ -348,7 +357,7 @@ function Game:update(dt)
     p.x = p.x + dt * p.vx
     p.y = p.y + dt * p.vy
 
-    p.vy = p.vy + dt*(self.paddleDefaults.y - p.y)*p.recovery
+    p.vy = p.vy + dt*(p.restY - p.y)*p.recovery
 
     if p.x + p.w > b.right then
         p.x = b.right - p.w
@@ -488,10 +497,9 @@ function Game:draw()
             self.bounds.left, self.bounds.top,
             self.bounds.right - self.bounds.left, self.bounds.bottom - self.bounds.top)
 
-
         -- draw the paddle
         love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.setColor(unpack(self.paddle.color))
         love.graphics.polygon("fill", self.paddle:getPolygon())
 
         -- draw the actors

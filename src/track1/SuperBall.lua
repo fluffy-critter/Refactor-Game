@@ -6,6 +6,7 @@ Refactor: 1 - Little Bouncing Ball
 ]]
 
 local util = require('util')
+local geom = require('geom')
 local SparkParticle = require('track1.SparkParticle')
 local Ball = require('track1.Ball')
 
@@ -71,28 +72,19 @@ function SuperBall:preUpdate(dt)
     if self.particleTime > self.particleInterval then
         local particleCount = math.floor(self.particleTime/self.particleInterval)*self.particleCount
         for i=1,particleCount do
-            local vx = math.random(-300, 300)
-            local vy = math.random(-300, 300)
-            if vx == 0 and vy == 0 then
-                vx = math.random(0, 1)*2 - 1
-                vy = math.random(0, 1)*2 - 1
-            end
-
-            local mag = math.sqrt(vx*vx + vy*vy)
-            vx = vx/mag
-            vy = vy/mag
+            local vx, vy = unpack(geom.randomVector(self.particleVelocity))
 
             table.insert(self.game.particles,
                 SparkParticle.new({
                     r = 4,
-                    x = self.x + vx*self.r,
-                    y = self.y + vy*self.r,
+                    x = self.x + vx*self.r/self.particleVelocity,
+                    y = self.y + vy*self.r/self.particleVelocity,
                     color = self.color,
                     blendMode = "add",
-                    vx = vx * self.particleVelocity,
-                    vy = vy * self.particleVelocity,
-                    ax = vx * -0.2,
-                    ay = vy * -0.2,
+                    vx = vx,
+                    vy = vy,
+                    ax = vx * -0.02,
+                    ay = vy * -0.02,
                     lifetime = self.particleLifetime
                 }))
         end
