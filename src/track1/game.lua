@@ -164,16 +164,16 @@ end
 function Game:setGameEvents()
     local function brickLivesColor(lives)
         local brt = math.random()*0.2 + 0.8
-        return {util.lerp(192, 255, lives/5)*brt, brt*192, util.lerp(255, 192, lives/5)*brt, 255}
+        return {util.lerp(128, 255, lives/5)*brt, util.lerp(240, 128, lives/5)*brt, util.lerp(255, 192, lives/5)*brt, 255}
     end
 
     -- spawn regular balls
-    for _,when in pairs({1, 3, 5, 8, 10}) do
+    for _,how in pairs({{when={1}, lives=3, count=3}, {when={3}}, {when={5}}, {when={8}}, {when={10}}}) do
         table.insert(self.eventQueue, {
-            when = {when},
+            when = how.when,
             what = function()
-                for i=1,5 do
-                    table.insert(self.balls, Ball.new(self))
+                for i=1,how.count or 5 do
+                    table.insert(self.balls, Ball.new(self, {lives=how.lives}))
                 end
             end
         })

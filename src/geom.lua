@@ -164,4 +164,9 @@ function geom.randomVector(length)
     return geom.normalize({vx, vy}, length)
 end
 
+function geom.vectorLength(vector)
+    local vx, vy = unpack(vector)
+    return math.sqrt(vx*vx + vy*vy)
+end
+
 return geom

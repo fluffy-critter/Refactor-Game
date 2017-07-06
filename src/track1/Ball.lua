@@ -18,6 +18,7 @@ Properties:
     spawnVelocity: velocity at spawn time
     elasticity: how much rebound force the ball gets
     recoil: how much rebound force the paddle gets
+    minVelocity: the minimum velocity for the ball (if we drop below this we get kicked to spawnVelocity)
 
     dx, dy: position impulse (reset every frame)
     dvx, dvy: velocity impulse (reset every frame)
@@ -57,6 +58,7 @@ Methods:
 
 local HitParticle = require('track1.HitParticle')
 local util = require('util')
+local geom = require('geom')
 
 local Ball = {}
 
@@ -87,6 +89,7 @@ function Ball:onInit()
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
         recoil = 0,
+        minVelocity = 1,
         blendMode = "alpha"
     })
 
@@ -97,14 +100,7 @@ end
 function Ball:onStart()
     self.x = math.random(self.game.bounds.left + self.r, self.game.bounds.right - self.r)
     self.y = math.random(self.game.bounds.top + self.r, (self.game.bounds.top + self.game.bounds.bottom)/2)
-    self.vx = math.random(-300, 300)
-    self.vy = math.random(-300, 300)
-
-    local mag = math.sqrt(self.vx*self.vx + self.vy*self.vy)
-    if mag and self.spawnVelocity then
-        self.vx = self.spawnVelocity*self.vx/mag
-        self.vy = self.spawnVelocity*self.vy/mag
-    end
+    self.vx, self.vy = unpack(geom.randomVector(self.spawnVelocity))
 
     self.paddleScoreVal = self.paddleScore
     self.timeSinceLastHit = 0
@@ -133,6 +129,12 @@ function Ball:postUpdate(dt)
     self.vy = self.vy + self.ay*dt
     self.x = self.x + self.vx*dt
     self.y = self.y + self.vy*dt
+
+    if geom.vectorLength({self.vx, self.vy}) < self.minVelocity and
+        geom.vectorLength({self.vx + self.ax, self.vy + self.ay}) < self.minVelocity
+    then
+        self.vx, self.vy = unpack(geom.randomVector(self.spawnVelocity))
+    end
 end
 
 function Ball:onHitPaddle(nrm, paddle)
