@@ -13,8 +13,13 @@ NAME=Refactor
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
 
+# Version of the game
+GAME_VERSION=$(shell git rev-parse --short HEAD)
+
+GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
+
 .PHONY: clean all
-.PHONY: publish publish-love publish-osx publish-win32 publish-win64 publish-status
+.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup
 
@@ -23,7 +28,10 @@ all: love-bundle osx win32 win64
 clean:
 	rm -rf build
 
-publish: publish-love publish-osx publish-win32 publish-win64 publish-status
+publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
+
+publish-precheck:
+	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
 publish-status:
 	butler status $(TARGET)
@@ -51,7 +59,7 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f) $(DEST)/.assets
 
 publish-love: $(DEST)/.published-love
 $(DEST)/.published-love: $(DEST)/love/$(NAME).love
-	butler push $(DEST)/love $(TARGET):love-bundle && touch $(@)
+	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
 osx: $(DEST)/osx/$(NAME).app
@@ -64,7 +72,7 @@ $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/dep
 
 publish-osx: $(DEST)/.published-osx
 $(DEST)/.published-osx: $(DEST)/osx/$(NAME).app
-	butler push $(DEST)/osx $(TARGET):osx && touch $(@)
+	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
 
 # OSX build dependencies
 $(DEST)/deps/love.app/Contents/MacOS/love:
@@ -98,7 +106,7 @@ $(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 
 publish-win32: $(DEST)/.published-win32
 $(DEST)/.published-win32: $(DEST)/win32/$(NAME).exe
-	butler push $(DEST)/win32 $(TARGET):win32 && touch $(@)
+	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
 win64: $(DEST)/win64/$(NAME).exe
@@ -109,5 +117,5 @@ $(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 
 publish-win64: $(DEST)/.published-win64
 $(DEST)/.published-win64: $(DEST)/win64/$(NAME).exe
-	butler push $(DEST)/win64 $(TARGET):win64 && touch $(@)
+	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
