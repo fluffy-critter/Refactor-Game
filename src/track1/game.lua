@@ -323,95 +323,102 @@ function Game:update(dt)
 
     self.spawner:update(dt)
 
-    for _,ball in pairs(self.balls) do
-
-        ball:preUpdate(dt)
-
-        -- test against walls
-        if ball.x - ball.r < self.bounds.left then
-            ball:onHitWall({1, 0}, self.bounds.left, ball.y)
-        end
-        if ball.x + ball.r > self.bounds.right then
-            ball:onHitWall({-1, 0}, self.bounds.right, ball.y)
-        end
-        if ball.y - ball.r < self.bounds.top then
-            ball:onHitWall({0, 1}, ball.x, self.bounds.top)
-        end
-        if ball.y - ball.r > self.bounds.bottom then
-            ball:onLost()
-            if ball:isAlive() then
-                ball:onStart()
-            end
-        end
-
-        -- test against paddle (if we're within range)
-        if math.abs(ball.x - p.x) < p.w and math.abs(ball.y - p.y) < p.w then
-            local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon())
-            if c then
-                ball:onHitPaddle(c, self.paddle)
-            end
-        end
-    end
-
-    for _,actor in pairs(self.actors) do
-        actor:preUpdate(dt)
-    end
-
-    for _,actor in pairs(self.actors) do
-        local poly
-        local bcircle = actor:getBoundingCircle()
-        local bx, by, br = unpack(bcircle or {})
-
+    local function physicsUpdate(dt)
         for _,ball in pairs(self.balls) do
-            if actor:isTangible(ball) then
-                local boundcheck
 
-                -- quick check, if bounding radius is available
-                if bcircle then
-                    local dx = ball.x - bx
-                    local dy = ball.y - by
-                    boundcheck = math.sqrt(dx*dx + dy*dy) < ball.r + br
-                else
-                    boundcheck = true
+            ball:preUpdate(dt)
+
+            -- test against walls
+            if ball.x - ball.r < self.bounds.left then
+                ball:onHitWall({1, 0}, self.bounds.left, ball.y)
+            end
+            if ball.x + ball.r > self.bounds.right then
+                ball:onHitWall({-1, 0}, self.bounds.right, ball.y)
+            end
+            if ball.y - ball.r < self.bounds.top then
+                ball:onHitWall({0, 1}, ball.x, self.bounds.top)
+            end
+            if ball.y - ball.r > self.bounds.bottom then
+                ball:onLost()
+                if ball:isAlive() then
+                    ball:onStart()
                 end
+            end
 
-                if boundcheck then
-                    if not poly then
-                        poly = actor:getPolygon()
+            -- test against paddle (if we're within range)
+            if math.abs(ball.x - p.x) < p.w and math.abs(ball.y - p.y) < p.w then
+                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon())
+                if c then
+                    ball:onHitPaddle(c, self.paddle)
+                end
+            end
+        end
+
+        for _,actor in pairs(self.actors) do
+            actor:preUpdate(dt)
+        end
+
+        for _,actor in pairs(self.actors) do
+            local poly
+            local bcircle = actor:getBoundingCircle()
+            local bx, by, br = unpack(bcircle or {})
+
+            for _,ball in pairs(self.balls) do
+                if actor:isTangible(ball) then
+                    local boundcheck
+
+                    -- quick check, if bounding radius is available
+                    if bcircle then
+                        local dx = ball.x - bx
+                        local dy = ball.y - by
+                        boundcheck = math.sqrt(dx*dx + dy*dy) < ball.r + br
+
+                        -- TODO: fail the bound check if we're moving away as well
+                    else
+                        boundcheck = true
                     end
-                    nrm = geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
-                    if nrm then
-                        actor:onHitBall(nrm, ball)
+
+                    if boundcheck then
+                        if not poly then
+                            poly = actor:getPolygon()
+                        end
+                        nrm = geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
+                        if nrm then
+                            actor:onHitBall(nrm, ball)
+                        end
                     end
                 end
             end
         end
-    end
 
-    local function doPostUpdates(cur)
+        local function doPostUpdates(cur)
+            local removes = {}
+            for idx,thing in pairs(cur) do
+                thing:postUpdate(dt)
+                if not thing:isAlive() then
+                    table.insert(removes, idx)
+                end
+            end
+            for _,r in pairs(removes) do
+                cur[r] = nil
+            end
+        end
+
+        doPostUpdates(self.balls)
+        doPostUpdates(self.actors)
+
         local removes = {}
-        for idx,thing in pairs(cur) do
-            thing:postUpdate(dt)
-            if not thing:isAlive() then
+        for idx,particle in pairs(self.particles) do
+            if not particle:update(dt) then
                 table.insert(removes, idx)
             end
         end
         for _,r in pairs(removes) do
-            cur[r] = nil
+            self.particles[r] = nil
         end
     end
-
-    doPostUpdates(self.balls)
-    doPostUpdates(self.actors)
-
-    local removes = {}
-    for idx,particle in pairs(self.particles) do
-        if not particle:update(dt) then
-            table.insert(removes, idx)
-        end
-    end
-    for _,r in pairs(removes) do
-        self.particles[r] = nil
+    for i = 1, 4 do
+        physicsUpdate(dt/4)
     end
 
     for _,item in pairs(self.deferred) do
