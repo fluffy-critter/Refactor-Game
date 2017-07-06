@@ -64,9 +64,7 @@ function Game:init()
     }
 
     -- TODO - make it an actor?
-    self.paddle = {
-        x = 480,
-        y = 660,
+    self.paddleDefaults = {
         w = 60,
         h = 6,
 
@@ -78,6 +76,12 @@ function Game:init()
         rebound = 0.5,
         tiltFactor = 0.01,
         recoil = 1,
+        recovery = 1
+    }
+
+    self.paddle = {
+        x = 1280 / 2,
+        y = 660,
 
         -- get the upward vector for the paddle
         tiltVector = function(self)
@@ -102,6 +106,7 @@ function Game:init()
             return self.cachedPoly
         end,
     }
+    util.applyDefaults(self.paddle, self.paddleDefaults)
     local paddle = self.paddle
 
     self.particles = {}
@@ -199,40 +204,59 @@ function Game:setGameEvents()
         })
     end
 
-    -- spawn staggered bricks
+    -- spawn randomizer
     table.insert(self.eventQueue, {
-        when = {3},
+        when = {7},
         what = function()
-        local bricks = {}
-            local w = 64
-            local h = 32
-            local top = self.bounds.top + h/2
-            local left = self.bounds.left + w/2
-            local right = self.bounds.right - w/2
-            local bottom = top + 12 * h
-            for row = 1, 6 do
-                local y = top + row * h
-                local y2 = bottom - (w - top)
-                local last = right
-                if y2 == y then
-                    last = (left + right)/2
-                end
-                for x = left - (row % 2)*w/2, last, w do
-                    table.insert(bricks, {
-                        color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                            x = x, y = y, w = w, h = h, lives = 3
-                    })
-                    table.insert(bricks, {
-                        color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                            x = right - (x - left),
-                            y = bottom - (y - top),
-                            w = w, h = h
-                    })
-                end
-            end
-            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2, 0)
+            -- TODO
         end
     })
+    table.insert(self.eventQueue, {
+        when = {8},
+        what = function()
+            for k,v in pairs(self.paddleDefaults) do
+                self.paddle[k] = v
+            end
+        end
+    })
+
+    -- spawn staggered bricks
+    for _,how in pairs({{when={3}, kill=true}, {when={6}, kill=false}}) do
+        table.insert(self.eventQueue, {
+            when = how.when,
+            args = {how.kill},
+            what = function(kill)
+                local bricks = {}
+                local w = 64
+                local h = 32
+                local top = self.bounds.top + h/2
+                local left = self.bounds.left + w/2
+                local right = self.bounds.right - w/2
+                local bottom = top + 12 * h
+                for row = 1, 6 do
+                    local y = top + row * h
+                    local y2 = bottom - (w - top)
+                    local last = right
+                    if y2 == y then
+                        last = (left + right)/2
+                    end
+                    for x = left - (row % 2)*w/2, last, w do
+                        table.insert(bricks, {
+                            color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
+                                x = x, y = y, w = w, h = h, lives = 3
+                        })
+                        table.insert(bricks, {
+                            color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
+                                x = right - (x - left),
+                                y = bottom - (y - top),
+                                w = w, h = h
+                        })
+                    end
+                end
+                self.spawner:spawn({self.actors, kill and self.toKill or nil}, Brick, bricks, 60/BPM/16, 2, 0)
+            end
+        })
+    end
 
     -- replace all the balls with identical particles
     table.insert(self.eventQueue, {
@@ -323,6 +347,8 @@ function Game:update(dt)
 
     p.x = p.x + dt * p.vx
     p.y = p.y + dt * p.vy
+
+    p.vy = p.vy + dt*(self.paddleDefaults.y - p.y)*p.recovery
 
     if p.x + p.w > b.right then
         p.x = b.right - p.w
