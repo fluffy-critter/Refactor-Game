@@ -16,7 +16,7 @@ LOVE_VERSION=0.10.2
 .PHONY: clean all
 .PHONY: publish publish-love publish-osx publish-win32 publish-win64 publish-status
 .PHONY: love-bundle osx win32 win64
-.PHONY: assets
+.PHONY: assets setup
 
 all: love-bundle osx win32 win64
 
@@ -28,6 +28,12 @@ publish: publish-love publish-osx publish-win32 publish-win64 publish-status
 publish-status:
 	butler status $(TARGET)
 
+setup: $(DEST)/.setup
+$(DEST)/.setup: .gitmodules
+	git submodule update --init --recursive
+	git submodule update --recursive
+	touch $(@)
+
 assets: $(DEST)/.assets
 $(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
 	mkdir -p $(DEST)
@@ -35,7 +41,7 @@ $(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
 	touch $(@)
 
 # .love bundle
-love-bundle: $(DEST)/love/$(NAME).love
+love-bundle: setup $(DEST)/love/$(NAME).love
 $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f) $(DEST)/.assets
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
