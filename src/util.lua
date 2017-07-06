@@ -65,4 +65,9 @@ function util.weakRef(data)
     return function() return weak.content end
 end
 
+-- linear interpolate from A to B, at point X = 0..1
+function util.lerp(a, b, x)
+    return a + (b - a)*x
+end
+
 return util

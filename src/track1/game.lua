@@ -162,6 +162,11 @@ function Game:defer(item)
 end
 
 function Game:setGameEvents()
+    local function brickLivesColor(lives)
+        local brt = math.random()*0.2 + 0.8
+        return {util.lerp(192, 255, lives/5)*brt, brt*192, util.lerp(255, 192, lives/5)*brt, 255}
+    end
+
     -- spawn regular balls
     for _,when in pairs({1, 3, 5, 8, 10}) do
         table.insert(self.eventQueue, {
@@ -223,6 +228,92 @@ function Game:setGameEvents()
         })
     end
 
+    -- spawn regular bricks
+    table.insert(self.eventQueue, {
+        when = {4},
+        what = function()
+            local bricks = {}
+            local w = 64
+            local h = 32
+            local top = self.bounds.top + h/2 + h
+            local left = self.bounds.left + w/2
+            local right = self.bounds.right - w/2
+            for row = 0, 7 do
+                local lives = 4 - math.floor(row/2)
+                local y = top + row * h
+                for x = left, right, w do
+                    table.insert(bricks, {
+                        color = brickLivesColor(lives),
+                        x = x, y = y, w = w, h = h, lives = lives
+                    })
+                end
+            end
+
+            -- local killLater = {}
+            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/2, (right - left)/w + 1)
+            -- table.insert(self.eventQueue, {
+            --     when = {2,0},
+            --     what = function()
+            --         for _,b in pairs(killLater) do
+            --             b:kill()
+            --         end
+            --     end
+            -- })
+        end
+    })
+
+    -- spawn zigzag bricks
+    table.insert(self.eventQueue, {
+        when = {5},
+        what = function()
+            local bricks = {}
+            local w = 64
+            local h = 32
+            local top = self.bounds.top + h/2
+            local left = self.bounds.left + w/2
+            local right = self.bounds.right - w/2
+
+            xstart = left
+            xend = right
+            xstep = w
+
+            lives = 3
+            y = top
+            while lives > 0 do
+                for x = xstart, xend, xstep do
+                    table.insert(bricks, {
+                        color = brickLivesColor(lives),
+                        x = x, y = y, w = w, h = h, lives = lives
+                    })
+                end
+
+                xstart, xend = xend, xstart
+                xstep = -xstep
+                lives = lives - 1
+
+                if lives > 0 then
+                    for x = xstart - w*3.5, xend, xstep*5 do
+                        table.insert(bricks, {
+                            color = brickLivesColor(5),
+                            x = x, y = y + 2*h, w = h*2, h = h*2, lives = 5
+                        })
+                    end
+
+                    nexty = y + 4*h
+                    for y = y + h, nexty - 1, h do
+                        table.insert(bricks, {
+                            color = brickLivesColor(lives),
+                            x = xstart, y = y, w = w, h = h, lives = lives
+                        })
+                    end
+                end
+                y = nexty
+            end
+
+            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2)
+        end
+    })
+
     -- spawn staggered bricks
     for _,how in pairs({{when={3}, kill=true}, {when={6}, kill=false}, {when={9}, kill=true, rate=16}}) do
         table.insert(self.eventQueue, {
@@ -231,27 +322,27 @@ function Game:setGameEvents()
                 local bricks = {}
                 local w = 64
                 local h = 32
-                local top = self.bounds.top + h/2
+                local top = self.bounds.top + h/2 + h
                 local left = self.bounds.left + w/2
                 local right = self.bounds.right - w/2
-                local bottom = top + 12 * h
-                for row = 1, 6 do
+                local bottom = top + 10 * h
+                for row = 0, 5 do
                     local y = top + row * h
                     local y2 = bottom - (w - top)
                     local last = right
-                    if row == 6 then
+                    if row == 5 then
                         last = (left + right)/2
                     end
-                    for x = left - ((row + 1) % 2)*w/2, last, w do
+                    for x = left - (row  % 2)*w/2, last, w do
                         table.insert(bricks, {
-                            color = {math.random(200,220), math.random(127,200), math.random(127,200), 255},
-                                x = x, y = y, w = w, h = h, lives = 3
+                            color = brickLivesColor(3),
+                            x = x, y = y, w = w, h = h, lives = 3
                         })
                         table.insert(bricks, {
-                            color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                                x = right - (x - left),
-                                y = bottom - (y - top),
-                                w = w, h = h
+                            color = brickLivesColor(1),
+                            x = right - (x - left),
+                            y = bottom - (y - top),
+                            w = w, h = h
                         })
                     end
                 end
@@ -361,19 +452,19 @@ function Game:update(dt)
 
     if p.x + p.w > b.right then
         p.x = b.right - p.w
-        p.vx = -p.vx * p.rebound
+        p.vx = -math.abs(p.vx) * p.rebound
     end
     if p.x - p.w < b.left then
         p.x = b.left + p.w
-        p.vx = -p.vx * p.rebound
+        p.vx = math.abs(p.vx) * p.rebound
     end
     if p.y + p.h > b.bottom then
         p.y = b.bottom - p.h
-        p.vy = -p.vy * p.rebound
+        p.vy = -math.abs(p.vy) * p.rebound
     end
     if p.y - p.h < b.top then
         p.y = b.top + p.h
-        p.vy = -p.vy * p.rebound
+        p.vy = math.abs(p.vy) * p.rebound
     end
 
     p.cachedPoly = nil

@@ -56,7 +56,7 @@ Randomizer.functions = {
     },
     {
         key = "rebound", val = function()
-            return math.random() * 5
+            return math.random()
         end
     },
     {
