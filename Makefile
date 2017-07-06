@@ -30,6 +30,7 @@ publish-status:
 
 setup: $(DEST)/.setup
 $(DEST)/.setup: .gitmodules
+	mkdir -p $(DEST)
 	git submodule update --init --recursive
 	git submodule update --recursive
 	touch $(@)
