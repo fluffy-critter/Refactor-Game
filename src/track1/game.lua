@@ -209,32 +209,25 @@ function Game:setGameEvents()
     end
 
     -- spawn randomizer
-    table.insert(self.eventQueue, {
-        when = {7},
-        what = function()
-            local randomizer = Randomizer.new(self, {
-                spawnInterval = 60/BPM,
-                lives = 20
-            })
-            table.insert(self.actors, randomizer)
-            table.insert(self.toKill, randomizer)
-        end
-    })
-    table.insert(self.eventQueue, {
-        when = {8},
-        what = function()
-            for k,v in pairs(self.paddleDefaults) do
-                self.paddle[k] = v
+    for _,when in pairs({{5,8}, {7}}) do
+        table.insert(self.eventQueue, {
+            when = when,
+            what = function()
+                local randomizer = Randomizer.new(self, {
+                    spawnInterval = 60/BPM,
+                    lives = 20
+                })
+                table.insert(self.actors, randomizer)
+                table.insert(self.toKill, randomizer)
             end
-        end
-    })
+        })
+    end
 
     -- spawn staggered bricks
-    for _,how in pairs({{when={3}, kill=true}, {when={6}, kill=false}}) do
+    for _,how in pairs({{when={3}, kill=true}, {when={6}, kill=false}, {when={9}, kill=true, rate=16}}) do
         table.insert(self.eventQueue, {
             when = how.when,
-            args = {how.kill},
-            what = function(kill)
+            what = function(kill, rate)
                 local bricks = {}
                 local w = 64
                 local h = 32
@@ -246,10 +239,10 @@ function Game:setGameEvents()
                     local y = top + row * h
                     local y2 = bottom - (w - top)
                     local last = right
-                    if y2 == y then
+                    if row == 6 then
                         last = (left + right)/2
                     end
-                    for x = left - (row % 2)*w/2, last, w do
+                    for x = left - ((row + 1) % 2)*w/2, last, w do
                         table.insert(bricks, {
                             color = {math.random(200,220), math.random(127,200), math.random(127,200), 255},
                                 x = x, y = y, w = w, h = h, lives = 3
@@ -262,10 +255,12 @@ function Game:setGameEvents()
                         })
                     end
                 end
-                self.spawner:spawn({self.actors, kill and self.toKill or nil}, Brick, bricks, 60/BPM/16, 2, 0)
+                self.spawner:spawn({self.actors, how.kill and self.toKill or nil}, Brick, bricks, 60/BPM/(how.rate or 8), 2, 0)
             end
         })
     end
+
+    -- TODO: double spiral pattern on 4, 8, 10
 
     -- replace all the balls with identical particles
     table.insert(self.eventQueue, {
@@ -297,6 +292,10 @@ function Game:setPhase(phase)
     end
 
     self.phase = phase
+
+    for k,v in pairs(self.paddleDefaults) do
+        self.paddle[k] = v
+    end
 
     for k,v in pairs(geom.collision_stats) do
         print(k,v)

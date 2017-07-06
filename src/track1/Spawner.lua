@@ -57,7 +57,7 @@ end
 function Spawner:update(dt)
     self.time = self.time + dt
 
-    if not self.nextEvent or self.nextEvent >= self.time then
+    if not self.nextEvent or self.time < self.nextEvent then
         return
     end
 

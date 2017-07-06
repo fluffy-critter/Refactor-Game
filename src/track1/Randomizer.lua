@@ -46,7 +46,7 @@ Randomizer.functions = {
     },
     {
         key = "speed", val = function()
-            return math.random(9000, 100000)
+            return math.random(2000, 36000)
         end
     },
     {
