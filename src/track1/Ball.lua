@@ -69,12 +69,12 @@ end
 
 function Ball:onInit()
     util.applyDefaults(self, {
-        r = 2,
+        r = 6,
         color = {255, 192, 192, 255},
         hitColor = {255, 64, 64, 192},
         ax = 0,
         ay = 0,
-        spawnVelocity = 100,
+        spawnVelocity = 240,
         lives = 1,
         elasticity = 1,
         paddleScore = 1,
@@ -128,7 +128,7 @@ end
 function Ball:onHitPaddle(nrm, paddle)
     local nx, ny = unpack(nrm)
 
-    self:applyReflection(nrm, paddle.vx, paddle.vy)
+    self:applyReflection(nrm, paddle.vx, paddle.vy, true)
 
     if self.timeSinceLastHit > self.scoreCooldown then
         self.game.score = self.game.score + self.paddleScoreVal
@@ -142,13 +142,13 @@ end
     x, y: location of the impact
 ]]
 function Ball:onHitWall(nrm, x, y)
-    self:applyReflection(nrm)
+    self:applyReflection(nrm, 0, 0, true)
 
     local nx, ny = unpack(nrm)
 
     local particles = self.game.particles
-    local w = math.abs(ny)*self.r*4 + 1
-    local h = math.abs(nx)*self.r*4 + 1
+    local w = math.abs(ny)*self.r*4 + 4
+    local h = math.abs(nx)*self.r*4 + 4
     table.insert(particles, HitParticle.new({
         x = x - w/2,
         y = y - w/2,
@@ -171,7 +171,7 @@ function Ball:isAlive()
     return self.lives > 0
 end
 
-function Ball:applyReflection(nrm, vx, vy)
+function Ball:applyReflection(nrm, vx, vy, immediate)
     vx = vx or 0
     vy = vy or 0
 
@@ -187,19 +187,23 @@ function Ball:applyReflection(nrm, vx, vy)
     local px = -nx*dot/mag2
     local py = -ny*dot/mag2
 
-    self:applyImpulse(nx, ny, (1 + self.elasticity)*px, (1 + self.elasticity)*py)
+    self:applyImpulse(nx, ny, (1 + self.elasticity)*px, (1 + self.elasticity)*py, immediate)
 end
 
-function Ball:applyImpulse(dx, dy, dvx, dvy)
-    -- move the ball to avoid recollision
-    self.dx = self.dx + dx
-    self.dy = self.dy + dy
+function Ball:applyImpulse(dx, dy, dvx, dvy, immediate)
 
-    -- reflect the velocity vector
-    self.dvx = self.dvx + dvx
-    self.dvy = self.dvy + dvy
-
-    self.dcount = self.dcount + 1
+    if immediate then
+        self.x = self.x + dx
+        self.y = self.y + dy
+        self.vx = self.vx + dvx
+        self.vy = self.vy + dvy
+    else
+        self.dx = self.dx + dx
+        self.dy = self.dy + dy
+        self.dvx = self.dvx + dvx
+        self.dvy = self.dvy + dvy
+        self.dcount = self.dcount + 1
+    end
 end
 
 function Ball:draw()

@@ -11,6 +11,7 @@ local HitParticle = require('track1.HitParticle')
 local Brick = require('track1.Brick')
 local Spawner = require('track1.Spawner')
 local geom = require('geom')
+local util = require('util')
 
 local Game = {}
 
@@ -34,7 +35,7 @@ function Game:musicPos()
     local phase = math.floor(measure/16)
     measure = measure - phase*16
 
-    return {phase, measure, beat, timeOfs}
+    return {phase, measure, beat}
 end
 
 -- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
@@ -52,26 +53,25 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(320, 240)
-    self.canvas:setFilter("nearest", "nearest")
+    self.canvas = love.graphics.newCanvas(1280, 720)
 
     self.bounds = {
-        left = 8,
-        right = 320 - 8,
-        top = 8,
-        bottom = 240
+        left = 32,
+        right = 1280 - 32,
+        top = 32,
+        bottom = 720
     }
 
     self.paddle = {
-        x = 160,
-        y = 220,
-        w = 20,
-        h = 2,
+        x = 480,
+        y = 660,
+        w = 60,
+        h = 6,
 
         vx = 0,
         vy = 0,
 
-        speed = 6000,
+        speed = 18000,
         friction = 0.001,
         rebound = 0.5,
         tiltFactor = 0.01,
@@ -79,7 +79,7 @@ function Game:init()
         -- get the upward vector for the paddle
         tiltVector = function(self)
             local x = self.vx * self.tiltFactor
-            local y = -60
+            local y = -100
             local d = math.sqrt(x * x + y * y)
             return { x = x / d, y = y / d }
         end,
@@ -104,11 +104,11 @@ function Game:init()
     -- initialize with the starter ball
     self.balls = {
         Ball.new(self, {
-            r = 3,
+            r = 10,
             color = {128, 255, 255, 255},
             lives = 3,
             hitColor = {0, 128, 128, 255},
-            ay = 10,
+            ay = 30,
             preUpdate = function(self, dt)
                 Ball.preUpdate(self, dt)
                 self.vx = self.vx + dt*(paddle.x - self.x)
@@ -127,7 +127,7 @@ function Game:init()
                 self.vy = 0
             end,
             onLost = function(self)
-                self.ay = self.ay + 10
+                self.ay = self.ay + 30
             end
         })
     }
@@ -136,99 +136,112 @@ function Game:init()
 
     self.spawner = Spawner.new(self)
     self.toKill = {}
+
+    self.eventQueue = {}
+    self.nextEvent = nil
+    self:setGameEvents()
 end
 
 function Game:defer(item)
     tables.insert(self.deferred, item)
 end
 
+function Game:setGameEvents()
+    -- spawn regular balls
+    for _,when in pairs({1, 3, 5, 8, 10}) do
+        table.insert(self.eventQueue, {
+            when = {when},
+            what = function()
+                for i=1,5 do
+                    table.insert(self.balls, Ball.new(self))
+                end
+            end
+        })
+    end
+
+    -- spawn bouncy balls
+    for _,when in pairs({2, 6, 7, 10}) do
+        table.insert(self.eventQueue, {
+            when = {when},
+            what = function()
+                for i=1,5 do
+                    table.insert(self.balls, Ball.new(self, {
+                        r = 4,
+                        elasticity = 0.9,
+                        color = {255, 255, 128, 255},
+                        hitColor = {255, 255, 0, 128},
+                        onStart = function(self)
+                            Ball.onStart(self)
+                            self.ay = 600
+                            self.vx = 0
+                            self.vy = 0
+                        end,
+                        lives = 6
+                    }))
+                end
+            end
+        })
+    end
+
+    -- spawn superballs
+    for _,when in pairs({3, 4, 5, 7, 9}) do
+        table.insert(self.eventQueue, {
+            when = {when},
+            what = function()
+                table.insert(self.balls, SuperBall.new(self))
+            end
+        })
+    end
+
+    -- spawn staggered bricks
+    table.insert(self.eventQueue, {
+        when = {3},
+        what = function()
+        local bricks = {}
+            local w = 64
+            local h = 32
+            local top = self.bounds.top + h/2
+            local left = self.bounds.left + w/2
+            local right = self.bounds.right - w/2
+            local bottom = top + 12 * h
+            for row = 1, 6 do
+                local y = top + row * h
+                local y2 = bottom - (w - top)
+                local last = right
+                if y2 == y then
+                    last = (left + right)/2
+                end
+                for x = left - (row % 2)*w/2, last, w do
+                    table.insert(bricks, {
+                        color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
+                            x = x, y = y, w = w, h = h
+                    })
+                    table.insert(bricks, {
+                        color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
+                            x = right - (x - left),
+                            y = bottom - (y - top),
+                            w = w, h = h
+                    })
+                end
+            end
+            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2, 0)
+        end
+    })
+
+    self.nextEvent = {0}
+end
+
+
 function Game:setPhase(phase)
     print("setting phase to " .. phase)
-
-    -- TODO this should really just be an event queue thing (which will be useful for the other games too)
 
     for _,brick in pairs(self.toKill) do
         brick:kill()
     end
     self.toKill = {}
 
-    if phase == 3 or phase == 4 or phase == 5 or phase == 7 or phase == 9 then
-        -- spawn a superball
-        table.insert(self.balls, SuperBall.new(self))
-    end
-
     if phase == 0 then
         self.music:play()
-    elseif phase == 1 then
-        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={255, 0, 0}, lifetime=0.1}))
-        for i=1,5 do
-            table.insert(self.balls, Ball.new(self))
-        end
-    elseif phase == 2 then
-        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={255, 255, 0}, lifetime=0.1}))
-        for i=1,5 do
-            table.insert(self.balls, Ball.new(self, {
-                r = 1.5,
-                elasticity = 0.9,
-                color = {255, 255, 128, 255},
-                hitColor = {255, 255, 0, 128},
-                onStart = function(self)
-                    Ball.onStart(self)
-                    self.ay = 200
-                    self.vx = 0
-                    self.vy = 0
-                end,
-                lives = 6
-            }))
-        end
-    elseif phase == 3 then
-        table.insert(self.particles, HitParticle.new({x=0, y=0, w=320, h=240, color={0, 0, 255}, lifetime=0.1}))
-
-        local bricks = {}
-        for i=1,5 do
-            local xofs = 8 - (i%2) * 8
-            -- TODO alternate directions per row?
-            for j=1,18 + i%2 do
-                table.insert(bricks, {
-                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                    x = j * 16 + xofs,
-                    y = i * 8,
-                    w = 16,
-                    h = 8
-                })
-                table.insert(bricks, {
-                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                    x = 320 - j * 16 + xofs,
-                    y = (12 - i) * 8,
-                    w = 16,
-                    h = 8
-                })
-            end
-        end
-        for j = 1,10 do
-            local i = 6
-            local xofs = 0
-            table.insert(bricks, {
-                color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                x = j * 16 + xofs,
-                y = i * 8,
-                w = 16,
-                h = 8
-            })
-            if j < 10 then
-                table.insert(bricks, {
-                    color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                    x = 320 - j * 16 + xofs,
-                    y = (12 - i) * 8,
-                    w = 16,
-                    h = 8
-                })
-            end
-        end
-        self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 1, 0)
-    elseif phase == 4 then
-
-        -- spawn aliens
     end
 
     self.phase = phase
@@ -240,15 +253,39 @@ function Game:keypressed(key, code, isrepeat)
     end
 end
 
+function Game:runEvents(time)
+    if not self.nextEvent or util.arrayLT(self.nextEvent, time) then
+        return
+    end
+
+    local removes = {}
+    self.nextEvent = nil
+
+    for idx,event in pairs(self.eventQueue) do
+        if not util.arrayLT(time, event.when) then
+            event.what(unpack(event.args or {}))
+            table.insert(removes, idx)
+        elseif not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
+            self.nextEvent = event.when
+        end
+    end
+    for _,r in ipairs(removes) do
+        self.eventQueue[r] = nil
+    end
+end
+
 function Game:update(dt)
     local p = self.paddle
     local b = self.bounds
 
+    local time = self:musicPos()
     if self.music:isPlaying() then
-        local phase = self:musicPos()[1]
+        local phase = time[1]
         if phase > self.phase then
             self:setPhase(phase)
         end
+
+        self:runEvents(time)
     end
 
     local pax = 0

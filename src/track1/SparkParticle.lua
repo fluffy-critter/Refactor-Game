@@ -14,7 +14,7 @@ function SparkParticle.new(cfg)
     setmetatable(self, {__index=SparkParticle})
 
     util.applyDefaults(self, {
-        w = 1,
+        r = 1,
         h = 1,
         gamma = 1,
         blendMode = "add",
@@ -42,10 +42,11 @@ function SparkParticle:update(dt)
 end
 
 function SparkParticle:draw()
+    local size = util.clamp(1 - self.time/self.lifetime, 0, 1)
     love.graphics.setBlendMode(self.blendMode)
     love.graphics.setColor(self.color[1], self.color[2], self.color[3],
-        (self.color[4] or 255)*math.pow(util.clamp(1 - self.time/self.lifetime, 0, 1), self.gamma))
-    love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+        (self.color[4] or 255)*math.pow(size, self.gamma))
+    love.graphics.circle("fill", self.x, self.y, self.r*size)
 end
 
 return SparkParticle

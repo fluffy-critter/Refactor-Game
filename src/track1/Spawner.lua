@@ -75,7 +75,7 @@ function Spawner:update(dt)
             self.nextEvent = spawn.when
         end
     end
-    for _,r in pairs(removes) do
+    for _,r in ipairs(removes) do
         self.queue[r] = nil
     end
 end

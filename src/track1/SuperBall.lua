@@ -25,10 +25,10 @@ end
 
 function SuperBall:onInit()
     util.applyDefaults(self, {
-        r = 5,
+        r = 20,
         color = {255, 255, 127, 255},
-        hitColor = {128, 128, 64, 192},
-        spawnVelocity = 100,
+        hitColor = {255, 255, 0, 255},
+        spawnVelocity = 300,
         lives = 1,
         elasticity = 1.01,
         paddleScore = 5,
@@ -83,6 +83,7 @@ function SuperBall:preUpdate(dt)
 
             table.insert(self.game.particles,
                 SparkParticle.new({
+                    r = 4,
                     x = self.x + vx*self.r,
                     y = self.y + vy*self.r,
                     color = self.color,
