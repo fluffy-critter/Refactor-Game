@@ -147,13 +147,13 @@ function Ball:onHitWall(nrm, x, y)
     local nx, ny = unpack(nrm)
 
     local particles = self.game.particles
-    local w = math.abs(ny)*self.r*4 + 4
-    local h = math.abs(nx)*self.r*4 + 4
+    local w = math.abs(ny)*self.r*4 + 2
+    local h = math.abs(nx)*self.r*4 + 2
     table.insert(particles, HitParticle.new({
         x = x - w/2,
-        y = y - w/2,
-        w = w/2,
-        h = h/2,
+        y = y - h/2,
+        w = w,
+        h = h,
         color = self.hitColor,
         lifetime = 0.3
     }))

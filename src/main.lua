@@ -77,10 +77,13 @@ function love.update(dt)
         currentGame.music:setPitch(speed)
     end
 
+    local mul = 1
+    if love.keyboard.isDown('s') then
+        mul = 0.1
+    end
+
     if state ~= "paused" then
-        for i = 1,4 do
-            currentGame:update(dt*speed/4)
-        end
+        currentGame:update(dt*mul)
     end
 end
 
@@ -92,7 +95,10 @@ function love.draw()
     if state ~= "playing" then
         love.graphics.setShader(shaders.hueshift)
         local saturation = speed*.75 + .25
-        local shift = (1 - speed)*math.pi/2
+        local shift = (1 - speed)*math.pi
+        if state == "resuming" then
+            shift = -shift
+        end
         shaders.hueshift:send("basis", {
             saturation * math.cos(shift),
             saturation * math.sin(shift)

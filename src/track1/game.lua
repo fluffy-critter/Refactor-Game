@@ -391,9 +391,14 @@ end
 
 function Game:draw()
     self.canvas:renderTo(function()
-        love.graphics.clear(0, 0, 0)
+        love.graphics.clear(10, 10, 20)
 
-        love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setColor(0,0,0,255)
+        love.graphics.rectangle("fill",
+            self.bounds.left, self.bounds.top,
+            self.bounds.right - self.bounds.left, self.bounds.bottom - self.bounds.top)
+
 
         -- draw the particle effects
         for _,particle in pairs(self.particles) do
@@ -414,6 +419,9 @@ function Game:draw()
         for _,ball in pairs(self.balls) do
             ball:draw()
         end
+
+        love.graphics.setColor(255,255,255,255)
+        love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
     end)
 
     return self.canvas
