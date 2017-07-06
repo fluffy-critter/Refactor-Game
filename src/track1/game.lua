@@ -261,6 +261,7 @@ function Game:setGameEvents()
     end
 
     -- TODO: double spiral pattern on 4, 8, 10
+    -- spawn something else on 5, 7
 
     -- replace all the balls with identical particles
     table.insert(self.eventQueue, {

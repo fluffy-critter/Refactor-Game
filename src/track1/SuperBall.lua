@@ -33,7 +33,7 @@ function SuperBall:onInit()
         lives = 1,
         elasticity = 1.01,
         paddleScore = 5,
-        paddleScoreInc = 0,
+        paddleScoreInc = 5,
         scoreCooldown = 0.5,
         particleInterval = 0.01,
         particleLifetime = 0.3,
