@@ -7,6 +7,7 @@ Refactor: 1 - Little Bouncing Ball
 
 local util = require('util')
 local Actor = require('track1.Actor')
+local HitParticle = require('track1.HitParticle')
 
 local Brick = {}
 setmetatable(Brick, {__index = Actor})
@@ -48,7 +49,7 @@ function Brick:onInit()
 end
 
 function Brick:kill()
-    if self.state ~= dying and self.state ~= dead then
+    if self.state <= Brick.states.dying then
         self.stateAge = 0
         self.state = Brick.states.dying
     end
@@ -88,7 +89,7 @@ function Brick:preUpdate(dt)
 end
 
 function Brick:isTangible(ball)
-    return self.state == Brick.states.alive
+    return self.state == Brick.states.alive or self.state == Brick.states.hit
 end
 
 function Brick:isAlive()
@@ -96,6 +97,10 @@ function Brick:isAlive()
 end
 
 function Brick:onHitBall(nrm, ball)
+    if self.state ~= Brick.states.alive then
+        return
+    end
+
     self.game.score = self.game.score + self.scoreValue
 
     self.lives = self.lives - 1
@@ -104,6 +109,14 @@ function Brick:onHitBall(nrm, ball)
         self.state = Brick.states.dying
     else
         self.state = Brick.states.hit
+        table.insert(self.game.particles, HitParticle.new({
+            x = self.x - self.w/2,
+            y = self.y - self.h/2,
+            w = self.w,
+            h = self.h,
+            lifetime = self.deathTime,
+            color = self.hitColor
+        }))
     end
 
     ball:onHitActor(nrm, self)
@@ -114,11 +127,8 @@ function Brick:draw()
 
     if self.state == Brick.states.spawning then
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], (self.color[4] or 255) * self.stateAge / self.spawnTime)
-    elseif self.state == Brick.states.alive then
+    elseif self.state == Brick.states.alive or self.state == Brick.states.hit then
         love.graphics.setColor(unpack(self.color))
-    elseif self.state == Brick.states.hit then
-        -- TODO fade back to live color
-        love.graphics.setColor(unpack(self.deathColor))
     elseif self.state == Brick.states.dying then
         love.graphics.setColor(self.deathColor[1], self.deathColor[2], self.deathColor[3], (self.color[4] or 255) * (1 - self.stateAge / self.spawnTime))
     end

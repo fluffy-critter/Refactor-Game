@@ -8,6 +8,7 @@ Refactor: 1 - Little Bouncing Ball
 local Ball = require('track1.Ball')
 local SuperBall = require('track1.SuperBall')
 local HitParticle = require('track1.HitParticle')
+local SparkParticle = require('track1.SparkParticle')
 local Brick = require('track1.Brick')
 local Spawner = require('track1.Spawner')
 local geom = require('geom')
@@ -188,9 +189,9 @@ function Game:setGameEvents()
     end
 
     -- spawn superballs
-    for _,when in pairs({3, 4, 5, 7, 9}) do
+    for _,when in pairs({{3}, {4}, {5}, {10, 8}, {10, 10}, {10, 12}, {10, 15}, {10, 15, 2}}) do
         table.insert(self.eventQueue, {
-            when = {when},
+            when = when,
             what = function()
                 table.insert(self.balls, SuperBall.new(self))
             end
@@ -218,7 +219,7 @@ function Game:setGameEvents()
                 for x = left - (row % 2)*w/2, last, w do
                     table.insert(bricks, {
                         color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
-                            x = x, y = y, w = w, h = h
+                            x = x, y = y, w = w, h = h, lives = 3
                     })
                     table.insert(bricks, {
                         color = {math.random(127,200), math.random(200,220), math.random(200,220), 255},
@@ -229,6 +230,19 @@ function Game:setGameEvents()
                 end
             end
             self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2, 0)
+        end
+    })
+
+    -- replace all the balls with identical particles
+    table.insert(self.eventQueue, {
+        when = {11},
+        what = function()
+            for _,ball in pairs(self.balls) do
+                local pobj = {lifetime = 0.5}
+                util.applyDefaults(pobj, ball)
+                table.insert(self.particles, SparkParticle.new(pobj))
+            end
+            self.balls = {}
         end
     })
 
@@ -262,7 +276,7 @@ function Game:keypressed(key, code, isrepeat)
 end
 
 function Game:runEvents(time)
-    if not self.nextEvent or util.arrayLT(self.nextEvent, time) then
+    if not self.nextEvent or util.arrayLT(time, self.nextEvent) then
         return
     end
 
@@ -418,6 +432,7 @@ function Game:update(dt)
         end
     end
     for i = 1, 4 do
+        -- TODO maybe slide this based on framerate and/or precision issues
         physicsUpdate(dt/4)
     end
 
@@ -438,11 +453,6 @@ function Game:draw()
             self.bounds.right - self.bounds.left, self.bounds.bottom - self.bounds.top)
 
 
-        -- draw the particle effects
-        for _,particle in pairs(self.particles) do
-            particle:draw()
-        end
-
         -- draw the paddle
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(255, 255, 255, 255)
@@ -456,6 +466,11 @@ function Game:draw()
         -- draw the balls
         for _,ball in pairs(self.balls) do
             ball:draw()
+        end
+
+        -- draw the particle effects
+        for _,particle in pairs(self.particles) do
+            particle:draw()
         end
 
         love.graphics.setColor(255,255,255,255)
