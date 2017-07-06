@@ -8,12 +8,13 @@ conf.lua - initial configuration
 ]]
 
 function love.conf(t)
-    t.modules.joystick = false
+    t.modules.joystick = true
     t.modules.physics = false
     t.window.resizable = true
     t.window.width = 1280
     t.window.height = 720
     t.window.vsync = true
+    t.window.fullscreen = true
 
     t.version = "0.10.2"
 

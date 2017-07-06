@@ -74,14 +74,15 @@ function Game:init()
         vy = 0,
 
         speed = 18000,
-        friction = 0.001,
+        friction = 0.0015,
         rebound = 0.5,
         tiltFactor = 0.01,
+        recoil = 1,
 
         -- get the upward vector for the paddle
         tiltVector = function(self)
             local x = self.vx * self.tiltFactor
-            local y = -100
+            local y = -60
             local d = math.sqrt(x * x + y * y)
             return { x / d, y / d }
         end,
@@ -318,6 +319,7 @@ function Game:update(dt)
         p.vx = p.vx - p.speed*dt
     end
     p.vx = p.vx * math.pow(p.friction, dt)
+    p.vy = p.vy * math.pow(p.friction, dt)
 
     p.x = p.x + dt * p.vx
     p.y = p.y + dt * p.vy
@@ -329,6 +331,14 @@ function Game:update(dt)
     if p.x - p.w < b.left then
         p.x = b.left + p.w
         p.vx = -p.vx * p.rebound
+    end
+    if p.y + p.h > b.bottom then
+        p.y = b.bottom - p.h
+        p.vy = -p.vy * p.rebound
+    end
+    if p.y - p.h < b.top then
+        p.y = b.top + p.h
+        p.vy = -p.vy * p.rebound
     end
 
     p.cachedPoly = nil

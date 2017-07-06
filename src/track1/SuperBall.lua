@@ -37,7 +37,8 @@ function SuperBall:onInit()
         particleInterval = 0.01,
         particleLifetime = 0.3,
         particleVelocity = 50,
-        particleCount = 3
+        particleCount = 3,
+        recoil = 50
     })
 
     Ball.onInit(self)

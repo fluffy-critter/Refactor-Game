@@ -17,6 +17,7 @@ Properties:
 
     spawnVelocity: velocity at spawn time
     elasticity: how much rebound force the ball gets
+    recoil: how much rebound force the paddle gets
 
     dx, dy: position impulse (reset every frame)
     dvx, dvy: velocity impulse (reset every frame)
@@ -80,6 +81,7 @@ function Ball:onInit()
         paddleScore = 1,
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
+        recoil = 0,
         blendMode = "alpha"
     })
 end
@@ -133,6 +135,10 @@ function Ball:onHitPaddle(nrm, paddle)
     if self.timeSinceLastHit > self.scoreCooldown then
         self.game.score = self.game.score + self.paddleScoreVal
         self.paddleScoreVal = self.paddleScoreVal + self.paddleScoreInc
+
+        paddle.vx = paddle.vx - self.recoil * nx * paddle.recoil
+        paddle.vy = paddle.vy - self.recoil * ny * paddle.recoil
+
     end
     self.timeSinceLastHit = 0
 end
