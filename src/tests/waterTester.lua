@@ -20,19 +20,19 @@ function waterTester:init()
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.arena:renderTo(function()
         love.graphics.setColor(255, 255, 255)
-        love.graphics.rectangle("fill", 1280/2 - 64, 720/2 - 64, 64, 64)
+        love.graphics.rectangle("fill", (1280 - 64)/2, (720 - 500)/2, 64, 500)
     end)
 
     self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
     self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
 
     self.params = {
-        sampleRadius = 4.0,
-        damp = 1.0,
-        fluidity = 1.0,
+        fluidity = 1.5,
+        damp = 0.913,
         timeMul = 15,
-        fresnel = 5,
-        rsize = 10
+        rsize = 32,
+        fresnel = 0.1,
+        sampleRadius = 5.5,
     }
 
     self.music = {
@@ -74,18 +74,21 @@ function waterTester:keypressed(key, code, isRepeat)
         self.layers.water:renderTo(function()
             love.graphics.clear(0,0,0)
         end)
+
+        print("waterTerms = {")
+        for k,v in pairs(self.params) do
+            print("    " .. k .. " = " .. v .. ",")
+        end
+        print("}")
     end
 
-    for k,v in pairs(self.params) do
-        print(k,v)
-    end
 end
 
 function waterTester:update(dt)
     self.phase = self.phase + dt
     self.layers.water:renderTo(function()
         local ofsx = math.sin(self.phase*0.3)*720/2
-        local ofsy = math.cos(self.phase*0.3)*720/2
+        local ofsy = math.sin(self.phase*0.003)*320/2
 
         love.graphics.setColorMask(true, false, false, false)
         love.graphics.setColor(255, 0, 0)

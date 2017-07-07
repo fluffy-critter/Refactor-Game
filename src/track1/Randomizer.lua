@@ -110,16 +110,18 @@ function Randomizer:onInit()
 end
 
 function Randomizer:draw()
-    love.graphics.setBlendMode("alpha")
-    local alpha = 255
-    if self.state == Randomizer.states.dying then
-        alpha = util.clamp(255*(1 - self.stateAge/self.deadTime), 0, 255)
-    end
-    love.graphics.setColor(math.random(192,255), math.random(192,255), math.random(192,255), alpha)
-    local w = math.random(self.w - self.sizefuck, self.w)
-    local h = math.random(self.h - self.sizefuck, self.h)
-    -- TODO draw static instead
-    love.graphics.rectangle("fill", self.x - w/2, self.y - h/2, w, h)
+    self.game.layers.overlay:renderTo(function()
+        love.graphics.setBlendMode("alpha")
+        local alpha = 255
+        if self.state == Randomizer.states.dying then
+            alpha = util.clamp(255*(1 - self.stateAge/self.deadTime), 0, 255)
+        end
+        love.graphics.setColor(math.random(192,255), math.random(192,255), math.random(192,255), alpha)
+        local w = math.random(self.w - self.sizefuck, self.w)
+        local h = math.random(self.h - self.sizefuck, self.h)
+        -- TODO draw static instead
+        love.graphics.rectangle("fill", self.x - w/2, self.y - h/2, w, h)
+    end)
 end
 
 function Randomizer:isTangible(ball)

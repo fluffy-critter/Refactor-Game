@@ -66,6 +66,14 @@ function Game:init()
 
     self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
     self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
+    self.waterParams = {
+        fluidity = 1.5,
+        damp = 0.913,
+        timeMul = 15,
+        rsize = 32,
+        fresnel = 0.1,
+        sampleRadius = 5.5,
+    }
 
     self.bounds = {
         left = 32,
@@ -224,7 +232,7 @@ function Game:setGameEvents()
     end
 
     -- spawn randomizer
-    for _,when in pairs({{5,8}, {7}, {10}}) do
+    for _,when in pairs({{5,8}, {10}}) do
         table.insert(self.eventQueue, {
             when = when,
             what = function()
@@ -234,6 +242,23 @@ function Game:setGameEvents()
                 })
                 table.insert(self.actors, randomizer)
                 table.insert(self.toKill, randomizer)
+            end
+        })
+    end
+    for _,when in pairs({{7}, {10}}) do
+        table.insert(self.eventQueue, {
+            when = when,
+            what = function()
+                local spawns = {}
+                for i=1,3 do
+                    table.insert(spawns, {
+                        spawnInterval = 180/BPM,
+                        lives = 10,
+                        xFrequency = 0.3,
+                        yFrequency = 6.7,
+                    })
+                end
+                self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM)
             end
         })
     end
@@ -580,10 +605,10 @@ function Game:update(dt)
 
     self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
         shaders.waterRipple, {
-            psize = {4.0/1280, 4.0/720},
-            damp = 0.95,
-            fluidity = 1.0,
-            dt = dt*15
+            psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
+            damp = self.waterParams.damp,
+            fluidity = self.waterParams.fluidity,
+            dt = dt*self.waterParams.timeMul
         })
 end
 
@@ -597,7 +622,7 @@ function Game:draw()
 
         love.graphics.setBlendMode("alpha")
         -- love.graphics.setColor(10,10,40,80)
-        love.graphics.setColor(0, 255, 255, 64)
+        love.graphics.setColor(192, 255, 255, 20)
         love.graphics.rectangle("fill", 0, 0, 1280, self.bounds.top)
         love.graphics.rectangle("fill", 0, self.bounds.top, self.bounds.left, self.bounds.bottom - self.bounds.top)
         love.graphics.rectangle("fill", self.bounds.right, self.bounds.top, 1280 - self.bounds.right, self.bounds.bottom - self.bounds.top)
@@ -633,8 +658,8 @@ function Game:draw()
 
         love.graphics.setShader(shaders.waterReflect)
         shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
-        shaders.waterReflect:send("rsize", 50.0)
-        shaders.waterReflect:send("fresnel", 10.0);
+        shaders.waterReflect:send("rsize", self.waterParams.rsize)
+        shaders.waterReflect:send("fresnel", self.waterParams.fresnel);
         shaders.waterReflect:send("source", self.layers.arena)
         shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
         shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})

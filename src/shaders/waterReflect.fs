@@ -18,7 +18,9 @@ vec4 effect(vec4 color, Image water, vec2 pos, vec2 screen_coords) {
     vec2 gradient = vec2(Texel(water, pos + dx*0.5).r - Texel(water, pos - dx*0.5).r,
                          Texel(water, pos + dy*0.5).r - Texel(water, pos - dy*0.5).r);
 
-    return color*mix(bgColor + waveColor*Texel(water, pos).r,
-        Texel(source, pos + gradient*psize*rsize),
-        min(1.0, fresnel*dot(gradient, gradient)));
+    vec3 fvec = vec3(gradient, fresnel);
+    float fterm = length(cross(vec3(0,0,1), normalize(fvec))) + 0.2;
+
+    return mix(bgColor, waveColor, max(0, Texel(water, pos).r))
+        + Texel(source, pos + gradient*psize*rsize)*fterm;
 }
