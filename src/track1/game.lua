@@ -181,12 +181,12 @@ end
 
 function Game:setGameEvents()
     local function brickLivesColor(lives)
-        local brt = math.random()*0.2 + 0.8
+        local brt = math.random()*0.1 + 0.9
         return {util.lerp(128, 255, lives/5)*brt, util.lerp(240, 128, lives/5)*brt, util.lerp(255, 192, lives/5)*brt, 255}
     end
 
     -- spawn regular balls
-    for _,how in pairs({{when={1}, lives=3, count=3}, {when={3}}, {when={5}}, {when={8}}, {when={10}}}) do
+    for _,how in pairs({{when={1}, lives=3, count=3}, {when={3}}, {when={4}}, {when={5}}, {when={8}}, {when={10}}}) do
         table.insert(self.eventQueue, {
             when = how.when,
             what = function()
@@ -268,29 +268,31 @@ function Game:setGameEvents()
     -- TODO: spawn plain aliens on {4}, {6}, {8}, {9,8}, {10}, {10,8}
 
     -- spawn regular bricks
-    table.insert(self.eventQueue, {
-        when = {4},
-        what = function()
-            local bricks = {}
-            local w = 64
-            local h = 32
-            local top = self.bounds.top + h/2 + h
-            local left = self.bounds.left + w/2
-            local right = self.bounds.right - w/2
-            for row = 0, 7 do
-                local lives = 4 - math.floor(row/2)
-                local y = top + row * h
-                for x = left, right, w do
-                    table.insert(bricks, {
-                        color = brickLivesColor(lives),
-                        x = x, y = y, w = w, h = h, lives = lives
-                    })
+    for _,when in pairs({{4}, {10}}) do
+        table.insert(self.eventQueue, {
+            when = when,
+            what = function()
+                local bricks = {}
+                local w = 64
+                local h = 32
+                local top = self.bounds.top + h/2 + h
+                local left = self.bounds.left + w/2
+                local right = self.bounds.right - w/2
+                for row = 0, 7 do
+                    local lives = 4 - math.floor(row/2)
+                    local y = top + row * h
+                    for x = left, right, w do
+                        table.insert(bricks, {
+                            color = brickLivesColor(lives),
+                            x = x, y = y, w = w, h = h, lives = lives
+                        })
+                    end
                 end
-            end
 
-            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/2, (right - left)/w + 1)
-        end
-    })
+                self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/2, (right - left)/w + 1)
+            end
+        })
+    end
 
     -- spawn zigzag bricks
     table.insert(self.eventQueue, {
@@ -394,6 +396,9 @@ function Game:setGameEvents()
                 table.insert(self.particles, SparkParticle.new(pobj))
             end
             self.balls = {}
+            for _,actor in pairs(self.actors) do
+                actor:kill()
+            end
         end
     })
 
