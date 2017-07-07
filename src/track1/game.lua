@@ -71,21 +71,21 @@ function Game:init()
         w = 60,
         h = 6,
 
-        vx = 0,
-        vy = 0,
-
         speed = 18000,
         friction = 0.0015,
         rebound = 0.5,
         tiltFactor = 0.01,
         recoil = 1,
-        recovery = 1
+        recovery = 1,
+        restY = 660,
+
     }
 
     self.paddle = {
         x = 1280 / 2,
         y = 660,
-        restY = 660,
+        vx = 0,
+        vy = 0,
 
         -- get the upward vector for the paddle
         tiltVector = function(self)
@@ -214,7 +214,7 @@ function Game:setGameEvents()
     end
 
     -- spawn randomizer
-    for _,when in pairs({{5,8}, {7}}) do
+    for _,when in pairs({{5,8}, {7}, {10}}}) do
         table.insert(self.eventQueue, {
             when = when,
             what = function()
@@ -249,16 +249,7 @@ function Game:setGameEvents()
                 end
             end
 
-            -- local killLater = {}
             self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/2, (right - left)/w + 1)
-            -- table.insert(self.eventQueue, {
-            --     when = {2,0},
-            --     what = function()
-            --         for _,b in pairs(killLater) do
-            --             b:kill()
-            --         end
-            --     end
-            -- })
         end
     })
 

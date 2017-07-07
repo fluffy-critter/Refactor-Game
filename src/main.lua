@@ -71,6 +71,8 @@ function love.mousepressed(...)
 end
 
 function love.load()
+    love.mouse.setVisible(false)
+
     tracks[1] = require('track1.game')
 
     currentGame = tracks[1].new()
