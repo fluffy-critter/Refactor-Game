@@ -14,6 +14,7 @@ local Brick = require('track1.Brick')
 local Spawner = require('track1.Spawner')
 local geom = require('geom')
 local util = require('util')
+local shaders = require('shaders')
 
 local Game = {}
 
@@ -55,7 +56,16 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
+    local limits = love.graphics.getSystemLimits()
+
     self.canvas = love.graphics.newCanvas(1280, 720)
+
+    self.layers = {}
+    self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(1280, 720)
+
+    self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
+    self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
 
     self.bounds = {
         left = 32,
@@ -214,7 +224,7 @@ function Game:setGameEvents()
     end
 
     -- spawn randomizer
-    for _,when in pairs({{5,8}, {7}, {10}}}) do
+    for _,when in pairs({{5,8}, {7}, {10}}) do
         table.insert(self.eventQueue, {
             when = when,
             what = function()
@@ -567,17 +577,30 @@ function Game:update(dt)
         item(self)
     end
     self.deferred = {}
+
+    self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
+        shaders.waterRipple, {
+            psize = {4.0/1280, 4.0/720},
+            damp = 0.95,
+            fluidity = 1.0,
+            dt = dt*15
+        })
 end
 
 function Game:draw()
-    self.canvas:renderTo(function()
-        love.graphics.clear(10, 10, 20)
+    self.layers.overlay:renderTo(function()
+        love.graphics.clear(0,0,0,0)
+    end)
+
+    self.layers.arena:renderTo(function()
+        love.graphics.clear(0, 0, 0, 0)
 
         love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(0,0,0,255)
-        love.graphics.rectangle("fill",
-            self.bounds.left, self.bounds.top,
-            self.bounds.right - self.bounds.left, self.bounds.bottom - self.bounds.top)
+        -- love.graphics.setColor(10,10,40,80)
+        love.graphics.setColor(0, 255, 255, 64)
+        love.graphics.rectangle("fill", 0, 0, 1280, self.bounds.top)
+        love.graphics.rectangle("fill", 0, self.bounds.top, self.bounds.left, self.bounds.bottom - self.bounds.top)
+        love.graphics.rectangle("fill", self.bounds.right, self.bounds.top, 1280 - self.bounds.right, self.bounds.bottom - self.bounds.top)
 
         -- draw the paddle
         love.graphics.setBlendMode("alpha")
@@ -603,7 +626,27 @@ function Game:draw()
         love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
     end)
 
-    return self.canvas
+    self.canvas:renderTo(function()
+        love.graphics.setBlendMode("alpha", "premultiplied")
+        love.graphics.clear(0,0,0)
+        love.graphics.setColor(255, 255, 255, 255)
+
+        love.graphics.setShader(shaders.waterReflect)
+        shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
+        shaders.waterReflect:send("rsize", 50.0)
+        shaders.waterReflect:send("fresnel", 10.0);
+        shaders.waterReflect:send("source", self.layers.arena)
+        shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
+        shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
+        love.graphics.draw(self.layers.water)
+        love.graphics.setShader()
+
+        love.graphics.draw(self.layers.arena)
+        love.graphics.draw(self.layers.overlay)
+    end)
+
+    return self.canvas;
+    -- return self.layers.water;
 end
 
 return Game

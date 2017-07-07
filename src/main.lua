@@ -72,10 +72,14 @@ end
 
 function love.load()
     love.mouse.setVisible(false)
+    love.keyboard.setKeyRepeat(true)
 
     tracks[1] = require('track1.game')
 
     currentGame = tracks[1].new()
+
+    -- currentGame = require('tests.waterTester')
+    -- currentGame:init()
 end
 
 function love.update(dt)

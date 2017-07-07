@@ -92,10 +92,23 @@ function SuperBall:preUpdate(dt)
     end
 end
 
+function SuperBall:postUpdate(dt)
+    Ball.postUpdate(self, dt)
+
+    self.game.layers.water:renderTo(function()
+        love.graphics.setColorMask(true, false, false, false)
+        -- love.graphics.setColor(0,0,0)
+        -- love.graphics.circle("fill", self.x, self.y, self.r)
+        love.graphics.setColor(255,255,255)
+        love.graphics.circle("fill", self.x, self.y, self.r/2)
+        love.graphics.setColorMask(true, true, true, true)
+    end)
+end
+
 function SuperBall:draw()
     Ball.draw(self)
 
-    -- TODO slight camera shake, draw into ripple layer
+    -- TODO slight camera shake
 end
 
 return SuperBall

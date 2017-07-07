@@ -70,4 +70,24 @@ function util.lerp(a, b, x)
     return a + (b - a)*x
 end
 
+-- render a shader from a source buffer to a destination buffer with a shader and args; return the buffers swapped
+function util.mapShader(source, dest, shader, args)
+    dest:renderTo(function()
+        love.graphics.setBlendMode("replace", "premultiplied")
+        love.graphics.setShader(shader)
+        for k,v in pairs(args) do
+            shader:send(k,v)
+        end
+        love.graphics.draw(source)
+        love.graphics.setShader()
+    end)
+    return dest, source
+end
+
+-- premultiply a color
+function util.premultiply(color)
+    local a = color[4] or 255
+    return {color[1]*a/255, color[2]*a/255, color[3]*a/255, a}
+end
+
 return util
