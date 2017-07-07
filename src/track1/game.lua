@@ -231,7 +231,7 @@ function Game:setGameEvents()
         })
     end
 
-    -- spawn randomizer
+    -- spawn randomizer "bosses"
     for _,when in pairs({{5,8}, {10}}) do
         table.insert(self.eventQueue, {
             when = when,
@@ -245,6 +245,7 @@ function Game:setGameEvents()
             end
         })
     end
+    -- spawn regular randomizers
     for _,when in pairs({{7}, {10}}) do
         table.insert(self.eventQueue, {
             when = when,
@@ -256,12 +257,15 @@ function Game:setGameEvents()
                         lives = 10,
                         xFrequency = 0.3,
                         yFrequency = 6.7,
+                        score = 65536,
                     })
                 end
-                self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM)
+                self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM, 1)
             end
         })
     end
+
+    -- TODO: spawn plain aliens on {4}, {6}, {8}, {9,8}, {10}, {10,8}
 
     -- spawn regular bricks
     table.insert(self.eventQueue, {
@@ -422,6 +426,7 @@ end
 
 function Game:keypressed(key, code, isrepeat)
     if key == '.' then
+        self.spawner.queue = {}
         self:seekMusic(self.phase + 1)
     end
 end
