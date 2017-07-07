@@ -56,13 +56,16 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.layers = {}
-    self.layers.arena = love.graphics.newCanvas(1280, 720)
-    self.layers.overlay = love.graphics.newCanvas(1280, 720)
+    local limits = love.graphics.getSystemLimits()
+
     self.canvas = love.graphics.newCanvas(1280, 720)
 
-    self.layers.water = love.graphics.newCanvas(1280, 720)
-    self.layers.waterBack = love.graphics.newCanvas(1280, 720)
+    self.layers = {}
+    self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(1280, 720)
+
+    self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
+    self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
 
     self.bounds = {
         left = 32,
@@ -577,8 +580,10 @@ function Game:update(dt)
 
     self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
         shaders.waterRipple, {
-            psize = {1.0/1280, 1.0/720},
-            damp = 0.2,
+            psize = {4.0/1280, 4.0/720},
+            damp = 0.95,
+            fluidity = 1.0,
+            dt = dt*15
         })
 end
 
@@ -628,9 +633,11 @@ function Game:draw()
 
         love.graphics.setShader(shaders.waterReflect)
         shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
-        shaders.waterReflect:send("rsize", 250.0)
+        shaders.waterReflect:send("rsize", 50.0)
         shaders.waterReflect:send("fresnel", 10.0);
         shaders.waterReflect:send("source", self.layers.arena)
+        shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
+        shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
         love.graphics.draw(self.layers.water)
         love.graphics.setShader()
 
@@ -638,7 +645,8 @@ function Game:draw()
         love.graphics.draw(self.layers.overlay)
     end)
 
-    return self.canvas
+    return self.canvas;
+    -- return self.layers.water;
 end
 
 return Game

@@ -46,12 +46,25 @@ function Brick:onInit()
 
     self.state = Brick.states.spawning
     self.stateAge = 0
+
+    self.game.layers.water:renderTo(function()
+        love.graphics.setColorMask(true, false, false, false)
+        love.graphics.setColor(255,255,255)
+        love.graphics.polygon("fill", self:getPolygon())
+        love.graphics.setColorMask(true, true, true, true)
+    end)
 end
 
 function Brick:kill()
     if self.state <= Brick.states.dying then
         self.stateAge = 0
         self.state = Brick.states.dying
+        self.game.layers.water:renderTo(function()
+            love.graphics.setColorMask(true, false, false, false)
+            love.graphics.setColor(0,255,255)
+            love.graphics.polygon("fill", self:getPolygon())
+            love.graphics.setColorMask(true, true, true, true)
+        end)
     end
 end
 
@@ -106,7 +119,7 @@ function Brick:onHitBall(nrm, ball)
     self.lives = self.lives - 1
     self.stateAge = 0
     if self.lives == 0 then
-        self.state = Brick.states.dying
+        self:kill()
     else
         self.state = Brick.states.hit
         table.insert(self.game.particles, HitParticle.new({
