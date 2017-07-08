@@ -128,7 +128,7 @@ function Randomizer:isTangible(ball)
     return self.state == Randomizer.states.alive and ball.parent ~= self and not ball.isBullet
 end
 
-function Randomizer:preUpdate(dt)
+function Randomizer:preUpdate(_, dt)
     self.time = self.time + dt
     self.stateAge = self.stateAge + dt
 

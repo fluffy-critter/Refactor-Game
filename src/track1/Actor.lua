@@ -8,8 +8,8 @@ Actor functions:
 getBoundingCircle() - get the bounding circle, in the form of {x, y, r}
 getPolygon() - get the collision poly, in the form of {x1, y1, x2, y2, ...}, clockwise winding
 
-preUpdate(dt) - prepare for the frame
-postUpdate(dt) - handle the results of the update
+preUpdate(dt, rawt) - prepare for the frame (rawt = time without judder effect)
+postUpdate(dt, rawt) - handle the results of the update
 
 isTangible(ball) - return whether this actor is tangible to the specified ball
 isAlive() - return whether this actor should still persist

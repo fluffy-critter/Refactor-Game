@@ -29,6 +29,7 @@ clean:
 	rm -rf build
 
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
+	@echo "Done publishing build $(GAME_VERSION)"
 
 publish-precheck:
 	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0

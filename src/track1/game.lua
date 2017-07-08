@@ -179,30 +179,22 @@ function Game:defer(item)
     table.insert(self.deferred, item)
 end
 
+
 function Game:setGameEvents()
     local function brickLivesColor(lives)
         local brt = math.random()*0.1 + 0.9
         return {util.lerp(128, 255, lives/5)*brt, util.lerp(240, 128, lives/5)*brt, util.lerp(255, 192, lives/5)*brt, 255}
     end
 
-    -- spawn regular balls
-    for _,how in pairs({{when={1}, lives=3, count=3}, {when={3}}, {when={4}}, {when={5}}, {when={8}}, {when={10}}}) do
-        table.insert(self.eventQueue, {
-            when = how.when,
-            what = function()
-                for i=1,how.count or 5 do
-                    table.insert(self.balls, Ball.new(self, {lives=how.lives}))
+    local spawnFuncs = {
+        balls = {
+            regular = function(count, lives)
+                for i=1,count or 5 do
+                    table.insert(self.balls, Ball.new(self, {lives=lives or 3}))
                 end
-            end
-        })
-    end
-
-    -- spawn bouncy balls
-    for _,when in pairs({2, 6, 7, 10}) do
-        table.insert(self.eventQueue, {
-            when = {when},
-            what = function()
-                for i=1,5 do
+            end,
+            bouncy = function(count,lives)
+                for i =1,count or 5 do
                     table.insert(self.balls, Ball.new(self, {
                         r = 4,
                         elasticity = 0.9,
@@ -214,64 +206,15 @@ function Game:setGameEvents()
                             self.vx = 0
                             self.vy = 0
                         end,
-                        lives = 6
+                        lives = lives or 6
                     }))
                 end
-            end
-        })
-    end
-
-    -- spawn superballs
-    for _,when in pairs({{3}, {4}, {5}, {10, 8}, {10, 10}, {10, 12}, {10, 15}, {10, 15, 2}}) do
-        table.insert(self.eventQueue, {
-            when = when,
-            what = function()
+            end,
+            super = function()
                 table.insert(self.balls, SuperBall.new(self))
             end
-        })
-    end
-
-    -- spawn randomizer "bosses"
-    for _,when in pairs({{5,8}, {10}}) do
-        table.insert(self.eventQueue, {
-            when = when,
-            what = function()
-                local randomizer = Randomizer.new(self, {
-                    spawnInterval = 60/BPM,
-                    lives = 20
-                })
-                table.insert(self.actors, randomizer)
-                table.insert(self.toKill, randomizer)
-            end
-        })
-    end
-    -- spawn regular randomizers
-    for _,when in pairs({{7}, {10}}) do
-        table.insert(self.eventQueue, {
-            when = when,
-            what = function()
-                local spawns = {}
-                for i=1,3 do
-                    table.insert(spawns, {
-                        spawnInterval = 180/BPM,
-                        lives = 10,
-                        xFrequency = 0.3,
-                        yFrequency = 6.7,
-                        score = 65536,
-                    })
-                end
-                self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM, 1)
-            end
-        })
-    end
-
-    -- TODO: spawn plain aliens on {4}, {6}, {8}, {9,8}, {10}, {10,8}
-
-    -- spawn regular bricks
-    for _,when in pairs({{4}, {10}}) do
-        table.insert(self.eventQueue, {
-            when = when,
-            what = function()
+        }, bricks = {
+            classic = function()
                 local bricks = {}
                 local w = 64
                 local h = 32
@@ -290,67 +233,8 @@ function Game:setGameEvents()
                 end
 
                 self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/2, (right - left)/w + 1)
-            end
-        })
-    end
-
-    -- spawn zigzag bricks
-    table.insert(self.eventQueue, {
-        when = {5},
-        what = function()
-            local bricks = {}
-            local w = 64
-            local h = 32
-            local top = self.bounds.top + h/2
-            local left = self.bounds.left + w/2
-            local right = self.bounds.right - w/2
-
-            xstart = left
-            xend = right
-            xstep = w
-
-            lives = 3
-            y = top
-            while lives > 0 do
-                for x = xstart, xend, xstep do
-                    table.insert(bricks, {
-                        color = brickLivesColor(lives),
-                        x = x, y = y, w = w, h = h, lives = lives
-                    })
-                end
-
-                xstart, xend = xend, xstart
-                xstep = -xstep
-                lives = lives - 1
-
-                if lives > 0 then
-                    for x = xstart - w*3.5, xend, xstep*5 do
-                        table.insert(bricks, {
-                            color = brickLivesColor(5),
-                            x = x, y = y + 2*h, w = h*2, h = h*2, lives = 5
-                        })
-                    end
-
-                    nexty = y + 4*h
-                    for y = y + h, nexty - 1, h do
-                        table.insert(bricks, {
-                            color = brickLivesColor(lives),
-                            x = xstart, y = y, w = w, h = h, lives = lives
-                        })
-                    end
-                end
-                y = nexty
-            end
-
-            self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2)
-        end
-    })
-
-    -- spawn staggered bricks
-    for _,how in pairs({{when={3}, kill=true}, {when={6}, kill=false}, {when={9}, kill=true, rate=16}}) do
-        table.insert(self.eventQueue, {
-            when = how.when,
-            what = function(kill, rate)
+            end,
+            staggered = function(rate)
                 local bricks = {}
                 local w = 64
                 local h = 32
@@ -378,33 +262,253 @@ function Game:setGameEvents()
                         })
                     end
                 end
-                self.spawner:spawn({self.actors, how.kill and self.toKill or nil}, Brick, bricks, 60/BPM/(how.rate or 8), 2, 0)
-            end
-        })
-    end
+                self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/(rate or 8), 2, 0)
+            end,
+            zigzag = function(zigs, flip)
+                local bricks = {}
+                local w = 64
+                local h = 32
+                local top = self.bounds.top + h/2
+                local left = self.bounds.left + w/2
+                local right = self.bounds.right - w/2
 
-    -- TODO: double spiral pattern on 4, 8, 10
-    -- spawn something else on 5, 7
+                xstart = left
+                xend = right
+                xstep = w
+                if flip then
+                    xstart, xend = xend, xstart
+                    xstep = -w
+                end
 
-    -- replace all the balls with identical particles
-    table.insert(self.eventQueue, {
-        when = {11},
-        what = function()
-            for _,ball in pairs(self.balls) do
-                local pobj = {lifetime = 0.5}
-                util.applyDefaults(pobj, ball)
-                table.insert(self.particles, SparkParticle.new(pobj))
+                y = top
+                local lives = zigs
+                while lives > 0 do
+                    for x = xstart, xend, xstep do
+                        table.insert(bricks, {
+                            color = brickLivesColor(lives),
+                            x = x, y = y, w = w, h = h, lives = lives
+                        })
+                    end
+
+                    xstart, xend = xend, xstart
+                    xstep = -xstep
+                    lives = lives - 1
+
+                    if lives > 0 then
+                        for x = xstart - w*3.5, xend, xstep*5 do
+                            table.insert(bricks, {
+                                color = brickLivesColor(5),
+                                x = x, y = y + 2*h, w = h*2, h = h*2, lives = 5
+                            })
+                        end
+
+                        nexty = y + 4*h
+                        for y = y + h, nexty - 1, h do
+                            table.insert(bricks, {
+                                color = brickLivesColor(lives),
+                                x = xstart, y = y, w = w, h = h, lives = lives
+                            })
+                        end
+                    end
+                    y = nexty
+                end
+
+                self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2)
             end
-            self.balls = {}
-            for _,actor in pairs(self.actors) do
-                actor:kill()
-            end
+        }, mobs = {
+            randomizer = {
+                boss = function()
+                    local randomizer = Randomizer.new(self, {
+                        spawnInterval = 60/BPM,
+                        lives = 20,
+                        w = 96,
+                        h = 96,
+                        sizefuck = 32
+                    })
+                    table.insert(self.actors, randomizer)
+                    table.insert(self.toKill, randomizer)
+                end,
+                minions = function()
+                    local spawns = {}
+                    for i=1,3 do
+                        table.insert(spawns, {
+                            spawnInterval = 180/BPM,
+                            lives = 10,
+                            xFrequency = 0.3,
+                            yFrequency = 6.7,
+                            centerX = (i*2 - 1)*1280/6,
+                            travelX = 1280/5,
+                            score = 65536,
+                            w = 64,
+                            h = 64,
+                            sizefuck = 16
+                        })
+                    end
+                    self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM, 1)
+                end
+            }
+        }
+    }
+
+    local timeFuncs = {
+        judder = function(time)
+            local phase, measure, beat = unpack(time)
+
+            -- each group of stabs is on the two-beat boundary
+            local offset = beat % 2
+
+            -- and the start of each stab is on 3/4 beats
+            local stabOfs = offset % .75
+
+            return 1 - stabOfs
+        end,
+        ramp = function(time)
+            local phase, measure, beat = unpack(time)
+            return 1.2 - beat % 1
         end
-    })
+    }
+
+    self.eventQueue = {
+        {
+            when = {1},
+            what = function()
+                spawnFuncs.balls.regular(3, 3)
+            end
+        },
+        {
+            when = {2},
+            what = function()
+                spawnFuncs.balls.bouncy()
+            end
+        },
+        {
+            when = {3},
+            what = function()
+                spawnFuncs.bricks.staggered()
+
+                spawnFuncs.balls.regular()
+                spawnFuncs.balls.super()
+            end
+        },
+        {
+            when = {4},
+            what = function()
+                spawnFuncs.bricks.classic()
+
+                spawnFuncs.balls.regular()
+                spawnFuncs.balls.super()
+            end
+            -- spawnFuncs.mobs.aliens()
+        },
+        {
+            when = {5},
+            what = function()
+                spawnFuncs.bricks.zigzag(3)
+
+                spawnFuncs.balls.regular()
+                spawnFuncs.balls.super()
+            end
+        },
+        {
+            when = {5,8},
+            what = spawnFuncs.mobs.randomizer.boss
+        },
+        {
+            when = {6},
+            what = function()
+                spawnFuncs.balls.bouncy()
+                -- spawnFuncs.mobs.aliens()
+                self.timeMapper = timeFuncs.judder
+            end
+        },
+        {
+            when = {7},
+            what = function()
+                spawnFuncs.balls.bouncy()
+                spawnFuncs.mobs.randomizer.minions()
+                self.timeMapper = timeFuncs.ramp
+            end
+        },
+        {
+            when = {7,8},
+            what = function()
+                spawnFuncs.bricks.zigzag(4)
+
+                spawnFuncs.balls.bouncy()
+                spawnFuncs.mobs.randomizer.minions()
+                -- self.timeMapper = nil
+            end
+        },
+        {
+            when = {8},
+            what = function()
+                spawnFuncs.balls.regular()
+                -- spawnFuncs.bricks.???
+                -- spawnFuncs.mobs.aliens()
+            end
+        },
+        {
+            when = {9},
+            what = function()
+                -- spawnFuncs.bricks.???
+                self.timeMapper = timeFuncs.judder
+            end
+        },
+        {
+            when = {9,8},
+            what = function()
+            end
+            -- spawnFuncs.mobs.aliens()
+        },
+        {
+            when = {10},
+            what = function()
+                spawnFuncs.bricks.classic()
+
+                spawnFuncs.balls.regular()
+                spawnFuncs.balls.bouncy()
+
+                spawnFuncs.mobs.randomizer.boss()
+                spawnFuncs.mobs.randomizer.minions()
+
+                -- spawnFuncs.mobs.aliens()
+
+                -- spawn superballs on particular beats
+                for _,when in pairs({{10,8}, {10,10}, {10,12}, {10,15}, {10,15,2}}) do
+                    table.insert(self.eventQueue, {
+                        when = when,
+                        what = spawnFuncs.balls.super
+                    })
+                end
+            end
+        },
+        {
+            when = {10,8},
+            what = function()
+                -- spawnFuncs.mobs.aliens()
+            end
+        },
+        {
+            when = {11},
+            what = function()
+                -- replace all the balls with identical particles
+                for _,ball in pairs(self.balls) do
+                    local pobj = {lifetime = 0.5}
+                    util.applyDefaults(pobj, ball)
+                    table.insert(self.particles, SparkParticle.new(pobj))
+                end
+                self.balls = {}
+
+                -- kill the mobs
+                for _,actor in pairs(self.actors) do
+                    actor:kill()
+                end
+            end
+        },
+    }
 
     self.nextEvent = {0}
 end
-
 
 function Game:setPhase(phase)
     print("setting phase to " .. phase)
@@ -427,6 +531,8 @@ function Game:setPhase(phase)
     for k,v in pairs(geom.collision_stats) do
         print(k,v)
     end
+
+    self.timeMapper = nil
 end
 
 function Game:keypressed(key, code, isrepeat)
@@ -510,9 +616,14 @@ function Game:update(dt)
     self.spawner:update(dt)
 
     local function physicsUpdate(dt)
+        local rawt = dt
+        if self.timeMapper then
+            dt = self.timeMapper(time)*dt
+        end
+
         for _,ball in pairs(self.balls) do
 
-            ball:preUpdate(dt)
+            ball:preUpdate(dt, rawt)
 
             -- test against walls
             if ball.x - ball.r < self.bounds.left then
@@ -541,7 +652,7 @@ function Game:update(dt)
         end
 
         for _,actor in pairs(self.actors) do
-            actor:preUpdate(dt)
+            actor:preUpdate(dt, rawt)
         end
 
         for _,actor in pairs(self.actors) do
@@ -580,7 +691,7 @@ function Game:update(dt)
         local function doPostUpdates(cur)
             local removes = {}
             for idx,thing in pairs(cur) do
-                thing:postUpdate(dt)
+                thing:postUpdate(dt, rawt)
                 if not thing:isAlive() then
                     table.insert(removes, idx)
                 end
