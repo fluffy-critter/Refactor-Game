@@ -714,9 +714,58 @@ function Game:update(dt)
             self.particles[r] = nil
         end
     end
+
     for i = 1, 4 do
         -- TODO maybe slide this based on framerate and/or precision issues
         physicsUpdate(dt/4)
+    end
+
+    -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
+    local physicsBeat = math.floor(time[3])
+    if self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) then
+        self.lastPhysicsBeat = physicsBeat
+        local beatOfs = time[3] - physicsBeat
+
+        local BPS = BPM/60
+        local SPB = 60/BPM
+
+        for _,ball in pairs(self.balls) do
+            -- if a ball is above the paddle and moving downward...
+            if ball.y < p.y and ball.vy > 0 then
+                -- p = y + vt + .5at^2, solve for t
+                local nextHitDelta, nb = util.solveQuadratic(.5*ball.ay, ball.vy, ball.y - p.y)
+                if nextHitDelta < 0 or (nb and nb > 0 and nb < nextHitDelta) then
+                    nextHitDelta = nb
+                end
+
+                -- how many beats away the next hit will be
+                local nextHitCurBeats = nextHitDelta*BPS + beatOfs
+
+                if nextHitCurBeats > 1 then
+
+                    -- how many beats away the next beat should be
+                    local nextHitDesiredBeats = math.floor(nextHitCurBeats + 0.5) - beatOfs
+
+                    -- and phrased in time
+                    local nt = nextHitDesiredBeats*SPB
+
+                    -- if the new hit is at least one beat away and doesn't change time by more than 25%...
+                    if nt >= SPB and math.abs(nt/nextHitDelta - 1) < .95 then
+                        print("dt = " .. nextHitDelta .. " -> " .. nt)
+
+                        --[[ y' = y + vt + .5at^2, solve for v:
+
+                            y' - y - .5at^2 = vt
+                            v = (y' - y - .5at^2)/t
+                        ]]
+
+                        local vy = (p.y - ball.y - .5*ball.ay*nt*nt)/nt
+                        -- ball.vx = ball.vx*vy/ball.vy
+                        ball.vy = vy
+                    end
+                end
+            end
+        end
     end
 
     for _,item in pairs(self.deferred) do

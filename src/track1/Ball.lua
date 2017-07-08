@@ -112,6 +112,7 @@ function Ball:preUpdate(dt)
     self.dvx = 0
     self.dvy = 0
     self.dcount = 0
+    self.hasImpulsed = false
 
     self.timeSinceLastHit = self.timeSinceLastHit + dt
 end
@@ -207,6 +208,7 @@ function Ball:applyReflection(nrm, vx, vy, immediate)
 end
 
 function Ball:applyImpulse(dx, dy, dvx, dvy, immediate)
+    self.hasImpulsed = true
 
     if immediate then
         self.x = self.x + dx
