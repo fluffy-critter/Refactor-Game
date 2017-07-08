@@ -774,7 +774,7 @@ function Game:draw()
 
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.clear(0,0,0)
+        love.graphics.clear(0,0,0,0)
         love.graphics.setColor(255, 255, 255, 255)
 
         love.graphics.setShader(shaders.waterReflect)

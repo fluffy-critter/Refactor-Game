@@ -126,6 +126,7 @@ function love.draw()
 
     local canvas = currentGame:draw()
 
+    love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.setColor(255, 255, 255)
 
     if state ~= "playing" then
