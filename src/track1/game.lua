@@ -334,10 +334,10 @@ function Game:setGameEvents()
                         table.insert(spawns, {
                             spawnInterval = 180/BPM,
                             lives = 10,
-                            xFrequency = 0.3,
+                            xFrequency = 0.7,
                             yFrequency = 6.7,
                             centerX = (i*2 - 1)*1280/6,
-                            travelX = 1280/5,
+                            travelX = 1280/6,
                             score = 65536,
                             w = 64,
                             h = 64,
@@ -360,11 +360,11 @@ function Game:setGameEvents()
             -- and the start of each stab is on 3/4 beats
             local stabOfs = offset % .75
 
-            return 1 - stabOfs
+            return 2*(.75 - stabOfs)
         end,
         ramp = function(time)
             local phase, measure, beat = unpack(time)
-            return 1.2 - beat % 1
+            return 1.5*(1 - beat % 1)
         end
     }
 
@@ -427,6 +427,8 @@ function Game:setGameEvents()
                 spawnFuncs.balls.bouncy()
                 spawnFuncs.mobs.randomizer.minions()
                 self.timeMapper = timeFuncs.ramp
+
+                --spawnFuncs.bricks.??? - and add its kill list to {7,8}
             end
         },
         {
@@ -434,9 +436,7 @@ function Game:setGameEvents()
             what = function()
                 spawnFuncs.bricks.zigzag(4)
 
-                spawnFuncs.balls.bouncy()
-                spawnFuncs.mobs.randomizer.minions()
-                -- self.timeMapper = nil
+                --spawnFuncs.mobs.randomizer.aliens()
             end
         },
         {
