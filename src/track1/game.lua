@@ -52,7 +52,7 @@ end
 
 function Game:init()
     print("1.load")
-    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3')
+    self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
 

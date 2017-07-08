@@ -58,7 +58,7 @@ function love.keypressed(...)
     if key == 'p' then
         onPause()
     elseif key == 'f' then
-        love.window.setFullscreen(not love.window.fullscreen)
+        love.window.setFullscreen(not love.window.getFullscreen())
     elseif currentGame.keypressed then
         currentGame:keypressed(...)
     end

@@ -9,6 +9,9 @@ An alien that goes and fucks shit up
 
 local util = require('util')
 local geom = require('geom')
+local imagepool = require('imagepool')
+local shaders = require('shaders')
+
 local Actor = require('track1.Actor')
 local Ball = require('track1.Ball')
 local SparkParticle = require('track1.SparkParticle')
@@ -97,7 +100,7 @@ function Randomizer:onInit()
         particleCount = 30,
         particleLifetime = 0.2,
         particleVelocity = 100,
-        score = 262144
+        score = 262144,
     })
 
     self.x = self.centerX + math.sin(self.position*self.xFrequency)*self.travelX
@@ -107,6 +110,26 @@ function Randomizer:onInit()
     self.stateAge = 0
     self.time = 0
     self.nextSpawn = 0
+
+    self.images = {
+        imagepool.load("images/glitch.png"),
+        self.game.canvas,
+        self.game.layers.water
+    }
+    for _,v in pairs(imagepool.pool) do
+        table.insert(self.images, v)
+    end
+
+    self.quads = {
+        love.graphics.newQuad(0, 0, 1, 1, 1, 1),
+        love.graphics.newQuad(0, 0, 1, 1, 2, 2),
+        love.graphics.newQuad(0, 1, 1, 1, 2, 2),
+        love.graphics.newQuad(1, 0, 1, 1, 2, 2),
+        love.graphics.newQuad(1, 1, 1, 1, 2, 2),
+        love.graphics.newQuad(1, 1, 1, 1, 3, 3),
+    }
+
+    print("images", #self.images, #self.quads)
 end
 
 function Randomizer:draw()
@@ -119,8 +142,20 @@ function Randomizer:draw()
         love.graphics.setColor(math.random(192,255), math.random(192,255), math.random(192,255), alpha)
         local w = math.random(self.w - self.sizefuck, self.w)
         local h = math.random(self.h - self.sizefuck, self.h)
-        -- TODO draw static instead
-        love.graphics.rectangle("fill", self.x - w/2, self.y - h/2, w, h)
+
+        w = w * (math.random(0,1)*2 - 1)*alpha/255
+        h = h * (math.random(0,1)*2 - 1)
+
+        love.graphics.setShader(shaders.hueshift)
+        shaders.hueshift:send("basis", {math.random()*2 - 1, math.random()*2 - 1})
+
+        love.graphics.draw(self.images[math.random(1,#self.images)],
+            self.quads[math.random(1,#self.quads)],
+            self.x, self.y,
+            math.random(0,3)*math.pi/2,
+            w, h, 0.5, 0.5)
+
+        love.graphics.setShader()
     end)
 end
 

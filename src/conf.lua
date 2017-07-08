@@ -1,5 +1,5 @@
 --[[
-Colorful Critter
+Refactor
 
 (c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 
