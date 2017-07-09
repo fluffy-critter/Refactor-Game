@@ -332,6 +332,77 @@ function Game:setGameEvents()
                 end
 
                 self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2)
+            end,
+            dualSpiral = function(rows, spacing)
+                local bricks = {}
+                local w = 32
+                local h = 32
+                local top = self.bounds.top + h
+                local left = self.bounds.left + w
+                local right = self.bounds.right - w
+                local bottom = top + rows*h
+
+                local startX, endX = left, right
+                local startY, endY = top, bottom
+                local stepX, stepY = 1, 0
+                local x = left
+                local y = top
+
+                local sz = 2
+
+                for i = 1, 1000 do
+                    table.insert(bricks, {
+                        color = brickLivesColor(sz),
+                        x = x,
+                        y = y,
+                        w = w*sz,
+                        h = h*sz,
+                        lives = sz
+                    })
+                    table.insert(bricks, {
+                        color = brickLivesColor(sz),
+                        x = right - x + left,
+                        y = bottom - y + top,
+                        w = w*sz,
+                        h = h*sz,
+                        lives = sz
+                    })
+
+                    x = x + stepX*(sz + 1)*w/2
+                    y = y + stepY*(sz + 1)*h/2
+                    sz = 1
+
+                    if stepX ~= 0 and x*stepX >= endX*stepX then
+                        sz = 2
+                        x = endX
+                        startX, endX = endX, startX
+
+                        stepX, stepY = -stepY, stepX
+                        endY = endY - stepY*spacing*h
+
+                        rows = rows - spacing
+                        if rows <= 0 then
+                            break
+                        end
+                    end
+
+                    if stepY ~= 0 and y*stepY >= endY*stepY then
+                        sz = 2
+                        y = endY
+
+                        startY, endY = endY, startY
+
+                        stepX, stepY = -stepY, stepX
+                        endX = endX - stepX*spacing*w
+
+                        rows = rows - spacing
+                        if rows <= 0 then
+                            break
+                        end
+                    end
+                end
+
+                self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 15/BPM/16, 2)
             end
         }, mobs = {
             randomizer = {
@@ -418,7 +489,7 @@ function Game:setGameEvents()
             when = {0},
             what = function()
                 -- Test new things here!
-                -- spawnFuncs.mobs.eyes.minions(1)
+                spawnFuncs.bricks.dualSpiral(15, 3)
             end
         },
         {
