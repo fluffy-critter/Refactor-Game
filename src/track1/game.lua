@@ -637,7 +637,15 @@ function Game:update(dt)
         end
 
         self:runEvents(time)
-    elseif self.phase >= 11 then
+    end
+
+    if self.phase >= 11 then
+        --[[
+            The game is over, but because EventQueue events don't necessarily execute in order, we can't
+            just do a final cull when phase 11 starts. Thus, as soon as we hit phase 11, we just keep on
+            repeatedly culling everything until the game's over.
+        ]]
+
         -- replace all the balls with identical particles
         for _,ball in pairs(self.balls) do
             local pobj = {lifetime = 0.5}
@@ -653,7 +661,9 @@ function Game:update(dt)
             actor:kill()
         end
 
-        -- TODO go to game exit state
+        if not self.music:isPlaying() then
+            -- TODO go to game exit state
+        end
     end
 
     if p.stunned > 0 then
