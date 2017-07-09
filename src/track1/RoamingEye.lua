@@ -45,7 +45,8 @@ function RoamingEye:onInit()
         moveIntervalMin = 2,
         moveIntervalMax = 8,
         moveSpeedMax = 100,
-        score = 10000,
+        scoreHit = 100,
+        scoreDead = 10000,
         vx = 0,
         vy = 0,
         spawnTime = 0.25,
@@ -199,8 +200,10 @@ function RoamingEye:onHitBall(nrm, ball)
 
     self.lives = self.lives - 1
     if self.lives < 1 then
+        self.game.score = self.game.score + self.scoreDead
         self:kill()
     else
+        self.game.score = self.game.score + self.scoreHit
         self.state = RoamingEye.states.hit
         self.stateAge = 0
     end
@@ -260,7 +263,7 @@ function RoamingEye:draw()
         if chargeAmount then
             local chargeFlash = math.floor(chargeTime*chargeTime / 0.2)%2
             if chargeFlash == 0 then
-                love.graphics.setBlendMode("alpha", "alphamultiply")
+                love.graphics.setBlendMode("add", "alphamultiply")
                 love.graphics.setColor(unpack(chargeColor))
                 local cx, cy = px*self.r, py*self.r
                 local dx, dy = unpack(geom.normalize({-cy, cx}, self.pupilSize/2))

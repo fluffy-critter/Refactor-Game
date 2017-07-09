@@ -95,7 +95,8 @@ function Randomizer:onInit()
         particleCount = 30,
         particleLifetime = 0.2,
         particleVelocity = 100,
-        score = 262144,
+        scoreHit = 100,
+        scoreDead = 262144,
     })
 
     self.x = self.centerX + math.sin(self.position*self.xFrequency)*self.travelX
@@ -260,8 +261,9 @@ function Randomizer:onHitBall(nrm, ball)
     if self.lives == 0 then
         self.state = Randomizer.states.dying
         print("u kill me")
-        self.game.score = self.game.score + self.score
+        self.game.score = self.game.score + self.scoreDead
     else
+        self.game.score = self.game.score + self.scoreHit
         self.state = Randomizer.states.hit
     end
 
