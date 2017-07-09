@@ -561,6 +561,7 @@ function Game:setGameEvents()
                     table.insert(self.particles, SparkParticle.new(pobj))
                 end
                 self.balls = {}
+                self.spawner.queue = {}
 
                 -- kill the mobs
                 for _,actor in pairs(self.actors) do
