@@ -15,7 +15,7 @@ uniform float fluidity; // inverse of viscosity
 vec4 effect(vec4 color, Image water, vec2 pos, vec2 screen_coords) {
     vec4 here = Texel(water, pos);
     float z = here.r;
-    float v = here.g;
+    float v = here.g/30000.;
 
     vec2 dx = vec2(psize.x, 0);
     vec2 dy = vec2(0, psize.y);
@@ -34,5 +34,5 @@ vec4 effect(vec4 color, Image water, vec2 pos, vec2 screen_coords) {
     z += v*dt;
     v = v*pow(damp, dt);
 
-    return vec4(z, v, 0, 0);
+    return vec4(z, v*30000., 0, 0);
 }

@@ -72,8 +72,8 @@ function Game:init()
 
     local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f", "rg16f", "rgba16f", "rg11b10f")
     if waterFormat then
-        self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
-        self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
+        self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
+        self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
         self.waterParams = {
             fluidity = 1.5,
             damp = 0.913,
@@ -82,6 +82,8 @@ function Game:init()
             fresnel = 0.1,
             sampleRadius = 5.5,
         }
+    else
+        self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
     self.bounds = {
@@ -813,7 +815,7 @@ function Game:update(dt)
     end
     self.deferred = {}
 
-    if self.layers.water then
+    if self.waterParams then
         self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
             shaders.waterRipple, {
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
@@ -875,7 +877,7 @@ function Game:draw()
         love.graphics.clear(0,0,0,0)
         love.graphics.setColor(255, 255, 255, 255)
 
-        if self.layers.water then
+        if self.waterParams then
             love.graphics.setShader(shaders.waterReflect)
             shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
             shaders.waterReflect:send("rsize", self.waterParams.rsize)

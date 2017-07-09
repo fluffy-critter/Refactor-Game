@@ -110,6 +110,10 @@ function util.solveQuadratic(a, b, c)
 end
 
 local graphicsFormats = love.graphics.getCanvasFormats()
+-- print("supported graphics formats:")
+-- for k,v in pairs(graphicsFormats) do
+--     if v then print("\t" .. k) end
+-- end
 function util.selectCanvasFormat(...)
     for _,k in ipairs({...}) do
         if graphicsFormats[k] then
