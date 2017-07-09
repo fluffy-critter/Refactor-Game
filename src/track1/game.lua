@@ -200,6 +200,7 @@ function Game:setGameEvents()
                         elasticity = 0.9,
                         color = {255, 255, 128, 255},
                         hitColor = {255, 255, 0, 128},
+                        beatSync = 0.5,
                         onStart = function(self)
                             Ball.onStart(self)
                             self.ay = 600
@@ -211,7 +212,7 @@ function Game:setGameEvents()
                 end
             end,
             super = function()
-                table.insert(self.balls, SuperBall.new(self))
+                table.insert(self.balls, SuperBall.new(self, {}))
             end
         }, bricks = {
             classic = function()
@@ -721,48 +722,38 @@ function Game:update(dt)
     end
 
     -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
-    local physicsBeat = math.floor(time[3])
-    if self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) then
+    local physicsBeat = math.floor(time[3]*4)
+    if self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) and not self.timeMapper then
         self.lastPhysicsBeat = physicsBeat
-        local beatOfs = time[3] - physicsBeat
 
         local BPS = BPM/60
         local SPB = 60/BPM
 
         for _,ball in pairs(self.balls) do
             -- if a ball is above the paddle and moving downward...
-            if ball.y < p.y and ball.vy > 0 then
+            local targetY = p.y - p.h/2 - ball.r
+            if ball.y < targetY and ball.vy > 0 then
                 -- p = y + vt + .5at^2, solve for t
-                local nextHitDelta, nb = util.solveQuadratic(.5*ball.ay, ball.vy, ball.y - p.y)
+                local nextHitDelta, nb = util.solveQuadratic(.5*ball.ay, ball.vy, ball.y - targetY)
                 if nextHitDelta < 0 or (nb and nb > 0 and nb < nextHitDelta) then
                     nextHitDelta = nb
                 end
 
-                -- how many beats away the next hit will be
-                local nextHitCurBeats = nextHitDelta*BPS + beatOfs
+                local beatOfs = time[3]/ball.beatSync % 1
+                local deltaBeats = nextHitDelta*BPS/ball.beatSync
 
-                if nextHitCurBeats > 1 then
+                -- round this to the nearest beat, after taking off the beatOfs
+                deltaBeats = math.floor(deltaBeats + beatOfs + 0.5) - beatOfs
 
-                    -- how many beats away the next beat should be
-                    local nextHitDesiredBeats = math.floor(nextHitCurBeats + 0.5) - beatOfs
+                if deltaBeats > .5 then
+                    -- new time before next hit
+                    local deltaTime = deltaBeats*SPB*ball.beatSync
 
-                    -- and phrased in time
-                    local nt = nextHitDesiredBeats*SPB
+                    -- print("dt = " .. nextHitDelta .. " -> " .. deltaTime)
 
-                    -- if the new hit is at least one beat away and doesn't change time by more than 25%...
-                    if nt >= SPB and math.abs(nt/nextHitDelta - 1) < .95 then
-                        print("dt = " .. nextHitDelta .. " -> " .. nt)
-
-                        --[[ y' = y + vt + .5at^2, solve for v:
-
-                            y' - y - .5at^2 = vt
-                            v = (y' - y - .5at^2)/t
-                        ]]
-
-                        local vy = (p.y - ball.y - .5*ball.ay*nt*nt)/nt
-                        -- ball.vx = ball.vx*vy/ball.vy
-                        ball.vy = vy
-                    end
+                    -- p = y + vt + .5at^2, solve for v
+                    local vy = (targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime
+                    ball.vy = vy
                 end
             end
         end
@@ -801,6 +792,8 @@ function Game:draw()
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(unpack(self.paddle.color))
         love.graphics.polygon("fill", self.paddle:getPolygon())
+
+        -- love.graphics.line(0, self.paddle.y, 1280, self.paddle.y)
 
         -- draw the actors
         for _,actor in pairs(self.actors) do
