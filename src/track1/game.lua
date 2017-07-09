@@ -562,12 +562,6 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.eyes.boss()
             end
         },
-        {
-            when = {11},
-            what = function()
-                -- TODO go to game exit state
-            end
-        },
     }
 
     self.nextEvent = {0}
@@ -583,6 +577,9 @@ function Game:setPhase(phase)
 
     if phase == 0 then
         self.music:play()
+    end
+
+    if phase == 11 then
     end
 
     self.phase = phase
@@ -629,8 +626,18 @@ function Game:runEvents(time)
 end
 
 function Game:update(dt)
-    -- this shouldn't be necessary but argh wtf
-    if self.phase >= 11 then
+    local p = self.paddle
+    local b = self.bounds
+
+    local time = self:musicPos()
+    if self.music:isPlaying() then
+        local phase = time[1]
+        if phase > self.phase then
+            self:setPhase(phase)
+        end
+
+        self:runEvents(time)
+    elseif self.phase >= 11 then
         -- replace all the balls with identical particles
         for _,ball in pairs(self.balls) do
             local pobj = {lifetime = 0.5}
@@ -645,19 +652,8 @@ function Game:update(dt)
         for _,actor in pairs(self.actors) do
             actor:kill()
         end
-    end
 
-    local p = self.paddle
-    local b = self.bounds
-
-    local time = self:musicPos()
-    if self.music:isPlaying() then
-        local phase = time[1]
-        if phase > self.phase then
-            self:setPhase(phase)
-        end
-
-        self:runEvents(time)
+        -- TODO go to game exit state
     end
 
     if p.stunned > 0 then
