@@ -90,4 +90,14 @@ function util.premultiply(color)
     return {color[1]*a/255, color[2]*a/255, color[3]*a/255, a}
 end
 
+-- get the solutions to a quadratic equation; returns up two values, or nil if complex
+function util.solveQuadratic(a, b, c)
+    local det = b*b - 4*a*c
+    if det < 0 then
+        return nil
+    end
+    det = math.sqrt(det)
+    return (-b - det)/2/a, (-b + det)/2/a
+end
+
 return util

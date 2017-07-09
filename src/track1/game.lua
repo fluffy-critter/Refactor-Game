@@ -200,6 +200,7 @@ function Game:setGameEvents()
                         elasticity = 0.9,
                         color = {255, 255, 128, 255},
                         hitColor = {255, 255, 0, 128},
+                        beatSync = 0.5,
                         onStart = function(self)
                             Ball.onStart(self)
                             self.ay = 600
@@ -211,7 +212,7 @@ function Game:setGameEvents()
                 end
             end,
             super = function()
-                table.insert(self.balls, SuperBall.new(self))
+                table.insert(self.balls, SuperBall.new(self, {}))
             end
         }, bricks = {
             classic = function()
@@ -714,9 +715,48 @@ function Game:update(dt)
             self.particles[r] = nil
         end
     end
+
     for i = 1, 4 do
         -- TODO maybe slide this based on framerate and/or precision issues
         physicsUpdate(dt/4)
+    end
+
+    -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
+    local physicsBeat = math.floor(time[3]*4)
+    if self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) and not self.timeMapper then
+        self.lastPhysicsBeat = physicsBeat
+
+        local BPS = BPM/60
+        local SPB = 60/BPM
+
+        for _,ball in pairs(self.balls) do
+            -- if a ball is above the paddle and moving downward...
+            local targetY = p.y - p.h/2 - ball.r
+            if ball.y < targetY and ball.vy > 0 then
+                -- p = y + vt + .5at^2, solve for t
+                local nextHitDelta, nb = util.solveQuadratic(.5*ball.ay, ball.vy, ball.y - targetY)
+                if nextHitDelta < 0 or (nb and nb > 0 and nb < nextHitDelta) then
+                    nextHitDelta = nb
+                end
+
+                local beatOfs = time[3]/ball.beatSync % 1
+                local deltaBeats = nextHitDelta*BPS/ball.beatSync
+
+                -- round this to the nearest beat, after taking off the beatOfs
+                deltaBeats = math.floor(deltaBeats + beatOfs + 0.5) - beatOfs
+
+                if deltaBeats > .5 then
+                    -- new time before next hit
+                    local deltaTime = deltaBeats*SPB*ball.beatSync
+
+                    -- print("dt = " .. nextHitDelta .. " -> " .. deltaTime)
+
+                    -- p = y + vt + .5at^2, solve for v
+                    local vy = (targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime
+                    ball.vy = vy
+                end
+            end
+        end
     end
 
     for _,item in pairs(self.deferred) do
@@ -752,6 +792,8 @@ function Game:draw()
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(unpack(self.paddle.color))
         love.graphics.polygon("fill", self.paddle:getPolygon())
+
+        -- love.graphics.line(0, self.paddle.y, 1280, self.paddle.y)
 
         -- draw the actors
         for _,actor in pairs(self.actors) do

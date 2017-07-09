@@ -33,6 +33,8 @@ Properties:
     isBullet: it is a bullet, and thus actors shouldn't respond to it (unless they want to)
     parent: reference to the actor that spawned it, if applicable
 
+    beatSync: what increment of beats to synchronize to
+
 Methods:
 
     onInit() - called when the ball is first initialized
@@ -90,7 +92,8 @@ function Ball:onInit()
         scoreCooldown = 0.5,
         recoil = 0,
         minVelocity = 1,
-        blendMode = "alpha"
+        blendMode = "alpha",
+        beatSync = 1
     })
 
     self.paddleScoreVal = self.paddleScore
@@ -112,6 +115,7 @@ function Ball:preUpdate(dt)
     self.dvx = 0
     self.dvy = 0
     self.dcount = 0
+    self.hasImpulsed = false
 
     self.timeSinceLastHit = self.timeSinceLastHit + dt
 end
@@ -207,6 +211,7 @@ function Ball:applyReflection(nrm, vx, vy, immediate)
 end
 
 function Ball:applyImpulse(dx, dy, dvx, dvy, immediate)
+    self.hasImpulsed = true
 
     if immediate then
         self.x = self.x + dx
