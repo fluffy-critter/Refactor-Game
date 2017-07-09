@@ -9,7 +9,8 @@ Some useful shaders
 local shaders = {
     hueshift =  love.graphics.newShader("shaders/hueshift.fs"),
     waterRipple = love.graphics.newShader("shaders/waterRipple.fs"),
-    waterReflect = love.graphics.newShader("shaders/waterReflect.fs")
+    waterReflect = love.graphics.newShader("shaders/waterReflect.fs"),
+    sphereDistort = love.graphics.newShader("shaders/sphereDistort.fs")
 }
 
 return shaders

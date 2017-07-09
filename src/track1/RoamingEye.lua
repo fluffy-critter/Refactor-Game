@@ -8,6 +8,7 @@ RoamingEye - it looks at you piercingly
 
 local geom = require('geom')
 local util = require('util')
+local shaders = require('shaders')
 
 local Actor = require('track1.Actor')
 local StunBullet = require('track1.StunBullet')
@@ -57,8 +58,8 @@ function RoamingEye:onInit()
     })
 
     util.applyDefaults(self, {
-        irisSize = self.r/2,
-        pupilSize = self.r/4,
+        irisSize = self.r/2.5,
+        pupilSize = self.r/3.5,
         minX = b.left + self.r,
         maxX = b.right - self.r,
         minY = b.top + self.r,
@@ -222,7 +223,10 @@ function RoamingEye:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(alpha, alpha, alpha, alpha)
+        -- love.graphics.setShader(shaders.sphereDistort)
+        -- shaders.sphereDistort:send("gamma", 0.9)
         love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
+        love.graphics.setShader()
 
         -- TODO charging animation
 
