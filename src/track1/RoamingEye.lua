@@ -174,6 +174,13 @@ function RoamingEye:checkHitBalls(balls)
     end
 end
 
+function RoamingEye:kill()
+    if self.state < RoamingEye.states.dying then
+        self.state = RoamingEye.states.dying
+        self.stateAge = 0
+    end
+end
+
 function RoamingEye:onHitBall(nrm, ball)
     if self.state ~= RoamingEye.states.alive then
         return
@@ -186,8 +193,7 @@ function RoamingEye:onHitBall(nrm, ball)
 
     self.lives = self.lives - 1
     if self.lives < 1 then
-        self.state = RoamingEye.states.dying
-        self.stateAge = 0
+        self:kill()
     else
         self.state = RoamingEye.states.hit
         self.stateAge = 0
