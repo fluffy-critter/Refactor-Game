@@ -41,6 +41,7 @@ function RoamingEye:onInit()
         shootInterval = 4,
         shootChargeTime = 2,
         shootSpeed = 300,
+        shootSpeedIncrement = 50,
         moveIntervalMin = 2,
         moveIntervalMax = 8,
         moveSpeedMax = 100,
@@ -83,7 +84,7 @@ function RoamingEye:onInit()
     self.lookX = 0
     self.lookY = 0
 
-    self.canvas = love.graphics.newCanvas(self.r*2, self.r*2)
+    self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, "rgba4", 4)
 end
 
 function RoamingEye:isAlive()
@@ -109,7 +110,6 @@ function RoamingEye:preUpdate(dt)
         return
     end
 
-
     self.time = self.time + dt
 
     if self.time > self.nextMove then
@@ -131,6 +131,10 @@ function RoamingEye:preUpdate(dt)
 end
 
 function RoamingEye:postUpdate(dt)
+    if self.state >= RoamingEye.states.hit then
+        return
+    end
+
     self.lookX = self.game.paddle.x - self.x
     self.lookY = self.game.paddle.y - self.y
     self.x = self.x + self.vx
@@ -148,6 +152,7 @@ function RoamingEye:postUpdate(dt)
                 vy = vy*self.shootSpeed,
                 parent = self
             }))
+            self.shootSpeed = self.shootSpeed + self.shootSpeedIncrement
         end)
 
         self.vx = self.vx - vx*self.recoil
@@ -263,13 +268,11 @@ function RoamingEye:draw()
                     self.x + cx - dx, self.y + cy - dy,
                     self.x + self.lookX, self.y + self.lookY)
             end
-
-            -- TODO particles? or is that overkill?
         end
 
 
         love.graphics.setBlendMode("alpha", "alphamultiply")
-        if self.state == RoamingEye.states.spawning then
+        if self.state == RoamingEye.states.spawning or self.state == RoamingEye.states.dying then
             love.graphics.setColor(255, 255, 255, alpha)
             love.graphics.circle("fill", self.x, self.y, self.r)
         end
