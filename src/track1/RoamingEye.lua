@@ -199,6 +199,7 @@ function RoamingEye:onHitBall(nrm, ball)
 
     self.lives = self.lives - 1
     if self.lives < 1 then
+        self.game.score = self.game.score + self.score
         self:kill()
     else
         self.state = RoamingEye.states.hit
