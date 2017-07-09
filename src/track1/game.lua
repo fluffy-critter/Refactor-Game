@@ -70,16 +70,19 @@ function Game:init()
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.overlay = love.graphics.newCanvas(1280, 720)
 
-    self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
-    self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
-    self.waterParams = {
-        fluidity = 1.5,
-        damp = 0.913,
-        timeMul = 15,
-        rsize = 32,
-        fresnel = 0.1,
-        sampleRadius = 5.5,
-    }
+    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f", "rg16f", "rgba16f", "rg11b10f")
+    if waterFormat then
+        self.layers.water = love.graphics.newCanvas(1280, 720, "rg32f")
+        self.layers.waterBack = love.graphics.newCanvas(1280, 720, "rg32f")
+        self.waterParams = {
+            fluidity = 1.5,
+            damp = 0.913,
+            timeMul = 15,
+            rsize = 32,
+            fresnel = 0.1,
+            sampleRadius = 5.5,
+        }
+    end
 
     self.bounds = {
         left = 32,
@@ -810,13 +813,15 @@ function Game:update(dt)
     end
     self.deferred = {}
 
-    self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
-        shaders.waterRipple, {
-            psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
-            damp = self.waterParams.damp,
-            fluidity = self.waterParams.fluidity,
-            dt = dt*self.waterParams.timeMul
-        })
+    if self.layers.water then
+        self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
+            shaders.waterRipple, {
+                psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
+                damp = self.waterParams.damp,
+                fluidity = self.waterParams.fluidity,
+                dt = dt*self.waterParams.timeMul
+            })
+    end
 end
 
 function Game:draw()
@@ -870,15 +875,17 @@ function Game:draw()
         love.graphics.clear(0,0,0,0)
         love.graphics.setColor(255, 255, 255, 255)
 
-        love.graphics.setShader(shaders.waterReflect)
-        shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
-        shaders.waterReflect:send("rsize", self.waterParams.rsize)
-        shaders.waterReflect:send("fresnel", self.waterParams.fresnel);
-        shaders.waterReflect:send("source", self.layers.arena)
-        shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
-        shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
-        love.graphics.draw(self.layers.water)
-        love.graphics.setShader()
+        if self.layers.water then
+            love.graphics.setShader(shaders.waterReflect)
+            shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
+            shaders.waterReflect:send("rsize", self.waterParams.rsize)
+            shaders.waterReflect:send("fresnel", self.waterParams.fresnel);
+            shaders.waterReflect:send("source", self.layers.arena)
+            shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
+            shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
+            love.graphics.draw(self.layers.water)
+            love.graphics.setShader()
+        end
 
         love.graphics.draw(self.layers.arena)
         love.graphics.draw(self.layers.overlay)

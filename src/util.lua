@@ -109,4 +109,14 @@ function util.solveQuadratic(a, b, c)
     return (-b - det)/2/a, (-b + det)/2/a
 end
 
+local graphicsFormats = love.graphics.getCanvasFormats()
+function util.selectCanvasFormat(...)
+    for _,k in ipairs({...}) do
+        if graphicsFormats[k] then
+            return k
+        end
+    end
+    return nil
+end
+
 return util

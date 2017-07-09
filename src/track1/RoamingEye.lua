@@ -84,7 +84,8 @@ function RoamingEye:onInit()
     self.lookX = 0
     self.lookY = 0
 
-    self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, "rgba4", 4)
+    local canvasFormat = util.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
+    self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, canvasFormat, 2)
 end
 
 function RoamingEye:isAlive()
