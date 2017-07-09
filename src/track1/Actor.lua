@@ -5,6 +5,7 @@ Refactor: 1 - Little Bouncing Ball
 
 Actor functions:
 
+checkHitBalls(balls) - run the collision loop for a bunch of balls
 getBoundingCircle() - get the bounding circle, in the form of {x, y, r}
 getPolygon() - get the collision poly, in the form of {x1, y1, x2, y2, ...}, clockwise winding
 
@@ -21,14 +22,66 @@ draw() - render the actor
 
 ]]
 
+local geom = require('geom')
+
 local Actor = {}
+
+function Actor:checkHitBalls(balls)
+    -- default implementation - test each ball against the bounding circle and then the polygon, memoizing as we go
+    local poly, aabb
+    local bcircle = self:getBoundingCircle()
+    local bx, by, br = unpack(bcircle or {})
+
+    local function checkBall(ball)
+        if not self:isTangible(ball) then
+            return false
+        end
+
+        if bcircle then
+            local dx = ball.x - bx
+            local dy = ball.y - by
+            if math.sqrt(dx*dx + dy*dy) >= ball.r + br then
+                return false
+            end
+
+            -- TODO: fail the bound check if the ball is moving away as well
+        end
+
+        if not poly then
+            poly = self:getPolygon()
+            if not poly then
+                return false
+            end
+        end
+
+        if not aabb then
+            aabb = geom.getAABB(poly)
+            if not aabb then
+                return false
+            end
+        end
+
+        if not geom.pointAABBCollision(ball.x, ball.y, ball.r, aabb) then
+            return false
+        end
+
+        return geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
+    end
+
+    for _,ball in pairs(balls) do
+        nrm = checkBall(ball)
+        if nrm then
+            self:onHitBall(nrm, ball)
+        end
+    end
+end
 
 function Actor:getBoundingCircle()
     -- no default
 end
 
 function Actor:getPolygon()
-    return {}
+    return nil
 end
 
 function Actor:preUpdate(dt)

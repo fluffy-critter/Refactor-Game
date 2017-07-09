@@ -51,7 +51,8 @@ function Game:seekMusic(phase, measure, beat, timeOfs)
 end
 
 function Game:init()
-    print("1.load")
+    self.syncBeats = true -- try to synchronize ball paddle bounces to beats
+
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
@@ -530,7 +531,9 @@ function Game:setPhase(phase)
     end
 
     for k,v in pairs(geom.collision_stats) do
-        print(k,v)
+        if tonumber(v) then
+            print(k,v)
+        end
     end
 
     self.timeMapper = nil
@@ -657,36 +660,7 @@ function Game:update(dt)
         end
 
         for _,actor in pairs(self.actors) do
-            local poly
-            local bcircle = actor:getBoundingCircle()
-            local bx, by, br = unpack(bcircle or {})
-
-            for _,ball in pairs(self.balls) do
-                if actor:isTangible(ball) then
-                    local boundcheck
-
-                    -- quick check, if bounding radius is available
-                    if bcircle then
-                        local dx = ball.x - bx
-                        local dy = ball.y - by
-                        boundcheck = math.sqrt(dx*dx + dy*dy) < ball.r + br
-
-                        -- TODO: fail the bound check if we're moving away as well
-                    else
-                        boundcheck = true
-                    end
-
-                    if boundcheck then
-                        if not poly then
-                            poly = actor:getPolygon()
-                        end
-                        nrm = geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
-                        if nrm then
-                            actor:onHitBall(nrm, ball)
-                        end
-                    end
-                end
-            end
+            actor:checkHitBalls(self.balls)
         end
 
         local function doPostUpdates(cur)
@@ -723,7 +697,7 @@ function Game:update(dt)
 
     -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
     local physicsBeat = math.floor(time[3]*4)
-    if self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) and not self.timeMapper then
+    if self.syncBeats and self.music:isPlaying() and (physicsBeat ~= self.lastPhysicsBeat) and not self.timeMapper then
         self.lastPhysicsBeat = physicsBeat
 
         local BPS = BPM/60

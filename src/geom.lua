@@ -7,13 +7,11 @@ Refactor
 
 local geom = {}
 
-geom.collision_stats = {
-    tests = 0,
-    fail_aabb = 0,
-    fail_face_inclusion = 0,
-    pass_face_projection = 0,
-    fail_corner_inclusion = 0
-}
+geom.collision_stats = {}
+local cs = geom.collision_stats
+function geom.collision_stats:incr(key)
+    self[key] = (self[key] or 0) + 1
+end
 
 -- Check if two rectangles overlap (note: x2 must be >= x1, same for y)
 function geom.quadsOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
@@ -61,36 +59,38 @@ function geom.normalize(nrm, len)
     return {x*len/d, y*len/d}
 end
 
--- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
-function geom.pointPolyCollision(x, y, r, poly)
-    local cs = geom.collision_stats
+-- get the AABB of a polygon; {x0, y0, x1, y1}
+function geom.getAABB(poly)
+    cs:incr('get_aabb')
 
-    cs.tests = cs.tests + 1
+    local aabb = {poly[1], poly[2], poly[1], poly[2]}
 
-    local npoints = #poly / 2
-
-    local minx = poly[1]
-    local maxx = poly[1]
-    local miny = poly[2]
-    local maxy = poly[2]
-    for i = 2, npoints do
-        local px = poly[i*2 - 1]
-        local py = poly[i*2]
-        minx = math.min(minx, px)
-        maxx = math.max(maxx, px)
-        miny = math.min(miny, py)
-        maxy = math.max(maxy, py)
+    for i = 3, #poly, 2 do
+        aabb[1] = math.min(aabb[1], poly[i])
+        aabb[2] = math.min(aabb[2], poly[i + 1])
+        aabb[3] = math.max(aabb[3], poly[i])
+        aabb[4] = math.max(aabb[4], poly[i + 1])
     end
 
-    -- do the fast AABB test (no need to do it as quads)
-    if ((x + r <= minx) or
-        (x - r >= maxx) or
-        (y + r <= miny) or
-        (y - r >= maxy)) then
+    return aabb
+end
 
-        cs.fail_aabb = cs.fail_aabb + 1
+-- check to see if a ball collides with an AABB
+function geom.pointAABBCollision(x, y, r, aabb)
+    cs:incr('point_aabb_test')
+    if x + r <= aabb[1] or y + r <= aabb[2] or x - r >= aabb[3] or y - r >= aabb[4] then
+        cs:incr('point_aabb_fail')
         return false
     end
+    cs:incr('point_aabb_pass')
+    return true
+end
+
+-- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
+function geom.pointPolyCollision(x, y, r, poly)
+    cs:incr('point_poly_test')
+
+    local npoints = #poly / 2
 
     local x1, y1, x2, y2
     x2 = poly[npoints*2 - 1]
@@ -115,7 +115,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
         if dist[i] >= r then
             -- We are fully outside on this side, so we are outside
-            cs.fail_face_inclusion = cs.fail_face_inclusion + 1
+            cs:incr('point_poly_face_inclusion_fail')
             return false
         end
 
@@ -130,7 +130,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     -- is our center inside the nearest segment? If so, we just use its normal
     if maxSideProj >= 0 and maxSideProj <= 1 then
-        cs.pass_face_projection = cs.pass_face_projection + 1
+        cs:incr('point_poly_face_projection_pass')
         return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
@@ -150,10 +150,11 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     if cornerDist2 >= r*r then
         -- oops, after all that work it turns out we're not actually intersecting
-        cs.fail_corner_inclusion = cs.fail_corner_inclusion + 1
+        cs:incr('point_poly_corner_fail')
         return false
     end
 
+    cs:incr('point_poly_corner_pass')
     return geom.normalize({cornerX, cornerY}, r - math.sqrt(cornerDist2))
 end
 
