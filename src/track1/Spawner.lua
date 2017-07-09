@@ -80,4 +80,9 @@ function Spawner:update(dt)
     end
 end
 
+function Spawner:kill()
+    self.queue = {}
+    self.nextEvent = nil
+end
+
 return Spawner

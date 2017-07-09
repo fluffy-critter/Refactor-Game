@@ -565,19 +565,7 @@ function Game:setGameEvents()
         {
             when = {11},
             what = function()
-                -- replace all the balls with identical particles
-                for _,ball in pairs(self.balls) do
-                    local pobj = {lifetime = 0.5}
-                    util.applyDefaults(pobj, ball)
-                    table.insert(self.particles, SparkParticle.new(pobj))
-                end
-                self.balls = {}
-                self.spawner.queue = {}
-
-                -- kill the mobs
-                for _,actor in pairs(self.actors) do
-                    actor:kill()
-                end
+                -- TODO go to game exit state
             end
         },
     }
@@ -588,8 +576,8 @@ end
 function Game:setPhase(phase)
     print("setting phase to " .. phase)
 
-    for _,brick in pairs(self.toKill) do
-        brick:kill()
+    for _,actor in pairs(self.toKill) do
+        actor:kill()
     end
     self.toKill = {}
 
@@ -641,6 +629,24 @@ function Game:runEvents(time)
 end
 
 function Game:update(dt)
+    -- this shouldn't be necessary but argh wtf
+    if self.phase >= 11 then
+        -- replace all the balls with identical particles
+        for _,ball in pairs(self.balls) do
+            local pobj = {lifetime = 0.5}
+            util.applyDefaults(pobj, ball)
+            table.insert(self.particles, SparkParticle.new(pobj))
+        end
+        self.balls = {}
+
+        -- kill the mobs
+        self.spawner:kill()
+        self.deferred = {}
+        for _,actor in pairs(self.actors) do
+            actor:kill()
+        end
+    end
+
     local p = self.paddle
     local b = self.bounds
 

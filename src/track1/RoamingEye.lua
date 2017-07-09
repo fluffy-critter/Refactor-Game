@@ -24,6 +24,7 @@ function RoamingEye.new(game, o)
 
     self.game = game
 
+    print("i see you")
     self:onInit()
     return self
 end

@@ -50,7 +50,7 @@ function Brick:onInit()
 end
 
 function Brick:kill()
-    if self.state <= Brick.states.dying then
+    if self.state < Brick.states.dying then
         self.stateAge = 0
         self.state = Brick.states.dying
         self.game.layers.water:renderTo(function()
