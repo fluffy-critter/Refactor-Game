@@ -3,6 +3,8 @@
 Hue/saturation shift shader. (Use setColor() to further attenuate the brightness or whatever.)
 
 See https://beesbuzz.biz/code/hsv_color_transforms.php for an explanation of the math.
+
+(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 */
 
 uniform vec2 basis; // transform basis; {saturation*cos(theta), saturation*sin(theta)}

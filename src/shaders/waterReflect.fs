@@ -4,6 +4,7 @@ Shader for rendering the water effect
 
 Stores height in red channel, velocity in green (multiplied by some large factor).
 
+(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 */
 
 uniform vec2 psize; // texture coordinate step per pixel

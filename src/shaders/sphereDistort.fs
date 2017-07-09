@@ -1,6 +1,8 @@
 /* sphereDistort.fs
 
 Distorts a circle in a canvas to look more spherical
+
+(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 */
 
 uniform float gamma; // how much to distort by
