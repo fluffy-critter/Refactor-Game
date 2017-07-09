@@ -260,7 +260,7 @@ function RoamingEye:draw()
         if chargeAmount then
             local chargeFlash = math.floor(chargeTime*chargeTime / 0.2)%2
             if chargeFlash == 0 then
-                love.graphics.setBlendMode("alpha", "alphamultiply")
+                love.graphics.setBlendMode("add", "alphamultiply")
                 love.graphics.setColor(unpack(chargeColor))
                 local cx, cy = px*self.r, py*self.r
                 local dx, dy = unpack(geom.normalize({-cy, cx}, self.pupilSize/2))
