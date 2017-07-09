@@ -147,35 +147,35 @@ function Game:init()
     self.actors = {}
 
     -- initialize with the starter ball
-    self.balls = {
-        Ball.new(self, {
-            r = 10,
-            color = {128, 255, 255, 255},
-            lives = 3,
-            hitColor = {0, 128, 128, 255},
-            ay = 30,
-            preUpdate = function(self, dt)
-                Ball.preUpdate(self, dt)
-                self.vx = self.vx + dt*(paddle.x - self.x)
-                self.vy = self.vy + dt*(paddle.y - self.y)
-            end,
-            onHitPaddle = function(self, nrm, paddle)
-                self.preUpdate = Ball.preUpdate
-                self.onHitPaddle = Ball.onHitPaddle
-                self.onStart = Ball.onStart
-                self:onHitPaddle(nrm, paddle)
-                self.game:setPhase(0)
-            end,
-            onStart = function(self)
-                Ball.onStart(self)
-                self.vx = 0
-                self.vy = 0
-            end,
-            onLost = function(self)
-                self.ay = self.ay + 30
-            end
-        })
-    }
+    self.starterBall = Ball.new(self, {
+        r = 10,
+        color = {128, 255, 255, 255},
+        lives = 3,
+        hitColor = {0, 128, 128, 255},
+        ay = 30,
+        preUpdate = function(self, dt)
+            Ball.preUpdate(self, dt)
+            self.vx = self.vx + dt*(paddle.x - self.x)
+            self.vy = self.vy + dt*(paddle.y - self.y)
+        end,
+        onHitPaddle = function(self, nrm, paddle)
+            self.preUpdate = Ball.preUpdate
+            self.onHitPaddle = Ball.onHitPaddle
+            self.onStart = Ball.onStart
+            self:onHitPaddle(nrm, paddle)
+            self.game:setPhase(0)
+        end,
+        onStart = function(self)
+            Ball.onStart(self)
+            self.vx = 0
+            self.vy = 0
+        end,
+        onLost = function(self)
+            self.ay = self.ay + 30
+        end
+    })
+
+    self.balls = {self.starterBall}
 
     self.deferred = {}
 
@@ -464,6 +464,8 @@ function Game:setGameEvents()
         {
             when = {5},
             what = function()
+                self.starterBall.ay = math.min(self.starterBall.ay, 50)
+
                 spawnFuncs.bricks.zigzag(3)
 
                 spawnFuncs.balls.regular()
@@ -512,6 +514,8 @@ function Game:setGameEvents()
         {
             when = {9},
             what = function()
+                self.starterBall.ay = math.min(self.starterBall.ay, 50)
+
                 -- spawnFuncs.bricks.???
                 self.timeMapper = timeFuncs.judder
             end
@@ -525,6 +529,8 @@ function Game:setGameEvents()
         {
             when = {10},
             what = function()
+                self.starterBall.ay = math.min(self.starterBall.ay, 50)
+
                 spawnFuncs.bricks.classic()
 
                 spawnFuncs.balls.regular()
