@@ -37,9 +37,9 @@ function RoamingEye:onInit()
         ballColor = {128, 192, 192},
         irisColor = {128, 0, 192},
         pupilColor = {0, 0, 0},
-        chargeColor = {255, 0, 0, 128},
+        chargeColor = {255, 0, 0, 192},
         shootInterval = 4,
-        shootChargeTime = 1,
+        shootChargeTime = 2,
         shootSpeed = 300,
         moveIntervalMin = 2,
         moveIntervalMax = 8,
@@ -201,12 +201,14 @@ function RoamingEye:onHitBall(nrm, ball)
 end
 
 function RoamingEye:draw()
-    local px, py = unpack(geom.normalize({self.lookX, self.lookY}, (self.r - self.irisSize)))
+    local px, py = unpack(geom.normalize({self.lookX, self.lookY}))
+    local irisR = self.r - self.irisSize
     local chargeTime = self.time - (self.nextShot - self.shootChargeTime)
-    local chargeAmount
+    local chargeAmount, chargeColor
 
     if chargeTime >= 0 and chargeTime < self.shootChargeTime then
         chargeAmount = chargeTime/self.shootChargeTime
+        chargeColor = {self.chargeColor[1], self.chargeColor[2], self.chargeColor[3], self.chargeColor[4]*chargeAmount}
     end
 
     self.canvas:renderTo(function()
@@ -217,13 +219,13 @@ function RoamingEye:draw()
         love.graphics.circle("fill", self.r, self.r, self.r)
 
         love.graphics.setColor(unpack(self.irisColor))
-        love.graphics.circle("fill", self.r + px*0.9, self.r + py*0.9, self.irisSize)
+        love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.irisSize)
         love.graphics.setColor(unpack(self.pupilColor))
-        love.graphics.circle("fill", self.r + px*0.9, self.r + py*0.9, self.pupilSize)
+        love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize)
 
         if chargeAmount then
-            love.graphics.setColor(self.chargeColor[1], self.chargeColor[2], self.chargeColor[3], self.chargeColor[4]*chargeAmount)
-            love.graphics.circle("fill", self.r + px, self.r + py, self.pupilSize - 1)
+            love.graphics.setColor(unpack(chargeColor))
+            love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize - 1)
         end
 
     end)
@@ -249,7 +251,22 @@ function RoamingEye:draw()
         love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
         love.graphics.setShader()
 
-        -- TODO charging animation
+        if chargeAmount then
+            local chargeFlash = math.floor(chargeTime*chargeTime / 0.2)%2
+            if chargeFlash == 0 then
+                love.graphics.setBlendMode("alpha", "alphamultiply")
+                love.graphics.setColor(unpack(chargeColor))
+                local cx, cy = px*self.r, py*self.r
+                local dx, dy = unpack(geom.normalize({-cy, cx}, self.pupilSize/2))
+                love.graphics.polygon("fill",
+                    self.x + cx + dx, self.y + cy + dy,
+                    self.x + cx - dx, self.y + cy - dy,
+                    self.x + self.lookX, self.y + self.lookY)
+            end
+
+            -- TODO particles? or is that overkill?
+        end
+
 
         love.graphics.setBlendMode("alpha", "alphamultiply")
         if self.state == RoamingEye.states.spawning then
