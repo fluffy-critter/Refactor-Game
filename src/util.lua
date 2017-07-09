@@ -9,6 +9,15 @@ Useful utility functions
 
 local util = {}
 
+-- Create an enum
+function util.enum(...)
+    local enum = {}
+    for k,v in ipairs({...}) do
+        enum[v] = k
+    end
+    return enum
+end
+
 -- Apply defaults to a dict
 function util.applyDefaults(dest, defaults)
     for k,v in pairs(defaults) do

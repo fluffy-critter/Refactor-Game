@@ -7,11 +7,16 @@ Refactor: 1 - Little Bouncing Ball
 
 local Ball = require('track1.Ball')
 local SuperBall = require('track1.SuperBall')
+
 local HitParticle = require('track1.HitParticle')
 local SparkParticle = require('track1.SparkParticle')
+
 local Randomizer = require('track1.Randomizer')
 local Brick = require('track1.Brick')
+local RoamingEye = require('track1.RoamingEye')
+
 local Spawner = require('track1.Spawner')
+
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
@@ -83,7 +88,6 @@ function Game:init()
         bottom = 720
     }
 
-    -- TODO - make it an actor?
     self.paddleDefaults = {
         color = {255, 255, 255, 255},
 
@@ -100,35 +104,42 @@ function Game:init()
 
     }
 
+    -- TODO - make it an actor? or at least factor out into a class
     self.paddle = {
         x = 1280 / 2,
         y = 660,
         vx = 0,
         vy = 0,
-
-        -- get the upward vector for the paddle
-        tiltVector = function(self)
-            local x = self.vx * self.tiltFactor
-            local y = -60
-            local d = math.sqrt(x * x + y * y)
-            return { x / d, y / d }
-        end,
-
-        getPolygon = function(self)
-            if not self.cachedPoly then
-                local ux, uy = unpack(self:tiltVector())
-                local rx, ry = -uy, ux
-
-                self.cachedPoly = {
-                    self.x + ux*self.h - rx*self.w, self.y + uy*self.h - ry*self.w,
-                    self.x + ux*self.h + rx*self.w, self.y + uy*self.h + ry*self.w,
-                    self.x - ux*self.h + rx*self.w, self.y - uy*self.h + ry*self.w,
-                    self.x - ux*self.h - rx*self.w, self.y - uy*self.h - ry*self.w
-                }
-            end
-            return self.cachedPoly
-        end,
+        stunned = 0,
+        stunFlashInterval = 1/30,
     }
+
+    function self.paddle:tiltVector()
+        local x = self.vx * self.tiltFactor
+        local y = -60
+        local d = math.sqrt(x * x + y * y)
+        return { x / d, y / d }
+    end
+
+    function self.paddle:getPolygon()
+        if not self.cachedPoly then
+            local ux, uy = unpack(self:tiltVector())
+            local rx, ry = -uy, ux
+
+            self.cachedPoly = {
+                self.x + ux*self.h - rx*self.w, self.y + uy*self.h - ry*self.w,
+                self.x + ux*self.h + rx*self.w, self.y + uy*self.h + ry*self.w,
+                self.x - ux*self.h + rx*self.w, self.y - uy*self.h + ry*self.w,
+                self.x - ux*self.h - rx*self.w, self.y - uy*self.h - ry*self.w
+            }
+        end
+        return self.cachedPoly
+    end
+
+    function self.paddle:stun(time)
+        self.stunned = math.max(0, self.stunned) + time
+    end
+
     util.applyDefaults(self.paddle, self.paddleDefaults)
     local paddle = self.paddle
 
@@ -348,6 +359,33 @@ function Game:setGameEvents()
                     end
                     self.spawner:spawn({self.actors, self.toKill}, Randomizer, spawns, 120/BPM, 1)
                 end
+            },
+            eyes = {
+                minions = function(count, kill)
+                    local spawns = {}
+                    for i = 1,count do
+                        table.insert(spawns, {
+                            r = 32,
+                            lives = 5,
+                            shootInterval = 5,
+                            score = 5000
+                        })
+                    end
+                    self.spawner:spawn({self.actors, kill and self.toKill}, RoamingEye, spawns, 30/BPM, 1)
+                end,
+                boss = function()
+                    local eye = RoamingEye.new(self, {
+                        r = 64,
+                        lives = 20,
+                        shootInterval = 3,
+                        moveIntervalMin = 240/BPM,
+                        moveIntervalMax = 240/BPM,
+                        score = 20000
+                    })
+                    table.insert(self.actors, eye)
+                    table.insert(self.toKill, eye)
+                    -- TODO shieldballs
+                end,
             }
         }
     }
@@ -372,6 +410,12 @@ function Game:setGameEvents()
 
     self.eventQueue = {
         {
+            when = {0},
+            what = function()
+                -- Test new things here!
+            end
+        },
+        {
             when = {1},
             what = function()
                 spawnFuncs.balls.regular(3, 3)
@@ -384,12 +428,25 @@ function Game:setGameEvents()
             end
         },
         {
+            when = {2,8},
+            what = function()
+                -- spawnFuncs.mobs.aliens
+            end
+        },
+        {
             when = {3},
             what = function()
                 spawnFuncs.bricks.staggered()
 
                 spawnFuncs.balls.regular()
                 spawnFuncs.balls.super()
+
+                spawnFuncs.mobs.eyes.minions(3)
+            end
+        },
+        {
+            when = {3,8},
+            what = function()
             end
         },
         {
@@ -399,8 +456,9 @@ function Game:setGameEvents()
 
                 spawnFuncs.balls.regular()
                 spawnFuncs.balls.super()
+
+                spawnFuncs.mobs.eyes.minions(3)
             end
-            -- spawnFuncs.mobs.aliens()
         },
         {
             when = {5},
@@ -419,7 +477,7 @@ function Game:setGameEvents()
             when = {6},
             what = function()
                 spawnFuncs.balls.bouncy()
-                -- spawnFuncs.mobs.aliens()
+                spawnFuncs.mobs.eyes.minions(6)
                 self.timeMapper = timeFuncs.judder
             end
         },
@@ -438,7 +496,8 @@ function Game:setGameEvents()
             what = function()
                 spawnFuncs.bricks.zigzag(4)
 
-                --spawnFuncs.mobs.randomizer.aliens()
+                spawnFuncs.mobs.eyes.minions(5)
+                spawnFuncs.mobs.eyes.boss()
             end
         },
         {
@@ -473,7 +532,7 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.randomizer.boss()
                 spawnFuncs.mobs.randomizer.minions()
 
-                -- spawnFuncs.mobs.aliens()
+                spawnFuncs.mobs.eyes.minions(3)
 
                 -- spawn superballs on particular beats
                 for _,when in pairs({{10,8}, {10,10}, {10,12}, {10,15}, {10,15,2}}) do
@@ -487,7 +546,8 @@ function Game:setGameEvents()
         {
             when = {10,8},
             what = function()
-                -- spawnFuncs.mobs.aliens()
+                spawnFuncs.mobs.eyes.minions(3)
+                spawnFuncs.mobs.eyes.boss()
             end
         },
         {
@@ -581,13 +641,17 @@ function Game:update(dt)
         self:runEvents(time)
     end
 
-    local pax = 0
-    if love.keyboard.isDown("right") then
-        p.vx = p.vx + p.speed*dt
+    if p.stunned > 0 then
+        p.stunned = p.stunned - dt
+    else
+        if love.keyboard.isDown("right") then
+            p.vx = p.vx + p.speed*dt
+        end
+        if love.keyboard.isDown("left") then
+            p.vx = p.vx - p.speed*dt
+        end
     end
-    if love.keyboard.isDown("left") then
-        p.vx = p.vx - p.speed*dt
-    end
+
     p.vx = p.vx * math.pow(p.friction, dt)
     p.vy = p.vy * math.pow(p.friction, dt)
 
@@ -763,9 +827,14 @@ function Game:draw()
         love.graphics.rectangle("fill", self.bounds.right, self.bounds.top, 1280 - self.bounds.right, self.bounds.bottom - self.bounds.top)
 
         -- draw the paddle
+        local p = self.paddle
         love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(unpack(self.paddle.color))
-        love.graphics.polygon("fill", self.paddle:getPolygon())
+        if p.stunned > 0 and math.floor(p.stunned/p.stunFlashInterval) % 2 == 0 then
+            love.graphics.setColor(p.color[1], p.color[2], p.color[3], 128)
+        else
+            love.graphics.setColor(unpack(p.color))
+        end
+        love.graphics.polygon("fill", p:getPolygon())
 
         -- love.graphics.line(0, self.paddle.y, 1280, self.paddle.y)
 

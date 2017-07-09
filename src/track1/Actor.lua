@@ -30,7 +30,6 @@ function Actor:checkHitBalls(balls)
     -- default implementation - test each ball against the bounding circle and then the polygon, memoizing as we go
     local poly, aabb
     local bcircle = self:getBoundingCircle()
-    local bx, by, br = unpack(bcircle or {})
 
     local function checkBall(ball)
         if not self:isTangible(ball) then
@@ -38,9 +37,7 @@ function Actor:checkHitBalls(balls)
         end
 
         if bcircle then
-            local dx = ball.x - bx
-            local dy = ball.y - by
-            if math.sqrt(dx*dx + dy*dy) >= ball.r + br then
+            if not geom.pointPointCollision(ball.x, ball.y, ball.r, unpack(bcircle)) then
                 return false
             end
 

@@ -12,13 +12,7 @@ local HitParticle = require('track1.HitParticle')
 local Brick = {}
 setmetatable(Brick, {__index = Actor})
 
-Brick.states = {
-    spawning = 0,
-    alive = 1,
-    hit = 2,
-    dying = 3,
-    dead = 4
-}
+Brick.states = util.enum("spawning", "alive", "hit", "dying", "dead")
 
 function Brick.new(game, o)
     local self = o or {}
@@ -107,6 +101,14 @@ end
 
 function Brick:isAlive()
     return self.state ~= Brick.states.dead
+end
+
+function Brick:checkHitBalls(balls)
+    if self.state ~= Brick.states.alive then
+        return
+    end
+
+    Actor.checkHitBalls(self, balls)
 end
 
 function Brick:onHitBall(nrm, ball)

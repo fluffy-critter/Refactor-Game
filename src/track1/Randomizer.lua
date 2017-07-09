@@ -29,12 +29,7 @@ function Randomizer.new(game, o)
     return self
 end
 
-Randomizer.states = {
-    alive = 1,
-    hit = 2,
-    dying = 3,
-    dead = 4
-}
+Randomizer.states = util.enum("alive", "hit", "dying", "dead")
 
 Randomizer.functions = {
     {
@@ -249,12 +244,16 @@ function Randomizer:getBoundingCircle()
     return {self.x, self.y, math.sqrt((self.w*self.w + self.h*self.h)/4)}
 end
 
-function Randomizer:onHitBall(nrm, ball)
-    print("i been shot")
-
+function Randomizer:checkHitBalls(balls)
     if self.state ~= Randomizer.states.alive then
         return
     end
+
+    Actor.checkHitBalls(self, balls)
+end
+
+function Randomizer:onHitBall(nrm, ball)
+    print("i been shot")
 
     self.lives = self.lives - 1
     self.stateAge = 0

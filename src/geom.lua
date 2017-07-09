@@ -86,6 +86,19 @@ function geom.pointAABBCollision(x, y, r, aabb)
     return true
 end
 
+-- check to see if two balls collide; returns false, or displacement normal for ball 1 as {x,y}
+function geom.pointPointCollision(x1, y1, r1, x2, y2, r2)
+    local dx = x1 - x2
+    local dy = y1 - y2
+    local len = math.sqrt(dx*dx + dy*dy)
+    local limit = r1 + r2
+    if len < limit then
+        local disp = limit - len
+        return geom.normalize({dx*disp/len, dy*disp/len})
+    end
+    return false
+end
+
 -- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
 function geom.pointPolyCollision(x, y, r, poly)
     cs:incr('point_poly_test')

@@ -6,6 +6,7 @@ Refactor
 ]]
 
 local shaders = require('shaders')
+local util = require('util')
 
 local PROFILE = false
 
@@ -37,6 +38,7 @@ end
 local tracks = {}
 local currentGame
 
+-- TODO switch to util.enum
 local state = "playing"
 local speed = 1.0
 local resumeMusic = false
