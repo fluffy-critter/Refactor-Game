@@ -45,7 +45,8 @@ function RoamingEye:onInit()
         moveIntervalMin = 2,
         moveIntervalMax = 8,
         moveSpeedMax = 100,
-        score = 10000,
+        scoreHit = 100,
+        scoreDead = 10000,
         vx = 0,
         vy = 0,
         spawnTime = 0.25,
@@ -199,9 +200,10 @@ function RoamingEye:onHitBall(nrm, ball)
 
     self.lives = self.lives - 1
     if self.lives < 1 then
-        self.game.score = self.game.score + self.score
+        self.game.score = self.game.score + self.scoreDead
         self:kill()
     else
+        self.game.score = self.game.score + self.scoreHit
         self.state = RoamingEye.states.hit
         self.stateAge = 0
     end
