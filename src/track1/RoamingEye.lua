@@ -34,10 +34,10 @@ function RoamingEye:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 32,
-        ballColor = {128, 255, 255},
-        irisColor = {128, 0, 255},
+        ballColor = {128, 192, 192},
+        irisColor = {128, 0, 192},
         pupilColor = {0, 0, 0},
-        pupilShootColor = {255, 0, 0},
+        chargeColor = {255, 0, 0, 128},
         shootInterval = 4,
         shootChargeTime = 1,
         shootSpeed = 300,
@@ -202,6 +202,12 @@ end
 
 function RoamingEye:draw()
     local px, py = unpack(geom.normalize({self.lookX, self.lookY}, (self.r - self.irisSize)))
+    local chargeTime = self.time - (self.nextShot - self.shootChargeTime)
+    local chargeAmount
+
+    if chargeTime >= 0 and chargeTime < self.shootChargeTime then
+        chargeAmount = chargeTime/self.shootChargeTime
+    end
 
     self.canvas:renderTo(function()
         love.graphics.clear(0,0,0,0)
@@ -213,7 +219,13 @@ function RoamingEye:draw()
         love.graphics.setColor(unpack(self.irisColor))
         love.graphics.circle("fill", self.r + px*0.9, self.r + py*0.9, self.irisSize)
         love.graphics.setColor(unpack(self.pupilColor))
-        love.graphics.circle("fill", self.r + px, self.r + py, self.pupilSize)
+        love.graphics.circle("fill", self.r + px*0.9, self.r + py*0.9, self.pupilSize)
+
+        if chargeAmount then
+            love.graphics.setColor(self.chargeColor[1], self.chargeColor[2], self.chargeColor[3], self.chargeColor[4]*chargeAmount)
+            love.graphics.circle("fill", self.r + px, self.r + py, self.pupilSize - 1)
+        end
+
     end)
 
     self.game.layers.overlay:renderTo(function()
@@ -229,8 +241,11 @@ function RoamingEye:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(alpha, alpha, alpha, alpha)
-        -- love.graphics.setShader(shaders.sphereDistort)
-        -- shaders.sphereDistort:send("gamma", 0.9)
+        love.graphics.setShader(shaders.sphereDistort)
+        shaders.sphereDistort:send("gamma", 0.9)
+        shaders.sphereDistort:send("env", self.game.canvas)
+        shaders.sphereDistort:send("center", {self.x/1280, self.y/720})
+        shaders.sphereDistort:send("reflectSize", {self.r/128, self.r/72})
         love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
         love.graphics.setShader()
 

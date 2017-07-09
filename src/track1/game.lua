@@ -413,7 +413,7 @@ function Game:setGameEvents()
             when = {0},
             what = function()
                 -- Test new things here!
-                -- spawnFuncs.mobs.eyes.minions(1)
+                spawnFuncs.mobs.eyes.minions(1)
             end
         },
         {

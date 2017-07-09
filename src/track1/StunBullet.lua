@@ -35,6 +35,13 @@ function StunBullet:onInit()
         stunTime = 1
     })
 
+    self.game.layers.water:renderTo(function()
+        love.graphics.setColorMask(true, false, false, false)
+        love.graphics.setColor(0,255,255)
+        love.graphics.circle("fill", self.x, self.y, self.r*2)
+        love.graphics.setColorMask(true, true, true, true)
+    end)
+
     Ball.onInit(self)
 end
 
