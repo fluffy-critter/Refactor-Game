@@ -199,6 +199,12 @@ function Game:defer(item)
     table.insert(self.deferred, item)
 end
 
+function Game:addEvent(event)
+    table.insert(self.eventQueue, event)
+    if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
+        self.nextEvent = event.when
+    end
+end
 
 function Game:setGameEvents()
     local function brickLivesColor(lives)
@@ -497,7 +503,7 @@ function Game:setGameEvents()
         {
             when = {2,8},
             what = function()
-                -- spawnFuncs.mobs.aliens
+                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
@@ -514,6 +520,7 @@ function Game:setGameEvents()
         {
             when = {3,8},
             what = function()
+                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
@@ -559,7 +566,7 @@ function Game:setGameEvents()
 
                 local killList = {}
                 spawnFuncs.bricks.zagzig(10, 5, killList)
-                table.insert(self.eventQueue, {
+                self:addEvent({
                     when = {7,8},
                     what = function()
                         for _,brick in ipairs(killList) do
@@ -587,7 +594,13 @@ function Game:setGameEvents()
                 spawnFuncs.balls.super()
 
                 spawnFuncs.bricks.zagzig(12, 4)
-                -- spawnFuncs.mobs.aliens()
+                -- spawnFuncs.mobs.flappyBat
+            end
+        },
+        {
+            when = {8,8},
+            what = function()
+                spawnFuncs.mobs.eyes.minions(2)
             end
         },
         {
@@ -595,15 +608,15 @@ function Game:setGameEvents()
             what = function()
                 self.starterBall.ay = math.min(self.starterBall.ay, 50)
 
-                spawnFuncs.bricks.zigzag(5)
+                spawnFuncs.bricks.zigzag(4)
                 self.timeMapper = timeFuncs.judder
             end
         },
         {
             when = {9,8},
             what = function()
-                spawnFuncs.bricks.zagzig(10, 5)
-                -- spawnFuncs.mobs.aliens()
+                spawnFuncs.bricks.zagzig(11, 5)
+                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
@@ -613,7 +626,7 @@ function Game:setGameEvents()
 
                 spawnFuncs.bricks.classic()
 
-                spawnFuncs.balls.regular()
+                -- spawnFuncs.balls.regular()
                 spawnFuncs.balls.bouncy()
 
                 spawnFuncs.mobs.randomizer.boss()
@@ -623,7 +636,7 @@ function Game:setGameEvents()
 
                 -- spawn superballs on particular beats
                 for _,when in pairs({{10,8}, {10,10}, {10,12}, {10,15}, {10,15,2}}) do
-                    table.insert(self.eventQueue, {
+                    self:addEvent({
                         when = when,
                         what = spawnFuncs.balls.super
                     })
