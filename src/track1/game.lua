@@ -336,7 +336,7 @@ function Game:setGameEvents()
 
                 self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 60/BPM/16, 2)
             end,
-            dualSpiral = function(rows, spacing)
+            zagzig = function(rows, spacing, killList)
                 local bricks = {}
                 local w = 32
                 local h = 32
@@ -345,67 +345,54 @@ function Game:setGameEvents()
                 local right = self.bounds.right - w
                 local bottom = top + rows*h
 
-                local startX, endX = left, right
-                local startY, endY = top, bottom
-                local stepX, stepY = 1, 0
-                local x = left
-                local y = top
+                local startY, endY = bottom, top
+                local stepY = -1
 
-                local sz = 2
-
-                for i = 1, 1000 do
+                for col = left, right, spacing*w do
                     table.insert(bricks, {
-                        color = brickLivesColor(sz),
-                        x = x,
-                        y = y,
-                        w = w*sz,
-                        h = h*sz,
-                        lives = sz
-                    })
-                    table.insert(bricks, {
-                        color = brickLivesColor(sz),
-                        x = right - x + left,
-                        y = bottom - y + top,
-                        w = w*sz,
-                        h = h*sz,
-                        lives = sz
+                        color = brickLivesColor(4),
+                        x = col,
+                        y = startY,
+                        w = w*2,
+                        h = h*2,
+                        lives = 4
                     })
 
-                    x = x + stepX*(sz + 1)*w/2
-                    y = y + stepY*(sz + 1)*h/2
-                    sz = 1
-
-                    if stepX ~= 0 and x*stepX >= endX*stepX then
-                        sz = 2
-                        x = endX
-                        startX, endX = endX, startX
-
-                        stepX, stepY = -stepY, stepX
-                        endY = endY - stepY*spacing*h
-
-                        rows = rows - spacing
-                        if rows <= 0 then
-                            break
-                        end
+                    for y = startY + stepY*3*h/2, endY - stepY*3*h/2, stepY*h do
+                        table.insert(bricks, {
+                            color = brickLivesColor(1),
+                            x = col,
+                            y = y,
+                            w = w,
+                            h = h,
+                            lives = 1
+                        })
                     end
 
-                    if stepY ~= 0 and y*stepY >= endY*stepY then
-                        sz = 2
-                        y = endY
+                    table.insert(bricks, {
+                        color = brickLivesColor(4),
+                        x = col,
+                        y = endY,
+                        w = w*2,
+                        h = h*2,
+                        lives = 4
+                    })
 
-                        startY, endY = endY, startY
+                    startY, endY, stepY = endY, startY, -stepY
 
-                        stepX, stepY = -stepY, stepX
-                        endX = endX - stepX*spacing*w
-
-                        rows = rows - spacing
-                        if rows <= 0 then
-                            break
-                        end
+                    for x = col + w*3/2, math.min(right, col + w*spacing - w*3/2), w do
+                        table.insert(bricks, {
+                            color = brickLivesColor(1),
+                            x = x,
+                            y = startY,
+                            w = w,
+                            h = h,
+                            lives = 1
+                        })
                     end
                 end
 
-                self.spawner:spawn({self.actors, self.toKill}, Brick, bricks, 15/BPM/16, 2)
+                self.spawner:spawn({self.actors, self.toKill, killList}, Brick, bricks, 30/BPM/16, 1)
             end
         }, mobs = {
             randomizer = {
@@ -415,7 +402,8 @@ function Game:setGameEvents()
                         lives = 20,
                         w = 96,
                         h = 96,
-                        sizefuck = 32
+                        sizefuck = 32,
+                        scoreDead = 65536,
                     })
                     table.insert(self.actors, randomizer)
                     table.insert(self.toKill, randomizer)
@@ -430,7 +418,7 @@ function Game:setGameEvents()
                             yFrequency = 6.7,
                             centerX = (i*2 - 1)*1280/6,
                             travelX = 1280/6,
-                            score = 65536,
+                            scoreDead = 1024,
                             w = 64,
                             h = 64,
                             sizefuck = 16
@@ -447,7 +435,7 @@ function Game:setGameEvents()
                             r = 32,
                             lives = 5,
                             shootInterval = 5,
-                            score = 5000
+                            scoreDead = 1000
                         })
                     end
                     self.spawner:spawn({self.actors, kill and self.toKill}, RoamingEye, spawns, 30/BPM, 1)
@@ -459,7 +447,7 @@ function Game:setGameEvents()
                         shootInterval = 3,
                         moveIntervalMin = 240/BPM,
                         moveIntervalMax = 240/BPM,
-                        score = 20000
+                        scoreDead= 5000
                     })
                     table.insert(self.actors, eye)
                     table.insert(self.toKill, eye)
@@ -492,7 +480,6 @@ function Game:setGameEvents()
             when = {0},
             what = function()
                 -- Test new things here!
-                spawnFuncs.bricks.dualSpiral(15, 3)
             end
         },
         {
@@ -545,7 +532,7 @@ function Game:setGameEvents()
             what = function()
                 self.starterBall.ay = math.min(self.starterBall.ay, 50)
 
-                spawnFuncs.bricks.zigzag(3)
+                spawnFuncs.bricks.zigzag(4)
 
                 spawnFuncs.balls.regular()
                 spawnFuncs.balls.super()
@@ -570,13 +557,24 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.randomizer.minions()
                 self.timeMapper = timeFuncs.ramp
 
-                --spawnFuncs.bricks.??? - and add its kill list to {7,8}
+                local killList = {}
+                spawnFuncs.bricks.zagzig(10, 5, killList)
+                table.insert(self.eventQueue, {
+                    when = {7,8},
+                    what = function()
+                        for _,brick in ipairs(killList) do
+                            brick:kill()
+                        end
+                    end
+                })
             end
         },
         {
             when = {7,8},
             what = function()
                 spawnFuncs.bricks.zigzag(4)
+
+                spawnFuncs.balls.regular()
 
                 spawnFuncs.mobs.eyes.minions(5)
                 spawnFuncs.mobs.eyes.boss()
@@ -585,8 +583,10 @@ function Game:setGameEvents()
         {
             when = {8},
             what = function()
-                spawnFuncs.balls.regular()
-                -- spawnFuncs.bricks.???
+                spawnFuncs.balls.regular(3, 1)
+                spawnFuncs.balls.super()
+
+                spawnFuncs.bricks.zagzig(12, 4)
                 -- spawnFuncs.mobs.aliens()
             end
         },
@@ -595,15 +595,16 @@ function Game:setGameEvents()
             what = function()
                 self.starterBall.ay = math.min(self.starterBall.ay, 50)
 
-                -- spawnFuncs.bricks.???
+                spawnFuncs.bricks.zigzag(5)
                 self.timeMapper = timeFuncs.judder
             end
         },
         {
             when = {9,8},
             what = function()
+                spawnFuncs.bricks.zagzig(10, 5)
+                -- spawnFuncs.mobs.aliens()
             end
-            -- spawnFuncs.mobs.aliens()
         },
         {
             when = {10},
