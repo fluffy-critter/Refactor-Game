@@ -145,7 +145,9 @@ function Game:init()
     end
 
     function self.paddle:stun(time)
-        self.stunned = math.max(0, self.stunned) + time
+        if self.stunned <= 0 then
+            self.stunned = time
+        end
     end
 
     util.applyDefaults(self.paddle, self.paddleDefaults)
@@ -511,7 +513,7 @@ function Game:setGameEvents()
             what = function()
                 spawnFuncs.bricks.staggered()
 
-                spawnFuncs.balls.regular()
+                spawnFuncs.balls.regular(2, 2)
                 spawnFuncs.balls.super()
 
                 spawnFuncs.mobs.eyes.minions(3)
