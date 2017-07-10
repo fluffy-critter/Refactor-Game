@@ -452,9 +452,10 @@ function Game:setGameEvents()
                     local eye = RoamingEye.new(self, {
                         r = 64,
                         lives = 20,
-                        shootInterval = 3,
-                        moveIntervalMin = 240/BPM,
+                        shootInterval = 120/BPM,
+                        moveIntervalMin = 120/BPM,
                         moveIntervalMax = 240/BPM,
+                        hitTime = 60/BPM,
                         scoreDead= 5000
                     })
                     table.insert(self.actors, eye)
@@ -557,6 +558,12 @@ function Game:setGameEvents()
                 spawnFuncs.balls.bouncy()
                 spawnFuncs.mobs.eyes.minions(6)
                 self.timeMapper = timeFuncs.judder
+            end
+        },
+        {
+            when = {6,8},
+            what = function()
+                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
@@ -888,17 +895,20 @@ function Game:update(dt)
             if ball.y < targetY and ball.vy > 0 then
                 -- p = y + vt + .5at^2, solve for t
                 local nextHitDelta, nb = util.solveQuadratic(.5*ball.ay, ball.vy, ball.y - targetY)
-                if nextHitDelta < 0 or (nb and nb > 0 and nb < nextHitDelta) then
+                if not nextHitDelta or nextHitDelta < 0 or (nb and nb > 0 and nb < nextHitDelta) then
                     nextHitDelta = nb
                 end
 
-                local beatOfs = time[3]/ball.beatSync % 1
-                local deltaBeats = nextHitDelta*BPS/ball.beatSync
+                local deltaBeats
+                if nextHitDelta then
+                    local beatOfs = time[3]/ball.beatSync % 1
+                    deltaBeats = nextHitDelta*BPS/ball.beatSync
 
-                -- round this to the nearest beat, after taking off the beatOfs
-                deltaBeats = math.floor(deltaBeats + beatOfs + 0.5) - beatOfs
+                    -- round this to the nearest beat, after taking off the beatOfs
+                    deltaBeats = math.floor(deltaBeats + beatOfs + 0.33) - beatOfs
+                end
 
-                if deltaBeats > .5 then
+                if deltaBeats and deltaBeats > .5 then
                     -- new time before next hit
                     local deltaTime = deltaBeats*SPB*ball.beatSync
 

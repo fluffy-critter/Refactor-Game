@@ -189,11 +189,12 @@ function RoamingEye:kill()
 end
 
 function RoamingEye:onHitBall(nrm, ball)
+    ball:onHitActor(nrm, self)
+
     if self.state ~= RoamingEye.states.alive then
         return
     end
 
-    ball:onHitActor(nrm, self)
     local nx, ny = unpack(nrm)
     self.vx = self.vx - self.rebound*nx*ball.r*ball.r/self.r/self.r
     self.vy = self.vy - self.rebound*nx*ball.r*ball.r/self.r/self.r
