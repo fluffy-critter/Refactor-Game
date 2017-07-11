@@ -767,49 +767,49 @@ function Game:update(dt)
         end
     end
 
-    if p.stunned > 0 then
-        p.stunned = p.stunned - dt
-    else
-        if love.keyboard.isDown("right") then
-            p.vx = p.vx + p.speed*dt
-        end
-        if love.keyboard.isDown("left") then
-            p.vx = p.vx - p.speed*dt
-        end
-    end
-
-    p.vx = p.vx * math.pow(p.friction, dt)
-    p.vy = p.vy * math.pow(p.friction, dt)
-
-    p.x = p.x + dt * p.vx
-    p.y = p.y + dt * p.vy
-
-    p.vy = p.vy + dt*(p.restY - p.y)*p.recovery
-
-    if p.x + p.w > b.right then
-        p.x = b.right - p.w
-        p.vx = -math.abs(p.vx) * p.rebound
-    end
-    if p.x - p.w < b.left then
-        p.x = b.left + p.w
-        p.vx = math.abs(p.vx) * p.rebound
-    end
-    if p.y + p.h > b.bottom then
-        p.y = b.bottom - p.h
-        p.vy = -math.abs(p.vy) * p.rebound
-    end
-    if p.y - p.h < b.top then
-        p.y = b.top + p.h
-        p.vy = math.abs(p.vy) * p.rebound
-    end
-
-    p.cachedPoly = nil
-
     -- TODO: timeline judder
 
     self.spawner:update(dt)
 
     local function physicsUpdate(dt)
+        if p.stunned > 0 then
+            p.stunned = p.stunned - dt
+        else
+            if love.keyboard.isDown("right") then
+                p.vx = p.vx + p.speed*dt
+            end
+            if love.keyboard.isDown("left") then
+                p.vx = p.vx - p.speed*dt
+            end
+        end
+
+        p.vx = p.vx * math.pow(p.friction, dt)
+        p.vy = p.vy * math.pow(p.friction, dt)
+
+        p.x = p.x + dt * p.vx
+        p.y = p.y + dt * p.vy
+
+        p.vy = p.vy + dt*(p.restY - p.y)*p.recovery
+
+        if p.x + p.w > b.right then
+            p.x = b.right - p.w
+            p.vx = -math.abs(p.vx) * p.rebound
+        end
+        if p.x - p.w < b.left then
+            p.x = b.left + p.w
+            p.vx = math.abs(p.vx) * p.rebound
+        end
+        if p.y + p.h > b.bottom then
+            p.y = b.bottom - p.h
+            p.vy = -math.abs(p.vy) * p.rebound
+        end
+        if p.y - p.h < b.top then
+            p.y = b.top + p.h
+            p.vy = math.abs(p.vy) * p.rebound
+        end
+
+        p.cachedPoly = nil
+
         local rawt = dt
         if self.timeMapper then
             dt = self.timeMapper(time)*dt
