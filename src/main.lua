@@ -7,6 +7,7 @@ Refactor
 
 local shaders = require('shaders')
 local util = require('util')
+local input = require('input')
 
 local PROFILE = false
 
@@ -93,6 +94,8 @@ end
 function love.update(dt)
     if Pie then Pie:attach() end
 
+    input.update(dt)
+
     if state == "pausing" then
         speed = speed - dt*3
         if speed <= 0 then
@@ -145,6 +148,10 @@ function love.draw()
     end
     blitCanvas(canvas)
     love.graphics.setShader()
+
+    -- love.graphics.setColor(255,255,255,255)
+    -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
+
     if Pie then Pie:detach() end
 
     if Pie then Pie:draw() end

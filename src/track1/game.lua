@@ -20,6 +20,7 @@ local Spawner = require('track1.Spawner')
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
+local input = require('input')
 
 local Game = {}
 
@@ -775,12 +776,7 @@ function Game:update(dt)
         if p.stunned > 0 then
             p.stunned = p.stunned - dt
         else
-            if love.keyboard.isDown("right") then
-                p.vx = p.vx + p.speed*dt
-            end
-            if love.keyboard.isDown("left") then
-                p.vx = p.vx - p.speed*dt
-            end
+            p.vx = p.vx + p.speed*dt*input.x
         end
 
         p.vx = p.vx * math.pow(p.friction, dt)
