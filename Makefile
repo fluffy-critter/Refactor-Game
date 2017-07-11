@@ -36,6 +36,7 @@ publish-precheck:
 
 publish-status:
 	butler status $(TARGET)
+	@ echo "Current version: $(GAME_VERSION)"
 
 publish-wait:
 	@ while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
