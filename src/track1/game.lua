@@ -71,14 +71,14 @@ function Game:init()
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.overlay = love.graphics.newCanvas(1280, 720)
 
-    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f", "rg16f", "rgba16f")
+    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
         self.waterParams = {
             fluidity = 1.5,
             damp = 0.913,
-            timeMul = 15,
+            timeStep = 15/60,
             rsize = 32,
             fresnel = 0.1,
             sampleRadius = 5.5,
@@ -937,7 +937,7 @@ function Game:update(dt)
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
                 damp = self.waterParams.damp,
                 fluidity = self.waterParams.fluidity,
-                dt = dt*self.waterParams.timeMul
+                dt = self.waterParams.timeStep
             })
     end
 end
