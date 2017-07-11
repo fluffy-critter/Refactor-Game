@@ -93,8 +93,8 @@ function RoamingEye:isAlive()
     return self.state ~= RoamingEye.states.dead
 end
 
-function RoamingEye:preUpdate(dt)
-    self.stateAge = self.stateAge + dt
+function RoamingEye:preUpdate(dt, rawt)
+    self.stateAge = self.stateAge + rawt
 
     if self.state == RoamingEye.states.spawning and self.stateAge > self.spawnTime then
         self.stateAge = 0
@@ -137,8 +137,8 @@ function RoamingEye:postUpdate(dt)
         return
     end
 
-    self.lookX = self.game.paddle.x - self.x
-    self.lookY = self.game.paddle.y - self.y
+    self.lookX = self.lookX*(1 - dt*10) + (self.game.paddle.x - self.x)*dt*10
+    self.lookY = self.lookY*(1 - dt*10) + (self.game.paddle.y - self.y)*dt*10
     self.x = self.x + self.vx
     self.y = self.y + self.vy
 
@@ -167,10 +167,6 @@ function RoamingEye:postUpdate(dt)
 end
 
 function RoamingEye:checkHitBalls(balls)
-    if self.state ~= RoamingEye.states.alive then
-        return
-    end
-
     for _,ball in pairs(balls) do
         if not ball.isBullet then
             nrm = geom.pointPointCollision(ball.x, ball.y, ball.r, self.x, self.y, self.r)
@@ -189,11 +185,16 @@ function RoamingEye:kill()
 end
 
 function RoamingEye:onHitBall(nrm, ball)
-    ball:onHitActor(nrm, self)
+    -- keep it immune while balls are passing through it
+    if self.state == RoamingEye.states.hit then
+        self.stateAge = self.stateAge % (self.hitFlashRate * 2)
+    end
 
     if self.state ~= RoamingEye.states.alive then
         return
     end
+
+    ball:onHitActor(nrm, self)
 
     local nx, ny = unpack(nrm)
     self.vx = self.vx - self.rebound*nx*ball.r*ball.r/self.r/self.r
@@ -261,7 +262,7 @@ function RoamingEye:draw()
         love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
         love.graphics.setShader()
 
-        if chargeAmount then
+        if self.state == RoamingEye.states.alive and chargeAmount then
             local chargeFlash = math.floor(chargeTime*chargeTime / 0.2)%2
             if chargeFlash == 0 then
                 love.graphics.setBlendMode("add", "alphamultiply")

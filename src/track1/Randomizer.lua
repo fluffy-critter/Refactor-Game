@@ -92,6 +92,7 @@ function Randomizer:onInit()
         w = 64,
         h = 64,
         sizefuck = 32,
+        hitFlashRate = 1/20,
         particleCount = 30,
         particleLifetime = 0.2,
         particleVelocity = 100,
@@ -134,6 +135,9 @@ function Randomizer:draw()
         local alpha = 255
         if self.state == Randomizer.states.dying then
             alpha = util.clamp(255*(1 - self.stateAge/self.deadTime), 0, 255)
+        elseif self.state == Randomizer.states.hit then
+            local flash = math.floor(self.stateAge/self.hitFlashRate) % 2
+            alpha = 127 + 128*flash
         end
         love.graphics.setColor(math.random(192,255), math.random(192,255), math.random(192,255), alpha)
         local w = math.random(self.w - self.sizefuck, self.w)
@@ -245,15 +249,16 @@ function Randomizer:getBoundingCircle()
     return {self.x, self.y, math.sqrt((self.w*self.w + self.h*self.h)/4)}
 end
 
-function Randomizer:checkHitBalls(balls)
+function Randomizer:onHitBall(nrm, ball)
+    -- keep it immune while balls are passing through it
+    if self.state == Randomizer.states.hit then
+        self.stateAge = min(self.stateAge % (self.hitFlashRate * 2), self.hitTime - self.hitFlashRate)
+    end
+
     if self.state ~= Randomizer.states.alive then
         return
     end
 
-    Actor.checkHitBalls(self, balls)
-end
-
-function Randomizer:onHitBall(nrm, ball)
     print("i been shot")
 
     self.lives = self.lives - 1
