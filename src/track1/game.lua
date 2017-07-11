@@ -59,6 +59,7 @@ end
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
+    self.toneMap = false -- do the HDR thing
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
@@ -186,7 +187,7 @@ function Game:init()
             self.vy = 0
         end,
         onLost = function(self)
-            self.ay = self.ay + 30
+            self.ay = math.min(self.ay + 30, 150)
         end
     })
 
@@ -545,7 +546,7 @@ function Game:setGameEvents()
         {
             when = {5},
             what = function()
-                self.starterBall.ay = math.min(self.starterBall.ay, 50)
+                self.starterBall.ay = math.min(self.starterBall.ay, 60)
 
                 spawnFuncs.bricks.zigzag(4)
 
@@ -876,9 +877,9 @@ function Game:update(dt)
         end
     end
 
-    for i = 1, 4 do
+    for i = 1, 8 do
         -- TODO maybe slide this based on framerate and/or precision issues
-        physicsUpdate(dt/4)
+        physicsUpdate(dt/8)
     end
 
     -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
@@ -915,8 +916,11 @@ function Game:update(dt)
                     -- print("dt = " .. nextHitDelta .. " -> " .. deltaTime)
 
                     -- p = y + vt + .5at^2, solve for v
-                    local vy = (targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime
-                    ball.vy = vy
+                    local vy = ball.vy*.75 + .25*((targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime)
+                    if vy/ball.vy < 1.25 then
+                        ball.vx = ball.vx * vy/ball.vy
+                        ball.vy = vy
+                    end
                 end
             end
         end
@@ -1005,22 +1009,24 @@ function Game:draw()
         love.graphics.draw(self.layers.overlay)
     end)
 
-    util.mapShader(self.canvas, self.layers.toneMap,
-        shaders.gaussToneMap, {
-            sampleRadius = {1/1280, 0},
-            lowCut = {0.7,0.7,0.7,0.7},
-            gamma = 4
-        })
-    self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-        shaders.gaussBlur, {
-            sampleRadius = {0, 1/720}
-        })
+    if self.toneMap then
+        util.mapShader(self.canvas, self.layers.toneMap,
+            shaders.gaussToneMap, {
+                sampleRadius = {1/1280, 0},
+                lowCut = {0.7,0.7,0.7,0.7},
+                gamma = 4
+            })
+        self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
+            shaders.gaussBlur, {
+                sampleRadius = {0, 1/720}
+            })
 
-    self.canvas:renderTo(function()
-        love.graphics.setBlendMode("add", "premultiplied")
-        love.graphics.setColor(192, 192, 192, 192)
-        love.graphics.draw(self.layers.toneMap)
-    end)
+        self.canvas:renderTo(function()
+            love.graphics.setBlendMode("add", "premultiplied")
+            love.graphics.setColor(192, 192, 192, 192)
+            love.graphics.draw(self.layers.toneMap)
+        end)
+    end
 
     return self.canvas;
     -- return self.layers.water;

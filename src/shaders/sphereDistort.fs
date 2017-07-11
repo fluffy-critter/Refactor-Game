@@ -14,7 +14,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
     vec2 pos = texture_coords*2.0 - vec2(1.0, 1.0);
 
     float r2 = dot(pos,pos);
-    float mask = 1. - step(0.999, r2);
+    float mask = 1. - smoothstep(0.95, 1., r2);
 
     vec4 reflection = vec4(0.,0.,0.,0.);
 

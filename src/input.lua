@@ -7,7 +7,7 @@ Refactor
 
 local input = {
     -- ramp time for digital inputs, in seconds
-    rampTime = 0.25,
+    rampTime = 0.1,
 
     -- current joystick position
     x = 0,

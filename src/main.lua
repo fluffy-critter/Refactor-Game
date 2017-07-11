@@ -91,6 +91,10 @@ function love.load()
     -- currentGame:init()
 end
 
+local frameCount = 0
+local frameTime = 0
+local fps
+
 function love.update(dt)
     if Pie then Pie:attach() end
 
@@ -124,6 +128,14 @@ function love.update(dt)
     end
 
     if Pie then Pie:detach() end
+
+    frameTime = frameTime + dt
+    frameCount = frameCount + 1
+    if frameTime >= 0.25 then
+        fps = frameCount/frameTime
+        frameTime = 0
+        frameCount = 0
+    end
 end
 
 function love.draw()
@@ -155,4 +167,10 @@ function love.draw()
     if Pie then Pie:detach() end
 
     if Pie then Pie:draw() end
+
+    if fps then
+        love.graphics.setBlendMode("alpha")
+        love.graphics.printf(math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
+    end
 end
+
