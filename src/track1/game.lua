@@ -56,6 +56,7 @@ function Game:seekMusic(phase, measure, beat, timeOfs)
 end
 
 function Game:init()
+    self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
@@ -145,7 +146,10 @@ function Game:init()
     end
 
     function self.paddle:stun(time)
-        if self.stunned <= 0 then
+        if self.stunned > 0 then
+            -- If we're already stunnned, only increase it to up to half of the new stun's length
+            self.stunned = math.max(self.stunned, time/2)
+        else
             self.stunned = time
         end
     end

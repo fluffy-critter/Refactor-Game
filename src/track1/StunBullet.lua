@@ -32,7 +32,7 @@ function StunBullet:onInit()
         shots = 1,
         bulletColor = {255, 128, 128},
         safeColor = {128, 255, 255},
-        stunTime = 0.5
+        stunTime = self.game.BPM/180
     })
 
     self.game.layers.water:renderTo(function()
