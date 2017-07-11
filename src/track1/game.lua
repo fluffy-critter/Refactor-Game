@@ -1020,18 +1020,6 @@ function Game:draw()
             sampleRadius = {0, 1/720}
         })
 
-    -- TODO compute appropriate tap sizes for single-pass
-    for i=1,2 do
-        self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            shaders.gaussBlur, {
-                sampleRadius = {1.414/1280, 0}
-            })
-        self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            shaders.gaussBlur, {
-                sampleRadius = {0, 1.414/720}
-            })
-    end
-
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("add", "premultiplied")
         love.graphics.setColor(192, 192, 192, 192)
