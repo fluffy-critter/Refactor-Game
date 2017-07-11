@@ -71,7 +71,7 @@ function Game:init()
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.overlay = love.graphics.newCanvas(1280, 720)
 
-    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f", "rg16f", "rgba16f", "rg11b10f")
+    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f", "rg16f", "rgba16f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
