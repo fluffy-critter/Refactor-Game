@@ -19,7 +19,7 @@ GAME_VERSION=$(shell git rev-parse --short HEAD)
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
 .PHONY: clean all
-.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
+.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup
 
@@ -36,6 +36,9 @@ publish-precheck:
 
 publish-status:
 	butler status $(TARGET)
+
+publish-wait:
+	@ while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
 
 setup: $(DEST)/.setup
 $(DEST)/.setup: .gitmodules
