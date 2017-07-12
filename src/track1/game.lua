@@ -59,7 +59,7 @@ end
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
-    self.toneMap = false -- do the HDR thing
+    self.toneMap = true -- do the HDR thing
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
@@ -537,7 +537,7 @@ function Game:setGameEvents()
             what = function()
                 spawnFuncs.bricks.classic()
 
-                spawnFuncs.balls.regular()
+                spawnFuncs.balls.regular(1,3)
                 spawnFuncs.balls.super()
 
                 spawnFuncs.mobs.eyes.minions(3)
@@ -550,7 +550,7 @@ function Game:setGameEvents()
 
                 spawnFuncs.bricks.zigzag(4)
 
-                spawnFuncs.balls.regular()
+                spawnFuncs.balls.regular(1,3)
                 spawnFuncs.balls.super()
             end
         },
@@ -561,7 +561,7 @@ function Game:setGameEvents()
         {
             when = {6},
             what = function()
-                spawnFuncs.balls.bouncy()
+                spawnFuncs.balls.bouncy(3,5)
                 spawnFuncs.mobs.eyes.minions(6)
                 self.timeMapper = timeFuncs.judder
             end
@@ -575,7 +575,7 @@ function Game:setGameEvents()
         {
             when = {7},
             what = function()
-                spawnFuncs.balls.bouncy()
+                spawnFuncs.balls.bouncy(1,3)
                 spawnFuncs.mobs.randomizer.minions()
                 self.timeMapper = timeFuncs.ramp
 
@@ -596,7 +596,7 @@ function Game:setGameEvents()
             what = function()
                 spawnFuncs.bricks.zigzag(4)
 
-                spawnFuncs.balls.regular()
+                spawnFuncs.balls.regular(3,1)
 
                 spawnFuncs.mobs.eyes.minions(5)
                 spawnFuncs.mobs.eyes.boss()
@@ -642,7 +642,7 @@ function Game:setGameEvents()
                 spawnFuncs.bricks.classic()
 
                 -- spawnFuncs.balls.regular()
-                spawnFuncs.balls.bouncy()
+                spawnFuncs.balls.bouncy(5,1)
 
                 spawnFuncs.mobs.randomizer.boss()
                 spawnFuncs.mobs.randomizer.minions()
@@ -917,7 +917,7 @@ function Game:update(dt)
 
                     -- p = y + vt + .5at^2, solve for v
                     local vy = ball.vy*.75 + .25*((targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime)
-                    if vy/ball.vy < 1.25 then
+                    if vy/ball.vy < 1.5 then
                         ball.vx = ball.vx * vy/ball.vy
                         ball.vy = vy
                     end

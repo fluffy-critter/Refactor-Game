@@ -91,7 +91,7 @@ function Ball:onInit()
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
         recoil = 0,
-        minVelocity = 1,
+        minVelocity = 20,
         blendMode = "alpha",
         beatSync = 1
     })
@@ -128,11 +128,10 @@ function Ball:postUpdate(dt)
         self.vy = self.vy + self.dvy/self.dcount
     end
 
-    -- apply acceleration first so that position includes the integration of acceleration
+    self.x = self.x + self.vx*dt + self.ax*dt*dt/2
+    self.y = self.y + self.vy*dt + self.ay*dt*dt/2
     self.vx = self.vx + self.ax*dt
     self.vy = self.vy + self.ay*dt
-    self.x = self.x + self.vx*dt
-    self.y = self.y + self.vy*dt
 
     if geom.vectorLength({self.vx, self.vy}) < self.minVelocity and
         geom.vectorLength({self.vx + self.ax, self.vy + self.ay}) < self.minVelocity
