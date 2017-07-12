@@ -682,9 +682,6 @@ function Game:setPhase(phase)
         self.music:play()
     end
 
-    if phase == 11 then
-    end
-
     self.phase = phase
 
     for k,v in pairs(self.paddleDefaults) do
@@ -700,8 +697,9 @@ function Game:setPhase(phase)
     self.timeMapper = nil
 end
 
-function Game:keypressed(key, code, isrepeat)
-    if key == '.' then
+function Game:onButtonPress(button)
+    if button == 'skip' then
+        print("tryin' ta skip")
         self.spawner.queue = {}
         self:seekMusic(self.phase + 1)
     end

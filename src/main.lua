@@ -56,11 +56,23 @@ local function onPause()
     end
 end
 
+function input.onPress(button)
+    if button == 'start' then
+        onPause()
+    elseif currentGame.onButtonPress then
+        currentGame:onButtonPress(button)
+    end
+end
+
+function input.onRelease(button)
+    if currentGame.onButtonRelease then
+        currentGame:onButtonRelease(button)
+    end
+end
+
 function love.keypressed(...)
     local key, code, isrepeat = ...
-    if key == 'p' then
-        onPause()
-    elseif key == 'f' then
+    if key == 'f' then
         --[[ TODO pause the music and game updates while this is happening (or else physics goes wonky on Mac)
 
         useful refactor: put game state, screen state, etc. into separate dicts, e.g. music.state="playing", music.speed=1.0, music.resumeOnPlay=false, screen.state="switching", etc.
