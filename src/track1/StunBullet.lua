@@ -30,7 +30,8 @@ function StunBullet:onInit()
         haloLength = 0.1,
         isBullet = true,
         shots = 1,
-        bulletColor = {255, 128, 128},
+        minVelocity = 50,
+        bulletColor = {255, 192, 128},
         safeColor = {128, 255, 255},
         stunTime = self.game.BPM/180
     })

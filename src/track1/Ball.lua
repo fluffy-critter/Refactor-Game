@@ -91,7 +91,7 @@ function Ball:onInit()
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
         recoil = 0,
-        minVelocity = 1,
+        minVelocity = 20,
         blendMode = "alpha",
         beatSync = 1
     })

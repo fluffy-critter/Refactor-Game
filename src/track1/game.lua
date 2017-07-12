@@ -59,7 +59,7 @@ end
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
-    self.toneMap = false -- do the HDR thing
+    self.toneMap = true -- do the HDR thing
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
@@ -235,6 +235,7 @@ function Game:setGameEvents()
                         color = {255, 255, 128, 255},
                         hitColor = {255, 255, 0, 128},
                         beatSync = 0.5,
+                        minVelocity = 0,
                         onStart = function(self)
                             Ball.onStart(self)
                             self.ay = 600

@@ -6,6 +6,7 @@ Refactor: 1 - Little Bouncing Ball
 RoamingEye - it looks at you piercingly
 ]]
 
+local ai = require('track1.ai')
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
@@ -68,10 +69,9 @@ function RoamingEye:onInit()
         maxY = (b.bottom - b.top)*.75 - self.r
     })
 
-    util.applyDefaults(self, {
-        x = math.random(self.minX, self.maxX),
-        y = math.random(self.minY, self.maxY)
-    })
+    if not self.x or not self.y then
+        self.x, self.y = self:pickLocation(self.game.balls)
+    end
 
     self.tgtX = self.x
     self.tgtY = self.y
@@ -116,8 +116,7 @@ function RoamingEye:preUpdate(dt, rawt)
 
     if self.time > self.nextMove then
         self.nextMove = self.time + math.random(self.moveIntervalMin, self.moveIntervalMax)
-        self.tgtX = math.random(self.minX, self.maxX)
-        self.tgtY = math.random(self.minY, self.maxY)
+        self.tgtX, self.tgtY = self:pickLocation(self.game.balls)
     end
 
     local mx = (self.tgtX - self.x)*self.friction
@@ -130,6 +129,26 @@ function RoamingEye:preUpdate(dt, rawt)
 
     self.vx = self.vx + mx*dt
     self.vy = self.vy + my*dt
+end
+
+function RoamingEye:pickLocation(balls)
+    local bestX, bestY, bestDanger
+    for i=1,10 do
+        local x = math.random(self.minX, self.maxX)
+        local y = math.random(self.minY, self.maxY)
+
+        local danger = ai.computeDanger(x, y, balls)
+        if self.x and self.y then
+            danger = danger + ai.computeDanger((x + self.x)/2, (y + self.y)/2, balls)
+        end
+
+        if not bestDanger or danger < bestDanger then
+            bestX = x
+            bestY = y
+            bestDanger = danger
+        end
+    end
+    return bestX, bestY
 end
 
 function RoamingEye:postUpdate(dt)
