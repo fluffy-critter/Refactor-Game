@@ -44,7 +44,7 @@ function RoamingEye:onInit()
         shootSpeedIncrement = 50,
         moveIntervalMin = 2,
         moveIntervalMax = 8,
-        moveSpeedMax = 100,
+        moveSpeedMax = 3000,
         scoreHit = 100,
         scoreDead = 10000,
         vx = 0,
@@ -54,7 +54,7 @@ function RoamingEye:onInit()
         hitFlashRate = 1/20,
         deathTime = 0.5,
 
-        friction = 0.05,
+        friction = 0.5,
         recoil = 5,
         rebound = 50
     })
@@ -139,8 +139,8 @@ function RoamingEye:postUpdate(dt)
 
     self.lookX = self.lookX*(1 - dt*10) + (self.game.paddle.x - self.x)*dt*10
     self.lookY = self.lookY*(1 - dt*10) + (self.game.paddle.y - self.y)*dt*10
-    self.x = self.x + self.vx
-    self.y = self.y + self.vy
+    self.x = self.x + self.vx*dt
+    self.y = self.y + self.vy*dt
 
     if self.time > self.nextShot then
         local vx, vy = unpack(geom.normalize({self.lookX, self.lookY}, 1))
