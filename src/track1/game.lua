@@ -80,7 +80,7 @@ function Game:init()
         self.waterParams = {
             fluidity = 1.5,
             damp = 0.913,
-            timeStep = 3,
+            timeStep = 15,
             rsize = 32,
             fresnel = 0.1,
             sampleRadius = 5.5,
@@ -937,7 +937,7 @@ function Game:update(dt)
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
                 damp = self.waterParams.damp,
                 fluidity = self.waterParams.fluidity,
-                dt = self.waterParams.timeStep*math.max(dt, 1/30)
+                dt = self.waterParams.timeStep*math.min(dt, 1/30)
             })
     end
 end
