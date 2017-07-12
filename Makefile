@@ -83,7 +83,7 @@ $(DEST)/.published-osx: $(DEST)/osx/$(NAME).app
 $(DEST)/deps/love.app/Contents/MacOS/love:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
-	wget https://bitbucket.org/rude/love/downloads/love-0.10.2-macosx-x64.zip && \
+	wget https://bitbucket.org/rude/love/downloads/love-$(LOVE_VERSION)-macosx-x64.zip && \
 	unzip love-$(LOVE_VERSION)-macosx-x64.zip
 
 # Windows build dependencies
