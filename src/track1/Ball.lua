@@ -91,7 +91,7 @@ function Ball:onInit()
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
         recoil = 0,
-        minVelocity = 20,
+        minVelocity = 50,
         blendMode = "alpha",
         beatSync = 1
     })
@@ -128,16 +128,28 @@ function Ball:postUpdate(dt)
         self.vy = self.vy + self.dvy/self.dcount
     end
 
+    if self.minVelocity and self.ax == 0 and self.ay == 0 then
+        local vv = geom.vectorLength({self.vx, self.vy})
+        if vv < self.minVelocity then
+            print("kicking ball from " .. vv .. " to " .. self.minVelocity)
+            local tvx, tvy
+            if vv == 0 then
+                tvx, tvy = unpack(geom.randomVector(self.spawnVelocity))
+            else
+                local factor = self.minVelocity/vv
+                tvx = self.vx*factor
+                tvy = self.vy*factor
+            end
+
+            self.vx = self.vx*(1 - dt) + tvx*dt
+            self.vy = self.vy*(1 - dt) + tvy*dt
+        end
+    end
+
     self.x = self.x + self.vx*dt + self.ax*dt*dt/2
     self.y = self.y + self.vy*dt + self.ay*dt*dt/2
     self.vx = self.vx + self.ax*dt
     self.vy = self.vy + self.ay*dt
-
-    if geom.vectorLength({self.vx, self.vy}) < self.minVelocity and
-        geom.vectorLength({self.vx + self.ax, self.vy + self.ay}) < self.minVelocity
-    then
-        self.vx, self.vy = unpack(geom.randomVector(self.spawnVelocity))
-    end
 end
 
 function Ball:onHitPaddle(nrm, paddle)

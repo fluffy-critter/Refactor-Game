@@ -105,7 +105,7 @@ function Game:init()
         w = 60,
         h = 6,
 
-        speed = 18000,
+        speed = 12000,
         friction = 0.0015,
         rebound = 0.5,
         tiltFactor = 0.01,
@@ -169,12 +169,14 @@ function Game:init()
         lives = 3,
         hitColor = {0, 128, 128, 255},
         ay = 30,
+        minVelocity = 0,
         preUpdate = function(self, dt)
             Ball.preUpdate(self, dt)
             self.vx = self.vx + dt*(paddle.x - self.x)
             self.vy = self.vy + dt*(paddle.y - self.y)
         end,
         onHitPaddle = function(self, nrm, paddle)
+            self.minVelocity = 50
             self.preUpdate = Ball.preUpdate
             self.onHitPaddle = Ball.onHitPaddle
             self.onStart = Ball.onStart
