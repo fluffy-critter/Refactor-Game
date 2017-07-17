@@ -7,7 +7,7 @@ Refactor
 
 local input = {
     -- ramp time for digital inputs, in seconds
-    rampTime = 0.33,
+    rampTime = 1/6,
 
     -- dead zone for analog sticks
     deadZone = 0.1,
@@ -15,6 +15,9 @@ local input = {
     -- current joystick position
     x = 0,
     y = 0,
+
+    -- currently pressed buttons
+    pressed = {},
 
     onPress = function(key)
         -- override this to get button/axis press events
@@ -28,10 +31,102 @@ local input = {
 local state = {
     padX = 0,
     padY = 0,
-    analogX = 0,
-    analogY = 0,
-    pressed = {},
+    analogPressed = {},
+    padPressed = {}
 }
+
+-- map keys to the input mapping (TODO configurable)
+local keyboardMap = {
+    up = 'up',
+    down = 'down',
+    left = 'left',
+    right = 'right',
+
+    w = 'up',
+    s = 'down',
+    a = 'left',
+    d = 'right',
+
+    p = 'start',
+    enter = 'start',
+    esc = 'back',
+    f = 'fullscreen',
+
+    space = 'a',
+    z = 'b',
+    x = 'a',
+
+    ['.'] = 'skip'
+}
+
+-- map gamepad buttons to the input mapping (TODO configurable)
+local buttonMap = {
+    dpup = 'up',
+    dpdown = 'down',
+    dpleft = 'left',
+    dpright = 'right',
+
+    a = 'a',
+    x = 'b',
+
+    b = 'back',
+    back = 'back',
+
+    y = 'start',
+    start = 'start',
+
+    rightshoulder = 'skip'
+}
+
+local function handlePress(which, map)
+    local event = map[which]
+    if event and not input.pressed[event] then
+        input.pressed[event] = true
+        input.onPress(event)
+    end
+    if event then
+        state.padPressed[event] = true
+    end
+    return event
+end
+
+local function handleRelease(which, map)
+    local event = map[which]
+    if event and input.pressed[event] then
+        input.pressed[event] = false
+        input.onRelease(event)
+    end
+    if event then
+        state.padPressed[event] = false
+    end
+    return event
+end
+
+function love.gamepadpressed(joystick, button)
+    print("gp pressed: " .. button)
+    handlePress(button, buttonMap)
+end
+
+function love.gamepadreleased(joystick, button)
+    print("gp released: " .. button)
+    handleRelease(button, buttonMap)
+end
+
+local chainKeypressed = love.keypressed
+function love.keypressed(key, code, isrepeat)
+    print("kb pressed: " .. key, isrepeat)
+    if not handlePress(key, keyboardMap) and chainKeypressed then
+        chainKeypressed(key, code, isrepeat)
+    end
+end
+
+local chainKeyreleased = love.keyreleased
+function love.keyreleased(key, code)
+    print("kb released: " .. key)
+    if not handleRelease(key, keyboardMap) and chainKeyreleased then
+        chainKeyreleased(key, code)
+    end
+end
 
 function input.update(dt)
     --[[ hierarchy of things:
@@ -51,80 +146,71 @@ function input.update(dt)
     local padRate = dt/input.rampTime
 
     -- analog positions
-    local analogX, analogY
-
-    -- buttons which are pressed
-    local pressed = {}
-
-    -- Handle the keyboard
-    pressed['up']    = pressed['up']    or love.keyboard.isDown('up',    'w')
-    pressed['down']  = pressed['down']  or love.keyboard.isDown('down',  's')
-    pressed['left']  = pressed['left']  or love.keyboard.isDown('left',  'a')
-    pressed['right'] = pressed['right'] or love.keyboard.isDown('right', 'd')
-    pressed['start'] = pressed['start'] or love.keyboard.isDown('p')
-    pressed['back']  = pressed['back']  or love.keyboard.isDown('esc')
-    pressed['fire']  = pressed['fire']  or love.keyboard.isDown('space', 'enter')
-
-    pressed['skip']  = pressed['skip']  or love.keyboard.isDown('.')
+    local analogX, analogY = 0, 0
 
     -- handle the joysticks
     local joysticks = love.joystick.getJoysticks()
     for _,j in ipairs(joysticks) do
-        analogX = analogX or j:getGamepadAxis("leftx")
-        analogY = analogY or j:getGamepadAxis("lefty")
+        local leftx = j:getGamepadAxis("leftx")
+        if leftx and math.abs(leftx) > math.abs(analogX) then
+            analogX = leftx
+        end
 
-        pressed['up']    = pressed['up']    or j:isGamepadDown("dpup")
-        pressed['down']  = pressed['down']  or j:isGamepadDown("dpdown")
-        pressed['left']  = pressed['left']  or j:isGamepadDown("dpleft")
-        pressed['right'] = pressed['right'] or j:isGamepadDown("dpright")
-        pressed['start'] = pressed['start'] or j:isGamepadDown("start")
-        pressed['back']  = pressed['back']  or j:isGamepadDown("back")
-        pressed['fire']  = pressed['fire']  or j:isGamepadDown("a")
-
-        pressed['skip']  = pressed['skip']  or j:isGamepadDown("rightshoulder")
+        local lefty = j:getGamepadAxis("lefty")
+        if lefty and math.abs(lefty) > math.abs(analogY) then
+            analogY = lefty
+        end
     end
 
     -- TODO also handle touch events
 
-    if pressed['left'] then
+    if state.padPressed['left'] then
         padX = padX - padRate
     end
-    if pressed['right'] then
+    if state.padPressed['right'] then
         padX = padX + padRate
     end
-    if not pressed['left'] and not pressed['right'] then
+    if not state.padPressed['left'] and not state.padPressed['right'] then
         padX = 0
     end
 
-    if pressed['up'] then
-        padY = padY + padRate
-    end
-    if pressed['down'] then
+    -- love treats up as <0, probably to make it match screen coords
+    if state.padPressed['up'] then
         padY = padY - padRate
     end
-    if not pressed['up'] and not pressed['down'] then
+    if state.padPressed['down'] then
+        padY = padY + padRate
+    end
+    if not state.padPressed['up'] and not state.padPressed['down'] then
         padY = 0
     end
 
     padX = math.max(-1, math.min(padX, 1))
     padY = math.max(-1, math.min(padY, 1))
 
-    -- TODO manage pressed for up/down/left/right based on analogX/analogY
-
-    -- TODO this should really be handled using love.joystickpressed, love.joystickreleased
-    -- see which buttons are now pressed but weren't before
-    for k,v in pairs(pressed) do
-        if v and not state.pressed[k] then
-            input.onPress(k)
+    -- generate pressed events based on stick position
+    local function hysteresis(dir, val)
+        if val and not state.analogPressed[dir] and val > 0.4 then
+            state.analogPressed[dir] = true
+            if not input.pressed[dir] then
+                print("stick pressed: " .. dir)
+                input.onPress(dir)
+            end
+            input.pressed[dir] = true
+        elseif val and state.analogPressed[dir] and val < 0.3 then
+            state.analogPressed[dir] = false
+            if input.pressed[dir] then
+                print("stick released: " .. dir)
+                input.onRelease(dir)
+            end
+            input.pressed[dir] = false
         end
     end
 
-    -- see which buttons are now released
-    for k,v in pairs(state.pressed) do
-        if v and not pressed[k] then
-            input.onRelease(k)
-        end
-    end
+    hysteresis('left', -analogX)
+    hysteresis('right', analogX)
+    hysteresis('up', -analogY)
+    hysteresis('down', analogY)
 
     -- set our stick position as appropriate
     if analogX and math.abs(analogX) > input.deadZone then
@@ -141,7 +227,6 @@ function input.update(dt)
 
     state.padX = padX
     state.padY = padY
-    state.pressed = pressed
 end
 
 return input

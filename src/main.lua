@@ -59,6 +59,12 @@ end
 function input.onPress(button)
     if button == 'start' then
         onPause()
+    elseif button == 'fullscreen' then
+        --[[ TODO pause the music and game updates while this is happening (or else physics goes wonky on Mac)
+
+        useful refactor: put game state, screen state, etc. into separate dicts, e.g. music.state="playing", music.speed=1.0, music.resumeOnPlay=false, screen.state="switching", etc.
+        ]]
+        love.window.setFullscreen(not love.window.getFullscreen())
     elseif currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     end
@@ -70,19 +76,14 @@ function input.onRelease(button)
     end
 end
 
+local chainKeypressed = love.keypressed
 function love.keypressed(...)
-    local key, code, isrepeat = ...
-    if key == 'f' then
-        --[[ TODO pause the music and game updates while this is happening (or else physics goes wonky on Mac)
-
-        useful refactor: put game state, screen state, etc. into separate dicts, e.g. music.state="playing", music.speed=1.0, music.resumeOnPlay=false, screen.state="switching", etc.
-        ]]
-        love.window.setFullscreen(not love.window.getFullscreen())
-    elseif currentGame.keypressed then
-        currentGame:keypressed(...)
-    end
-
+    print("foo")
     if Pie then Pie:keypressed(...) end
+    if chainKeypressed then
+        print("bar")
+        chainKeypressed(...)
+    end
 end
 
 function love.mousepressed(...)
