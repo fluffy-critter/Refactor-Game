@@ -704,6 +704,7 @@ function Game:setPhase(phase)
             print(k,v)
         end
     end
+    geom.collision_stats = {}
 
     self.timeMapper = nil
 end
