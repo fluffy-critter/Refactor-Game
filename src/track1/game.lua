@@ -576,7 +576,7 @@ function Game:setGameEvents()
             when = {6},
             what = function()
                 spawnFuncs.balls.bouncy(3,5)
-                spawnFuncs.mobs.eyes.minions(6)
+                spawnFuncs.mobs.eyes.minions(6, true)
                 self.timeMapper = timeFuncs.judder
             end
         },
@@ -614,7 +614,7 @@ function Game:setGameEvents()
 
                 spawnFuncs.balls.regular(3,1)
 
-                spawnFuncs.mobs.eyes.minions(5)
+                spawnFuncs.mobs.eyes.minions(5, true)
                 spawnFuncs.mobs.eyes.boss()
             end
         },
@@ -625,6 +625,8 @@ function Game:setGameEvents()
                 spawnFuncs.balls.super()
 
                 spawnFuncs.bricks.zagzig(12, 4)
+
+                spawnFuncs.mobs.eyes.minions(3, true)
             end
         },
         {
@@ -922,7 +924,7 @@ function Game:update(dt)
                     deltaBeats = nextHitDelta*BPS/ball.beatSync
 
                     -- round this to the nearest beat, after taking off the beatOfs
-                    deltaBeats = math.floor(deltaBeats + beatOfs + 0.33) - beatOfs
+                    deltaBeats = math.floor(deltaBeats + beatOfs + 0.25) - beatOfs
                 end
 
                 if deltaBeats and deltaBeats > .5 then
@@ -934,7 +936,6 @@ function Game:update(dt)
                     -- p = y + vt + .5at^2, solve for v
                     local vy = ball.vy*.75 + .25*((targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime)
                     if vy/ball.vy < 1.5 then
-                        ball.vx = ball.vx * vy/ball.vy
                         ball.vy = vy
                     end
                 end
