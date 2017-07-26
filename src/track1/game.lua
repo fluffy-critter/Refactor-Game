@@ -625,13 +625,12 @@ function Game:setGameEvents()
                 spawnFuncs.balls.super()
 
                 spawnFuncs.bricks.zagzig(12, 4)
-                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
             when = {8,8},
             what = function()
-                spawnFuncs.mobs.eyes.minions(2)
+                spawnFuncs.mobs.flappyBat(4)
             end
         },
         {
