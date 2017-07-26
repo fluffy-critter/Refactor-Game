@@ -9,6 +9,7 @@ RoamingEye - it looks at you piercingly
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
+local imagepool = require('imagepool')
 
 local Actor = require('track1.Actor')
 local StunBullet = require('track1.StunBullet')
@@ -87,6 +88,8 @@ function RoamingEye:onInit()
 
     local canvasFormat = util.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
     self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, canvasFormat, 2)
+
+    self.circle = imagepool.load('images/circlefill.png', {mipmaps = true})
 end
 
 function RoamingEye:isAlive()
@@ -211,6 +214,10 @@ function RoamingEye:onHitBall(nrm, ball)
     end
 end
 
+function RoamingEye:drawCircle(x, y, r)
+    love.graphics.draw(self.circle, x, y, 0, r/64, r/64, 64, 64)
+end
+
 function RoamingEye:draw()
     local px, py = unpack(geom.normalize({self.lookX, self.lookY}))
     local irisR = self.r - self.irisSize
@@ -227,16 +234,17 @@ function RoamingEye:draw()
 
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(unpack(self.ballColor))
-        love.graphics.circle("fill", self.r, self.r, self.r)
+
+        self:drawCircle(self.r, self.r, self.r)
 
         love.graphics.setColor(unpack(self.irisColor))
-        love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.irisSize)
+        self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.irisSize)
         love.graphics.setColor(unpack(self.pupilColor))
-        love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize)
+        self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize)
 
         if chargeAmount then
             love.graphics.setColor(unpack(chargeColor))
-            love.graphics.circle("fill", self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize - 1)
+            self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize - 1)
         end
 
     end)
@@ -280,7 +288,7 @@ function RoamingEye:draw()
         love.graphics.setBlendMode("alpha", "alphamultiply")
         if self.state == RoamingEye.states.spawning or self.state == RoamingEye.states.dying then
             love.graphics.setColor(255, 255, 255, alpha)
-            love.graphics.circle("fill", self.x, self.y, self.r)
+            self:drawCircle(self.x, self.y, self.r)
         end
     end)
 end
