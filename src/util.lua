@@ -123,4 +123,20 @@ function util.selectCanvasFormat(...)
     return nil
 end
 
+-- shuffle a list
+function util.shuffle(list)
+    local indices = {}
+    for i in ipairs(list) do
+        indices[i] = i
+    end
+    local ret = {}
+    while #indices > 0 do
+        local idx = math.random(1,#indices)
+        table.insert(ret, list[indices[idx]])
+        indices[idx] = indices[#indices]
+        table.remove(indices, #indices)
+    end
+    return ret
+end
+
 return util

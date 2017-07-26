@@ -33,7 +33,7 @@ function FlappyBat:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 24,
-        color = {255, 192, 64},
+        color = util.shuffle({255, 192, 96, 64}),
         flapInterval = 60/self.game.BPM,
         flapVY = -600,
         scoreHit = 100,
@@ -47,7 +47,7 @@ function FlappyBat:onInit()
     })
 
     util.applyDefaults(self, {
-        vx = math.random(-200,200),
+        vx = math.random(-250,250),
         vy = 0,
         -- -v = v + at -> a=-2v/t
         ay = -1.5*self.flapVY/self.flapInterval,

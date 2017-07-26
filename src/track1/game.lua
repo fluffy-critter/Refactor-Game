@@ -472,7 +472,7 @@ function Game:setGameEvents()
                     -- TODO shieldballs
                 end,
             },
-            flappyBat = function(count)
+            flappyBat = function(count, kill)
                 local spawns = {}
                 for i = 1,count do
                     table.insert(spawns, {})
@@ -583,7 +583,7 @@ function Game:setGameEvents()
         {
             when = {6,8},
             what = function()
-                spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.mobs.flappyBat(4, true)
                 spawnFuncs.balls.bouncy(3,2)
                 spawnFuncs.balls.regular(3,2)
             end
@@ -630,7 +630,7 @@ function Game:setGameEvents()
         {
             when = {8,8},
             what = function()
-                spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.mobs.flappyBat(4, true)
             end
         },
         {
