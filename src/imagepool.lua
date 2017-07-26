@@ -5,7 +5,7 @@ Refactor
 
 ]]
 
-imagepool = {}
+local imagepool = {}
 
 imagepool.pool = {}
 setmetatable(imagepool.pool, {__mode="v"})
