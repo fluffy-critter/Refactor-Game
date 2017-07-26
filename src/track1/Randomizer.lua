@@ -109,7 +109,7 @@ function Randomizer:onInit()
     self.nextSpawn = 0
 
     self.images = {
-        imagepool.load("images/glitch.png"),
+        imagepool.load("images/glitch.png", {nearest = true}),
         self.game.canvas,
         self.game.layers.water
     }

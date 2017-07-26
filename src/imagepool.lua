@@ -10,11 +10,28 @@ imagepool = {}
 imagepool.pool = {}
 setmetatable(imagepool.pool, {__mode="v"})
 
-function imagepool.load(filename)
-    local img = imagepool.pool[filename]
+function imagepool.load(filename, cfg)
+    cfg = cfg or {}
+
+    local key = filename
+
+    if cfg.mipmaps then key = key .. "|mipmap" end
+    if cfg.nearest then key = key .. "|nearest" end
+
+    local img = imagepool.pool[key]
     if not img then
-        img = love.graphics.newImage(filename)
-        imagepool.pool[filename] = img
+        img = love.graphics.newImage(filename, {mipmaps = cfg.mipmaps})
+        if cfg.mipmaps then
+            img:setMipmapFilter("linear")
+        end
+
+        if cfg.nearest then
+            img:setFilter("nearest", "nearest")
+        else
+            img:setFilter("linear", "linear")
+        end
+
+        imagepool.pool[key] = img
     end
     return img
 end

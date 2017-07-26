@@ -25,6 +25,7 @@ function SparkParticle.new(cfg)
     })
 
     self.time = 0
+    self.dot = imagepool.load('images/circlefill.png', {mipmaps = true})
 
     return self
 end
@@ -45,7 +46,7 @@ function SparkParticle:draw()
     local size = util.clamp(1 - self.time/self.lifetime, 0, 1)
     love.graphics.setColor(self.color[1], self.color[2], self.color[3],
         (self.color[4] or 255)*math.pow(size, self.gamma))
-    love.graphics.circle("fill", self.x, self.y, self.r*size)
+    love.graphics.draw(self.dot, self.x, self.y, 0, self.r*size/64, self.r*size/64, 64, 64)
 end
 
 return SparkParticle
