@@ -197,9 +197,9 @@ function FlappyBat:draw()
 
         if self.state == FlappyBat.states.dying then
             frame = 4
-        elseif self.vy >= self.flapVY/3 then
+        elseif self.vy >= self.flapVY/10 then
             frame = 1
-        elseif self.flapTime > 0.2 then
+        elseif self.vy >= self.flapVY/2 then
             frame = 3
         else
             frame = 2
