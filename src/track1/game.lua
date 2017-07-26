@@ -540,7 +540,7 @@ function Game:setGameEvents()
             when = {3,8},
             what = function()
                 spawnFuncs.balls.bouncy()
-                spawnFuncs.mobs.flappyBat(3)
+                -- spawnFuncs.mobs.flappyBat(3)
             end
         },
         {
@@ -567,7 +567,10 @@ function Game:setGameEvents()
         },
         {
             when = {5,8},
-            what = spawnFuncs.mobs.randomizer.boss
+            what = function()
+                spawnFuncs.mobs.randomizer.boss()
+                spawnFuncs.balls.bouncy()
+            end
         },
         {
             when = {6},
@@ -581,6 +584,8 @@ function Game:setGameEvents()
             when = {6,8},
             what = function()
                 spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.balls.bouncy(3,2)
+                spawnFuncs.balls.regular(3,2)
             end
         },
         {
@@ -641,6 +646,7 @@ function Game:setGameEvents()
         {
             when = {9,8},
             what = function()
+                spawnFuncs.balls.regular(3, 1)
                 spawnFuncs.bricks.zagzig(11, 5)
                 spawnFuncs.mobs.flappyBat(4)
             end
