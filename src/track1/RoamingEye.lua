@@ -244,7 +244,7 @@ function RoamingEye:draw()
 
         if chargeAmount then
             love.graphics.setColor(unpack(chargeColor))
-            self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize - 1)
+            self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize*math.sqrt(chargeAmount))
         end
 
     end)
