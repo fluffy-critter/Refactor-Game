@@ -38,6 +38,7 @@ function FlappyBat:onInit()
         scoreHit = 100,
         scoreDead = 100,
         spawnTime = 0.25,
+        deathTime = 1.0,
         hitTime = 0.25,
         hitFlashRate = 1/20,
         rebound = 0.1,
@@ -179,7 +180,7 @@ function FlappyBat:draw()
     self.game.layers.overlay:renderTo(function()
         local alpha = 255
         if self.state == FlappyBat.states.dying then
-            alpha = 127
+            alpha = math.max(0, 255*(1 - self.stateAge/self.deathTime))
         elseif self.state == FlappyBat.states.spawning then
             alpha = 255*self.stateAge/self.spawnTime
         elseif self.state == FlappyBat.states.hit then
