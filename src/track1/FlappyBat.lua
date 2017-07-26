@@ -207,6 +207,12 @@ function FlappyBat:draw()
 
         local flipX = self.x < self.game.paddle.x and 1 or -1
 
+        love.graphics.setColor(0, 0, 0, alpha/10)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x-1, self.y, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x+1, self.y, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y-1, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y+1, 0, flipX, 1, 32, 32)
+
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], alpha)
         love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y, 0, flipX, 1, 32, 32)
     end)
