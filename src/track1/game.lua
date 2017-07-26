@@ -638,6 +638,7 @@ function Game:setGameEvents()
             what = function()
                 self.starterBall.ay = math.min(self.starterBall.ay, 50)
 
+                spawnFuncs.balls.regular(3, 1)
                 spawnFuncs.bricks.zigzag(4)
                 self.timeMapper = timeFuncs.judder
             end

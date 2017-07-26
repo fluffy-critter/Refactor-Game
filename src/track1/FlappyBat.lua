@@ -8,6 +8,7 @@ Flappy Bat, Flap-Flappy Bat, Flappy Bat, god dammit
 
 local geom = require('geom')
 local util = require('util')
+local imagepool = require('imagepool')
 
 local Actor = require('track1.Actor')
 
@@ -32,7 +33,7 @@ function FlappyBat:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 24,
-        color = {127, 127, 255},
+        color = {255, 192, 64},
         flapInterval = 60/self.game.BPM,
         flapVY = -600,
         scoreHit = 100,
@@ -65,6 +66,12 @@ function FlappyBat:onInit()
     self.state = FlappyBat.states.spawning
     self.stateAge = 0
     self.flapTime = 0
+
+    self.spriteSheet = imagepool.load("images/flappybat.png", {nearest=true,mipmaps=false})
+    self.frames = {}
+    for i = 1, 4 do
+        self.frames[i] = love.graphics.newQuad((i - 1)*64, 0, 64, 64, 64*4, 64)
+    end
 end
 
 function FlappyBat:isAlive()
@@ -113,7 +120,6 @@ function FlappyBat:preUpdate(dt, rawt)
     end
 
     if flap then
-        print(self.rising)
         self.flapTime = 0
         self.vy = self.flapVY
     end
@@ -179,6 +185,7 @@ end
 function FlappyBat:draw()
     self.game.layers.overlay:renderTo(function()
         local alpha = 255
+        local frame
         if self.state == FlappyBat.states.dying then
             alpha = math.max(0, 255*(1 - self.stateAge/self.deathTime))
         elseif self.state == FlappyBat.states.spawning then
@@ -188,8 +195,20 @@ function FlappyBat:draw()
             alpha = 127 + 128*flash
         end
 
+        if self.state == FlappyBat.states.dying then
+            frame = 4
+        elseif self.vy >= self.flapVY/3 then
+            frame = 1
+        elseif self.flapTime > 0.2 then
+            frame = 3
+        else
+            frame = 2
+        end
+
+        local flipX = self.x < self.game.paddle.x and 1 or -1
+
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], alpha)
-        love.graphics.circle("fill", self.x, self.y, self.r)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y, 0, flipX, 1, 32, 32)
     end)
 end
 
