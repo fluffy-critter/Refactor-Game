@@ -78,10 +78,8 @@ end
 
 local chainKeypressed = love.keypressed
 function love.keypressed(...)
-    print("foo")
     if Pie then Pie:keypressed(...) end
     if chainKeypressed then
-        print("bar")
         chainKeypressed(...)
     end
 end
