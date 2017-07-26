@@ -14,6 +14,7 @@ local SparkParticle = require('track1.SparkParticle')
 local Randomizer = require('track1.Randomizer')
 local Brick = require('track1.Brick')
 local RoamingEye = require('track1.RoamingEye')
+local FlappyBat = require('track1.FlappyBat')
 
 local Spawner = require('track1.Spawner')
 
@@ -470,7 +471,14 @@ function Game:setGameEvents()
                     table.insert(self.toKill, eye)
                     -- TODO shieldballs
                 end,
-            }
+            },
+            flappyBat = function(count)
+                local spawns = {}
+                for i = 1,count do
+                    table.insert(spawns, {})
+                end
+                self.spawner:spawn({self.actors, kill and self.toKill}, FlappyBat, spawns, 30/BPM, 1)
+            end,
         }
     }
 
@@ -514,7 +522,7 @@ function Game:setGameEvents()
         {
             when = {2,8},
             what = function()
-                -- spawnFuncs.mobs.flappyBat
+                spawnFuncs.mobs.flappyBat(4)
             end
         },
         {
@@ -531,7 +539,8 @@ function Game:setGameEvents()
         {
             when = {3,8},
             what = function()
-                -- spawnFuncs.mobs.flappyBat
+                spawnFuncs.balls.bouncy()
+                -- spawnFuncs.mobs.flappyBat(3)
             end
         },
         {
@@ -558,7 +567,10 @@ function Game:setGameEvents()
         },
         {
             when = {5,8},
-            what = spawnFuncs.mobs.randomizer.boss
+            what = function()
+                spawnFuncs.mobs.randomizer.boss()
+                spawnFuncs.balls.bouncy()
+            end
         },
         {
             when = {6},
@@ -571,7 +583,9 @@ function Game:setGameEvents()
         {
             when = {6,8},
             what = function()
-                -- spawnFuncs.mobs.flappyBat
+                spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.balls.bouncy(3,2)
+                spawnFuncs.balls.regular(3,2)
             end
         },
         {
@@ -611,13 +625,12 @@ function Game:setGameEvents()
                 spawnFuncs.balls.super()
 
                 spawnFuncs.bricks.zagzig(12, 4)
-                -- spawnFuncs.mobs.flappyBat
             end
         },
         {
             when = {8,8},
             what = function()
-                spawnFuncs.mobs.eyes.minions(2)
+                spawnFuncs.mobs.flappyBat(4)
             end
         },
         {
@@ -632,8 +645,9 @@ function Game:setGameEvents()
         {
             when = {9,8},
             what = function()
+                spawnFuncs.balls.regular(3, 1)
                 spawnFuncs.bricks.zagzig(11, 5)
-                -- spawnFuncs.mobs.flappyBat
+                spawnFuncs.mobs.flappyBat(4)
             end
         },
         {
