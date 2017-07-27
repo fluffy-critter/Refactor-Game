@@ -206,7 +206,7 @@ function Game:init()
     self.nextEvent = nil
     self:setGameEvents()
 
-    self.scoreFont = love.graphics.newFont(32)
+    self.scoreFont = love.graphics.newFont("images/c64mono.fnt", "images/c64mono_0.png")
 end
 
 function Game:defer(item)
