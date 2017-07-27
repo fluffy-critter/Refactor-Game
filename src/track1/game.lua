@@ -24,7 +24,12 @@ local shaders = require('shaders')
 local input = require('input')
 local imagepool = require('imagepool')
 
-local Game = {}
+local Game = {
+    META = {
+        title = "little bouncing ball",
+        duration = 5*60 + 26
+    }
+}
 
 function Game.new()
     local o = {}
