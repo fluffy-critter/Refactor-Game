@@ -1,4 +1,5 @@
-All included work is copyright ©2017 j "fluffy" shagam. http://beesbuzz.biz/
+All included work is copyright ©2017 j "fluffy" shagam unless otherwise
+specified.
 
 Code, Lua and otherwise, is available under the ISC license, viewable at
 https://opensource.org/licenses/ISC and reproduced here:
@@ -20,3 +21,21 @@ under the terms of Creative Commons Attribution NonCommercial ShareAlike 4.0,
 viewable at https://creativecommons.org/licenses/by-nc-sa/4.0/; the executive
 summary is that you may use these elements within your own works provided that
 you give credit and also release your work under the same terms.
+
+-- Third Party Credits --
+
+Libraries:
+
+    LÖVE - http://love2d.org
+
+    Piefiller - https://github.com/Polynominal/Piefiller
+
+Fonts:
+
+    C64 Pro Mono - http://style64.org/c64-truetype
+
+Tools:
+
+    Logic Pro X - http://apple.com/logic-pro
+
+    BMFont - http://www.angelcode.com/products/bmfont/
