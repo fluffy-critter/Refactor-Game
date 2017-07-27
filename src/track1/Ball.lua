@@ -92,7 +92,7 @@ function Ball:onInit()
         paddleScoreInc = 1,
         scoreCooldown = 0.5,
         recoil = 0,
-        minVelocity = 50,
+        minVelocity = 1280*self.game.BPM/360, -- cover the screen width in 6 beats
         blendMode = "alpha",
         beatSync = 1
     })
