@@ -22,6 +22,7 @@ local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
+local imagepool = require('imagepool')
 
 local Game = {}
 
@@ -204,6 +205,8 @@ function Game:init()
     self.eventQueue = {}
     self.nextEvent = nil
     self:setGameEvents()
+
+    self.scoreFont = love.graphics.newFont(32)
 end
 
 function Game:defer(item)
@@ -1000,9 +1003,6 @@ function Game:draw()
         for _,particle in pairs(self.particles) do
             particle:draw()
         end
-
-        love.graphics.setColor(255,255,255,255)
-        love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
     end)
 
     self.canvas:renderTo(function()
@@ -1024,6 +1024,11 @@ function Game:draw()
 
         love.graphics.draw(self.layers.arena)
         love.graphics.draw(self.layers.overlay)
+
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setColor(255,255,255,255)
+        love.graphics.setFont(self.scoreFont)
+        love.graphics.print(self.score, 0, 0)
     end)
 
     if self.toneMap then

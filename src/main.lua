@@ -10,6 +10,7 @@ local util = require('util')
 local input = require('input')
 
 local PROFILE = false
+local DEBUG = false
 
 local Pie
 if PROFILE then
@@ -179,7 +180,7 @@ function love.draw()
 
     if Pie then Pie:draw() end
 
-    if fps then
+    if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
         love.graphics.printf(math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
     end

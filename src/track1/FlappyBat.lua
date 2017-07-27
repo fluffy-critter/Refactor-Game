@@ -67,7 +67,7 @@ function FlappyBat:onInit()
     self.stateAge = 0
     self.flapTime = 0
 
-    self.spriteSheet = imagepool.load("images/flappybat.png", {nearest=true,mipmaps=false})
+    self.spriteSheet = imagepool.load("track1/flappybat.png", {nearest=true,mipmaps=false})
     self.frames = {}
     for i = 1, 4 do
         self.frames[i] = love.graphics.newQuad((i - 1)*64, 0, 64, 64, 64*4, 64)
