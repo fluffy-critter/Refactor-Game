@@ -35,10 +35,20 @@ function util.enum(...)
             return o.name
         end
     }
-    for k,v in ipairs({...}) do
+
+    local vals = {...}
+
+    for k,v in ipairs(vals) do
         enum[v] = { enum = enum, val = k, name = v }
         setmetatable(enum[v], meta)
     end
+
+    setmetatable(enum, {
+        __call = function(e, n)
+            return enum[n]
+        end
+    })
+
     return enum
 end
 
