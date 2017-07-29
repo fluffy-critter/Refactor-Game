@@ -183,9 +183,4 @@ function geom.vectorLength(vector)
     return math.sqrt(vx*vx + vy*vy)
 end
 
--- Implements the smoothStep equation from x=0..1
-function geom.smoothStep(x)
-    return x*x*(3 - 2*x)
-end
-
 return geom

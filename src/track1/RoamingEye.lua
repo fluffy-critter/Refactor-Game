@@ -140,7 +140,7 @@ function RoamingEye:preUpdate(dt, rawt)
         self.vy = self.vy*self.moveSpeedMax/mag
     end
 
-    local pp = geom.smoothStep(math.min(1, (self.time - self.lastMove)/self.moveTime))
+    local pp = util.smoothStep(math.min(1, (self.time - self.lastMove)/self.moveTime))
     local px = self.posX + pp*(self.tgtX - self.posX)
     local py = self.posY + pp*(self.tgtY - self.posY)
 

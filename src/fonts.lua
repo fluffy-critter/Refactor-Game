@@ -6,7 +6,8 @@ Refactor
 ]]
 
 local fonts = {
-    scoreboard = love.graphics.newFont("fonts/scoreboard.fnt", "fonts/scoreboard_0.png")
+    scoreboard = love.graphics.newFont("fonts/scoreboard.fnt"),
+    centuryGothicDigits = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789")
 }
 
 return fonts

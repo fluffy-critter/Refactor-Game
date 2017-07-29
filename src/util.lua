@@ -12,23 +12,23 @@ local util = {}
 -- Create an enum
 function util.enum(...)
     local enum = {}
+    local function checktype(o)
+        if o.enum ~= enum then
+            error("attempted to compare incompatible enum types")
+        end
+    end
+
     local meta = {
         __eq = function(o1, o2)
-            if o1.enum ~= o2.enum then
-                error("attempted to compare incompatible enum types")
-            end
+            checktype(o2)
             return o1.val == o2.val
         end,
         __lt = function(o1, o2)
-            if o1.enum ~= o2.enum then
-                error("attempted to compare incompatible enum types")
-            end
+            checktype(o2)
             return o1.val < o2.val
         end,
         __le = function(o1, o2)
-            if o1.enum ~= o2.enum then
-                error("attempted to compare incompatible enum types")
-            end
+            checktype(o2)
             return o1.val == o2.val
         end,
         __tostring = function(o)
@@ -44,6 +44,7 @@ function util.enum(...)
     end
 
     setmetatable(enum, {
+        -- allows [de]serializing based on value, eg MyEnum(3)
         __call = function(e, n)
             return enum[n]
         end
@@ -81,13 +82,15 @@ end
 
 -- Compares two arrays for equality
 function util.arrayEQ(a1, a2)
+    if #a1 ~= #a2 then return false end
+
     for k,v in ipairs(a1) do
         if v ~= a2[k] then
             return false
         end
     end
 
-    return #a1 == #a2
+    return true
 end
 
 -- Makes an array comparable
@@ -102,7 +105,7 @@ function util.comparable(ret)
     return ret
 end
 
--- Weak reference (see https://stackoverflow.com/a/29110759/318857)
+-- Generate a weak reference to an object
 function util.weakRef(data)
     local weak = setmetatable({content=data}, {__mode="v"})
     return function() return weak.content end
@@ -133,21 +136,21 @@ function util.premultiply(color)
     return {color[1]*a/255, color[2]*a/255, color[3]*a/255, a}
 end
 
--- get the solutions to a quadratic equation; returns up two values, or nil if complex
+-- get the solutions to a quadratic equation; returns up to two values, or nil if complex
 function util.solveQuadratic(a, b, c)
     local det = b*b - 4*a*c
     if det < 0 then
         return nil
     end
+    if det == 0 then
+        return -b/2/a
+    end
     det = math.sqrt(det)
     return (-b - det)/2/a, (-b + det)/2/a
 end
 
+-- Select the most-preferred canvas format from a list of formats
 local graphicsFormats = love.graphics.getCanvasFormats()
--- print("supported graphics formats:")
--- for k,v in pairs(graphicsFormats) do
---     if v then print("\t" .. k) end
--- end
 function util.selectCanvasFormat(...)
     for _,k in ipairs({...}) do
         if graphicsFormats[k] then
@@ -157,7 +160,7 @@ function util.selectCanvasFormat(...)
     return nil
 end
 
--- shuffle a list
+-- shuffle a list the right way
 function util.shuffle(list)
     local indices = {}
     for i in ipairs(list) do
@@ -172,5 +175,11 @@ function util.shuffle(list)
     end
     return ret
 end
+
+-- Implements the cubic smoothStep from x=0..1
+function util.smoothStep(x)
+    return x*x*(3 - 2*x)
+end
+
 
 return util
