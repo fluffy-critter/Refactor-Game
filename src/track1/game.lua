@@ -212,7 +212,7 @@ function Game:init()
     self.nextEvent = nil
     self:setGameEvents()
 
-    self.scoreFont = fonts.scoreboard
+    self.scoreFont = fonts.centuryGothicDigits
 end
 
 function Game:defer(item)
