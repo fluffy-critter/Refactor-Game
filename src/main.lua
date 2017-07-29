@@ -40,39 +40,54 @@ end
 local tracks = {}
 local currentGame
 
--- TODO switch to util.enum
-local state = "playing"
-local speed = 1.0
-local resumeMusic = false
+local PlayState = util.enum("playing", "pausing", "paused", "resuming")
+local playing = {
+    state = PlayState.playing,
+    speed = 1.0,
+    resumeMusic = false
+}
+
+local ScreenState = util.enum("ready", "configwait")
+local screen = {
+    state = ScreenState.waiting,
+    resumeMusic = false
+}
 
 local function onPause()
-    if state == "playing" or state == "resuming" then
-        state = "pausing"
-        resumeMusic = currentGame.music:isPlaying()
-    elseif state == "pausing" or state == "paused" then
-        state = "resuming"
-        if resumeMusic then
+    if playing.state == PlayState.playing or playing.state == PlayState.resuming then
+        playing.state = PlayState.pausing
+        playing.resumeMusic = currentGame.music:isPlaying()
+    elseif playing.state == PlayState.pausing or playing.state == PlayState.paused then
+        playing.state = PlayState.resuming
+        if playing.resumeMusic then
             currentGame.music:resume()
         end
     end
 end
 
 function input.onPress(button)
+    if screen.state == ScreenState.configwait then
+        return
+    end
+
     if button == 'start' then
         onPause()
     elseif button == 'fullscreen' then
-        --[[ TODO pause the music and game updates while this is happening (or else physics goes wonky on Mac)
-
-        useful refactor: put game state, screen state, etc. into separate dicts, e.g. music.state="playing", music.speed=1.0, music.resumeOnPlay=false, screen.state="switching", etc.
-        ]]
+        screen.state = ScreenState.configwait
+        if currentGame and currentGame.music:isPlaying() then
+            screen.resumeMusic = true
+            currentGame.music:pause()
+        else
+            screen.resumeMusic = false
+        end
         love.window.setFullscreen(not love.window.getFullscreen())
-    elseif currentGame.onButtonPress then
+    elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     end
 end
 
 function input.onRelease(button)
-    if currentGame.onButtonRelease then
+    if currentGame and currentGame.onButtonRelease then
         currentGame:onButtonRelease(button)
     end
 end
@@ -111,24 +126,28 @@ local fps
 function love.update(dt)
     if Pie then Pie:attach() end
 
+    if screen.state == ScreenState.configwait then
+        return
+    end
+
     input.update(dt)
 
-    if state == "pausing" then
-        speed = speed - dt*3
-        if speed <= 0 then
-            speed = 0
+    if playing.state == PlayState.pausing then
+        playing.speed = playing.speed - dt*3
+        if playing.speed <= 0 then
+            playing.speed = 0
             currentGame.music:pause()
-            state = "paused"
+            playing.state = PlayState.paused
         else
-            currentGame.music:setPitch(speed)
+            currentGame.music:setPitch(playing.speed)
         end
-    elseif state == "resuming" then
-        speed = speed + dt*3
-        if speed >= 1 then
-            speed = 1
-            state = "playing"
+    elseif playing.state == PlayState.resuming then
+        playing.speed = playing.speed + dt*3
+        if playing.speed >= 1 then
+            playing.speed = 1
+            playing.state = PlayState.playing
         end
-        currentGame.music:setPitch(speed)
+        currentGame.music:setPitch(playing.speed)
     end
 
     local mul = 1
@@ -136,7 +155,7 @@ function love.update(dt)
         mul = 0.1
     end
 
-    if state ~= "paused" then
+    if playing.state ~= PlayState.paused then
         currentGame:update(dt*mul)
     end
 
@@ -154,16 +173,23 @@ end
 function love.draw()
     if Pie then Pie:attach() end
 
+    if screen.state == ScreenState.configwait then
+        screen.state = ScreenState.ready
+        if screen.resumeMusic then
+            currentGame.music:resume()
+        end
+    end
+
     local canvas = currentGame:draw()
 
     love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.setColor(255, 255, 255)
 
-    if state ~= "playing" then
+    if playing.state ~= PlayState.playing then
         love.graphics.setShader(shaders.hueshift)
-        local saturation = speed*.85 + .15
-        local shift = (1 - speed)*math.pi
-        if state == "resuming" then
+        local saturation = playing.speed*.85 + .15
+        local shift = (1 - playing.speed)*math.pi
+        if playing.state == PlayState.resuming then
             shift = -shift
         end
         shaders.hueshift:send("basis", {
