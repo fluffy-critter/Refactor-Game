@@ -791,8 +791,8 @@ function Game:update(dt)
             actor:kill()
         end
 
-        if not self.music:isPlaying() then
-            -- TODO go to game exit state
+        if time[2] >= 2 or not self.music:isPlaying() then
+            self.gameOver = true
         end
     end
 
