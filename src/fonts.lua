@@ -6,7 +6,7 @@ Refactor
 ]]
 
 local fonts = {
-    -- AndaleMono32 = love.graphics.newFont("fonts/AndaleMono32.fnt", "fonts/AndaleMono32_0.png")
+    scoreboard = love.graphics.newFont("fonts/scoreboard.fnt", "fonts/scoreboard_0.png")
 }
 
 return fonts
