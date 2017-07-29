@@ -23,6 +23,7 @@ local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
 local imagepool = require('imagepool')
+local fonts = require('fonts')
 
 local Game = {}
 
@@ -206,7 +207,7 @@ function Game:init()
     self.nextEvent = nil
     self:setGameEvents()
 
-    self.scoreFont = love.graphics.newFont("images/c64mono.fnt", "images/c64mono_0.png")
+    self.scoreFont = love.graphics.newFont(32)
 end
 
 function Game:defer(item)
