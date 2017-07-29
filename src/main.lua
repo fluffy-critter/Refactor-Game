@@ -98,6 +98,7 @@ function love.load()
     tracks[1] = require('track1.game')
 
     currentGame = tracks[1].new()
+    love.window.setTitle(currentGame.META.title)
 
     -- currentGame = require('tests.waterTester')
     -- currentGame:init()
