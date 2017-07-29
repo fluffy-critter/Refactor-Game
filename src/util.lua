@@ -12,9 +12,43 @@ local util = {}
 -- Create an enum
 function util.enum(...)
     local enum = {}
-    for k,v in ipairs({...}) do
-        enum[v] = k
+    local meta = {
+        __eq = function(o1, o2)
+            if o1.enum ~= o2.enum then
+                error("attempted to compare incompatible enum types")
+            end
+            return o1.val == o2.val
+        end,
+        __lt = function(o1, o2)
+            if o1.enum ~= o2.enum then
+                error("attempted to compare incompatible enum types")
+            end
+            return o1.val < o2.val
+        end,
+        __le = function(o1, o2)
+            if o1.enum ~= o2.enum then
+                error("attempted to compare incompatible enum types")
+            end
+            return o1.val == o2.val
+        end,
+        __tostring = function(o)
+            return o.name
+        end
+    }
+
+    local vals = {...}
+
+    for k,v in ipairs(vals) do
+        enum[v] = { enum = enum, val = k, name = v }
+        setmetatable(enum[v], meta)
     end
+
+    setmetatable(enum, {
+        __call = function(e, n)
+            return enum[n]
+        end
+    })
+
     return enum
 end
 
