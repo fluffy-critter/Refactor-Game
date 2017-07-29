@@ -3,6 +3,29 @@ Refactor
 
 (c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 
+
+Game class objects are expected to have:
+
+    META - a table containing:
+        title - the title of the game
+        duration - the duration in seconds
+
+    new() - a method that spawns a new instance
+
+Game instances are expected to have:
+
+    music - an object that presents at least the following subset of the audio source API:
+        pause()
+        resume()
+        setPitch(multiplier)
+        tell()
+        isPlaying()
+
+    gameOver - becomes true/truthy when the game is finished (must be nil or false otherwise); the game
+    update/render loop will keep on going, though (the controller will fade the game out once this is true)
+
+    score - the game score (numeric)
+
 ]]
 
 local shaders = require('shaders')
@@ -37,14 +60,18 @@ local function blitCanvas(canvas)
         blitSize[1]/canvasWidth, blitSize[2]/canvasHeight)
 end
 
-local tracks = {}
+local tracks = {
+    require('track1.game')
+}
 local currentGame
 
-local PlayState = util.enum("playing", "pausing", "paused", "resuming")
+local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending")
 local playing = {
-    state = PlayState.playing,
+    state = PlayState.starting,
+    unpauseState = nil,
     speed = 1.0,
-    resumeMusic = false
+    resumeMusic = false,
+    fade = 0
 }
 
 local ScreenState = util.enum("ready", "configwait")
@@ -54,14 +81,17 @@ local screen = {
 }
 
 local function onPause()
-    if playing.state == PlayState.playing or playing.state == PlayState.resuming then
-        playing.state = PlayState.pausing
-        playing.resumeMusic = currentGame.music:isPlaying()
-    elseif playing.state == PlayState.pausing or playing.state == PlayState.paused then
+    if playing.state == PlayState.pausing or playing.state == PlayState.paused then
         playing.state = PlayState.resuming
         if playing.resumeMusic then
             currentGame.music:resume()
         end
+    else
+        if playing.state ~= PlayState.resuming then
+            playing.unpauseState = playing.state
+        end
+        playing.state = PlayState.pausing
+        playing.resumeMusic = currentGame.music:isPlaying()
     end
 end
 
@@ -106,17 +136,15 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
+local function startGame(game)
+    currentGame = game.new()
+    love.window.setTitle(currentGame.META.title)
+    playing.state = PlayState.starting
+end
+
 function love.load()
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
-
-    tracks[1] = require('track1.game')
-
-    currentGame = tracks[1].new()
-    love.window.setTitle(currentGame.META.title)
-
-    -- currentGame = require('tests.waterTester')
-    -- currentGame:init()
 end
 
 local frameCount = 0
@@ -128,6 +156,27 @@ function love.update(dt)
 
     if screen.state == ScreenState.configwait then
         return
+    end
+
+    if not currentGame then
+        startGame(tracks[1])
+    end
+
+    if playing.state == PlayState.starting then
+        playing.fade = playing.fade + dt
+        if playing.fade >= 1 then
+            playing.fade = 1
+            playing.state = playing.playing
+        end
+    end
+
+    if currentGame.gameOver then
+        playing.state = PlayState.ending
+        playing.fade = playing.fade - dt
+        if playing.fade <= 0 then
+            currentGame = nil
+            return
+        end
     end
 
     input.update(dt)
@@ -145,7 +194,7 @@ function love.update(dt)
         playing.speed = playing.speed + dt*3
         if playing.speed >= 1 then
             playing.speed = 1
-            playing.state = PlayState.playing
+            playing.state = playing.unpauseState
         end
         currentGame.music:setPitch(playing.speed)
     end
@@ -180,25 +229,27 @@ function love.draw()
         end
     end
 
-    local canvas = currentGame:draw()
+    if currentGame then
+        local canvas = currentGame:draw()
 
-    love.graphics.setBlendMode("alpha", "premultiplied")
-    love.graphics.setColor(255, 255, 255)
+        love.graphics.setBlendMode("alpha", "premultiplied")
+        love.graphics.setColor(255*playing.fade, 255*playing.fade, 255*playing.fade)
 
-    if playing.state ~= PlayState.playing then
-        love.graphics.setShader(shaders.hueshift)
-        local saturation = playing.speed*.85 + .15
-        local shift = (1 - playing.speed)*math.pi
-        if playing.state == PlayState.resuming then
-            shift = -shift
+        if playing.state ~= PlayState.playing then
+            love.graphics.setShader(shaders.hueshift)
+            local saturation = playing.speed*.85 + .15
+            local shift = (1 - playing.speed)*math.pi
+            if playing.state == PlayState.resuming then
+                shift = -shift
+            end
+            shaders.hueshift:send("basis", {
+                saturation * math.cos(shift),
+                saturation * math.sin(shift)
+            })
         end
-        shaders.hueshift:send("basis", {
-            saturation * math.cos(shift),
-            saturation * math.sin(shift)
-        })
+        blitCanvas(canvas)
+        love.graphics.setShader()
     end
-    blitCanvas(canvas)
-    love.graphics.setShader()
 
     -- love.graphics.setColor(255,255,255,255)
     -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
