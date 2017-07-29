@@ -173,4 +173,10 @@ function util.shuffle(list)
     return ret
 end
 
+-- Implements the smoothStep equation from x=0..1
+function util.smoothStep(x)
+    return x*x*(3 - 2*x)
+end
+
+
 return util

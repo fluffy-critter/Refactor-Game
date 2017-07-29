@@ -172,7 +172,7 @@ function love.update(dt)
 
     if currentGame.gameOver then
         playing.state = PlayState.ending
-        playing.fade = playing.fade - dt
+        playing.fade = playing.fade - dt/2
         if playing.fade <= 0 then
             currentGame = nil
             return
@@ -233,7 +233,8 @@ function love.draw()
         local canvas = currentGame:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.setColor(255*playing.fade, 255*playing.fade, 255*playing.fade)
+        local brt = 255*util.smoothStep(playing.fade)
+        love.graphics.setColor(brt, brt, brt)
 
         if playing.state ~= PlayState.playing then
             love.graphics.setShader(shaders.hueshift)
