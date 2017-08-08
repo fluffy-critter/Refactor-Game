@@ -37,7 +37,7 @@ local DEBUG = false
 
 local Pie
 if PROFILE then
-    local piefiller = require('thirdparty.Piefiller.piefiller')
+    local piefiller = require('thirdparty.piefiller')
     Pie = piefiller:new()
     Pie:setKey("save_to_file","w")
 end

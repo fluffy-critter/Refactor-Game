@@ -64,7 +64,7 @@ function Game:init()
     self.canvas = love.graphics.newCanvas(256, 224)
     self.canvas:setFilter("nearest")
 
-    self.background = imagepool.load("track2/kitchen.png")
+    self.background = imagepool.load('track2/kitchen.png')
 end
 
 function Game:onButtonPress(...)
