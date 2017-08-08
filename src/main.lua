@@ -37,7 +37,7 @@ local DEBUG = false
 
 local Pie
 if PROFILE then
-    local piefiller = require('thirdparty.Piefiller.piefiller')
+    local piefiller = require('thirdparty.piefiller')
     Pie = piefiller:new()
     Pie:setKey("save_to_file","w")
 end
@@ -62,7 +62,8 @@ local function blitCanvas(canvas, aspect)
 end
 
 local tracks = {
-    require('track1.game')
+    require('track1.game'),
+    require('track2.game')
 }
 local currentGame
 
@@ -160,7 +161,7 @@ function love.update(dt)
     end
 
     if not currentGame then
-        startGame(tracks[1])
+        startGame(tracks[2])
     end
 
     if playing.state == PlayState.starting then
@@ -229,6 +230,8 @@ function love.draw()
             currentGame.music:resume()
         end
     end
+
+    love.graphics.clear(32, 32, 32)
 
     if currentGame then
         local canvas, aspect = currentGame:draw()
