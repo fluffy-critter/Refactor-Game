@@ -67,6 +67,12 @@ function Game:init()
     self.background = imagepool.load("track2/kitchen.png")
 end
 
+function Game:onButtonPress(...)
+    if self.textBox then
+        self.textBox:onButtonPress(...)
+    end
+end
+
 function Game:update(dt)
     local time = self:musicPos()
 
@@ -87,6 +93,9 @@ function Game:update(dt)
 
     if self.textBox then
         self.textBox:update(dt)
+        if not self.textBox:isAlive() then
+            self.textBox = nil
+        end
     end
 end
 
