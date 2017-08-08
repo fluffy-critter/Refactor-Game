@@ -42,12 +42,13 @@ if PROFILE then
     Pie:setKey("save_to_file","w")
 end
 
-local function blitCanvas(canvas)
+local function blitCanvas(canvas, aspect)
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
 
-    local canvasWidth = canvas:getWidth()
     local canvasHeight = canvas:getHeight()
+    local canvasWidth = aspect and (canvasHeight * aspect) or canvas:getWidth()
+    local sx = canvasWidth/canvas:getWidth()
 
     local blitSize = { screenWidth, screenWidth*canvasHeight/canvasWidth }
     if screenHeight < blitSize[2] then
@@ -57,7 +58,7 @@ local function blitCanvas(canvas)
     local blitX = (love.graphics.getWidth() - blitSize[1])/2
     local blitY = (love.graphics.getHeight() - blitSize[2])/2
     love.graphics.draw(canvas, blitX, blitY, 0,
-        blitSize[1]/canvasWidth, blitSize[2]/canvasHeight)
+        blitSize[1]*sx/canvasWidth, blitSize[2]/canvasHeight)
 end
 
 local tracks = {
@@ -233,7 +234,7 @@ function love.draw()
     love.graphics.clear(32, 32, 32)
 
     if currentGame then
-        local canvas = currentGame:draw()
+        local canvas, aspect = currentGame:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
         local brt = 255*util.smoothStep(playing.fade)
@@ -251,7 +252,7 @@ function love.draw()
                 saturation * math.sin(shift)
             })
         end
-        blitCanvas(canvas)
+        blitCanvas(canvas, aspect)
         love.graphics.setShader()
     end
 
