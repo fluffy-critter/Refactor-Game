@@ -1056,7 +1056,7 @@ function Game:draw()
         end)
     end
 
-    return self.canvas;
+    return self.canvas
     -- return self.layers.water;
     -- return self.layers.toneMap
 end
