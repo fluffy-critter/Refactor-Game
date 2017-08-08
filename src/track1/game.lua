@@ -22,8 +22,15 @@ local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
+local imagepool = require('imagepool')
+local fonts = require('fonts')
 
-local Game = {}
+local Game = {
+    META = {
+        title = "little bouncing ball",
+        duration = 5*60 + 26
+    }
+}
 
 function Game.new()
     local o = {}
@@ -204,6 +211,8 @@ function Game:init()
     self.eventQueue = {}
     self.nextEvent = nil
     self:setGameEvents()
+
+    self.scoreFont = fonts.centuryGothicDigits
 end
 
 function Game:defer(item)
@@ -472,7 +481,7 @@ function Game:setGameEvents()
                     -- TODO shieldballs
                 end,
             },
-            flappyBat = function(count)
+            flappyBat = function(count, kill)
                 local spawns = {}
                 for i = 1,count do
                     table.insert(spawns, {})
@@ -576,14 +585,14 @@ function Game:setGameEvents()
             when = {6},
             what = function()
                 spawnFuncs.balls.bouncy(3,5)
-                spawnFuncs.mobs.eyes.minions(6)
+                spawnFuncs.mobs.eyes.minions(6, true)
                 self.timeMapper = timeFuncs.judder
             end
         },
         {
             when = {6,8},
             what = function()
-                spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.mobs.flappyBat(4, true)
                 spawnFuncs.balls.bouncy(3,2)
                 spawnFuncs.balls.regular(3,2)
             end
@@ -614,7 +623,7 @@ function Game:setGameEvents()
 
                 spawnFuncs.balls.regular(3,1)
 
-                spawnFuncs.mobs.eyes.minions(5)
+                spawnFuncs.mobs.eyes.minions(5, true)
                 spawnFuncs.mobs.eyes.boss()
             end
         },
@@ -625,12 +634,14 @@ function Game:setGameEvents()
                 spawnFuncs.balls.super()
 
                 spawnFuncs.bricks.zagzig(12, 4)
+
+                spawnFuncs.mobs.eyes.minions(3, true)
             end
         },
         {
             when = {8,8},
             what = function()
-                spawnFuncs.mobs.flappyBat(4)
+                spawnFuncs.mobs.flappyBat(4, true)
             end
         },
         {
@@ -780,8 +791,8 @@ function Game:update(dt)
             actor:kill()
         end
 
-        if not self.music:isPlaying() then
-            -- TODO go to game exit state
+        if time[2] >= 2 or not self.music:isPlaying() then
+            self.gameOver = true
         end
     end
 
@@ -922,7 +933,7 @@ function Game:update(dt)
                     deltaBeats = nextHitDelta*BPS/ball.beatSync
 
                     -- round this to the nearest beat, after taking off the beatOfs
-                    deltaBeats = math.floor(deltaBeats + beatOfs + 0.33) - beatOfs
+                    deltaBeats = math.floor(deltaBeats + beatOfs + 0.25) - beatOfs
                 end
 
                 if deltaBeats and deltaBeats > .5 then
@@ -934,7 +945,6 @@ function Game:update(dt)
                     -- p = y + vt + .5at^2, solve for v
                     local vy = ball.vy*.75 + .25*((targetY - ball.y)/deltaTime - .5*ball.ay*deltaTime)
                     if vy/ball.vy < 1.5 then
-                        ball.vx = ball.vx * vy/ball.vy
                         ball.vy = vy
                     end
                 end
@@ -999,9 +1009,6 @@ function Game:draw()
         for _,particle in pairs(self.particles) do
             particle:draw()
         end
-
-        love.graphics.setColor(255,255,255,255)
-        love.graphics.print("phase=" .. self.phase .. " score=" .. self.score, 0, 0)
     end)
 
     self.canvas:renderTo(function()
@@ -1023,6 +1030,11 @@ function Game:draw()
 
         love.graphics.draw(self.layers.arena)
         love.graphics.draw(self.layers.overlay)
+
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setColor(255,255,255,255)
+        love.graphics.setFont(self.scoreFont)
+        love.graphics.print(self.score, 0, 0)
     end)
 
     if self.toneMap then
@@ -1044,7 +1056,7 @@ function Game:draw()
         end)
     end
 
-    return self.canvas;
+    return self.canvas
     -- return self.layers.water;
     -- return self.layers.toneMap
 end

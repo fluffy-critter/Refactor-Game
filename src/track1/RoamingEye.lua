@@ -46,6 +46,7 @@ function RoamingEye:onInit()
         moveIntervalMin = 2,
         moveIntervalMax = 8,
         moveSpeedMax = 3000,
+        moveTime = 180/self.game.BPM, -- how long the move should take
         scoreHit = 100,
         scoreDead = 10000,
         vx = 0,
@@ -55,9 +56,10 @@ function RoamingEye:onInit()
         hitFlashRate = 1/20,
         deathTime = 0.5,
 
-        friction = 0.5,
-        recoil = 5,
-        rebound = 50
+        recoil = 500,
+        recovery = 60/self.game.BPM, -- how long to take to recover from an impulse
+        rebound = 400,
+        friction = 0.9
     })
 
     util.applyDefaults(self, {
@@ -76,10 +78,13 @@ function RoamingEye:onInit()
 
     self.tgtX = self.x
     self.tgtY = self.y
+    self.posX = self.x
+    self.posY = self.y
 
     self.state = RoamingEye.states.spawning
     self.stateAge = 0
     self.time = 0
+    self.lastMove = 0
     self.nextShot = self.shootInterval
     self.nextMove = 0
 
@@ -116,23 +121,37 @@ function RoamingEye:preUpdate(dt, rawt)
     end
 
     self.time = self.time + dt
-
     if self.time > self.nextMove then
+        self.lastMove = self.time
         self.nextMove = self.time + math.random(self.moveIntervalMin, self.moveIntervalMax)
+        self.posX = self.tgtX
+        self.posY = self.tgtY
         self.tgtX = math.random(self.minX, self.maxX)
         self.tgtY = math.random(self.minY, self.maxY)
     end
 
-    local mx = (self.tgtX - self.x)*self.friction
-    local my = (self.tgtY - self.y)*self.friction
-    local mag = math.sqrt(mx*mx + my*my)
+    local ff = math.pow(self.friction, dt)
+    self.vx = self.vx*ff
+    self.vy = self.vy*ff
+
+    local mag = math.sqrt(self.vx*self.vx + self.vy*self.vy)
     if mag > self.moveSpeedMax then
-        mx = mx*self.moveSpeedMax/mag
-        my = my*self.moveSpeedMax/mag
+        self.vx = self.vx*self.moveSpeedMax/mag
+        self.vy = self.vy*self.moveSpeedMax/mag
     end
 
-    self.vx = self.vx + mx*dt
-    self.vy = self.vy + my*dt
+    local pp = util.smoothStep(math.min(1, (self.time - self.lastMove)/self.moveTime))
+    local px = self.posX + pp*(self.tgtX - self.posX)
+    local py = self.posY + pp*(self.tgtY - self.posY)
+
+    -- p = x + vt + .5at^2, t=recovery, solve for a
+    local ax = 2*(px - self.x - self.vx*self.recovery)/(self.recovery*self.recovery)
+    local ay = 2*(py - self.y - self.vy*self.recovery)/(self.recovery*self.recovery)
+
+    self.x = self.x + dt*(self.vx + ax*dt/2)
+    self.y = self.y + dt*(self.vy + ay*dt/2)
+    self.vx = self.vx + dt*ax
+    self.vy = self.vy + dt*ay
 end
 
 function RoamingEye:postUpdate(dt)
@@ -142,8 +161,6 @@ function RoamingEye:postUpdate(dt)
 
     self.lookX = self.lookX*(1 - dt*10) + (self.game.paddle.x - self.x)*dt*10
     self.lookY = self.lookY*(1 - dt*10) + (self.game.paddle.y - self.y)*dt*10
-    self.x = self.x + self.vx*dt
-    self.y = self.y + self.vy*dt
 
     if self.time > self.nextShot then
         local vx, vy = unpack(geom.normalize({self.lookX, self.lookY}, 1))
@@ -155,18 +172,15 @@ function RoamingEye:postUpdate(dt)
                 y = self.y + vy*self.r,
                 vx = vx*self.shootSpeed,
                 vy = vy*self.shootSpeed,
+                minVelocity = self.shootSpeed,
                 parent = self
             }))
             self.shootSpeed = self.shootSpeed + self.shootSpeedIncrement
+            self.vx = self.vx - vx*self.recoil
+            self.vy = self.vy - vy*self.recoil
         end)
-
-        self.vx = self.vx - vx*self.recoil
-        self.vy = self.vy - vy*self.recoil
     end
 
-    local ffactor = math.pow(self.friction, dt)
-    self.vx = self.vx*ffactor
-    self.vy = self.vy*ffactor
 end
 
 function RoamingEye:checkHitBalls(balls)
@@ -284,12 +298,18 @@ function RoamingEye:draw()
             end
         end
 
-
         love.graphics.setBlendMode("alpha", "alphamultiply")
         if self.state == RoamingEye.states.spawning or self.state == RoamingEye.states.dying then
             love.graphics.setColor(255, 255, 255, alpha)
             self:drawCircle(self.x, self.y, self.r)
         end
+
+        --[[
+        love.graphics.setColor(128,0,0,128)
+        self:drawCircle(self.posX, self.posY, 10)
+        love.graphics.setColor(0,0,128,128)
+        self:drawCircle(self.tgtX, self.tgtY, 10)
+        ]]
     end)
 end
 

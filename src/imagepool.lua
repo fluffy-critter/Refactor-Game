@@ -10,6 +10,8 @@ local imagepool = {}
 imagepool.pool = {}
 setmetatable(imagepool.pool, {__mode="v"})
 
+imagepool.lru = {}
+
 function imagepool.load(filename, cfg)
     cfg = cfg or {}
 
@@ -33,6 +35,20 @@ function imagepool.load(filename, cfg)
 
         imagepool.pool[key] = img
     end
+
+    -- TODO this isn't quite LRU behavior but eh, good enough?
+    for idx,used in ipairs(imagepool.lru) do
+        if used == img then
+            local last = #imagepool.lru
+            imagepool.lru[idx] = imagepool.lru[last]
+            table.remove(imagepool.lru, last)
+        end
+    end
+    table.insert(imagepool.lru, img)
+    while #imagepool.lru > 30 do
+        table.remove(imagepool.lru, 1)
+    end
+
     return img
 end
 
