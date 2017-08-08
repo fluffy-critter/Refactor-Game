@@ -79,11 +79,39 @@ function Game:update(dt)
     if time[1] > self.phase then
         print("phase = " .. self.phase)
         self.phase = time[1]
-        self.textBox = TextBox.new({
-            font = fonts.returnOfGanon.red,
-        })
+        if self.phase % 2 == 1 then
+            self.textBox = TextBox.new({text="foo"})
+        else
+            self.textBox = TextBox.new({
+                choices={
+                    {
+                        text="hello",
+                        action=function()
+                            print("mew")
+                        end
+                    },
+                    {
+                        text="goodbye",
+                        action=function()
+                            print("woof")
+                        end
+                    },
+                    {
+                        text="wtf",
+                        action=function()
+                            print("moo")
+                        end
+                    },
+                },
+                onClose = function(self)
+                    if not self.selected then
+                        print("dialog choice timed out")
+                    end
+                end
+            })
+        end
     end
-    if self.textBox then
+    if self.textBox and self.textBox.text then
         self.textBox.text = "Music just got to phase:\n" .. self.phase .. "\n" .. string.format("%d:%d:%.2f", unpack(time))
     end
 

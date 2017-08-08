@@ -48,10 +48,10 @@ local keyboardMap = {
     d = 'right',
 
     p = 'start',
-    enter = 'start',
     esc = 'back',
     f = 'fullscreen',
 
+    ['return'] = 'a',
     space = 'a',
     z = 'b',
     x = 'a',

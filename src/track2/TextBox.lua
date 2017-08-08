@@ -7,12 +7,12 @@ Refactor: 2 - Strangers
 
 local util = require('util')
 local imagepool = require('imagepool')
+local fonts = require('fonts')
 
 local TextBox = {
-    states = util.enum("opening", "writing", "steady", "closing", "closed")
+    states = util.enum("opening", "writing", "ready", "closing", "closed")
 }
 
-local default9Slice = imagepool.load('track2/textbox-blue.png')
 local defaultQuads = {}
 for row = 0, 2 do
     for col = 0, 2 do
@@ -30,19 +30,26 @@ function TextBox.new(o)
 end
 
 function TextBox:onInit()
+    local imgFile = self.text and "track2/textbox-blue.png" or "track2/textbox-red.png"
+    local font = self.text and fonts.returnOfGanon.red or fonts.returnOfGanon.blue
+
     util.applyDefaults(self, {
-        image = default9Slice,
+        image = imagepool.load(imgFile),
         quads = defaultQuads,
+        font = font,
 
         -- position is in 8x8 character cells, NOT in pixels
         left = 1,
-        top = 18,
+        top = 19,
         right = 30,
         bottom = 27,
 
+        index = 1,
+
         openTime = 0.25, -- time to open (in seconds)
         printSpeed = 100, -- characters/second
-        closeTime = 0.1
+        closeTime = 0.1,
+        selectBlinkTime = 0.1, -- how long the select blinks after a movement
     })
 
     self.state = TextBox.states.opening
@@ -50,18 +57,36 @@ function TextBox:onInit()
 end
 
 function TextBox:onButtonPress(key)
-    if key ~= 'a' then
+    if self.state >= self.states.closing then
         return false
     end
 
-    if self.state < TextBox.states.steady then
-        self.state = TextBox.states.steady
-        self.stateAge = 0
-    else
-        self:close()
+    if key == 'a' then
+        if self.state < TextBox.states.ready then
+            self.state = TextBox.states.ready
+            self.stateAge = 0
+        elseif self.state == TextBox.states.ready then
+            if self.choices then
+                self.selected = self.index
+                self.choices[self.index].action()
+            end
+            self:close()
+        end
+
+        return true
     end
 
-    return true
+    if self.choices and (key == 'up' or key == 'down') then
+        if key == 'up' and self.index > 1 then
+            self.index = self.index - 1
+        elseif key == 'down' and self.index < #self.choices then
+            self.index = self.index + 1
+        end
+        self.stateAge = 0
+        return true
+    end
+
+    return false
 end
 
 function TextBox:update(dt)
@@ -70,10 +95,16 @@ function TextBox:update(dt)
     if self.state == TextBox.states.opening and self.stateAge > self.openTime then
         self.state = TextBox.states.writing
         self.stateAge = 0
-    elseif self.state == TextBox.states.writing and self.stateAge > string.len(self.text)/self.printSpeed then
-        self.state = TextBox.states.steady
+    elseif self.state == TextBox.states.writing and (not self.text or self.stateAge > string.len(self.text)/self.printSpeed )then
+        self.state = TextBox.states.ready
+        if self.onReady then
+            self:onReady()
+        end
     elseif self.state == TextBox.states.closing and self.stateAge > self.closeTime then
         self.state = TextBox.states.closed
+        if self.onClose then
+            self:onClose()
+        end
     end
 end
 
@@ -130,20 +161,32 @@ function TextBox:draw()
     end
     love.graphics.draw(self.image, self.quads[9], right, bottom)
 
-    -- draw text (TODO support coloredText)
-    local text
-    if self.state == TextBox.states.writing then
-        text = string.sub(self.text, 1, self.stateAge*self.printSpeed)
-    elseif self.state == TextBox.states.steady then
-        text = self.text
-    end
+    -- draw text (TODO support coloredText?)
+    love.graphics.setFont(self.font)
+    love.graphics.setColor(255, 255, 255)
 
-    if text then
-        love.graphics.setFont(self.font)
-        love.graphics.setColor(255, 255, 255)
+    if self.text then
+        local text = ""
+        if self.state == TextBox.states.writing then
+            text = string.sub(self.text, 1, self.stateAge*self.printSpeed)
+        elseif self.state == TextBox.states.ready then
+            text = self.text
+        end
+
         love.graphics.print(text, left + 8, top + 8)
     end
 
+    if self.state == TextBox.states.ready and self.choices then
+        local y = top + 8
+        local yinc = self.font:getLineHeight() * self.font:getHeight()
+        for n,choice in ipairs(self.choices) do
+            love.graphics.print(choice.text, left + 16, y)
+            if n == self.index and self.stateAge > self.selectBlinkTime then
+                love.graphics.print(">", left + 8, y)
+            end
+            y = y + yinc
+        end
+    end
 end
 
 return TextBox
