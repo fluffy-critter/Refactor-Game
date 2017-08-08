@@ -103,18 +103,18 @@ local function handleRelease(which, map)
 end
 
 function love.gamepadpressed(joystick, button)
-    print("gp pressed: " .. button)
+    -- print("gp pressed: " .. button)
     handlePress(button, buttonMap)
 end
 
 function love.gamepadreleased(joystick, button)
-    print("gp released: " .. button)
+    -- print("gp released: " .. button)
     handleRelease(button, buttonMap)
 end
 
 local chainKeypressed = love.keypressed
 function love.keypressed(key, code, isrepeat)
-    print("kb pressed: " .. key, isrepeat)
+    -- print("kb pressed: " .. key, isrepeat)
     if not handlePress(key, keyboardMap) and chainKeypressed then
         chainKeypressed(key, code, isrepeat)
     end
@@ -122,7 +122,7 @@ end
 
 local chainKeyreleased = love.keyreleased
 function love.keyreleased(key, code)
-    print("kb released: " .. key)
+    -- print("kb released: " .. key)
     if not handleRelease(key, keyboardMap) and chainKeyreleased then
         chainKeyreleased(key, code)
     end

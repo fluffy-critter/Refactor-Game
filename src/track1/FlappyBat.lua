@@ -33,7 +33,7 @@ function FlappyBat:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 24,
-        color = {255, 192, 64},
+        color = util.shuffle({255, 192, 96, 64}),
         flapInterval = 60/self.game.BPM,
         flapVY = -600,
         scoreHit = 100,
@@ -47,7 +47,7 @@ function FlappyBat:onInit()
     })
 
     util.applyDefaults(self, {
-        vx = math.random(-200,200),
+        vx = math.random(-250,250),
         vy = 0,
         -- -v = v + at -> a=-2v/t
         ay = -1.5*self.flapVY/self.flapInterval,
@@ -67,7 +67,7 @@ function FlappyBat:onInit()
     self.stateAge = 0
     self.flapTime = 0
 
-    self.spriteSheet = imagepool.load("images/flappybat.png", {nearest=true,mipmaps=false})
+    self.spriteSheet = imagepool.load("track1/flappybat.png", {nearest=true,mipmaps=false})
     self.frames = {}
     for i = 1, 4 do
         self.frames[i] = love.graphics.newQuad((i - 1)*64, 0, 64, 64, 64*4, 64)
@@ -206,6 +206,12 @@ function FlappyBat:draw()
         end
 
         local flipX = self.x < self.game.paddle.x and 1 or -1
+
+        love.graphics.setColor(0, 0, 0, alpha/10)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x-1, self.y, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x+1, self.y, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y-1, 0, flipX, 1, 32, 32)
+        love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y+1, 0, flipX, 1, 32, 32)
 
         love.graphics.setColor(self.color[1], self.color[2], self.color[3], alpha)
         love.graphics.draw(self.spriteSheet, self.frames[frame], self.x, self.y, 0, flipX, 1, 32, 32)
