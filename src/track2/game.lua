@@ -97,6 +97,10 @@ function Game:update(dt)
             self.textBox = nil
         end
     end
+
+    if util.arrayLT({17,2,0}, time) then
+        self.gameOver = true
+    end
 end
 
 function Game:draw()
