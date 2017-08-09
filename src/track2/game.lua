@@ -48,7 +48,7 @@ end
 -- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
 function Game:seekMusic(phase, measure, beat, timeOfs)
     local time = (phase or 0)
-    time = time*16 + (measure or 0)
+    time = time*4 + (measure or 0)
     time = time*4 + (beat or 0)
     time = time*60/BPM + (timeOfs or 0)
     self.music:seek(time)
@@ -68,16 +68,32 @@ function Game:init()
     self.scaled = love.graphics.newCanvas(256*3, 224*3)
 
     self.background = imagepool.load('track2/kitchen.png')
+
+    self.lyrics = require('track2.lyrics')
+    self.lyricPos = 1
+    self.nextLyric = self.lyrics[self.lyricPos]
 end
 
-function Game:onButtonPress(...)
+function Game:onButtonPress(button, code, isRepeat)
+    if button == 'skip' then
+        print("tryin' ta skip")
+        self:seekMusic(self.phase + 1)
+        return true
+    end
+
     if self.textBox then
-        self.textBox:onButtonPress(...)
+        return self.textBox:onButtonPress(button, code, isRepeat)
     end
 end
 
 function Game:update(dt)
     local time = self:musicPos()
+
+    if self.nextLyric and util.arrayLT(self.nextLyric[1], time) then
+        self.lyricText = self.nextLyric[2]
+        self.lyricPos = self.lyricPos + 1
+        self.nextLyric = self.lyrics[self.lyricPos]
+    end
 
     if time[1] > self.phase then
         print("phase = " .. self.phase)
@@ -136,6 +152,8 @@ end
 
 function Game:draw()
     self.canvas:renderTo(function()
+        love.graphics.clear(0, 0, 0, 255)
+
         love.graphics.setBlendMode("alpha")
 
         love.graphics.setColor(255, 255, 255)
@@ -143,6 +161,18 @@ function Game:draw()
 
         if self.textBox then
             self.textBox:draw()
+        end
+
+        if self.lyricText then
+            local font = fonts.chronoTrigger
+            local width, wrapped = font:getWrap(self.lyricText, 256)
+
+            love.graphics.setColor(0, 0, 0, 127)
+            love.graphics.rectangle("fill", 256 - width - 4, 0, width + 4, 14)
+
+            love.graphics.setFont(font)
+            love.graphics.setColor(255, 255, 255)
+            love.graphics.print(self.lyricText, 256 - width - 2, 0)
         end
     end)
 

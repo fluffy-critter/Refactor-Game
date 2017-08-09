@@ -12,8 +12,8 @@ dialog = {
             text = "Good morning, dear!",
             responses = {
                 "Uh... hi?",
-                "Who are you?",
-                "Who the hell are you"
+                "Who the hell are you",
+                "What are you doing here"
             }
         },
     },
@@ -43,7 +43,7 @@ dialog = {
             text = "It's... it's me, your husband?"
         },
         "cold shoulder" = {
-            text = "Is everything really this bad? We've been married too long for this."
+            text = "Please, tell me what's wrong. This isn't like you..."
         }
     },
 
@@ -66,6 +66,9 @@ dialog = {
         },
         "frustrated" = {
             text = "Ha ha ha, jeeze, I just... I don't think I can do this anymore."
+        },
+        "concerned" = {
+            text = "Ha ha, wait, I get it, this is just one of your weird jokes, right? Very funny."
         }
     },
 
