@@ -34,7 +34,7 @@ local BPM = 90
 
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    local beat = self.music:tell()*BPM/60
+    local beat = (self.music:tell() - 0.25)*BPM/60
 
     local measure = math.floor(beat/4)
     beat = beat - measure*4
@@ -51,7 +51,7 @@ function Game:seekMusic(phase, measure, beat, timeOfs)
     time = time*4 + (measure or 0)
     time = time*4 + (beat or 0)
     time = time*60/BPM + (timeOfs or 0)
-    self.music:seek(time)
+    self.music:seek(time + 0.25)
 end
 
 function Game:init()
