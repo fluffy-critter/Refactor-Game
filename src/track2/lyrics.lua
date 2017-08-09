@@ -35,16 +35,22 @@ local lyrics =  {
     {{10,0,3.5}, [[laughing right at me]]},
     {{10,1,3}, [[Sitting in my house]]}, {{10,3,0}},
 
-    -- [[So many pictures of us together]]
-    -- [[The room is starting to blur]]
-    -- [[He says he's beginning to worry about me]]
-    -- [[But I just can't be sure]]
-    -- [[I can't be sure]]
+    {{11,0,0.5}, [[So many pictures of us together]]}, {{11,1,2}},
+    {{11,2,0.5}, [[The room is starting to blur]]}, {{11,3,1}},
+    {{12,0,0.5}, [[He says he's beginning to]]},
+    {{12,1,0}, [[worry about me]]}, {{12,1,3.5}},
+    {{12,2,0.5}, [[But I just can't be sure,]]},
+    {{12,3,0.5}, [[I]]},
+    {{12,3,1.5}, [[can't]]},
+    {{12,3,2.5}, [[be]]},
+    {{12,3,3.5}, [[sure]]},
+    {{13,1,0}},
 
-    -- [[In my house]]
-    -- [[In my house]]
-    -- [[What's this person that I do not know]]
-    -- [[Doing in my house]]
+    {{15,0,0}, [[In my house]]}, {{15,1,0}},
+    {{15,2,0}, [[In my house]]}, {{15,3,0}},
+    {{16,0,0.5}, [[What's this person]]},
+    {{16,0,3.5}, [[that I do not know]]},
+    {{16,1,3}, [[Doing in my house]]}, {{16,3,0}}
 }
 
 return lyrics

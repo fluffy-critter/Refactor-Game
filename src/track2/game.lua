@@ -172,7 +172,7 @@ function Game:draw()
 
             love.graphics.setFont(font)
             love.graphics.setColor(255, 255, 255)
-            love.graphics.print(self.lyricText, 256 - width - 2, 0)
+            love.graphics.print(self.lyricText, 256 - width - 1, 0)
         end
     end)
 
