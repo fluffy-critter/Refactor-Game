@@ -29,11 +29,11 @@ local lyrics =  {
     {{8,1,1}, [[having brought him]]},
     {{8,1,3.5}, [[Into my house]]}, {{8,3,0}},
 
-    -- [[It's my house]]
-    -- [[He's in my house]]
-    -- [[Why is this person]]
-    -- [[laughing right at me]]
-    -- [[Sitting in my house]]
+    {{9,0,0}, [[It's my house]]}, {{9,1,0}},
+    {{9,1,3.5}, [[He's in my house]]}, {{9,3,0}},
+    {{10,0,0.5}, [[Why is this person]]},
+    {{10,0,3.5}, [[laughing right at me]]},
+    {{10,1,3}, [[Sitting in my house]]}, {{10,3,0}},
 
     -- [[So many pictures of us together]]
     -- [[The room is starting to blur]]
@@ -43,7 +43,7 @@ local lyrics =  {
 
     -- [[In my house]]
     -- [[In my house]]
-    -- [[What is this person that I do not know]]
+    -- [[What's this person that I do not know]]
     -- [[Doing in my house]]
 }
 
