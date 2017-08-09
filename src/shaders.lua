@@ -13,6 +13,7 @@ local shaders = {
     sphereDistort = love.graphics.newShader("shaders/sphereDistort.fs"),
     gaussToneMap = love.graphics.newShader("shaders/gaussToneMap.fs"),
     gaussBlur = love.graphics.newShader("shaders/gaussBlur.fs"),
+    crtScaler = love.graphics.newShader("shaders/crtScaler.fs"),
 }
 
 return shaders

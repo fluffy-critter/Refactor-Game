@@ -12,7 +12,7 @@ local fonts = {
         red = love.graphics.newFont("fonts/ReturnOfGanon.fnt", "fonts/ReturnOfGanon_0-red.png"),
         blue = love.graphics.newFont("fonts/ReturnOfGanon.fnt", "fonts/ReturnOfGanon_0-blue.png"),
         ttf16 = love.graphics.newFont("fonts/ReturnOfGanon.ttf", 16)
-    }
+    },
 }
 
 return fonts

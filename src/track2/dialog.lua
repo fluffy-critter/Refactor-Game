@@ -11,8 +11,8 @@ dialog = {
         "default" = {
             text = "Good morning, dear!",
             responses = {
-                "Uh... hi",
-                "Who are you",
+                "Uh... hi?",
+                "Who are you?",
                 "Who the hell are you"
             }
         },
@@ -21,7 +21,12 @@ dialog = {
     -- What's this person that I do not think I know doing in my house
     2 = {
         "cold shoulder" = {
-            text = "Hon? You okay?"
+            text = "Hon? You okay?",
+            responses = {
+                "No, I... I'm not sure.",
+                "I'm fine...",
+                "How did you get in here?"
+            }
         }
     },
 
@@ -33,7 +38,14 @@ dialog = {
     4 = {},
 
     -- He says he is my husband
-    5 = {},
+    5 = {
+        "default" = {
+            text = "It's... it's me, your husband?"
+        },
+        "cold shoulder" = {
+            text = "Is everything really this bad? We've been married too long for this."
+        }
+    },
 
     -- He knows everything about me
     6 = {},

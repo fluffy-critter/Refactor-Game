@@ -11,6 +11,7 @@ local shaders = require('shaders')
 local input = require('input')
 local imagepool = require('imagepool')
 local fonts = require('fonts')
+local shaders = require('shaders')
 
 local TextBox = require('track2.TextBox')
 
@@ -63,6 +64,8 @@ function Game:init()
 
     self.canvas = love.graphics.newCanvas(256, 224)
     self.canvas:setFilter("nearest")
+
+    self.scaled = love.graphics.newCanvas(256*3, 224*3)
 
     self.background = imagepool.load('track2/kitchen.png')
 end
@@ -143,7 +146,15 @@ function Game:draw()
         end
     end)
 
-    return self.canvas, 1
+    self.scaled:renderTo(function()
+        love.graphics.setBlendMode("alpha", "premultiplied")
+        love.graphics.setColor(255, 255, 255)
+        love.graphics.setShader(shaders.crtScaler)
+        shaders.crtScaler:send("screenSize", {256, 224})
+        love.graphics.draw(self.canvas, 0, 0, 0, 3, 3)
+    end)
+    return self.scaled, 4/3
+
 end
 
 return Game
