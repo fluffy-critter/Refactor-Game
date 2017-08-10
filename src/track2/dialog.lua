@@ -20,7 +20,7 @@ dialog = {
 
     -- What's this person that I do not think I know doing in my house
     2 = {
-        "cold shoulder" = {
+        "silence" = {
             text = "Hon? You okay?",
             responses = {
                 "No, I... I'm not sure.",
@@ -42,7 +42,7 @@ dialog = {
         "default" = {
             text = "It's... it's me, your husband?"
         },
-        "cold shoulder" = {
+        "silence" = {
             text = "Please, tell me what's wrong. This isn't like you..."
         }
     },
@@ -61,7 +61,7 @@ dialog = {
 
     -- Why is this person laughing right at me
     10 = {
-        "cold shoulder" = {
+        "silence" = {
             text = "Ha ha, okay, what did I do to make you so angry at me?"
         },
         "frustrated" = {
@@ -69,6 +69,9 @@ dialog = {
         },
         "concerned" = {
             text = "Ha ha, wait, I get it, this is just one of your weird jokes, right? Very funny."
+        },
+        "give up" = {
+            text = "Ha ha ha, oh gosh... everything we've done together, it's all meaningless now, isn't it?"
         }
     },
 
@@ -76,7 +79,11 @@ dialog = {
     11 = {},
 
     -- He says he's beginning to worry about me
-    12 = {},
+    12 = {
+        "silence" = {
+            text = "Hello, emergency services? Yes, my spouse, I think they're having a stroke..."
+        }
+    },
 
     -- In my house
     15 = {},
