@@ -165,18 +165,32 @@ function TextBox:draw()
     love.graphics.setFont(self.font)
     love.graphics.setColor(255, 255, 255)
 
-    if self.text then
-        local text = ""
+    if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
+        local width, wrapped = self.font:getWrap(self.text, right - left - 8)
+        local text
+        local length
         if self.state == TextBox.states.writing then
-            text = string.sub(self.text, 1, self.stateAge*self.printSpeed)
-        elseif self.state == TextBox.states.ready then
-            text = self.text
+            length = self.stateAge*self.printSpeed
         end
 
-        love.graphics.print(text, left + 8, top + 8)
+        for k,line in ipairs(wrapped) do
+            if length and length <= 0 then
+                break
+            end
+
+            if text then
+                text = text .. '\n'
+            end
+
+            local chunk = string.sub(line, 1, length)
+            length = length and (length - #chunk)
+            text = (text or '') .. chunk
+        end
+
+        love.graphics.print(text or '', left + 8, top + 8)
     end
 
-    if self.state == TextBox.states.ready and self.choices then
+    if self.choices and self.state == TextBox.states.ready then
         local y = top + 8
         local yinc = self.font:getLineHeight() * self.font:getHeight()
         for n,choice in ipairs(self.choices) do
