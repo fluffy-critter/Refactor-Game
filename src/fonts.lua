@@ -6,6 +6,7 @@ Refactor
 ]]
 
 local fonts = {
+    system = love.graphics.newFont(8),
     scoreboard = love.graphics.newFont("fonts/scoreboard.fnt"),
     centuryGothicDigits = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789"),
     returnOfGanon = {

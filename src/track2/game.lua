@@ -131,7 +131,7 @@ function Game:update(dt)
         end
     end
     if self.textBox and self.textBox.text then
-        self.textBox.text = "Music just got to phase:\n" .. self.phase .. "\n" .. string.format("%d:%d:%.2f", unpack(time))
+        self.textBox.text = "Music just got to phase: " .. self.phase .. " asdf asdf asdf asdf asdf asdf asdf\n" .. string.format("%d:%d:%.2f", unpack(time))
     end
 
     if self.textBox and time[2] >= 3 and time[3] >= 3 then
@@ -145,7 +145,7 @@ function Game:update(dt)
         end
     end
 
-    if util.arrayLT({17,2,0}, time) then
+    if util.arrayLT({17,1,0}, time) then
         self.gameOver = true
     end
 end
@@ -174,6 +174,10 @@ function Game:draw()
             love.graphics.setColor(255, 255, 255)
             love.graphics.print(self.lyricText, 256 - width - 1, 0)
         end
+
+        love.graphics.setFont(fonts.system)
+        love.graphics.setColor(255,255,0)
+        love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos())))
     end)
 
     self.scaled:renderTo(function()
