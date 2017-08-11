@@ -94,20 +94,22 @@ function util.arrayEQ(a1, a2)
 end
 
 -- Makes an array comparable
+local arrayComparableMeta = {
+    __lt = util.arrayLT,
+    __le = function(a1, a2)
+        return not util.arrayLT(a2, a1)
+    end,
+    __eq = util.arrayEQ
+}
 function util.comparable(ret)
-    setmetatable(ret, {
-        __lt = util.arrayLT,
-        __le = function(a1, a2)
-            return not util.arrayLT(a2, a1)
-        end,
-        __eq = util.arrayEQ
-    })
+    setmetatable(ret, arrayComparableMeta)
     return ret
 end
 
 -- Generate a weak reference to an object
+local weakRefMeta = {__mode="v"}
 function util.weakRef(data)
-    local weak = setmetatable({content=data}, {__mode="v"})
+    local weak = setmetatable({content=data}, weakRefMeta)
     return function() return weak.content end
 end
 
@@ -180,6 +182,5 @@ end
 function util.smoothStep(x)
     return x*x*(3 - 2*x)
 end
-
 
 return util

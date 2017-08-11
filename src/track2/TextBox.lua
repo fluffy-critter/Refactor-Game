@@ -48,6 +48,7 @@ function TextBox:onInit()
 
         openTime = 0.25, -- time to open (in seconds)
         printSpeed = 100, -- characters/second
+        minDisplayTime = 0.5, -- Minimum time in seconds for text to display before dismissal
         closeTime = 0.1,
         selectBlinkTime = 0.1, -- how long the select blinks after a movement
     })
@@ -62,9 +63,9 @@ function TextBox:onButtonPress(key)
     end
 
     if key == 'a' then
-        if self.state < TextBox.states.ready then
+        if self.state < TextBox.states.ready or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime) then
             self.state = TextBox.states.ready
-            self.stateAge = 0
+            self.stateAge = self.minDisplayTime
         elseif self.state == TextBox.states.ready then
             if self.choices then
                 self.selected = self.index
