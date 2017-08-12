@@ -158,10 +158,13 @@ function Game:draw()
 
         love.graphics.setBlendMode("alpha")
 
-        love.graphics.setColor(255, 255, 255)
-        love.graphics.draw(self.background, 0, 0)
+        -- TODO draw scene
+        if self.phase < 17 then
+            love.graphics.setColor(255, 255, 255)
+            love.graphics.draw(self.background, 0, 0)
 
-        love.graphics.draw(self.border)
+            love.graphics.draw(self.border)
+        end
 
         if self.textBox then
             self.textBox:draw()
