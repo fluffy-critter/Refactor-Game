@@ -65,8 +65,10 @@ function Game:init()
     self.canvas = love.graphics.newCanvas(256, 224)
     self.canvas:setFilter("nearest")
 
-    self.scaled = love.graphics.newCanvas(256*3, 224*3)
+    self.outputScale = 4
+    self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
+    self.border =imagepool.load('track2/border.png')
     self.background = imagepool.load('track2/kitchen.png')
 
     self.lyrics = require('track2.lyrics')
@@ -159,6 +161,8 @@ function Game:draw()
         love.graphics.setColor(255, 255, 255)
         love.graphics.draw(self.background, 0, 0)
 
+        love.graphics.draw(self.border)
+
         if self.textBox then
             self.textBox:draw()
         end
@@ -183,9 +187,9 @@ function Game:draw()
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(255, 255, 255)
-        -- love.graphics.setShader(shaders.crtScaler)
+        love.graphics.setShader(shaders.crtScaler)
         shaders.crtScaler:send("screenSize", {256, 224})
-        love.graphics.draw(self.canvas, 0, 0, 0, 3, 3)
+        love.graphics.draw(self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
         love.graphics.setShader()
     end)
     return self.scaled, 4/3
