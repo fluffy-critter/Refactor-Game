@@ -29,7 +29,7 @@ function util.enum(...)
         end,
         __le = function(o1, o2)
             checktype(o2)
-            return o1.val == o2.val
+            return o1.val <= o2.val
         end,
         __tostring = function(o)
             return o.name
