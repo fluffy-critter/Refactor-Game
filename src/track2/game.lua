@@ -65,7 +65,7 @@ function Game:init()
     self.canvas = love.graphics.newCanvas(256, 224)
     self.canvas:setFilter("nearest")
 
-    self.outputScale = 4
+    self.outputScale = 3
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
     self.border =imagepool.load('track2/border.png')
