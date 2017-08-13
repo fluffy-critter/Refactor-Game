@@ -182,7 +182,7 @@ function Game:draw()
             love.graphics.print(self.lyricText, 256 - width - 1, 0)
         end
 
-        love.graphics.setFont(fonts.system)
+        love.graphics.setFont(fonts.debug)
         love.graphics.setColor(255,255,0)
         love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos())))
     end)

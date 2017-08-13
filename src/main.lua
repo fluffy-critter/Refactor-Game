@@ -37,6 +37,7 @@ setmetatable(_G, {
 local shaders = require('shaders')
 local util = require('util')
 local input = require('input')
+local fonts = require('fonts')
 
 local PROFILE = false
 local DEBUG = false
@@ -88,6 +89,17 @@ local screen = {
     resumeMusic = false
 }
 
+local function startGame(game)
+    currentGame = game.new()
+    love.window.setTitle(currentGame.META.title)
+    playing.state = PlayState.starting
+end
+
+local menu
+local menuPos = 1
+
+local mainmenu = {}
+
 local function onPause()
     if playing.state == PlayState.pausing or playing.state == PlayState.paused then
         playing.state = PlayState.resuming
@@ -108,7 +120,7 @@ function input.onPress(button)
         return
     end
 
-    if button == 'start' then
+    if button == 'start' and currentGame then
         onPause()
     elseif button == 'fullscreen' then
         screen.state = ScreenState.configwait
@@ -121,6 +133,18 @@ function input.onPress(button)
         love.window.setFullscreen(not love.window.getFullscreen())
     elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
+    elseif not currentGame then
+        if button == 'up' and menuPos > 1 then
+            menuPos = menuPos - 1
+            -- TODO play sound
+        elseif button == 'down' and menuPos < #menu then
+            menuPos = menuPos + 1
+            -- TODO play sound
+        elseif button == 'a' or button == 'start' then
+            menu[menuPos].onSelect()
+        elseif button == 'back' or button == 'b' then
+            -- TODO 'go back' action
+        end
     end
 end
 
@@ -144,15 +168,19 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
-local function startGame(game)
-    currentGame = game.new()
-    love.window.setTitle(currentGame.META.title)
-    playing.state = PlayState.starting
-end
-
 function love.load()
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
+
+    for n,track in ipairs(tracks) do
+        mainmenu[n] = {
+            label = n .. ". " .. track.META.title,
+            onSelect = function()
+                startGame(track)
+            end
+        }
+    end
+    menu = mainmenu
 end
 
 local frameCount = 0
@@ -166,10 +194,6 @@ function love.update(dt)
         return
     end
 
-    if not currentGame then
-        startGame(tracks[2])
-    end
-
     if playing.state == PlayState.starting then
         playing.fade = playing.fade + dt
         if playing.fade >= 1 then
@@ -178,7 +202,7 @@ function love.update(dt)
         end
     end
 
-    if currentGame.gameOver then
+    if currentGame and currentGame.gameOver then
         playing.state = PlayState.ending
         playing.fade = playing.fade - dt/2
         if playing.fade <= 0 then
@@ -212,7 +236,7 @@ function love.update(dt)
         mul = 0.1
     end
 
-    if playing.state ~= PlayState.paused then
+    if currentGame and playing.state ~= PlayState.paused then
         currentGame:update(dt*mul)
     end
 
@@ -260,6 +284,19 @@ function love.draw()
         end
         blitCanvas(canvas, aspect)
         love.graphics.setShader()
+    else
+        -- draw menu
+        love.graphics.setFont(fonts.mainMenu)
+        love.graphics.setColor(255,255,255,255)
+        local y = 0
+        for n,item in ipairs(menu) do
+            love.graphics.print(item.label, 16, y)
+            if n == menuPos then
+                love.graphics.print(">", 0, y)
+            end
+
+            y = y + fonts.mainMenu:getHeight()
+        end
     end
 
     -- love.graphics.setColor(255,255,255,255)
