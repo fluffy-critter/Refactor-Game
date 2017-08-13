@@ -286,6 +286,7 @@ function love.draw()
         love.graphics.setShader()
     else
         -- draw menu
+        love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.mainMenu)
         love.graphics.setColor(255,255,255,255)
         local y = 0
