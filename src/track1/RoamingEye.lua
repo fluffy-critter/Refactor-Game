@@ -186,7 +186,7 @@ end
 function RoamingEye:checkHitBalls(balls)
     for _,ball in pairs(balls) do
         if not ball.isBullet then
-            nrm = geom.pointPointCollision(ball.x, ball.y, ball.r, self.x, self.y, self.r)
+            local nrm = geom.pointPointCollision(ball.x, ball.y, ball.r, self.x, self.y, self.r)
             if nrm then
                 self:onHitBall(nrm, ball)
             end

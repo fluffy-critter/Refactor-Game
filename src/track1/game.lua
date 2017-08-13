@@ -319,15 +319,17 @@ function Game:setGameEvents()
                 local left = self.bounds.left + w/2
                 local right = self.bounds.right - w/2
 
-                xstart = left
-                xend = right
-                xstep = w
+                local xstart = left
+                local xend = right
+                local xstep = w
                 if flip then
                     xstart, xend = xend, xstart
                     xstep = -w
                 end
 
-                y = top
+                local y = top
+                local nexty
+
                 local lives = zigs
                 while lives > 0 do
                     for x = xstart, xend, xstep do

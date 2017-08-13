@@ -140,7 +140,7 @@ function FlappyBat:checkHitBalls(balls)
     for _,ball in pairs(balls) do
         if not ball.isBullet then
             -- TODO proper bounding test (or maybe we make flappybat a circle in a lazyass way)
-            nrm = geom.pointPointCollision(ball.x, ball.y, ball.r, self.x, self.y, self.r)
+            local nrm = geom.pointPointCollision(ball.x, ball.y, ball.r, self.x, self.y, self.r)
             if nrm then
                 self:onHitBall(nrm, ball)
             end
