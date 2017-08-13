@@ -28,6 +28,12 @@ Game instances are expected to have:
 
 ]]
 
+setmetatable(_G, {
+    __newindex = function(_, name, value)
+        error("attempted to write to global variable " .. name, 2)
+    end
+})
+
 local shaders = require('shaders')
 local util = require('util')
 local input = require('input')

@@ -66,7 +66,7 @@ function Actor:checkHitBalls(balls)
     end
 
     for _,ball in pairs(balls) do
-        nrm = checkBall(ball)
+        local nrm = checkBall(ball)
         if nrm then
             self:onHitBall(nrm, ball)
         end
