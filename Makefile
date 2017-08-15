@@ -23,7 +23,7 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup
 
-all: love-bundle osx win32 win64
+all: tests love-bundle osx win32 win64
 
 clean:
 	rm -rf build
@@ -31,7 +31,7 @@ clean:
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
 
-publish-precheck:
+publish-precheck: tests
 	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
 publish-status:
@@ -53,6 +53,10 @@ $(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
 	mkdir -p $(DEST)
 	./update-art.sh
 	touch $(@)
+
+# TODO grab the binary out of the appropriate platform version
+tests: setup
+	love $(SRC) --cute-headless
 
 # .love bundle
 love-bundle: setup $(DEST)/love/$(NAME).love

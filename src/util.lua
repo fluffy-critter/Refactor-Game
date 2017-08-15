@@ -46,7 +46,7 @@ function util.enum(...)
     setmetatable(enum, {
         -- allows [de]serializing based on value, eg MyEnum(3)
         __call = function(e, n)
-            return enum[n]
+            return enum[vals[n]]
         end
     })
 
@@ -75,6 +75,10 @@ function util.arrayLT(a1, a2)
         elseif v < a2[k] then
             return true
         end
+    end
+
+    if #a1 < #a2 then
+        return true
     end
 
     return false

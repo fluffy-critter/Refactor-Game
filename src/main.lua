@@ -28,19 +28,21 @@ Game instances are expected to have:
 
 ]]
 
+local cute = require('thirdparty.cute')
+
 setmetatable(_G, {
     __newindex = function(_, name, value)
         error("attempted to write to global variable " .. name, 2)
     end
 })
 
+local PROFILE = false
+local DEBUG = false
+
 local shaders = require('shaders')
 local util = require('util')
 local input = require('input')
 local fonts = require('fonts')
-
-local PROFILE = false
-local DEBUG = false
 
 local Pie
 if PROFILE then
@@ -168,7 +170,9 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
-function love.load()
+function love.load(args)
+    cute.go(args)
+
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
 
@@ -252,6 +256,8 @@ function love.update(dt)
 end
 
 function love.draw()
+    cute.draw()
+
     if Pie then Pie:attach() end
 
     if screen.state == ScreenState.configwait then
