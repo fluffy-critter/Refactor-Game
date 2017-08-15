@@ -159,6 +159,8 @@ end
 local chainKeypressed = love.keypressed
 function love.keypressed(...)
     if Pie then Pie:keypressed(...) end
+    cute.keypressed(...)
+
     if chainKeypressed then
         chainKeypressed(...)
     end
