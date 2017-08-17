@@ -5,9 +5,7 @@ Refactor: 2 - Strangers
 
 Design:
 
-dialog top-level object contains pools
-
-each pool contains a bunch of fragments, in the form of:
+dialog top-level object contains named pools; each pool contains a bunch of fragments, in the form of:
 
     poolName = {
         pos = {...}, -- position in the parameter space
@@ -15,23 +13,26 @@ each pool contains a bunch of fragments, in the form of:
         responses = { -- choice box to create afterwards (if nil, just select another dialog)
             { "responseText", {paramchanges}, "poolChange" } -- text to show (nil = silence), adjustments to the parameter space, name of pool to jump to (optional)
         },
-        setPool = "pool" -- which pool to switch to if we get to this point (used for no responses),
+        setPool = "pool", -- which pool to switch to if we get to this point (used for no responses)
+        max_count = ..., -- Maximum number of times this fragment can appear (default: 1)
     },
 
 "pos" matches against attributes including the following:
 
     phase - music phase (fractional?)
 
-    interruptions - the number of times the player has interrupted NPC's speech
+    interrupted - the number of times the player has interrupted NPC's speech
 
     silences - how many times in a row the player has been silent
 
 Only attributes present in the snippet's position will be considered; any attribute present in the snippet but not in the current position will be treated as 0.
 
+NOTE: Since this is stored as a module, please don't modify any of the table data within the game. Use sideband data to track stuff.
+
 ]]
 
 dialog = {
-    state = "intro",
+    start_state = "intro",
 
     -- starting point
     intro = {
@@ -40,7 +41,7 @@ dialog = {
             text = "Good morning, dear!",
             responses = {
                 {"Uh... hi...", {concern = +1}, "normal"},
-                {"Who the hell are you?", {concern = +1, defense = +1}, "brain_problems"},
+                {"Who the hell are you?", {concern = +1, defense = +1}, "last_night"},
                 {"What are you doing here?", {defense = +1}, "normal"},
                 {nil, {}, "silence"}
             }
@@ -60,7 +61,7 @@ dialog = {
             text = "Good morning.",
             responses = {
                 {"...good morning...", {concern = +1, tired = +1}, "normal"},
-                {"Who are you?", {concern = +1, defense = -1}, "brain_problems"},
+                {"Who are you?", {concern = +1, defense = +7}, "last_night"},
                 {"What are you doing here?", {anger = +3}, "alienated"},
                 {nil, {anger = +1}, "silence"}
             }
@@ -72,17 +73,29 @@ dialog = {
         {
             pos = {phase = 2, anger = 3},
             text = "I said, good morning.",
-            responses = {}
+            responses = {
+                {"Um... hello.", {concern = +1}, "normal"},
+                {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
+                {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
+            }
         },
         {
             pos = {phase = 2, anger = 0},
             text = "Hello? I said good morning.",
-            responses = {}
+            responses = {
+                {"Um... hello.", {concern = +1}, "normal"},
+                {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
+                {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
+            }
         },
         {
             pos = {phase = 3},
             text = "Is everything okay?",
-            responses = {}
+            responses = {
+                {"Not really.", {concern = +2}, "normal"},
+                {"... Who are you?", {concern = +3}, "brain_problems"},
+                {"Yeah, I guess.", {concern = +1}, "normal"}
+            }
         },
         {
             pos = {phase = 4},
@@ -171,10 +184,52 @@ dialog = {
             text = "Someone is coming.... everything will be okay.",
             setPool = "stroke"
         },
+
+        -- fillers for the player advancing dialog manually
+        {
+            pos = {interrupted = 1},
+            text = "Are you trying to say something?",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 2},
+            text = "You look like you want to say something...",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 3},
+            text = "Please, just tell me what you're trying to say...",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 3, anger = 3},
+            text = "Well? Spit it out, already.",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 4, anger = 1},
+            text = "You know you can tell me anything, right?",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 7, anger = 1},
+            text = "I love you, and I'm so worried about you.",
+            max_count = 3,
+        },
+        {
+            pos = {interrupted = 12, anger = 1},
+            text = "Why are you skipping my text if you don't have anything to say?",
+        },
+
     },
 
     -- path where Greg thinks everything is normal
     normal = {
+    },
+
+    -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
+    last_night = {
+
     },
 
     -- path where Greg has determined Rose is having brain problems
@@ -187,11 +242,39 @@ dialog = {
 
     -- path where Greg has given up on helping Rose
     gave_up = {
-
+        {
+            pos = {},
+            text = "I just can't do this anymore. Goodbye."
+        },
+        {
+            pos = {},
+            text = "What does it matter? You won't even remember this anyway."
+        },
+        {
+            pos = {},
+            text = "\b .\b.\b.\b \b\bYou don't even...\b remember...\b\b me."
+        }
     },
 
     -- state where Greg believes Rose is having a stroke
-    stroke = {},
+    stroke = {
+        {
+            pos = {},
+            text = "Shh, shh, it's okay...\b\b Everything will be fine...",
+        },
+        {
+            pos = {},
+            text = "They'll be here soon.",
+        },
+        {
+            pos = {},
+            text = "I love you.\b We'll get through this.",
+        },
+        {
+            pos = {},
+            text = "It's okay, I'm here for you.",
+        },
+    },
 
 }
 

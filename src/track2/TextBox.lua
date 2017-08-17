@@ -47,14 +47,18 @@ function TextBox:onInit()
         index = 1,
 
         openTime = 0.25, -- time to open (in seconds)
-        printSpeed = 100, -- characters/second
+        charTime = 1/30, -- time to print a character
+        pauseTime = 1/3, -- time to wait on a pause (\b)
         minDisplayTime = 0.5, -- Minimum time in seconds for text to display before dismissal
         closeTime = 0.1,
         selectBlinkTime = 0.1, -- how long the select blinks after a movement
+
+        charsPrinted = 0, -- number of characters printed
     })
 
     self.state = TextBox.states.opening
     self.stateAge = 0
+    self.nextChar = 0 -- time remaining until the next character prints
 end
 
 function TextBox:onButtonPress(key)
@@ -93,14 +97,42 @@ end
 function TextBox:update(dt)
     self.stateAge = self.stateAge + dt
 
+    -- TODO maybe just do this when self.text and/or metrics change?
+    self.wrapped = nil
+    if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
+        local width, wrapped = self.font:getWrap(self.text, (self.right - self.left - 1)*8)
+        for _,line in ipairs(wrapped) do
+            self.wrapped = (self.wrapped and self.wrapped .. '\n' or '') .. line
+        end
+    end
+
     if self.state == TextBox.states.opening and self.stateAge > self.openTime then
         self.state = TextBox.states.writing
         self.stateAge = 0
-    elseif self.state == TextBox.states.writing and (not self.text or self.stateAge > string.len(self.text)/self.printSpeed )then
-        self.state = TextBox.states.ready
-        if self.onReady then
-            self:onReady()
+    elseif self.state == TextBox.states.writing then
+        if not self.wrapped or self.charsPrinted >= self.wrapped:len() then
+            self.state = TextBox.states.ready
+            if self.onReady then
+                self:onReady()
+            end
+        else
+            self.nextChar = self.nextChar - dt
+            while self.nextChar <= 0 and self.charsPrinted < self.wrapped:len() do
+                self.charsPrinted = self.charsPrinted + 1
+                local nc = self.wrapped:sub(1, self.charsPrinted):sub(-1)
+                -- print(self.state, self.charsPrinted, nc)
+                if nc == '\b' then
+                    self.nextChar = self.pauseTime
+                elseif nc == ' ' then
+                    self.nextChar = 0
+                else
+                    self.nextChar = self.charTime
+                    -- TODO play sound?
+                end
+            end
         end
+    elseif self.state == TextBox.states.ready then
+        self.charsPrinted = self.wrapped and self.wrapped:len()
     elseif self.state == TextBox.states.closing and self.stateAge > self.closeTime then
         self.state = TextBox.states.closed
         if self.onClose then
@@ -166,29 +198,8 @@ function TextBox:draw()
     love.graphics.setFont(self.font)
     love.graphics.setColor(255, 255, 255)
 
-    if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
-        local width, wrapped = self.font:getWrap(self.text, right - left - 8)
-        local text
-        local length
-        if self.state == TextBox.states.writing then
-            length = self.stateAge*self.printSpeed
-        end
-
-        for k,line in ipairs(wrapped) do
-            if length and length <= 0 then
-                break
-            end
-
-            if text then
-                text = text .. '\n'
-            end
-
-            local chunk = string.sub(line, 1, length)
-            length = length and (length - #chunk)
-            text = (text or '') .. chunk
-        end
-
-        love.graphics.print(text or '', left + 8, top + 8)
+    if self.wrapped and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
+        love.graphics.print(self.wrapped:sub(1, self.charsPrinted), left + 8, top + 8)
     end
 
     if self.choices and self.state == TextBox.states.ready then

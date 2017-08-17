@@ -133,7 +133,8 @@ function Game:update(dt)
         end
     end
     if self.textBox and self.textBox.text then
-        self.textBox.text = "Music just got to phase: " .. self.phase .. " asdf asdf asdf asdf asdf asdf asdf\n" .. string.format("%d:%d:%.2f", unpack(time))
+        -- self.textBox.text = "Music just got to phase: " .. self.phase .. " asdf asdf asdf asdf asdf asdf asdf\n" .. string.format("%d:%d:%.2f", unpack(time))
+        self.textBox.text = "What does it matter? You won't even remember this anyway.\b .\b.\b.\b \b\bYou don't even...\b remember...\b\b me."
     end
 
     if self.textBox and time[2] >= 3 and time[3] >= 3 then
