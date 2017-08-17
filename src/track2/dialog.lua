@@ -23,7 +23,8 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
 
     interrupted - the number of times the player has interrupted NPC's speech
 
-    silences - how many times in a row the player has been silent
+    silence_cur - how many times in a row the player has been silent
+    silence_total - how many times the player has been silent in all
 
 Only attributes present in the snippet's position will be considered; any attribute present in the snippet but not in the current position will be treated as 0.
 

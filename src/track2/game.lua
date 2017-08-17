@@ -106,6 +106,7 @@ function Game:update(dt)
         end
     end
 
+    -- TODO don't make new text selections after {12,3}
     if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
         print("advancing dialog")
         self.nextDialog = nil
@@ -174,7 +175,11 @@ function Game:textFinished(textBox, node)
         local onClose = function(textBox)
             if not textBox.selected then
                 print("selection timed out")
+                self.npc.silence_cur = (self.npc.silence_cur or 0) + 1
+                self.npc.silence_total = (self.npc.silence_total or 0) + 1
                 self:onChoice(silence)
+            else
+                self.npc.silence_cur = 0
             end
         end
 
