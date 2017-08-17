@@ -70,10 +70,14 @@ function TextBox:onButtonPress(key)
         if self.state < TextBox.states.ready or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime) then
             self.state = TextBox.states.ready
             self.stateAge = self.minDisplayTime
+            self.interrupted = true
         elseif self.state == TextBox.states.ready then
             if self.choices then
                 self.selected = self.index
-                self.choices[self.index].action()
+                local choice = self.choices[self.index]
+                if choice and choice.onSelect then
+                    choice:onSelect()
+                end
             end
             self:close()
         end

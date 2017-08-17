@@ -13,6 +13,7 @@ local imagepool = require('imagepool')
 local fonts = require('fonts')
 local shaders = require('shaders')
 
+local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
 
 local Game = {
@@ -31,27 +32,16 @@ function Game.new()
 end
 
 local BPM = 90
+local clock = util.clock(BPM, {4, 4}, 0.25)
 
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    local beat = (self.music:tell() - 0.25)*BPM/60
-
-    local measure = math.floor(beat/4)
-    beat = beat - measure*4
-
-    local phase = math.floor(measure/4)
-    measure = measure - phase*4
-
-    return {phase, measure, beat}
+    return clock.timeToPos(self.music:tell())
 end
 
 -- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
-function Game:seekMusic(phase, measure, beat, timeOfs)
-    local time = (phase or 0)
-    time = time*4 + (measure or 0)
-    time = time*4 + (beat or 0)
-    time = time*60/BPM + (timeOfs or 0)
-    self.music:seek(time + 0.25)
+function Game:seekMusic(pos, timeOfs)
+    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
 function Game:init()
@@ -74,12 +64,20 @@ function Game:init()
     self.lyrics = require('track2.lyrics')
     self.lyricPos = 1
     self.nextLyric = self.lyrics[self.lyricPos]
+
+    self.dialogCounts = {} -- sideband data for how many times each dialog has been seen
+    self.nextDialog = {1} -- when to show the next dialog box
+    self.nextTimeout = nil -- when the next dialog timeout is to occur
+    self.dialogState = dialog.start_state
+
+    -- the state of the NPC
+    self.npc = {}
 end
 
 function Game:onButtonPress(button, code, isRepeat)
     if button == 'skip' then
         print("tryin' ta skip")
-        self:seekMusic(self.phase + 1)
+        self:seekMusic({self.phase + 1})
         return true
     end
 
@@ -100,45 +98,42 @@ function Game:update(dt)
     if time[1] > self.phase then
         print("phase = " .. self.phase)
         self.phase = time[1]
-        if self.phase % 2 == 1 then
-            self.textBox = TextBox.new({text="foo"})
-        else
-            self.textBox = TextBox.new({
-                choices={
-                    {
-                        text="hello",
-                        action=function()
-                            print("mew")
-                        end
-                    },
-                    {
-                        text="goodbye",
-                        action=function()
-                            print("woof")
-                        end
-                    },
-                    {
-                        text="wtf",
-                        action=function()
-                            print("moo")
-                        end
-                    },
-                },
-                onClose = function(self)
-                    if not self.selected then
-                        print("dialog choice timed out")
-                    end
-                end
-            })
+
+        if self.phase == 0 then
+            -- text format testing
+            -- self.textBox = TextBox.new({text="test text, please remove me"})
+            self.textBox = TextBox.new({choices={{text="arghl"}}})
+
         end
     end
-    if self.textBox and self.textBox.text then
-        -- self.textBox.text = "Music just got to phase: " .. self.phase .. " asdf asdf asdf asdf asdf asdf asdf\n" .. string.format("%d:%d:%.2f", unpack(time))
-        self.textBox.text = "What does it matter? You won't even remember this anyway.\b .\b.\b.\b \b\bYou don't even...\b remember...\b\b me."
+
+    if self.nextDialog and not util.arrayLT(time, self.nextDialog) then
+        print("advancing dialog")
+        self.nextDialog = nil
+
+        local node = self:chooseDialog()
+        if node then
+            self.textBox = TextBox.new({text = node.text})
+
+            local game = self
+            self.textBox.onClose = function(textBox)
+                game:textFinished(textBox, node)
+            end
+
+            self.nextTimeout = self:getNextTimeout()
+        else
+            self.nextTimeout = nil
+            if self.textBox then
+                self.textBox:close()
+            end
+        end
     end
 
-    if self.textBox and time[2] >= 3 and time[3] >= 3 then
-        self.textBox:close()
+    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
+        self.nextTimeout = nil
+        if self.textBox then
+            self.textBox:close()
+        end
     end
 
     if self.textBox then
@@ -151,6 +146,96 @@ function Game:update(dt)
     if util.arrayLT({17,1,0}, time) then
         self.gameOver = true
     end
+end
+
+-- Get the next timeout for a textbox
+function Game:getNextTimeout()
+    -- TODO
+end
+
+-- Called when the NPC textbox finishes
+function Game:textFinished(textBox, node)
+    if textBox.interrupted then
+        print("moo")
+        self.npc.interrupted = (self.npc.interrupted or 0) + 1
+    end
+
+    if node.setState then
+        print("new state = " .. node.setState)
+        self.dialogState = node.setState
+    end
+
+    if node.responses then
+        -- We have responses for this fragment...
+        local choices = {}
+        local onClose
+        for _,response in ipairs(node.responses) do
+            if response[1] then
+                table.insert(choices, {
+                    text = response[1],
+                    onSelect = function(choice)
+                        self:onChoice(response)
+                    end
+                })
+            else
+                -- no text means this is the timeout option
+                onClose = function(textBox)
+                    if not textBox.selected then
+                        print("selection timed out")
+                        self:onChoice(response)
+                    end
+                end
+            end
+        end
+
+        print("choices: " .. #choices)
+
+        self.textBox = TextBox.new({choices = choices, onClose = onClose})
+    else
+        self.nextDialog = {self.phase + 1}
+    end
+end
+
+-- Called when the player makes a dialog choice (including timeout)
+function Game:onChoice(response)
+    if response[2] then
+        for k,v in pairs(response[2]) do
+            self.npc[k] = (self.npc[k] or 0) + v
+            print(k .. " now " .. self.npc[k])
+        end
+    end
+    if response[3] then
+        self.dialogState = response[3]
+        print("state now " .. self.dialogState)
+    end
+
+    self.nextDialog = {self.phase + 1}
+end
+
+-- Get the next conversation node from the dialog tree
+function Game:chooseDialog()
+    local minDistance, minNode
+    for _,node in ipairs(dialog[self.dialogState]) do
+        print("Considering: " .. node.text)
+        local distance = 0
+        for k,v in pairs(node.pos or {}) do
+            if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
+                local dx = v - (self.npc[k] or 0)
+                distance = distance + dx*dx
+            end
+        end
+        if not minDistance or distance < minDistance then
+            minNode = node
+            minDistance = distance
+        end
+    end
+
+    if minNode then
+        print("Chose: " .. minNode.text)
+        self.dialogCounts[minNode] = (self.dialogCounts[minNode] or 0) + 1
+    end
+
+    return minNode
 end
 
 function Game:draw()

@@ -13,7 +13,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
         responses = { -- choice box to create afterwards (if nil, just select another dialog)
             { "responseText", {paramchanges}, "poolChange" } -- text to show (nil = silence), adjustments to the parameter space, name of pool to jump to (optional)
         },
-        setPool = "pool", -- which pool to switch to if we get to this point (used for no responses)
+        setState = "state", -- which state to switch to if we get to this point
         max_count = ..., -- Maximum number of times this fragment can appear (default: 1)
     },
 
@@ -31,7 +31,7 @@ NOTE: Since this is stored as a module, please don't modify any of the table dat
 
 ]]
 
-dialog = {
+local dialog = {
     start_state = "intro",
 
     -- starting point
@@ -40,9 +40,9 @@ dialog = {
             pos = {},
             text = "Good morning, dear!",
             responses = {
-                {"Uh... hi...", {concern = +1}, "normal"},
-                {"Who the hell are you?", {concern = +1, defense = +1}, "last_night"},
-                {"What are you doing here?", {defense = +1}, "normal"},
+                {"Uh... hi...", {concern = 1}, "normal"},
+                {"Who the hell are you?", {concern = 1, defense = 1}, "last_night"},
+                {"What are you doing here?", {defense = 1}, "normal"},
                 {nil, {}, "silence"}
             }
         },
@@ -50,20 +50,20 @@ dialog = {
             pos = {concern = 2},
             text = "Good morning... how are you feeling today?",
             responses = {
-                {"I'm... fine...", {concern = +1}, "normal"},
+                {"I'm... fine...", {concern = 1}, "normal"},
                 {"Uh, fine, but... who are you?", {concern = -1}, "brain_problems"},
                 {"What are you doing in my house?", {}, "brain_problems"},
-                {nil, {defense = +1}, "silence"}
+                {nil, {defense = 1}, "silence"}
             }
         },
         {
             pos = {anger = 5},
             text = "Good morning.",
             responses = {
-                {"...good morning...", {concern = +1, tired = +1}, "normal"},
-                {"Who are you?", {concern = +1, defense = +7}, "last_night"},
-                {"What are you doing here?", {anger = +3}, "alienated"},
-                {nil, {anger = +1}, "silence"}
+                {"...good morning...", {concern = 1, tired = 1}, "normal"},
+                {"Who are you?", {concern = 1, defense = 7}, "last_night"},
+                {"What are you doing here?", {anger = 3}, "alienated"},
+                {nil, {anger = 1}, "silence"}
             }
         }
     },
@@ -74,7 +74,7 @@ dialog = {
             pos = {phase = 2, anger = 3},
             text = "I said, good morning.",
             responses = {
-                {"Um... hello.", {concern = +1}, "normal"},
+                {"Um... hello.", {concern = 1}, "normal"},
                 {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
                 {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
             }
@@ -83,7 +83,7 @@ dialog = {
             pos = {phase = 2, anger = 0},
             text = "Hello? I said good morning.",
             responses = {
-                {"Um... hello.", {concern = +1}, "normal"},
+                {"Um... hello.", {concern = 1}, "normal"},
                 {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
                 {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
             }
@@ -92,9 +92,9 @@ dialog = {
             pos = {phase = 3},
             text = "Is everything okay?",
             responses = {
-                {"Not really.", {concern = +2}, "normal"},
-                {"... Who are you?", {concern = +3}, "brain_problems"},
-                {"Yeah, I guess.", {concern = +1}, "normal"}
+                {"Not really.", {concern = 2}, "normal"},
+                {"... Who are you?", {concern = 3}, "brain_problems"},
+                {"Yeah, I guess.", {concern = 1}, "normal"}
             }
         },
         {
@@ -126,9 +126,9 @@ dialog = {
             pos = {phase = 7, defense = 0, anger = 0},
             text = "Is this about what I said last night? I'm sorry, it was out of line.",
             responses = {
-                {"...What did you say?", {concern = +2}, "brain_problems"},
-                {"Yes, it was.", {defense = +1}, "normal"},
-                {"It isn't that...", {defense = -1, anger = -1, concern = +2}, "normal"}
+                {"...What did you say?", {concern = 2}, "brain_problems"},
+                {"Yes, it was.", {defense = 1}, "normal"},
+                {"It isn't that...", {defense = -1, anger = -1, concern = 2}, "normal"}
             }
         },
         {
@@ -182,7 +182,7 @@ dialog = {
         {
             pos = {phase = 12.5},
             text = "Someone is coming.... everything will be okay.",
-            setPool = "stroke"
+            setState = "stroke"
         },
 
         -- fillers for the player advancing dialog manually

@@ -187,4 +187,41 @@ function util.smoothStep(x)
     return x*x*(3 - 2*x)
 end
 
+--[[ Returns a game clock
+BPM - tempo
+
+limits - the limits for each cadence; e.g. {4,8} = 4 beats per measure, 8 measures per phase. Can go as deeply as desired; position array is returned as most-significant first
+
+ofs - time offset for the start of the clock
+
+Returns an object with methods:
+
+timeToPos - converts a numerical position to a position array
+posToTime - converts a position array to a numerical position
+]]
+function util.clock(BPM, limits, ofs)
+    local timeToPos = function(time)
+        local remaining = (time - ofs)*BPM/60
+        local pos = {}
+        for idx,sz in ipairs(limits) do
+            local v = remaining % sz
+            pos[#limits + 2 - idx] = v
+            remaining = (remaining - v)/sz
+        end
+        pos[1] = remaining
+        return pos
+    end
+
+    local posToTime = function(pos)
+        local beat = 0
+        for idx,sz in ipairs(limits) do
+            beat = (beat + (pos[idx] or 0))*sz
+        end
+        beat = beat + (pos[#limits + 1] or 0)
+        return beat*60/BPM + ofs
+    end
+
+    return {timeToPos = timeToPos, posToTime = posToTime}
+end
+
 return util
