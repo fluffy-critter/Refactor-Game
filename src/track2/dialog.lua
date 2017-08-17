@@ -104,7 +104,7 @@ local dialog = {
         },
         {
             pos = {phase = 5},
-            text = "Please, tell me what's wrong...",
+            text = "Please, tell me what's wrong... You can talk to me.",
             responses = {}
         },
         {
@@ -152,12 +152,12 @@ local dialog = {
             responses = {}
         },
         {
-            pos = {phase = 10, defense = 0, anger = 0, concern = 5},
-            text = "Hahaha... please... just tell me, what's going on...?",
+            pos = {phase = 10, anger = 0},
+            text = "Hahaha...\b\b please...\b\b just tell me, what's going on...?",
             responses = {}
         },
         {
-            pos = {phase = 10, defense = 0, anger = 5, concern = -5},
+            pos = {phase = 10, anger = 5},
             text = "Ha ha, fine, don't tell me anything...",
             responses = {}
         },
@@ -189,36 +189,58 @@ local dialog = {
         {
             pos = {interrupted = 1},
             text = "Are you trying to say something?",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 2},
+            pos = {interrupted = 2, phase = 3},
             text = "You look like you want to say something...",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 3},
+            pos = {interrupted = 3, phase = 5},
             text = "Please, just tell me what you're trying to say...",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 3, anger = 3},
+            pos = {interrupted = 3, phase = 5, anger = 3},
             text = "Well? Spit it out, already.",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 4, anger = 1},
+            pos = {interrupted = 4, phase = 7, anger = 1},
             text = "You know you can tell me anything, right?",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 7, anger = 1},
+            pos = {interrupted = 4, phase = 7},
+            text = "You know you can tell me anything...",
+        },
+        {
+            pos = {interrupted = 4, phase = 7},
+            text = "Hon... Please.",
+        },
+        {
+            pos = {interrupted = 4, phase = 7},
+            text = "Please say something.",
+        },
+        {
+            pos = {interrupted = 4},
+            text = "Please say something. Anything.",
+        },
+        {
+            pos = {interrupted = 5, phase = 8, anger = 0},
             text = "I love you, and I'm so worried about you.",
-            max_count = 3,
         },
         {
-            pos = {interrupted = 12, anger = 1},
-            text = "Why are you skipping my text if you don't have anything to say?",
+            pos = {interrupted = 5, phase = 8, anger = 2},
+            text = "I love you. Please...\b\b Please talk to me.",
+        },
+        {
+            pos = {interrupted = 5, phase = 8},
+            text = "I just want to know why you aren't talking...",
+        },
+        {
+            pos = {interrupted = 5, phase = 8},
+            text = "Is there something I did?",
+        },
+        {
+            pos = {interrupted = 12, phase = 4, anger = 1},
+            text = "I mean...\b\b Why are you skipping my text\b if you don't\b have anything\b to say?",
         },
 
     },
