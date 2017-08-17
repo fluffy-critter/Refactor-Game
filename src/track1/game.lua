@@ -42,26 +42,16 @@ end
 
 local BPM = 132
 
+local clock = util.clock(BPM, {4, 16})
+
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    local beat = self.music:tell()*BPM/60
-
-    local measure = math.floor(beat/4)
-    beat = beat - measure*4
-
-    local phase = math.floor(measure/16)
-    measure = measure - phase*16
-
-    return {phase, measure, beat}
+    return clock.timeToPos(self.music:tell())
 end
 
 -- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
-function Game:seekMusic(phase, measure, beat, timeOfs)
-    local time = (phase or 0)
-    time = time*16 + (measure or 0)
-    time = time*4 + (beat or 0)
-    time = time*60/BPM + (timeOfs or 0)
-    self.music:seek(time)
+function Game:seekMusic(pos, timeOfs)
+    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
 function Game:init()
@@ -732,7 +722,7 @@ function Game:onButtonPress(button)
     if button == 'skip' then
         print("tryin' ta skip")
         self.spawner.queue = {}
-        self:seekMusic(self.phase + 1)
+        self:seekMusic({self.phase + 1})
     end
 end
 

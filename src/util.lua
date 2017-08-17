@@ -200,6 +200,8 @@ timeToPos - converts a numerical position to a position array
 posToTime - converts a position array to a numerical position
 ]]
 function util.clock(BPM, limits, ofs)
+    local ofs = ofs or 0
+
     local timeToPos = function(time)
         local remaining = (time - ofs)*BPM/60
         local pos = {}
