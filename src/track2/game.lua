@@ -72,6 +72,11 @@ function Game:init()
 
     -- the state of the NPC
     self.npc = {}
+
+    -- how much to emphasize an axis in the dialog scoring (default = 1)
+    self.weights = {
+        phase = 10
+    }
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -101,7 +106,7 @@ function Game:update(dt)
 
         if self.phase == 0 then
             -- text format testing
-            -- self.textBox = TextBox.new({text="test text, please remove me"})
+            self.textBox = TextBox.new({text="test text, %%%please r%e%m%o%v%e me asd fasdf asdf asldjfklsa flsajfkdls jl"})
             -- self.textBox = TextBox.new({choices={{text="arghl"}}})
         end
     end
@@ -229,12 +234,12 @@ function Game:chooseDialog()
     local now = self:musicPos()
     self.npc.phase = now[1] + now[2]/4 + now[3]/16
 
-    for _,node in ipairs(dialog[self.dialogState]) do
+    for _,_,node in util.cpairs(dialog[self.dialogState], dialog.filler) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
-                distance = distance + dx*dx
+                distance = distance + dx*dx*(self.weights[k] or 1)
             end
             if not minDistance or distance < minDistance then
                 print("Considering: " .. node.text .. " d=" .. distance)

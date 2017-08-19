@@ -48,7 +48,7 @@ function TextBox:onInit()
 
         openTime = 0.25, -- time to open (in seconds)
         charTime = 1/30, -- time to print a character
-        pauseTime = 1/3, -- time to wait on a pause (\b)
+        pauseTime = 1/4, -- time to wait on a pause (%)
         minDisplayTime = 0.5, -- Minimum time in seconds for text to display before dismissal
         closeTime = 0.1,
         selectBlinkTime = 0.1, -- how long the select blinks after a movement
@@ -105,9 +105,7 @@ function TextBox:update(dt)
     self.wrapped = nil
     if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
         local width, wrapped = self.font:getWrap(self.text, (self.right - self.left - 1)*8)
-        for _,line in ipairs(wrapped) do
-            self.wrapped = (self.wrapped and self.wrapped .. '\n' or '') .. line
-        end
+        self.wrapped = table.concat(wrapped, '\n')
     end
 
     if self.state == TextBox.states.opening and self.stateAge > self.openTime then
@@ -125,7 +123,7 @@ function TextBox:update(dt)
                 self.charsPrinted = self.charsPrinted + 1
                 local nc = self.wrapped:sub(1, self.charsPrinted):sub(-1)
                 -- print(self.state, self.charsPrinted, nc)
-                if nc == '\b' then
+                if nc == '%' then
                     self.nextChar = self.pauseTime
                 elseif nc == ' ' then
                     self.nextChar = 0

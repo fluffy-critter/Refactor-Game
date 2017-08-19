@@ -226,4 +226,27 @@ function util.clock(BPM, limits, ofs)
     return {timeToPos = timeToPos, posToTime = posToTime}
 end
 
+-- Like ipairs(sequence) except it can take arbitrarily many tables. Returns tbl,idx,value
+function util.cpairs(...)
+    local tables = {...}
+    local wtbl = 1
+    local widx = 1
+    return function()
+        local tbl = tables[wtbl]
+
+        while tbl and widx > #tbl and wtbl <= #tables do
+            widx = 1
+            wtbl = wtbl + 1
+            tbl = tables[wtbl]
+        end
+        if not tbl then
+            return
+        end
+
+        local pidx = widx
+        widx = widx + 1
+        return tbl,pidx,tbl[pidx]
+    end
+end
+
 return util

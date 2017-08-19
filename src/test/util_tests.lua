@@ -96,3 +96,20 @@ notion("quadratics", function()
     check(util.solveQuadratic(1, 0, 0)).is(0)
     check(util.solveQuadratic(1, 0, 1)).is(nil)
 end)
+
+notion("cpairs", function()
+    local t1 = {1,2,3}
+    local t2 = {}
+    local t3 = {4}
+
+    local concatted = {}
+    for tbl,idx,val in util.cpairs(t1, t2, t3, t2) do
+        table.insert(concatted, {tbl, idx, val})
+    end
+
+    check(#concatted).is(4)
+    check(concatted[1]).shallowMatches({t1, 1, 1})
+    check(concatted[2]).shallowMatches({t1, 2, 2})
+    check(concatted[3]).shallowMatches({t1, 3, 3})
+    check(concatted[4]).shallowMatches({t3, 1, 4})
+end)

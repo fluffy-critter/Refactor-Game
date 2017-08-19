@@ -35,11 +35,39 @@ NOTE: Since this is stored as a module, please don't modify any of the table dat
 local dialog = {
     start_state = "intro",
 
+    -- filler texts to adjust timing
+    filler = {
+        {
+            pos = {interrupted = 3, phase = 2},
+            text = "Could you let me finish?"
+        },
+        {
+            pos = {interrupted = 5, phase = 3},
+            text = "Could you please let me finish?"
+        },
+        {
+            pos = {interrupted = 7, phase = 4},
+            text = "Could you PLEASE let me finish?"
+        },
+        {
+            pos = {interrupted = 9, phase = 5},
+            text = "I don't really like being talked over, you know."
+        },
+        {
+            pos = {interrupted = 15, phase = 6},
+            text = "You know you're throwing off the timing of this dialog, right?"
+        },
+        {
+            pos = {interrupted = 20, phase = 7},
+            text = "Okay now I just know you're doing this to see what I say."
+        },
+    },
+
     -- starting point
     intro = {
         {
             pos = {},
-            text = "Good morning, dear!",
+            text = "Good morning, dear! #",
             responses = {
                 {"Uh... hi...", {concern = 1}, "normal"},
                 {"Who the hell are you?", {concern = 1, defense = 1}, "last_night"},
@@ -109,7 +137,7 @@ local dialog = {
         },
         {
             pos = {phase = 5},
-            text = "What's wrong?\b\b You can talk to me.",
+            text = "What's wrong?%% You can talk to me.",
             responses = {
                 {"Who are you?", {concern = 5}, "brain_problems"},
                 {"You're intruding.", {anger = 1, defense = 3}, "alienated"},
@@ -150,7 +178,7 @@ local dialog = {
         },
         {
             pos = {phase = 7, defense = 2, anger = 5},
-            text = "If this is about what I said last night, well\b.\b.\b.\b\b you deserved it.",
+            text = "If this is about what I said last night, well%.%.%.%% you deserved it.",
             responses = {}
         },
         {
@@ -170,7 +198,7 @@ local dialog = {
         },
         {
             pos = {phase = 10, anger = 0},
-            text = "Hahaha...\b\b please...\b\b just tell me, what's going on...?",
+            text = "Hahaha...%% please...%% just tell me, what's going on...?",
             responses = {}
         },
         {
@@ -190,7 +218,6 @@ local dialog = {
             }
         },
 
-        -- fillers for the player advancing dialog manually
         {
             pos = {interrupted = 1, phase = 1},
             text = "Are you trying to say something?",
@@ -233,7 +260,7 @@ local dialog = {
         },
         {
             pos = {interrupted = 3, anger = 2, phase = 6},
-            text = "I love you. Please...\b\b Please talk to me.",
+            text = "I love you. Please...%% Please talk to me.",
         },
         {
             pos = {interrupted = 4, phase = 7},
@@ -253,11 +280,7 @@ local dialog = {
         },
         {
             pos = {interrupted = 18, anger = 1, phase = 4},
-            text = "I mean...\b\b Why are you skipping my text\b if you don't\b have anything\b to say?",
-        },
-        {
-            pos = {interrupted = 20, phase = 4},
-            text = "You know you're throwing off the timing of this dialog, right?"
+            text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
         },
     },
 
@@ -357,13 +380,13 @@ local dialog = {
         },
         {
             pos = {phase = 6, anger = 3, concern = 2},
-            text = "You seemed to have it under control\b.\b.\b.\b until last night.",
+            text = "You seemed to have it under control%.%.%.% until last night.",
             responses = {}
         },
 
         {
             pos = {phase = 7},
-            text = "Sigh...\b Sorry to ramble about this. I guess I'm just not feeling so great myself, lately.",
+            text = "Sigh...% Sorry to ramble about this. I guess I'm just not feeling so great myself, lately.",
             responses = {}
         },
         {
@@ -400,7 +423,7 @@ local dialog = {
         },
         {
             pos = {},
-            text = "\b .\b.\b.\b \b\bYou don't even...\b remember...\b\b me."
+            text = "% .%.%.% %%You don't even...% remember...%% me."
         }
     },
 
@@ -421,7 +444,7 @@ local dialog = {
         },
         {
             pos = {phase = 12.5},
-            text = "Shh, shh, it's okay...\b\b Everything will be fine...",
+            text = "Shh, shh, it's okay...%% Everything will be fine...",
             max_count = 5
         },
         {
@@ -431,7 +454,7 @@ local dialog = {
         },
         {
             pos = {phase = 12.5},
-            text = "I love you.\b We'll get through this.",
+            text = "I love you.% We'll get through this.",
             max_count = 5
         },
         {
