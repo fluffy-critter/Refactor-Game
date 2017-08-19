@@ -231,14 +231,13 @@ function Game:chooseDialog()
 
     for _,node in ipairs(dialog[self.dialogState]) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
-            print("Considering: " .. node.text)
-            local distance = 0
+            local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
                 distance = distance + dx*dx
             end
-            print("   distance=" .. distance)
             if not minDistance or distance < minDistance then
+                print("Considering: " .. node.text .. " d=" .. distance)
                 minNode = node
                 minDistance = distance
             end
@@ -246,7 +245,7 @@ function Game:chooseDialog()
     end
 
     if minNode then
-        print("Chose: " .. minNode.text)
+        print("Chose: " .. minNode.text .. " d=" .. minDistance)
         self.dialogCounts[minNode] = (self.dialogCounts[minNode] or 0) + 1
     end
 

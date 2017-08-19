@@ -43,7 +43,7 @@ local dialog = {
             responses = {
                 {"Uh... hi...", {concern = 1}, "normal"},
                 {"Who the hell are you?", {concern = 1, defense = 1}, "last_night"},
-                {"What are you doing here?", {defense = 1}, "normal"},
+                {"What are you doing here?", {defense = 1}, "alienated"},
                 {nil, {}, "silence"}
             }
         },
@@ -53,7 +53,7 @@ local dialog = {
             responses = {
                 {"I'm... fine...", {concern = 1}, "normal"},
                 {"Uh, fine, but... who are you?", {concern = -1}, "brain_problems"},
-                {"What are you doing in my house?", {}, "brain_problems"},
+                {"What are you doing in my house?", {}, "alienated"},
                 {nil, {defense = 1}, "silence"}
             }
         },
@@ -101,22 +101,38 @@ local dialog = {
         {
             pos = {phase = 4},
             text = "Why are you looking at me like that?",
-            responses = {}
+            responses = {
+                {"Like what?", {defense = 1}, "normal"},
+                {"What are you doing here?", {defense = 3, anger = 2}, "last_night"},
+                {"I don't even know you.", {defense = 2, concern = 1, anger = 1}, "last_night"}
+            }
         },
         {
             pos = {phase = 5},
-            text = "Please, tell me what's wrong... You can talk to me.",
-            responses = {}
+            text = "What's wrong?\b\b You can talk to me.",
+            responses = {
+                {"Who are you?", {concern = 5}, "brain_problems"},
+                {"You're intruding.", {anger = 1, defense = 3}, "alienated"},
+                {"I'm not sure what's going on.", {concern = 3}, "normal"}
+            }
         },
         {
             pos = {phase = 6, anger = 0},
             text = "This isn't like you.",
-            responses = {}
+            responses = {
+                {"Like who?", {defense = 1, anger = 1}, "normal"},
+                {"Who ARE you?", {concern = 10}, "brain_problems"},
+                {"How should I be?", {defense = 3, anger = 1}, "normal"}
+            }
         },
         {
             pos = {phase = 6, anger = 5},
             text = "This is just like you.",
-            responses = {}
+            responses = {
+                {"What is?", {}, "normal"},
+                {"Sorry, do I know you?", {concern = 3}, "brain_problems"},
+                {""}
+            }
         },
         {
             pos = {phase = 7, defense = 3},
@@ -134,7 +150,7 @@ local dialog = {
         },
         {
             pos = {phase = 7, defense = 2, anger = 5},
-            text = "If this is about what I said last night, well, you deserved it.",
+            text = "If this is about what I said last night, well\b.\b.\b.\b\b you deserved it.",
             responses = {}
         },
         {
@@ -169,85 +185,194 @@ local dialog = {
             responses = {
                 {"no, I...", {}},
                 {"y....yes....", {}},
-                {"what's happening...", {concern=10}, "brain_problems"}
+                {"what's happening...", {concern=10}, "brain_problems"},
+                {nil, {}, "stroke"}
             }
-        },
-        {
-            pos = {phase = 11.5},
-            text = "Hey, are you okay? You're looking a bit wobbly."
-        },
-        {
-            pos = {phase = 12},
-            text = "Yes, emergency services? It's my spouse, I think they're having a stroke."
-        },
-        {
-            pos = {phase = 12.5},
-            text = "Someone is coming.... everything will be okay.",
-            setState = "stroke"
         },
 
         -- fillers for the player advancing dialog manually
         {
-            pos = {interrupted = 1},
+            pos = {interrupted = 1, phase = 1},
             text = "Are you trying to say something?",
         },
         {
-            pos = {interrupted = 2, phase = 3},
+            pos = {interrupted = 1, phase = 2},
             text = "You look like you want to say something...",
         },
         {
-            pos = {interrupted = 3, phase = 5},
+            pos = {interrupted = 1, phase = 3, anger = 0},
             text = "Please, just tell me what you're trying to say...",
         },
         {
-            pos = {interrupted = 3, phase = 5, anger = 3},
+            pos = {interrupted = 1, phase = 3, anger = 3},
             text = "Well? Spit it out, already.",
         },
         {
-            pos = {interrupted = 4, phase = 7, anger = 1},
+            pos = {interrupted = 2, phase = 4, anger = 1},
             text = "You know you can tell me anything, right?",
         },
         {
-            pos = {interrupted = 4, phase = 7},
+            pos = {interrupted = 2, phase = 4},
             text = "You know you can tell me anything...",
         },
         {
-            pos = {interrupted = 4, phase = 7},
+            pos = {interrupted = 2, phase = 4},
             text = "Hon... Please.",
         },
         {
-            pos = {interrupted = 4, phase = 7},
+            pos = {interrupted = 3, phase = 5},
             text = "Please say something.",
         },
         {
-            pos = {interrupted = 4},
+            pos = {interrupted = 3, phase = 3},
             text = "Please say something. Anything.",
         },
         {
-            pos = {interrupted = 5, phase = 8, anger = 0},
+            pos = {interrupted = 3, anger = 0, phase = 6},
             text = "I love you, and I'm so worried about you.",
         },
         {
-            pos = {interrupted = 5, phase = 8, anger = 2},
+            pos = {interrupted = 3, anger = 2, phase = 6},
             text = "I love you. Please...\b\b Please talk to me.",
         },
         {
-            pos = {interrupted = 5, phase = 8},
+            pos = {interrupted = 4, phase = 7},
             text = "I just want to know why you aren't talking...",
         },
         {
-            pos = {interrupted = 5, phase = 8},
-            text = "Is there something I did?",
+            pos = {interrupted = 4, phase = 7},
+            text = "Is it something I did?",
         },
         {
-            pos = {interrupted = 12, phase = 4, anger = 1},
+            pos = {interrupted = 4, phase = 7},
+            text = "Is it something I said?",
+        },
+        {
+            pos = {interrupted = 10, phase = 7},
+            text = "I just need to know...",
+        },
+        {
+            pos = {interrupted = 18, anger = 1, phase = 4},
             text = "I mean...\b\b Why are you skipping my text\b if you don't\b have anything\b to say?",
         },
-
+        {
+            pos = {interrupted = 20, phase = 4},
+            text = "You know you're throwing off the timing of this dialog, right?"
+        },
     },
 
     -- path where Greg thinks everything is normal
     normal = {
+        {
+            pos = {silence_cur = 1, silence_total = 0},
+            text = "You okay?",
+            responses = {}
+        },
+        {
+            pos = {silence_total = 3, silence_cur = 1},
+            text = "What's with the cold shoulder?",
+            responses = {
+                -- TODO
+                {nil, {anger = 1}, "silence"}
+            }
+        },
+        {
+            pos = {silence_total = 6, silence_cur = 1},
+            text = "So you're back on that now, huh?",
+            responses = {
+                -- TODO
+                {nil, {anger = 2}, "silence"}
+            }
+        },
+
+        {
+            pos = {phase = 1},
+            text = "How are you this morning?",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 2, concern = 0},
+            text = "Have you had breakfast already?",
+            responses = {}
+        },
+        {
+            pos = {phase = 2, concern = 1},
+            text = "You're looking tired. Didn't you sleep well?",
+            responses = {}
+        },
+        {
+            pos = {phase = 2, concern = 2},
+            text = "What's the matter?",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 3, concern = 0},
+            text = "It's a beautiful morning, isn't it?",
+            responses = {}
+        },
+        {
+            pos = {phase = 3, defense = 2},
+            text = "So, last night...",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 4, concern = 0},
+            text = "When we got home last night I was worried about you.",
+            responses = {}
+        },
+        {
+            pos = {phase = 4, concern = 1, defense = 2},
+            text = "When we got home last night I was afraid I'd upset you.",
+            responses = {}
+        },
+        {
+            pos = {phase = 4, anger = 2},
+            text = "I'm a bit frustrated about last night.",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 5, concern = 0},
+            text = "But I mean, we've been married for so long, I guess we were overdue for an argument.",
+            responses = {}
+        },
+        {
+            pos = {phase = 5, anger = 2, defense = 2},
+            text = "We've been married HOW long? Why didn't you tell me how you felt before?",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 6, concern = 2, anger = 0},
+            text = "I guess I'm just surprised, is all. I thought you'd gotten past your social anxiety...",
+            responses = {}
+        },
+        {
+            pos = {phase = 6, anger = 3, concern = 0},
+            text = "You told me you had that under control.",
+            responses = {}
+        },
+        {
+            pos = {phase = 6, anger = 3, concern = 2},
+            text = "You seemed to have it under control\b.\b.\b.\b until last night.",
+            responses = {}
+        },
+
+        {
+            pos = {phase = 7},
+            text = "Sigh...\b Sorry to ramble about this. I guess I'm just not feeling so great myself, lately.",
+            responses = {}
+        },
+        {
+            pos = {phase = 7.5},
+            text = "Where did everything go so wrong?",
+            responses = {}
+        },
+
+
     },
 
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
@@ -282,24 +407,41 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {},
+            pos = {phase = 11.5},
+            text = "Hey, are you okay? You're looking a bit wobbly.",
+        },
+        {
+            pos = {phase = 12},
+            text = "Yes, emergency services? It's my spouse, I think they're having a stroke."
+        },
+        {
+            pos = {phase = 12.5},
+            text = "Someone is coming.... everything will be okay.",
+            max_count = 5
+        },
+        {
+            pos = {phase = 12.5},
             text = "Shh, shh, it's okay...\b\b Everything will be fine...",
+            max_count = 5
         },
         {
-            pos = {},
+            pos = {phase = 12.5},
             text = "They'll be here soon.",
+            max_count = 5
         },
         {
-            pos = {},
+            pos = {phase = 12.5},
             text = "I love you.\b We'll get through this.",
+            max_count = 5
         },
         {
-            pos = {},
+            pos = {phase = 12.5},
             text = "It's okay, I'm here for you.",
+            max_count = 5
         },
     },
 
-}
+ }
 
 
 return dialog
