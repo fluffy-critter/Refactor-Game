@@ -163,7 +163,8 @@ end
 -- Get the next timeout for a textbox
 function Game:getNextTimeout()
     local now = self:musicPos()
-    local nextTime = clock.posToTime({now[1], math.floor(now[2]/2)*2 + 2, -0.5})
+    -- go for at most two measures, minus half a beat
+    local nextTime = clock.posToTime({now[1], now[2] + 2, -0.5})
     local nextPos = clock.timeToPos(nextTime)
 
     return nextPos
@@ -172,7 +173,8 @@ end
 -- Get the next new textbox time
 function Game:getNextDialog()
     local now = self:musicPos()
-    local nextTime = clock.posToTime({now[1], math.floor(now[2]/2)*2 + 2, 0})
+    -- always start at the next measure
+    local nextTime = clock.posToTime({now[1], now[2] + 1, 0})
     local nextPos = clock.timeToPos(nextTime)
 
     print("now=" .. table.concat(now,':') .. " nextDialog=" .. table.concat(nextPos,':'))
