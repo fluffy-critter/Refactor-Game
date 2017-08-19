@@ -106,11 +106,10 @@ function Game:update(dt)
 
         if self.phase == 0 then
             -- text format testing
-            self.textBox = TextBox.new({
-                            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
-                            cantInterrupt = true
-
-            })
+            -- self.textBox = TextBox.new({
+            --                 text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
+            --                 cantInterrupt = true
+            -- })
             -- self.textBox = TextBox.new({choices={{text="arghl"}}})
         end
     end
@@ -120,25 +119,29 @@ function Game:update(dt)
         print("advancing dialog")
         self.nextDialog = nil
 
-        local node = self:chooseDialog()
-        if node then
-            self.textBox = TextBox.new({text = node.text, cantInterrupt = node.cantInterrupt})
+        if self.nextChoices then
+            self.textBox = self.nextChoices
+            self.nextChoices = nil
+        else
+            local node = self:chooseDialog()
+            if node then
+                self.textBox = TextBox.new({text = node.text, cantInterrupt = node.cantInterrupt, onInterrupt = node.onInterrupt})
 
-            local game = self
-            self.textBox.onClose = function(textBox)
-                game:textFinished(textBox, node)
+                local game = self
+                self.textBox.onClose = function(textBox)
+                    game:textFinished(textBox, node)
+                end
             end
+        end
 
+        if self.textBox then
             self.nextTimeout = self:getNextTimeout()
         else
             self.nextTimeout = nil
-            if self.textBox then
-                self.textBox:close()
-            end
         end
     end
 
-    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
+    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) and not (self.textBox and self.textBox.state < TextBox.states.ready) then
         self.nextTimeout = nil
         if self.textBox then
             self.textBox:close()
@@ -160,8 +163,21 @@ end
 -- Get the next timeout for a textbox
 function Game:getNextTimeout()
     local now = self:musicPos()
-    local nextTime = clock.posToTime({now[1], now[2] + 2, 0})
-    return clock.timeToPos(nextTime)
+    local nextTime = clock.posToTime({now[1], math.floor(now[2]/2)*2 + 2, -0.5})
+    local nextPos = clock.timeToPos(nextTime)
+
+    return nextPos
+end
+
+-- Get the next new textbox time
+function Game:getNextDialog()
+    local now = self:musicPos()
+    local nextTime = clock.posToTime({now[1], math.floor(now[2]/2)*2 + 2, 0})
+    local nextPos = clock.timeToPos(nextTime)
+
+    print("now=" .. table.concat(now,':') .. " nextDialog=" .. table.concat(nextPos,':'))
+
+    return nextPos
 end
 
 -- Called when the NPC textbox finishes
@@ -208,11 +224,10 @@ function Game:textFinished(textBox, node)
 
         print("choices: " .. #choices)
 
-        self.textBox = TextBox.new({choices = choices, onClose = onClose})
-        self.nextTimeout = self:getNextTimeout()
-    else
-        self.nextDialog = {} -- TODO handle animations
+        self.nextChoices = TextBox.new({choices = choices, onClose = onClose})
     end
+
+    self.nextDialog = self:getNextDialog()
 end
 
 -- Called when the player makes a dialog choice (including timeout)
@@ -228,7 +243,7 @@ function Game:onChoice(response)
         print("state now " .. self.dialogState)
     end
 
-    self.nextDialog = {} -- TODO handle animations
+    self.nextDialog = self:getNextDialog()
 end
 
 -- Get the next conversation node from the dialog tree

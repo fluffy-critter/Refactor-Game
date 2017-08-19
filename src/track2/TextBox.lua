@@ -71,6 +71,9 @@ function TextBox:onButtonPress(key)
             self.state = TextBox.states.ready
             self.stateAge = self.minDisplayTime
             self.interrupted = true
+            if self.onInterrupt then
+                self:onInterrupt()
+            end
         elseif self.state == TextBox.states.ready then
             if self.choices then
                 self.selected = self.index

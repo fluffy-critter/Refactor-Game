@@ -42,7 +42,7 @@ end
 
 local BPM = 132
 
-local clock = util.clock(BPM, {4, 16})
+local clock = util.clock(BPM, {16, 4})
 
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()

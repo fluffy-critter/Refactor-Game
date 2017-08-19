@@ -190,7 +190,7 @@ end
 --[[ Returns a game clock
 BPM - tempo
 
-limits - the limits for each cadence; e.g. {4,8} = 4 beats per measure, 8 measures per phase. Can go as deeply as desired; position array is returned as most-significant first
+limits - the limits for each cadence; e.g. {8,4} = 8 measures per phase, 4 beats per measure. Can go as deeply as desired; position array is returned as most-significant first
 
 ofs - time offset for the start of the clock
 
@@ -205,9 +205,10 @@ function util.clock(BPM, limits, ofs)
     local timeToPos = function(time)
         local remaining = (time - ofs)*BPM/60
         local pos = {}
-        for idx,sz in ipairs(limits) do
+        for idx = #limits, 1, -1 do
+            local sz = limits[idx]
             local v = remaining % sz
-            pos[#limits + 2 - idx] = v
+            pos[idx + 1] = v
             remaining = (remaining - v)/sz
         end
         pos[1] = remaining

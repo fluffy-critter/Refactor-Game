@@ -88,6 +88,8 @@ end)
 
 notion("color premultiplication", function()
     check(util.premultiply({255,255,255})).shallowMatches({255,255,255,255})
+    check(util.premultiply({255,255,255,255})).shallowMatches({255,255,255,255})
+    check(util.premultiply({255,0,0,127})).shallowMatches({127,0,0,127})
     check(util.premultiply({255,255,255,0})).shallowMatches({0,0,0,0})
 end)
 
@@ -112,4 +114,39 @@ notion("cpairs", function()
     check(concatted[2]).shallowMatches({t1, 2, 2})
     check(concatted[3]).shallowMatches({t1, 3, 3})
     check(concatted[4]).shallowMatches({t3, 1, 4})
+end)
+
+notion("clock", function()
+    local clock = util.clock(60, {8, 4}, 1)
+
+    notion("timeToPos", function()
+        check(clock.timeToPos(1)).shallowMatches({0, 0, 0})
+        check(clock.timeToPos(2)).shallowMatches({0, 0, 1})
+        check(clock.timeToPos(3)).shallowMatches({0, 0, 2})
+        check(clock.timeToPos(4)).shallowMatches({0, 0, 3})
+        check(clock.timeToPos(5)).shallowMatches({0, 1, 0})
+    end)
+
+    notion("posToTime", function()
+        check(clock.posToTime({0})).is(1)
+        check(clock.posToTime({0,1})).is(5)
+        check(clock.posToTime({1,0})).is(33)
+
+        check(clock.posToTime({0,0,-1})).is(0)
+    end)
+
+    notion("offsets", function()
+        local time = 17
+        local base = clock.timeToPos(time)
+        check(clock.posToTime({base[1], base[2], base[3] + 1})).is(time + 1)
+        check(clock.posToTime({base[1], base[2], base[3] + 4})).is(time + 4)
+        check(clock.posToTime({base[1], base[2] + 1, base[3]})).is(time + 4)
+        check(clock.posToTime({base[1] + 1, base[2], base[3]})).is(time + 32)
+    end)
+
+    notion("offset modulus", function()
+        check(clock.timeToPos(clock.posToTime({0,0,4}))).shallowMatches({0,1,0})
+        check(clock.timeToPos(clock.posToTime({0,8,0}))).shallowMatches({1,0,0})
+        check(clock.timeToPos(clock.posToTime({0,1,-1}))).shallowMatches({0,0,3})
+    end)
 end)

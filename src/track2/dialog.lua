@@ -195,79 +195,42 @@ local dialog = {
         },
 
         {
-            pos = {interrupted = 1, phase = 1},
-            text = "Are you trying to say something?",
-        },
-        {
-            pos = {interrupted = 1, phase = 2},
+            pos = {interrupted = 3},
             text = "You look like you want to say something...",
         },
         {
-            pos = {interrupted = 1, phase = 3, anger = 0},
-            text = "Please, just tell me what you're trying to say...",
-        },
-        {
-            pos = {interrupted = 1, phase = 3, anger = 3},
-            text = "Well? Spit it out, already.",
-        },
-        {
-            pos = {interrupted = 2, phase = 4, anger = 1},
-            text = "You know you can tell me anything, right?",
-        },
-        {
-            pos = {interrupted = 2, phase = 4},
+            pos = {interrupted = 7, anger = 0},
             text = "You know you can tell me anything...",
         },
         {
-            pos = {interrupted = 2, phase = 4},
-            text = "Hon... Please.",
-        },
-        {
-            pos = {interrupted = 3, phase = 5},
+            pos = {interrupted = 11, phase = 2},
             text = "Please say something.",
         },
         {
-            pos = {interrupted = 3, phase = 3},
+            pos = {interrupted = 11, phase = 4},
             text = "Please say something. Anything.",
         },
         {
-            pos = {interrupted = 3, anger = 0, phase = 6},
-            text = "I love you, and I'm so worried about you.",
-        },
-        {
-            pos = {interrupted = 3, anger = 2, phase = 6},
-            text = "I love you. Please...%% Please talk to me.",
-        },
-        {
-            pos = {interrupted = 4, phase = 7},
+            pos = {interrupted = 13, phase = 7},
             text = "I just want to know why you aren't talking...",
         },
         {
-            pos = {interrupted = 4, phase = 7},
-            text = "Is it something I did?",
-        },
-        {
-            pos = {interrupted = 4, phase = 7},
-            text = "Is it something I said?",
-        },
-        {
-            pos = {interrupted = 10, phase = 7},
-            text = "I just need to know...",
-        },
-        {
-            pos = {interrupted = 18, anger = 1, phase = 4},
+            pos = {interrupted = 15, anger = 1},
             text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
         },
         {
-            pos = {interrupted = 25, phase = 6},
-            text = "You know you're throwing off the timing of this whoel, dialog, right?"
+            pos = {interrupted = 17},
+            text = "You know you're throwing off the timing of this whole dialog, right?",
+            onInterrupt = function(self)
+                self.text = self.text .. "...dammit"
+            end
         },
         {
-            pos = {interrupted = 30, phase = 7},
+            pos = {interrupted = 19},
             text = "Okay, now I just KNOW you're doing this to see what I say."
         },
         {
-            pos = {interrupted = 35, phase = 8},
+            pos = {interrupted = 20},
             text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
             cantInterrupt = true
         },
