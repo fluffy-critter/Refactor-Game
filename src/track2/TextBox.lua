@@ -67,7 +67,7 @@ function TextBox:onButtonPress(key)
     end
 
     if key == 'a' then
-        if self.state < TextBox.states.ready or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime) then
+        if (self.state < TextBox.states.ready or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime)) and not self.cantInterrupt then
             self.state = TextBox.states.ready
             self.stateAge = self.minDisplayTime
             self.interrupted = true

@@ -37,30 +37,6 @@ local dialog = {
 
     -- filler texts to adjust timing
     filler = {
-        {
-            pos = {interrupted = 3, phase = 2},
-            text = "Could you let me finish?"
-        },
-        {
-            pos = {interrupted = 5, phase = 3},
-            text = "Could you please let me finish?"
-        },
-        {
-            pos = {interrupted = 7, phase = 4},
-            text = "Could you PLEASE let me finish?"
-        },
-        {
-            pos = {interrupted = 9, phase = 5},
-            text = "I don't really like being talked over, you know."
-        },
-        {
-            pos = {interrupted = 15, phase = 6},
-            text = "You know you're throwing off the timing of this dialog, right?"
-        },
-        {
-            pos = {interrupted = 20, phase = 7},
-            text = "Okay now I just know you're doing this to see what I say."
-        },
     },
 
     -- starting point
@@ -70,7 +46,7 @@ local dialog = {
             text = "Good morning, dear! #",
             responses = {
                 {"Uh... hi...", {concern = 1}, "normal"},
-                {"Who the hell are you?", {concern = 1, defense = 1}, "last_night"},
+                {"Um... who are you...?", {concern = 1, defense = 1}, "last_night"},
                 {"What are you doing here?", {defense = 1}, "alienated"},
                 {nil, {}, "silence"}
             }
@@ -282,6 +258,19 @@ local dialog = {
             pos = {interrupted = 18, anger = 1, phase = 4},
             text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
         },
+        {
+            pos = {interrupted = 25, phase = 6},
+            text = "You know you're throwing off the timing of this whoel, dialog, right?"
+        },
+        {
+            pos = {interrupted = 30, phase = 7},
+            text = "Okay, now I just KNOW you're doing this to see what I say."
+        },
+        {
+            pos = {interrupted = 35, phase = 8},
+            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
+            cantInterrupt = true
+        },
     },
 
     -- path where Greg thinks everything is normal
@@ -409,6 +398,26 @@ local dialog = {
 
     -- path where Greg is feeling alienated
     alienated = {
+        {
+            pos = {interrupted = 5, phase = 2},
+            text = "Could you let me finish?"
+        },
+        {
+            pos = {interrupted = 10, phase = 3},
+            text = "Could you please let me finish?"
+        },
+        {
+            pos = {interrupted = 15, phase = 4},
+            text = "Could you PLEASE let me finish?"
+        },
+        {
+            pos = {interrupted = 20, phase = 5, anger = 0},
+            text = "I don't really like being talked over, you know."
+        },
+        {
+            pos = {interrupted = 20, phase = 5, anger = 5},
+            text = "I don't really like being talked over, you know."
+        },
     },
 
     -- path where Greg has given up on helping Rose
@@ -424,7 +433,12 @@ local dialog = {
         {
             pos = {},
             text = "% .%.%.% %%You don't even...% remember...%% me."
-        }
+        },
+
+        {
+            pos = {phase = 10},
+            text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?"
+        },
     },
 
     -- state where Greg believes Rose is having a stroke

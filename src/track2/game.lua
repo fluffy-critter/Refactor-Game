@@ -106,7 +106,11 @@ function Game:update(dt)
 
         if self.phase == 0 then
             -- text format testing
-            self.textBox = TextBox.new({text="test text, %%%please r%e%m%o%v%e me asd fasdf asdf asldjfklsa flsajfkdls jl"})
+            self.textBox = TextBox.new({
+                            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
+                            cantInterrupt = true
+
+            })
             -- self.textBox = TextBox.new({choices={{text="arghl"}}})
         end
     end
@@ -118,7 +122,7 @@ function Game:update(dt)
 
         local node = self:chooseDialog()
         if node then
-            self.textBox = TextBox.new({text = node.text})
+            self.textBox = TextBox.new({text = node.text, cantInterrupt = node.cantInterrupt})
 
             local game = self
             self.textBox.onClose = function(textBox)
