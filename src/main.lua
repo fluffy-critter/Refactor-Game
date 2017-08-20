@@ -43,6 +43,7 @@ local shaders = require('shaders')
 local util = require('util')
 local input = require('input')
 local fonts = require('fonts')
+local imagepool = require('imagepool')
 
 local Pie
 if PROFILE then
@@ -76,13 +77,21 @@ local tracks = {
 }
 local currentGame
 
-local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending")
+local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending", "menu")
 local playing = {
-    state = PlayState.starting,
+    state = PlayState.menu,
     unpauseState = nil,
     speed = 1.0,
     resumeMusic = false,
     fade = 0
+}
+
+local menuVolume = 1
+
+local bgLoops = {
+    love.audio.newSource('mainmenu/loop1.mp3'),
+    love.audio.newSource('mainmenu/loop2.mp3'),
+    love.audio.newSource('mainmenu/loop3.mp3')
 }
 
 local ScreenState = util.enum("ready", "configwait")
@@ -187,6 +196,11 @@ function love.load(args)
         }
     end
     menu = mainmenu
+
+    for _,loop in ipairs(bgLoops) do
+        loop:setLooping(true)
+        loop:play()
+    end
 end
 
 local frameCount = 0
@@ -200,11 +214,32 @@ function love.update(dt)
         return
     end
 
+    if playing.state == PlayState.menu then
+        if menuVolume == 0 then
+            for _,loop in ipairs(bgLoops) do
+                loop:resume()
+            end
+        end
+        menuVolume = math.min(1, menuVolume + dt)
+        for _,loop in ipairs(bgLoops) do
+            loop:setVolume(menuVolume)
+        end
+    end
+
     if playing.state == PlayState.starting then
         playing.fade = playing.fade + dt
         if playing.fade >= 1 then
             playing.fade = 1
             playing.state = playing.playing
+
+            for _,loop in ipairs(bgLoops) do
+                loop:pause()
+            end
+        end
+
+        menuVolume = 1 - playing.fade
+        for _,loop in ipairs(bgLoops) do
+            loop:setVolume(menuVolume)
         end
     end
 
@@ -213,7 +248,7 @@ function love.update(dt)
         playing.fade = playing.fade - dt/2
         if playing.fade <= 0 then
             currentGame = nil
-            return
+            playing.state = PlayState.menu
         end
     end
 
@@ -269,9 +304,10 @@ function love.draw()
         end
     end
 
-    love.graphics.clear(32, 32, 32)
 
     if currentGame then
+        love.graphics.clear(32, 32, 32)
+
         local canvas, aspect = currentGame:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
@@ -293,7 +329,28 @@ function love.draw()
         blitCanvas(canvas, aspect)
         love.graphics.setShader()
     else
+        love.graphics.clear(0,0,0)
+
         -- draw menu
+        local w = love.graphics:getWidth()
+        local h = love.graphics:getHeight()
+
+        love.graphics.setColor(44,48,0)
+        love.graphics.rectangle("fill", 0, 0, w, 300)
+        love.graphics.setColor(255,255,255,255)
+
+        local ground = imagepool.load('mainmenu/ground.png')
+        for x = 0, love.graphics:getWidth(), 702 do
+            love.graphics.draw(ground, x, 0)
+        end
+
+        local bg = imagepool.load('mainmenu/forest-stuff.png')
+        local scale = math.min(1, w/bg:getWidth(), h*1.2/bg:getHeight())
+        love.graphics.draw(bg, (w - bg:getWidth()*scale)/2, 0, 0, scale, scale)
+
+        local logo = imagepool.load('mainmenu/refactor-released.png')
+        love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
+
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.mainMenu)
         love.graphics.setColor(255,255,255,255)

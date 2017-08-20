@@ -232,6 +232,7 @@ function util.cpairs(...)
     local tables = {...}
     local wtbl = 1
     local widx = 1
+
     return function()
         local tbl = tables[wtbl]
 
