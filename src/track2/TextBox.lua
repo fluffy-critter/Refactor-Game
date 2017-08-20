@@ -205,6 +205,10 @@ function TextBox:draw()
 
     if self.wrapped and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
         love.graphics.print(self.wrapped:sub(1, self.charsPrinted), left + 8, top + 8)
+
+        if self.state == TextBox.states.ready and self.stateAge >= self.minDisplayTime then
+            love.graphics.print(">", right - 8, bottom - 4)
+        end
     end
 
     if self.choices and self.state == TextBox.states.ready then
