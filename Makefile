@@ -18,7 +18,7 @@ GAME_VERSION=$(shell git rev-parse --short HEAD)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
-.PHONY: clean all
+.PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup
@@ -57,6 +57,9 @@ $(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
 # TODO grab the binary out of the appropriate platform version
 tests: setup
 	love $(SRC) --cute-headless
+
+run: love-bundle
+	love $(DEST)/love/$(NAME).love
 
 # .love bundle
 love-bundle: setup $(DEST)/love/$(NAME).love
