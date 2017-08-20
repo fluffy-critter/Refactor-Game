@@ -35,15 +35,45 @@ NOTE: Since this is stored as a module, please don't modify any of the table dat
 local dialog = {
     start_state = "intro",
 
-    -- filler texts to adjust timing
-    filler = {
+    -- things that are always available
+    always = {
+        {
+            pos = {silence_total = 2, silence_cur = 1},
+            text = "You okay?",
+            responses = {
+                {"Yeah, I'm just... a bit preoccupied.", {concern = 1}},
+                {"No.", {defense = 3}},
+                {"Why are you even talking to me?", {anger = 3}, "alienated"}
+            }
+        },
+        {
+            pos = {silence_total = 3, silence_cur = 1},
+            text = "What's with the cold shoulder?",
+            responses = {
+                {"What should I say?", {defense = 5}},
+                {"Are you in the right home?", {concern = 3}},
+                {"Who do you think you are?", {anger = 2, defense = 2}, "alienated"},
+                {nil, {anger = 5}, "silence"}
+            }
+        },
+        {
+            pos = {silence_total = 6, silence_cur = 1},
+            text = "So you're back on that now, huh?",
+            responses = {
+                {"Back to what?", {defense = 1}},
+                {"I think you're confused.", {defense = 2, concern = 1}},
+                {"Who are you and why are you in my home?", {anger = 2, concern = 5}, "last_night"},
+                {nil, {anger = 2}, "silence"}
+            }
+        },
+
     },
 
     -- starting point
     intro = {
         {
             pos = {},
-            text = "Good morning, dear! #",
+            text = "# Good morning, dear! #",
             responses = {
                 {"Uh... hi...", {concern = 1}, "normal"},
                 {"Um... who are you...?", {concern = 1, defense = 1}, "last_night"},
@@ -80,7 +110,7 @@ local dialog = {
             text = "I said, good morning.",
             responses = {
                 {"Um... hello.", {concern = 1}, "normal"},
-                {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
+                {"Oh, sorry, I didn't hear you.", {concern = -1}, "normal"},
                 {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
             }
         },
@@ -89,7 +119,7 @@ local dialog = {
             text = "Hello? I said good morning.",
             responses = {
                 {"Um... hello.", {concern = 1}, "normal"},
-                {"Oh, sorry, I couldn't hear you.", {concern = -1}, "normal"},
+                {"Oh, sorry, I didn't hear you.", {concern = -1}, "normal"},
                 {"Mmhmm.", {defense = 1, anger = 2}, "anger"}
             }
         },
@@ -194,6 +224,7 @@ local dialog = {
             }
         },
 
+        -- fillers for someone who is enough of a doofus to stay silent while also accelerating the NPC text
         {
             pos = {interrupted = 3},
             text = "You look like you want to say something...",
@@ -217,12 +248,17 @@ local dialog = {
         {
             pos = {interrupted = 15, anger = 1},
             text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
+            responses = {
+                {"Because it's funny", {}, "alienated"},
+                {"Because I'm impatient", {}, "normal"},
+                {"Because this is just a game", {concern=50}, "brain_problems"},
+            }
         },
         {
             pos = {interrupted = 17},
             text = "You know you're throwing off the timing of this whole dialog, right?",
             onInterrupt = function(self)
-                self.text = self.text .. "...dammit"
+                self.text = self.text .. "\n... dammit"
             end
         },
         {
@@ -231,45 +267,44 @@ local dialog = {
         },
         {
             pos = {interrupted = 20},
-            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
+            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.%%%.%%%.%%%.%%%.%%%",
             cantInterrupt = true
         },
+    },
+
+    sidebar_going_somewhere = {
+        {
+            pos = {},
+            text = "What? No, I was just wondering if you'd eaten.",
+            responses = {
+                {"Oh, my mind was elsewhere.", {defense=2, concern=-2}, "normal"},
+                {"So you aren't abducting me, then?", {concern=5}, "brain_problems"},
+                {"I'm not hungry.", {concern=2}, "normal"},
+                {nil, {}, "silence"}
+            }
+        }
     },
 
     -- path where Greg thinks everything is normal
     normal = {
         {
-            pos = {silence_cur = 1, silence_total = 0},
-            text = "You okay?",
-            responses = {}
-        },
-        {
-            pos = {silence_total = 3, silence_cur = 1},
-            text = "What's with the cold shoulder?",
-            responses = {
-                -- TODO
-                {nil, {anger = 1}, "silence"}
-            }
-        },
-        {
-            pos = {silence_total = 6, silence_cur = 1},
-            text = "So you're back on that now, huh?",
-            responses = {
-                -- TODO
-                {nil, {anger = 2}, "silence"}
-            }
-        },
-
-        {
             pos = {phase = 1},
             text = "How are you this morning?",
-            responses = {}
+            responses = {
+                {"... Fine ...", {defense = 2, concern = 1}},
+                {"What are you doing here?", {defense = 5}},
+                {"Confused.", {concern = 3}}
+            }
         },
 
         {
             pos = {phase = 2, concern = 0},
             text = "Have you had breakfast already?",
-            responses = {}
+            responses = {
+                {"Not yet.", {}},
+                {"No...", {concern=1}},
+                {"Are we going somewhere?", {defense=2}, "sidebar_going_somewhere"},
+            }
         },
         {
             pos = {phase = 2, concern = 1},
@@ -344,7 +379,12 @@ local dialog = {
         {
             pos = {phase = 7.5},
             text = "Where did everything go so wrong?",
-            responses = {}
+            responses = {
+                {},
+                {},
+                {},
+                {nil, {}, "gave_up"}
+            }
         },
 
 
@@ -352,7 +392,26 @@ local dialog = {
 
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
+        {
+            pos = {concern = 10},
+            text = "Wait... you ACTUALLY don't know who I am?",
+            responses = {
+                {"No.", {}, "brain_problems"},
+                {"You're my husband...right?", {}, "brain_problems"},
+                {"Of...course I do", {anger=1, defense=1, concern=-5}, "normal"}
+            }
+        },
 
+        {
+            pos = {phase = 10, defense = 0},
+            text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
+            responses = {}
+        },
+        {
+            pos = {phase = 10, defense = 5},
+            text = "Ha ha, what? Are we even talking about the same thing?",
+            responses = {}
+        }
     },
 
     -- path where Greg has determined Rose is having brain problems
@@ -421,7 +480,7 @@ local dialog = {
         },
         {
             pos = {phase = 12.5},
-            text = "Shh, shh, it's okay...%% Everything will be fine...",
+            text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
             max_count = 5
         },
         {
@@ -431,7 +490,7 @@ local dialog = {
         },
         {
             pos = {phase = 12.5},
-            text = "I love you.% We'll get through this.",
+            text = "I love you.%#%\n\nWe'll get through this.",
             max_count = 5
         },
         {

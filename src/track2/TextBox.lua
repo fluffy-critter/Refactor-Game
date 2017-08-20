@@ -101,13 +101,18 @@ function TextBox:onButtonPress(key)
     return false
 end
 
+function TextBox:getWrappedText(text)
+    local width, wrapped = self.font:getWrap(text, (self.right - self.left - 1)*8)
+    return width, wrapped
+end
+
 function TextBox:update(dt)
     self.stateAge = self.stateAge + dt
 
     -- TODO maybe just do this when self.text and/or metrics change?
     self.wrapped = nil
     if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
-        local width, wrapped = self.font:getWrap(self.text, (self.right - self.left - 1)*8)
+        local width, wrapped = self:getWrappedText(self.text)
         self.wrapped = table.concat(wrapped, '\n')
     end
 

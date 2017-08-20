@@ -197,6 +197,14 @@ function love.load(args)
     end
     menu = mainmenu
 
+    local track
+    for _,arg in ipairs(args) do
+        if arg:sub(1, 5) == "track" then
+            track = require(arg .. ".game")
+            startGame(track)
+        end
+    end
+
     for _,loop in ipairs(bgLoops) do
         loop:setLooping(true)
         loop:play()

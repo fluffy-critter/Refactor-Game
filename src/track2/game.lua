@@ -107,8 +107,9 @@ function Game:update(dt)
         if self.phase == 0 then
             -- text format testing
             -- self.textBox = TextBox.new({
-            --                 text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
-            --                 cantInterrupt = true
+            --                 text = "You know you're throwing off the timing of this whole dialog, right?",
+            --                 -- text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
+            --                 -- cantInterrupt = true
             -- })
             -- self.textBox = TextBox.new({choices={{text="arghl"}}})
         end
@@ -255,7 +256,7 @@ function Game:chooseDialog()
     local now = self:musicPos()
     self.npc.phase = now[1] + now[2]/4 + now[3]/16
 
-    for _,_,node in util.cpairs(dialog[self.dialogState], dialog.filler) do
+    for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
             for k,v in pairs(node.pos or {}) do
