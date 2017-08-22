@@ -136,6 +136,10 @@ function Game:update(dt)
                 self.textBox.onClose = function(textBox)
                     game:textFinished(textBox, node)
                 end
+
+                if node.onReach then
+                    node.onReach(self.npc)
+                end
             end
         end
 
@@ -266,6 +270,10 @@ end
 
 -- Get the next conversation node from the dialog tree
 function Game:chooseDialog()
+    if self.npc.gone then
+        return nil
+    end
+
     local minDistance, minNode
 
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do

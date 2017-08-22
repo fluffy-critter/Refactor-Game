@@ -16,6 +16,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
                 adjustments to the parameter space,
                 name of pool to jump to (optional)
         },
+        onReach = function(npc), -- function to call if we've reached this state
         setState = "state", -- which state to switch to if we get to this point
         max_count = ..., -- Maximum number of times this fragment can appear (default: 1)
     },
@@ -315,84 +316,135 @@ local dialog = {
         {
             pos = {phase = 2, concern = 1},
             text = "You're looking tired. Didn't you sleep well?",
-            responses = {}
+            responses = {
+                {"Not particularly...", {defense=1, concern=1}},
+                {"How did you get in here?", {confused=3, concern=2}},
+                {"Please go away.", {anger=5, defense=5}}
+            }
         },
         {
             pos = {phase = 2, concern = 2},
             text = "What's the matter?",
-            responses = {}
+            responses = {
+                {"Who are you?", {concern=2}},
+                {"What are you doing here?", {defense=3, concern=2}},
+                {"Why are you in my house?", {anger=1, defense=2}}
+            }
         },
 
         {
             pos = {phase = 3, concern = 0},
             text = "It's a beautiful morning, isn't it?",
-            responses = {}
+            responses = {
+                {"Yeah...", {concern=-2, defense=-3}},
+                {"Why are you in my house?", {anger=1, defense=2}},
+                {"Who are you?", {concern=3}, "brain_problems"}
+            }
         },
         {
             pos = {phase = 3, defense = 2},
             text = "So, last night...",
-            responses = {}
+            responses = {
+                {"What about it?", {defense=2}},
+                {"I'm sorry, but who are you?", {concern=3, defense=-1}, "brain_problems"},
+                {"What happened?", {concern=5}, "last_night"}
+            }
         },
 
         {
             pos = {phase = 4, concern = 0},
             text = "When we got home last night I was worried about you.",
-            responses = {}
+            responses = {
+                {"We came home together?", {defense=2, anger=1}},
+                {"This is my home...", {defense=3, concern=2}},
+                {"What happened last night?", {concern=5}, "last_night"}
+            }
         },
         {
             pos = {phase = 4, concern = 1, defense = 2},
             text = "When we got home last night I was afraid I'd upset you.",
-            responses = {}
+            responses = {
+                {"Why would you think that?", {defense=-2, anger=-1}},
+                {"That's... okay...", {defense=2}},
+                {"I don't even know who you are.", {defense=2, concern=5}, "brain_problems"}
+            }
         },
         {
             pos = {phase = 4, anger = 2},
             text = "I'm a bit frustrated about last night.",
-            responses = {}
+            responses = {
+                {"What happened?", {concern=2,defense=-1}, "last_night"},
+                {"Did I promise you something?", {anger=1,defense=1}},
+                {"So you went home with a stranger, huh?", {concern=10,defense=10}, "brain_problems"}
+            }
         },
 
         {
             pos = {phase = 5, concern = 0},
             text = "But I mean, we've been married for so long, I guess we were overdue for an argument.",
-            responses = {}
+            responses = {
+                {"I don't remember it.", {concern=2}},
+                {"Sorry, what was it about?", {concern=3}},
+                {"Sorry...", {concern=-5,defense=-5}}
+            }
         },
         {
             pos = {phase = 5, anger = 2, defense = 2},
             text = "We've been married HOW long? Why didn't you tell me how you felt before?",
-            responses = {}
+            responses = {
+                {"We're... married?", {concern=5}, "brain_problems"},
+                {"I... guess it just didn't come up.", {defense=5,anger=3}},
+                {"Who are you?", {anger=5}, "last_night"}
+            }
         },
 
         {
             pos = {phase = 6, concern = 2, anger = 0},
-            text = "I guess I'm just surprised, is all. I thought you'd gotten past your social anxiety...",
-            responses = {}
+            text = "I guess I'm just surprised, is all. I thought you'd gotten past your anxiety problems...",
+            responses = {
+                {"How do you know about that?", {concern=3,defense=5}, "brain_problems"},
+                {"I don't even know who you are.", {defense=5}, "last_night"},
+                {"What happened?", {concern=5, defense=-5}}
+            }
         },
         {
             pos = {phase = 6, anger = 3, concern = 0},
             text = "You told me you had that under control.",
-            responses = {}
+            responses = {
+                {"Had what under control?", {defense=5}},
+                {"I'm sorry for whatever I did.", {defense=-3,concern=3}},
+                {"What are you talking about?", {defense=10,anger=10}}
+            }
         },
         {
             pos = {phase = 6, anger = 3, concern = 2},
             text = "You seemed to have it under control%.%.%.% until last night.",
-            responses = {}
+            responses = {
+                {"Had what under control?", {defense=5}},
+                {"I'm sorry for whatever I did.", {defense=-3,concern=3}},
+                {"What are you talking about?", {defense=10,anger=10}}
+            }
         },
 
         {
             pos = {phase = 7},
             text = "Sigh...% Sorry to ramble about this. I guess I'm just not feeling so great myself, lately.",
-            responses = {}
+            responses = {
+                {"Anything I can do to help?", {defense=-2,concern=-2,anger=-2}},
+                {"Why don't you tell me who you are first?", {concern=5}, "brain_problems"},
+                {"That's too bad.", {defense=5,anger=3}, "alienated"}
+            }
         },
         {
             pos = {phase = 7.5},
             text = "Where did everything go so wrong?",
             responses = {
-                {},
-                {},
-                {},
-                {nil, {}, "gave_up"}
+                {"When you went home with a stranger?", {concern=5}, "brain_problems"},
+                {"Who can tell.", {anger=2,defense=5}, "alienated"},
+                {"Last...night?", {defense=3,concern=-5}, "last_night"},
+                {nil, {}, "alienated"}
             }
         },
-
 
     },
 
@@ -402,9 +454,9 @@ local dialog = {
             pos = {concern = 10},
             text = "Wait... you ACTUALLY don't know who I am?",
             responses = {
-                {"No.", {}, "brain_problems"},
-                {"You're my husband...right?", {}, "brain_problems"},
-                {"Of...course I do", {anger=1, defense=1, concern=-5}, "normal"}
+                {"No.", {defense=2,anger=2}, "brain_problems"},
+                {"You're my husband...right?", {concern=5}, "brain_problems"},
+                {"Of course I do.", {anger=1, defense=1, concern=-5}, "normal"}
             }
         },
 
@@ -422,10 +474,21 @@ local dialog = {
 
     -- path where Greg has determined Rose is having brain problems
     brain_problems = {
+        {
+            pos = {phase = 10},
+            text = "Ha ha ha, okay, this...%%% this explains so much...",
+            responses = {}
+        }
     },
 
     -- path where Greg is feeling alienated
     alienated = {
+        {
+            pos = {phase = 10},
+            text = "Ha ha, wow, this is just... what the hell is going on here.",
+            responses = {}
+        },
+
         {
             pos = {interrupted = 5, phase = 2},
             text = "Could you let me finish?"
@@ -444,28 +507,35 @@ local dialog = {
         },
         {
             pos = {interrupted = 20, phase = 5, anger = 5},
-            text = "I don't really like being talked over, you know."
+            text = "I really don't like being talked over, you know.%%\nStop it.%%",
+            cantInterrupt = true
         },
     },
 
     -- path where Greg has given up on helping Rose
     gave_up = {
         {
-            pos = {},
-            text = "I just can't do this anymore. Goodbye."
-        },
-        {
-            pos = {},
+            pos = {phase = 12},
             text = "What does it matter? You won't even remember this anyway."
         },
         {
-            pos = {},
-            text = "% .%.%.% %%You don't even...% remember...%% me."
+            pos = {phase = 12},
+            text = "% .%.%.% %%You don't even...% remember...%% me.",
+            cantInterrupt = true
         },
 
         {
             pos = {phase = 10},
-            text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?"
+            text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?",
+            cantInterrupt = true
+        },
+
+        {
+            pos = {phase = 12.5},
+            text = "I just can't do this anymore. Goodbye.",
+            onReach = function(npc)
+                npc.gone = true
+            end
         },
     },
 
