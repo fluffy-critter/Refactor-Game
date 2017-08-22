@@ -359,17 +359,18 @@ function love.draw()
         local logo = imagepool.load('mainmenu/refactor-released.png')
         love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
 
+        local font = fonts.bodoni72.regular
         love.graphics.setBlendMode("alpha")
-        love.graphics.setFont(fonts.mainMenu)
+        love.graphics.setFont(font)
         love.graphics.setColor(255,255,255,255)
         local y = 0
         for n,item in ipairs(menu) do
-            love.graphics.print(item.label, 16, y)
             if n == menuPos then
                 love.graphics.print(">", 0, y)
             end
+            love.graphics.print(item.label, 16, y)
 
-            y = y + fonts.mainMenu:getHeight()
+            y = y + font:getHeight()
         end
     end
 

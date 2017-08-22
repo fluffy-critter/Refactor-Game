@@ -6,7 +6,11 @@ Refactor
 ]]
 
 local fonts = {
-    mainMenu = love.graphics.newFont(16), -- TODO bodoni
+    bodoni72 = {
+        regular = love.graphics.newFont("fonts/Bodoni72Regular.fnt"),
+        bold = love.graphics.newFont("fonts/Bodoni72Bold.fnt"),
+        italic = love.graphics.newFont("fonts/Bodoni72Italic.fnt"),
+    },
     debug = love.graphics.newFont(8),
     scoreboard = love.graphics.newFont("fonts/scoreboard.fnt"),
     centuryGothicDigits = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789"),
