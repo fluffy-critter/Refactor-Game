@@ -7,6 +7,8 @@ menudata.lua - data for the main menu
 
 ]]
 
+local menudata = {}
+
 menudata.credits = [[
 CREDITS
 
@@ -49,3 +51,5 @@ spectronaut • yupso
 
 Made with LÖVE
 ]]
+
+return menudata

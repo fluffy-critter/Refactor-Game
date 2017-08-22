@@ -40,8 +40,10 @@ Methods:
     onInit() - called when the ball is first initialized
     onStart() - called when the ball's life starts
 
-    preUpdate(dt) - called at the beginning of the update cycle. Clears impulses; extenders should call Ball.preUpdate(self,dt)
-    postUpdate(dt) - called at the end of the update cycle. Applies impulses; extenders should call Ball.postUpdate(self,dt)
+    preUpdate(dt) - called at the beginning of the update cycle.
+        Clears impulses; extenders should call Ball.preUpdate(self,dt)
+    postUpdate(dt) - called at the end of the update cycle.
+        Applies impulses; extenders should call Ball.postUpdate(self,dt)
 
     onHitPaddle(nrm, paddle) - called when the ball hits a paddle
     onHitWall(nrm, x, y) - called when the ball hits a wall
@@ -194,7 +196,7 @@ function Ball:onHitWall(nrm, x, y)
     }))
 end
 
-function Ball:onHitActor(nrm, actor)
+function Ball:onHitActor(nrm, _)
     self:applyReflection(nrm)
 end
 

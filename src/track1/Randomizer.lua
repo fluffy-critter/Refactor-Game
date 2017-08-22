@@ -184,24 +184,24 @@ function Randomizer:preUpdate(_, dt)
                     isBullet = true,
                     onStart = function()
                     end,
-                    onHitPaddle = function(self, nrm, paddle)
-                        self.lives = 0
-                        table.insert(self.game.particles, SparkParticle.new({
+                    onHitPaddle = function(bullet, _, paddle)
+                        bullet.lives = 0
+                        table.insert(bullet.game.particles, SparkParticle.new({
                             x = paddle.x,
                             y = paddle.y,
-                            color = self.color,
+                            color = bullet.color,
                             r = math.sqrt(paddle.w*paddle.w + paddle.h*paddle.h),
                             lifetime = 120/132
                         }))
 
                         -- choose a random status effect and apply it
-                        for i=1,3 do
+                        for _=1,3 do
                             local effect = Randomizer.functions[math.random(1,#Randomizer.functions)]
                             local val = effect.val()
                             print("i shoot you! enjoy your " .. effect.key .. " being " .. val)
                             paddle[effect.key] = val
                         end
-                        paddle.color = self.color
+                        paddle.color = bullet.color
                     end
                 }))
             end)
@@ -252,7 +252,7 @@ end
 function Randomizer:onHitBall(nrm, ball)
     -- keep it immune while balls are passing through it
     if self.state == Randomizer.states.hit then
-        self.stateAge = min(self.stateAge % (self.hitFlashRate * 2), self.hitTime - self.hitFlashRate)
+        self.stateAge = math.min(self.stateAge % (self.hitFlashRate * 2), self.hitTime - self.hitFlashRate)
     end
 
     if self.state ~= Randomizer.states.alive then
@@ -272,10 +272,8 @@ function Randomizer:onHitBall(nrm, ball)
         self.state = Randomizer.states.hit
     end
 
-    for i=1,self.particleCount do
+    for _=1,self.particleCount do
         local vx, vy = unpack(geom.randomVector(self.particleVelocity))
-        local vx = math.random(-500, 500)
-        local vy = math.random(-500, 500)
         table.insert(self.game.particles, SparkParticle.new({
             x = self.x,
             y = self.y,

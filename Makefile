@@ -21,9 +21,9 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: love-bundle osx win32 win64
-.PHONY: assets setup
+.PHONY: assets setup tests checks
 
-all: tests love-bundle osx win32 win64
+all: checks tests love-bundle osx win32 win64
 
 clean:
 	rm -rf build
@@ -31,7 +31,7 @@ clean:
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
 
-publish-precheck: tests
+publish-precheck: checks tests
 	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
 publish-status:
@@ -47,6 +47,9 @@ $(DEST)/.setup: .gitmodules
 	git submodule update --init --recursive
 	git submodule update --recursive
 	touch $(@)
+	@which luacheck 1>/dev/null || (echo \
+		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
+		&& false )
 
 assets: $(DEST)/.assets
 $(DEST)/.assets: $(shell find raw_assets -name '*.png')
@@ -57,6 +60,9 @@ $(DEST)/.assets: $(shell find raw_assets -name '*.png')
 # TODO grab the binary out of the appropriate platform version
 tests: setup
 	love $(SRC) --cute-headless
+
+checks: setup
+	find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
 
 run: love-bundle
 	love $(DEST)/love/$(NAME).love

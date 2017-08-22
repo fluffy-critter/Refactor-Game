@@ -12,7 +12,7 @@ notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
 
     local function checkLineCount(text, lines)
-        local width, wrapped = box:getWrappedText(text or "")
+        local _, wrapped = box:getWrappedText(text or "")
         return #wrapped <= lines
     end
 

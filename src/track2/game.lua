@@ -5,13 +5,10 @@ Refactor: 2 - Strangers
 
 ]]
 
-local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
-local input = require('input')
 local imagepool = require('imagepool')
 local fonts = require('fonts')
-local shaders = require('shaders')
 
 local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
@@ -41,7 +38,8 @@ function Game:musicPos()
     return clock.timeToPos(self.music:tell())
 end
 
--- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
+--[[ seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param
+that adjusts it by seconds ]]
 function Game:seekMusic(pos, timeOfs)
     self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
@@ -106,15 +104,14 @@ function Game:update(dt)
         print("phase = " .. self.phase)
         self.phase = time[1]
 
-        if self.phase == 0 then
+        -- if self.phase == 0 then
             -- text format testing
             -- self.textBox = TextBox.new({
             --                 text = "You know you're throwing off the timing of this whole dialog, right?",
-            --                 -- text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.",
             --                 -- cantInterrupt = true
             -- })
             -- self.textBox = TextBox.new({choices={{text="arghl"}}})
-        end
+        -- end
     end
 
     if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
@@ -129,7 +126,11 @@ function Game:update(dt)
 
             local node = self:chooseDialog()
             if node then
-                self.textBox = TextBox.new({text = node.text, cantInterrupt = node.cantInterrupt, onInterrupt = node.onInterrupt})
+                self.textBox = TextBox.new({
+                    text = node.text,
+                    cantInterrupt = node.cantInterrupt,
+                    onInterrupt = node.onInterrupt
+                })
 
                 local game = self
                 self.textBox.onClose = function(textBox)
@@ -145,7 +146,9 @@ function Game:update(dt)
         end
     end
 
-    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) and not (self.textBox and self.textBox.state < TextBox.states.ready) then
+    if self.nextTimeout
+        and not util.arrayLT(time, self.nextTimeout)
+        and not (self.textBox and self.textBox.state < TextBox.states.ready) then
         self.nextTimeout = nil
         if self.textBox then
             self.textBox:close()
@@ -212,8 +215,8 @@ function Game:textFinished(textBox, node)
         local choices = {}
 
         local silence = {}
-        local onClose = function(textBox)
-            if not textBox.selected then
+        local onClose = function(cbox)
+            if not cbox.selected then
                 print("selection timed out")
                 self.npc.silence_cur = (self.npc.silence_cur or 0) + 1
                 self.npc.silence_total = (self.npc.silence_total or 0) + 1
@@ -227,7 +230,7 @@ function Game:textFinished(textBox, node)
             if response[1] then
                 table.insert(choices, {
                     text = response[1],
-                    onSelect = function(choice)
+                    onSelect = function()
                         self:onChoice(response)
                     end
                 })
@@ -308,7 +311,7 @@ function Game:draw()
 
         if self.lyricText then
             local font = fonts.chronoTrigger
-            local width, wrapped = font:getWrap(self.lyricText, 256)
+            local width = font:getWrap(self.lyricText, 256)
 
             love.graphics.setColor(0, 0, 0, 127)
             love.graphics.rectangle("fill", 256 - width - 4, 0, width + 4, 14)

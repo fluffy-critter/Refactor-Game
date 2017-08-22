@@ -9,11 +9,9 @@ retain - whether to retain spawned items (for future killing)
 
 ]]
 
-local util = require('util')
-
 local Spawner = {}
 
-function Spawner.new(game)
+function Spawner.new(game, o)
     local self = o or {}
     setmetatable(self, {__index = Spawner})
 

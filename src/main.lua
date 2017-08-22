@@ -31,7 +31,7 @@ Game instances are expected to have:
 local cute = require('thirdparty.cute')
 
 setmetatable(_G, {
-    __newindex = function(_, name, value)
+    __newindex = function(_, name, _)
         error("attempted to write to global variable " .. name, 2)
     end
 })
@@ -159,6 +159,7 @@ function input.onPress(button)
             menu[menuPos].onSelect()
         elseif button == 'back' or button == 'b' then
             -- TODO parent menu
+            menu = mainmenu
         end
     end
 end
@@ -180,7 +181,7 @@ function love.keypressed(...)
 end
 
 function love.mousepressed(...)
-    local x, y, button, istouch = ...
+    -- local x, y, button, istouch = ...
 
     if Pie then Pie:mousepressed(...) end
 end

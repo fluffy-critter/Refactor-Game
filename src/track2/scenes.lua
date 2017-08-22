@@ -24,9 +24,6 @@ function scenes.kitchen()
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
     local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
 
-    local frameNum = 1
-    local frameTime = 0
-
     local rose = Sprite.new({
         sheet = spriteSheet,
         pos = {120, 112},

@@ -67,7 +67,9 @@ function TextBox:onButtonPress(key)
     end
 
     if key == 'a' then
-        if (self.state < TextBox.states.ready or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime)) and not self.cantInterrupt then
+        if (self.state < TextBox.states.ready
+            or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime))
+            and not self.cantInterrupt then
             self.state = TextBox.states.ready
             self.stateAge = self.minDisplayTime
             self.interrupted = true
@@ -112,7 +114,7 @@ function TextBox:update(dt)
     -- TODO maybe just do this when self.text and/or metrics change?
     self.wrapped = nil
     if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
-        local width, wrapped = self:getWrappedText(self.text)
+        local _, wrapped = self:getWrappedText(self.text)
         self.wrapped = table.concat(wrapped, '\n')
     end
 

@@ -11,7 +11,10 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
         pos = {...}, -- position in the parameter space
         text = "...", -- text displayed by the NPC
         responses = { -- choice box to create afterwards (if nil, just select another dialog)
-            { "responseText", {paramchanges}, "poolChange" } -- text to show (nil = silence), adjustments to the parameter space, name of pool to jump to (optional)
+            { "responseText", {paramchanges}, "poolChange" } --
+                text to show (nil = silence),
+                adjustments to the parameter space,
+                name of pool to jump to (optional)
         },
         setState = "state", -- which state to switch to if we get to this point
         max_count = ..., -- Maximum number of times this fragment can appear (default: 1)
@@ -26,9 +29,11 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
     silence_cur - how many times in a row the player has been silent
     silence_total - how many times the player has been silent in all
 
-Only attributes present in the snippet's position will be considered; any attribute present in the snippet but not in the current position will be treated as 0.
+Only attributes present in the snippet's position will be considered; any attribute present in the snippet but not in
+the current position will be treated as 0.
 
-NOTE: Since this is stored as a module, please don't modify any of the table data within the game. Use sideband data to track stuff.
+NOTE: Since this is stored as a module, please don't modify any of the table data within the game. Use sideband data to
+track stuff.
 
 ]]
 
@@ -267,7 +272,8 @@ local dialog = {
         },
         {
             pos = {interrupted = 20},
-            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%% from now on.%%%.%%%.%%%.%%%.%%%",
+            text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%%"
+                .. " from now on.%%%.%%%.%%%.%%%.%%%",
             cantInterrupt = true
         },
     },

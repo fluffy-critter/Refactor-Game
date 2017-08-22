@@ -45,7 +45,7 @@ function util.enum(...)
 
     setmetatable(enum, {
         -- allows [de]serializing based on value, eg MyEnum(3)
-        __call = function(e, n)
+        __call = function(_, n)
             return enum[vals[n]]
         end
     })
@@ -190,7 +190,8 @@ end
 --[[ Returns a game clock
 BPM - tempo
 
-limits - the limits for each cadence; e.g. {8,4} = 8 measures per phase, 4 beats per measure. Can go as deeply as desired; position array is returned as most-significant first
+limits - the limits for each cadence; e.g. {8,4} = 8 measures per phase, 4 beats per measure.
+    Can go as deeply as desired; position array is returned as most-significant first
 
 ofs - time offset for the start of the clock
 
@@ -200,7 +201,7 @@ timeToPos - converts a numerical position to a position array
 posToTime - converts a position array to a numerical position
 ]]
 function util.clock(BPM, limits, ofs)
-    local ofs = ofs or 0
+    ofs = ofs or 0
 
     local timeToPos = function(time)
         local remaining = (time - ofs)*BPM/60
