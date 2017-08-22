@@ -19,10 +19,10 @@ local input = {
     -- currently pressed buttons
     pressed = {},
 
-    onPress = function(key)
+    onPress = function(--[[key]])
         -- override this to get button/axis press events
     end,
-    onRelease = function(key)
+    onRelease = function(--[[key]])
         -- override this to get button/axis release events
     end,
 }
@@ -102,12 +102,12 @@ local function handleRelease(which, map)
     return event
 end
 
-function love.gamepadpressed(joystick, button)
+function love.gamepadpressed(_, button)
     -- print("gp pressed: " .. button)
     handlePress(button, buttonMap)
 end
 
-function love.gamepadreleased(joystick, button)
+function love.gamepadreleased(_, button)
     -- print("gp released: " .. button)
     handleRelease(button, buttonMap)
 end

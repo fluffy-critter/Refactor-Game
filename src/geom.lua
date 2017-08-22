@@ -22,7 +22,9 @@ function geom.quadsOverlap(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
         (by1 < ay2))
 end
 
---[[ Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with sign based on winding.
+--[[ Find the distance between the point x0,y0 and the projection of the line segment x1,y1 -- x2,y2, with
+sign based on winding.
+
 Outside (positive) is considered to the left of the line (i.e. clockwise winding)
 ]]
 function geom.linePointDistance(x0, y0, x1, y1, x2, y2)
@@ -99,7 +101,9 @@ function geom.pointPointCollision(x1, y1, r1, x2, y2, r2)
     return false
 end
 
--- check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided, displacement vector as {x,y} if it is
+--[[ check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided,
+displacement vector as {x,y} if it is
+]]
 function geom.pointPolyCollision(x, y, r, poly)
     cs:incr('point_poly_test')
 
@@ -110,7 +114,6 @@ function geom.pointPolyCollision(x, y, r, poly)
     y2 = poly[npoints*2]
 
     local dist = {}
-    local proj = {}
 
     local maxSide
     local maxSideDist
@@ -124,7 +127,6 @@ function geom.pointPolyCollision(x, y, r, poly)
         y2 = poly[i*2]
 
         dist[i] = geom.linePointDistance(x, y, x1, y1, x2, y2)
-        proj[i] = geom.projectPointToLine(x, y, x1, y1, x2, y2)
 
         if dist[i] >= r then
             -- We are fully outside on this side, so we are outside
@@ -147,7 +149,8 @@ function geom.pointPolyCollision(x, y, r, poly)
         return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
-    -- we are using the nearest corner instead; fortunately in this case the center of the circle is going to be outside the poly
+    --[[ we are using the nearest corner instead; fortunately in this case the center of the circle is
+    going to be outside the poly ]]
     local cornerX, cornerY
     local cornerDist2
     for i = 1, npoints do

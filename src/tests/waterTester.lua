@@ -45,7 +45,7 @@ function waterTester:init()
     self.phase = 0
 end
 
-function waterTester:keypressed(key, code, isRepeat)
+function waterTester:keypressed(key)
     if key == 'q' then
         self.params.damp = self.params.damp + 0.001
     elseif key == 'a' then

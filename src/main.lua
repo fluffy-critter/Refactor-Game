@@ -29,7 +29,7 @@ Game instances are expected to have:
 ]]
 
 setmetatable(_G, {
-    __newindex = function(_, name, value)
+    __newindex = function(_, name, _)
         error("attempted to write to global variable " .. name, 2)
     end
 })
@@ -138,7 +138,7 @@ function love.keypressed(...)
 end
 
 function love.mousepressed(...)
-    local x, y, button, istouch = ...
+    -- local x, y, button, istouch = ...
 
     if Pie then Pie:mousepressed(...) end
 end

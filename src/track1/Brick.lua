@@ -141,11 +141,13 @@ function Brick:draw()
     love.graphics.setBlendMode(self.blendMode)
 
     if self.state == Brick.states.spawning then
-        love.graphics.setColor(self.color[1], self.color[2], self.color[3], (self.color[4] or 255) * self.stateAge / self.spawnTime)
+        love.graphics.setColor(self.color[1], self.color[2], self.color[3],
+            (self.color[4] or 255) * self.stateAge / self.spawnTime)
     elseif self.state == Brick.states.alive or self.state == Brick.states.hit then
         love.graphics.setColor(unpack(self.color))
     elseif self.state == Brick.states.dying then
-        love.graphics.setColor(self.deathColor[1], self.deathColor[2], self.deathColor[3], (self.color[4] or 255) * (1 - self.stateAge / self.spawnTime))
+        love.graphics.setColor(self.deathColor[1], self.deathColor[2], self.deathColor[3],
+            (self.color[4] or 255) * (1 - self.stateAge / self.spawnTime))
     end
 
     love.graphics.polygon("fill", self:getPolygon())

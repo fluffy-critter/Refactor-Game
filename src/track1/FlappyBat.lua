@@ -78,7 +78,7 @@ function FlappyBat:isAlive()
     return self.state ~= FlappyBat.states.dead
 end
 
-function FlappyBat:preUpdate(dt, rawt)
+function FlappyBat:preUpdate(_, rawt)
     self.stateAge = self.stateAge + rawt
 
     if self.state == FlappyBat.states.spawning and self.stateAge > self.spawnTime then
@@ -169,7 +169,7 @@ function FlappyBat:onHitBall(nrm, ball)
 
     local nx, ny = unpack(nrm)
     self.vx = self.vx - self.rebound*nx*ball.r*ball.r/self.r/self.r
-    self.vy = self.vy - self.rebound*nx*ball.r*ball.r/self.r/self.r
+    self.vy = self.vy - self.rebound*ny*ball.r*ball.r/self.r/self.r
 
     self.lives = self.lives - 1
     if self.lives < 1 then

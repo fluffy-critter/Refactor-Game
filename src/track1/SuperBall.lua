@@ -57,7 +57,7 @@ function SuperBall:onStart()
     self.y = self.game.paddle.y + ty*(self.r + self.game.paddle.h)
 end
 
-function SuperBall:onHitActor(nrm, actor)
+function SuperBall:onHitActor(_, _)
     -- just barrel on through, getting slightly faster
     self.vx = self.vx*self.elasticity
     self.vy = self.vy*self.elasticity
@@ -71,7 +71,7 @@ function SuperBall:preUpdate(dt)
     self.particleTime = self.particleTime + dt
     if self.particleTime > self.particleInterval then
         local particleCount = math.floor(self.particleTime/self.particleInterval)*self.particleCount
-        for i=1,particleCount do
+        for _=1,particleCount do
             local vx, vy = unpack(geom.randomVector(self.particleVelocity))
 
             table.insert(self.game.particles,
