@@ -48,7 +48,7 @@ local keyboardMap = {
     d = 'right',
 
     p = 'start',
-    esc = 'back',
+    escape = 'back',
     f = 'fullscreen',
 
     ['return'] = 'a',

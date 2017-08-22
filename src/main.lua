@@ -142,6 +142,8 @@ function input.onPress(button)
             screen.resumeMusic = false
         end
         love.window.setFullscreen(not love.window.getFullscreen())
+    elseif currentGame and button == 'back' then
+        playing.state = PlayState.ending
     elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     elseif not currentGame then
@@ -154,7 +156,7 @@ function input.onPress(button)
         elseif button == 'a' or button == 'start' then
             menu[menuPos].onSelect()
         elseif button == 'back' or button == 'b' then
-            -- TODO 'go back' action
+            -- TODO parent menu
         end
     end
 end
@@ -253,8 +255,13 @@ function love.update(dt)
 
     if currentGame and currentGame.gameOver then
         playing.state = PlayState.ending
+    end
+
+    if playing.state == PlayState.ending then
         playing.fade = playing.fade - dt/2
+        currentGame.music:setVolume(playing.fade)
         if playing.fade <= 0 then
+            currentGame.music:stop()
             currentGame = nil
             playing.state = PlayState.menu
         end
