@@ -67,12 +67,11 @@ local buttonMap = {
     dpright = 'right',
 
     a = 'a',
-    x = 'b',
+    b = 'b',
+    x = 'x',
+    y = 'y',
 
-    b = 'back',
     back = 'back',
-
-    y = 'start',
     start = 'start',
 
     rightshoulder = 'skip'

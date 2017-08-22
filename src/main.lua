@@ -360,7 +360,7 @@ function love.draw()
         end
 
         local bg = imagepool.load('mainmenu/forest-stuff.png')
-        local scale = math.min(1, w/bg:getWidth(), h*1.2/bg:getHeight())
+        local scale = math.min(w/bg:getWidth(), h*1.2/bg:getHeight())
         love.graphics.draw(bg, (w - bg:getWidth()*scale)/2, 0, 0, scale, scale)
 
         local logo = imagepool.load('mainmenu/refactor-released.png')
