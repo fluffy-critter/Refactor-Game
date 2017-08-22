@@ -5,6 +5,13 @@ simple animated sprite class
 
 (c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 
+Sprite has the following properties:
+
+sheet - the image that is referenced as the spritesheet
+frame - the quad that represents the current frame in the spritesheet
+animation - nil, or a sequence of {frame, duration} pairs
+animSpeed - speed multiplier on the animation
+
 ]]
 
 local util = require('util')
@@ -17,7 +24,8 @@ function Sprite.new(o)
 
     util.applyDefaults(self, {
         frameTime = 0,
-        frameNum = 1
+        frameNum = 1,
+        animSpeed = 1
     })
 
     return self
@@ -29,7 +37,7 @@ function Sprite:update(dt)
             self.frameNum = 1
         end
 
-        self.frameTime = self.frameTime + dt
+        self.frameTime = self.frameTime + dt*self.animSpeed
         if self.frameTime > self.animation[self.frameNum][2] then
             self.frameTime = 0
             self.frameNum = self.frameNum + 1
