@@ -165,7 +165,6 @@ function Game:init()
     end
 
     util.applyDefaults(self.paddle, self.paddleDefaults)
-    local paddle = self.paddle
 
     self.particles = {}
     self.actors = {}
@@ -180,8 +179,8 @@ function Game:init()
         minVelocity = 0,
         preUpdate = function(ball, dt)
             Ball.preUpdate(ball, dt)
-            ball.vx = ball.vx + dt*(paddle.x - ball.x)
-            ball.vy = ball.vy + dt*(paddle.y - ball.y)
+            ball.vx = ball.vx + dt*(self.paddle.x - ball.x)
+            ball.vy = ball.vy + dt*(self.paddle.y - ball.y)
         end,
         onHitPaddle = function(ball, nrm, paddle)
             ball.minVelocity = 50
@@ -229,29 +228,34 @@ end
 function Game:setGameEvents()
     local function brickLivesColor(lives)
         local brt = math.random()*0.1 + 0.9
-        return {util.lerp(128, 255, lives/5)*brt, util.lerp(240, 128, lives/5)*brt, util.lerp(255, 192, lives/5)*brt, 255}
+        return {
+            util.lerp(128, 255, lives/5)*brt,
+            util.lerp(240, 128, lives/5)*brt,
+            util.lerp(255, 192, lives/5)*brt,
+            255
+        }
     end
 
     local spawnFuncs = {
         balls = {
             regular = function(count, lives)
-                for i=1,count or 5 do
+                for _=1,count or 5 do
                     table.insert(self.balls, Ball.new(self, {lives=lives or 3}))
                 end
             end,
             bouncy = function(count,lives)
-                for i =1,count or 5 do
+                for _=1,count or 5 do
                     table.insert(self.balls, Ball.new(self, {
                         r = 4,
                         elasticity = 0.9,
                         color = {255, 255, 128, 255},
                         hitColor = {255, 255, 0, 128},
                         beatSync = 0.5,
-                        onStart = function(self)
-                            Ball.onStart(self)
-                            self.ay = 600
-                            self.vx = 0
-                            self.vy = 0
+                        onStart = function(ball)
+                            Ball.onStart(ball)
+                            ball.ay = 600
+                            ball.vx = 0
+                            ball.vy = 0
                         end,
                         lives = lives or 6
                     }))
@@ -291,7 +295,6 @@ function Game:setGameEvents()
                 local bottom = top + 10 * h
                 for row = 0, 5 do
                     local y = top + row * h
-                    local y2 = bottom - (w - top)
                     local last = right
                     if row == 5 then
                         last = (left + right)/2
@@ -352,10 +355,10 @@ function Game:setGameEvents()
                         end
 
                         nexty = y + 4*h
-                        for y = y + h, nexty - 1, h do
+                        for by = y + h, nexty - 1, h do
                             table.insert(bricks, {
                                 color = brickLivesColor(lives),
-                                x = xstart, y = y, w = w, h = h, lives = lives
+                                x = xstart, y = by, w = w, h = h, lives = lives
                             })
                         end
                     end
@@ -458,7 +461,7 @@ function Game:setGameEvents()
             eyes = {
                 minions = function(count, kill)
                     local spawns = {}
-                    for i = 1,count do
+                    for _ = 1,count do
                         table.insert(spawns, {
                             r = 32,
                             lives = 5,
@@ -485,7 +488,7 @@ function Game:setGameEvents()
             },
             flappyBat = function(count, kill)
                 local spawns = {}
-                for i = 1,count do
+                for _ = 1,count do
                     table.insert(spawns, {})
                 end
                 self.spawner:spawn({self.actors, kill and self.toKill}, FlappyBat, spawns, 30/BPM, 1)
@@ -495,7 +498,7 @@ function Game:setGameEvents()
 
     local timeFuncs = {
         judder = function(time)
-            local phase, measure, beat = unpack(time)
+            local _, _, beat = unpack(time)
 
             -- each group of stabs is on the two-beat boundary
             local offset = beat % 2
@@ -506,7 +509,7 @@ function Game:setGameEvents()
             return 2*(.75 - stabOfs)
         end,
         ramp = function(time)
-            local phase, measure, beat = unpack(time)
+            local _, _, beat = unpack(time)
             return 1.5*(1 - beat % 1)
         end
     }
@@ -757,7 +760,7 @@ function Game:runEvents(time)
     end
 end
 
-function Game:update(dt)
+function Game:update(raw_dt)
     local p = self.paddle
     local b = self.bounds
 
@@ -798,9 +801,7 @@ function Game:update(dt)
         end
     end
 
-    -- TODO: timeline judder
-
-    self.spawner:update(dt)
+    self.spawner:update(raw_dt)
 
     local function physicsUpdate(dt)
         if p.stunned > 0 then
@@ -906,9 +907,9 @@ function Game:update(dt)
         end
     end
 
-    for i = 1, 8 do
+    for _ = 1, 8 do
         -- TODO maybe slide this based on framerate and/or precision issues
-        physicsUpdate(dt/8)
+        physicsUpdate(raw_dt/8)
     end
 
     -- experiment: synchronize the balls so that their velocities bring them to the paddle on a beat
@@ -965,7 +966,7 @@ function Game:update(dt)
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
                 damp = self.waterParams.damp,
                 fluidity = self.waterParams.fluidity,
-                dt = self.waterParams.timeStep*math.min(dt, 1/30)
+                dt = self.waterParams.timeStep*math.min(raw_dt, 1/30)
             })
     end
 end
@@ -983,7 +984,8 @@ function Game:draw()
         love.graphics.setColor(192, 255, 255, 20)
         love.graphics.rectangle("fill", 0, 0, 1280, self.bounds.top)
         love.graphics.rectangle("fill", 0, self.bounds.top, self.bounds.left, self.bounds.bottom - self.bounds.top)
-        love.graphics.rectangle("fill", self.bounds.right, self.bounds.top, 1280 - self.bounds.right, self.bounds.bottom - self.bounds.top)
+        love.graphics.rectangle("fill", self.bounds.right, self.bounds.top,
+            1280 - self.bounds.right, self.bounds.bottom - self.bounds.top)
 
         -- draw the paddle
         local p = self.paddle

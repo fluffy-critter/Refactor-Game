@@ -45,7 +45,7 @@ function util.enum(...)
 
     setmetatable(enum, {
         -- allows [de]serializing based on value, eg MyEnum(3)
-        __call = function(e, n)
+        __call = function(_, n)
             return enum[n]
         end
     })
