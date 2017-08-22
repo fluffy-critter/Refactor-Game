@@ -21,7 +21,7 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 .PHONY: clean all
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: love-bundle osx win32 win64
-.PHONY: assets setup
+.PHONY: assets setup tests checks
 
 all: love-bundle osx win32 win64
 
@@ -47,12 +47,21 @@ $(DEST)/.setup: .gitmodules
 	git submodule update --init --recursive
 	git submodule update --recursive
 	touch $(@)
+	@which luacheck 1>/dev/null || (echo \
+		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
+		&& false )
 
 assets: $(DEST)/.assets
 $(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
 	mkdir -p $(DEST)
 	./update-art.sh
 	touch $(@)
+
+checks:
+	find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
+
+run: love-bundle
+	love $(DEST)/love/$(NAME).love
 
 # .love bundle
 love-bundle: setup $(DEST)/love/$(NAME).love
