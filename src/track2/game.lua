@@ -116,7 +116,6 @@ function Game:update(dt)
         end
     end
 
-    -- TODO don't make new text selections after {12,3}
     if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
         print("advancing dialog")
         self.nextDialog = nil
@@ -186,6 +185,11 @@ function Game:getNextDialog()
     local nextPos = clock.timeToPos(nextTime)
 
     print("now=" .. table.concat(now,':') .. " nextDialog=" .. table.concat(nextPos,':'))
+
+    if not util.arrayLT(nextPos, {12,3}) then
+        -- no dialog after 12:3:0
+        return nil
+    end
 
     return nextPos
 end

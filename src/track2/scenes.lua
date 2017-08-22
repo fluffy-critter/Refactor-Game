@@ -8,75 +8,74 @@ Refactor: 2 - Strangers
 local imagepool = require('imagepool')
 local quadtastic = require('thirdparty.libquadtastic')
 
+local Sprite = require('track2.Sprite')
+
 local scenes = {}
 
-local function loadSprites()
-    local spriteSheet = imagepool.load('track2/sprites.png')
+local function loadSprites(imageFile, quadFile)
+    local spriteSheet = imagepool.load(imageFile)
     spriteSheet:setFilter('nearest')
-    local quads = quadtastic.create_quads(require('track2.sprites'), spriteSheet:getWidth(), spriteSheet:getHeight())
+    local quads = quadtastic.create_quads(require(quadFile), spriteSheet:getWidth(), spriteSheet:getHeight())
     return spriteSheet, quads
 end
 
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites()
+    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
 
     local frameNum = 1
     local frameTime = 0
 
-    local rose = {
+    local rose = Sprite.new({
         sheet = spriteSheet,
         pos = {120, 112},
-        frame = quads.rose_kitchen
-    }
+        frame = quads.rose.kitchen
+    })
 
-    local greg = {
+    local greg = Sprite.new({
         sheet = spriteSheet,
         pos = {217, 0},
-        animation = nil,
         animations = {
             walk_down = {
-                {quads.greg_down_0, .25},
-                {quads.greg_down_1, .25},
-                {quads.greg_down_0, .25},
-                {quads.greg_down_2, .25},
+                {quads.greg.down[1], .25},
+                {quads.greg.down[2], .25},
+                {quads.greg.down[1], .25},
+                {quads.greg.down[3], .25},
             }
         },
-        frameTime = 0,
-        frameNum = 0,
-        frame = quads.greg_down_0
-    }
+        frame = quads.greg.down[1]
+    })
+    greg.animation = greg.animations.walk_down
 
     return {
         frames = quads,
         rose = rose,
         greg = greg,
-        sprites = {rose, greg},
+
+        layers = {
+            {sheet = backgroundLayer},
+            greg,
+            {sheet = foregroundLayer},
+            rose
+        },
 
         update = function(self, dt)
-            for _,sprite in pairs(self.sprites) do
-                if sprite.animation then
-                    sprite.frameTime = sprite.frameTime + dt
-                    if sprite.frameTime > sprite.animation[frameNum][2] then
-                        sprite.frameTime = 0
-                        sprite.frameNum = sprite.frameNum + 1
-                        if sprite.frameNum > #sprite.animation then
-                            sprite.frameNum = 1
-                        end
-                        sprite.frame = sprite.animation[sprite.frameNum][1]
-                    end
+            for _,layer in ipairs(self.layers) do
+                if layer.update then
+                    layer:update(dt)
                 end
             end
         end,
+
         draw = function(self)
-            love.graphics.draw(backgroundLayer)
-
-            for _,sprite in pairs(self.sprites) do
-                love.graphics.draw(sprite.sheet, sprite.frame, unpack(sprite.pos))
+            for _,thing in ipairs(self.layers) do
+                if thing.frame then
+                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
+                else
+                    love.graphics.draw(thing.sheet, unpack(thing.pos or {}))
+                end
             end
-
-            love.graphics.draw(foregroundLayer)
         end
     }
 end
