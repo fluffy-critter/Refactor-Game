@@ -81,15 +81,15 @@ function Actor:getPolygon()
     return nil
 end
 
-function Actor:preUpdate(dt)
+function Actor:preUpdate(--[[dt]])
     -- no default
 end
 
-function Actor:postUpdate(dt)
+function Actor:postUpdate(--[[dt]])
     -- no default
 end
 
-function Actor:isTangible(ball)
+function Actor:isTangible(--[[ball]])
     return true
 end
 
@@ -97,7 +97,7 @@ function Actor:isAlive()
     return true
 end
 
-function Actor:onHitBall(nrm, ball)
+function Actor:onHitBall(--[[nrm, ball]])
     return false
 end
 

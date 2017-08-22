@@ -8,7 +8,6 @@ Refactor: 1 - Little Bouncing Ball
 local Ball = require('track1.Ball')
 local SuperBall = require('track1.SuperBall')
 
-local HitParticle = require('track1.HitParticle')
 local SparkParticle = require('track1.SparkParticle')
 
 local Randomizer = require('track1.Randomizer')
@@ -22,7 +21,6 @@ local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
-local imagepool = require('imagepool')
 local fonts = require('fonts')
 
 local Game = {
@@ -55,7 +53,9 @@ function Game:musicPos()
     return {phase, measure, beat}
 end
 
--- seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param that adjusts it by seconds
+--[[ seeks the music to a particular spot, using the same format as musicPos(),
+with an additional timeOfs param that adjusts it by seconds
+]]
 function Game:seekMusic(phase, measure, beat, timeOfs)
     local time = (phase or 0)
     time = time*16 + (measure or 0)
@@ -178,26 +178,26 @@ function Game:init()
         hitColor = {0, 128, 128, 255},
         ay = 30,
         minVelocity = 0,
-        preUpdate = function(self, dt)
-            Ball.preUpdate(self, dt)
-            self.vx = self.vx + dt*(paddle.x - self.x)
-            self.vy = self.vy + dt*(paddle.y - self.y)
+        preUpdate = function(ball, dt)
+            Ball.preUpdate(ball, dt)
+            ball.vx = ball.vx + dt*(paddle.x - ball.x)
+            ball.vy = ball.vy + dt*(paddle.y - ball.y)
         end,
-        onHitPaddle = function(self, nrm, paddle)
-            self.minVelocity = 50
-            self.preUpdate = Ball.preUpdate
-            self.onHitPaddle = Ball.onHitPaddle
-            self.onStart = Ball.onStart
-            self:onHitPaddle(nrm, paddle)
-            self.game:setPhase(0)
+        onHitPaddle = function(ball, nrm, paddle)
+            ball.minVelocity = 50
+            ball.preUpdate = Ball.preUpdate
+            ball.onHitPaddle = Ball.onHitPaddle
+            ball.onStart = Ball.onStart
+            ball:onHitPaddle(nrm, paddle)
+            self:setPhase(0)
         end,
-        onStart = function(self)
-            Ball.onStart(self)
-            self.vx = 0
-            self.vy = 0
+        onStart = function(ball)
+            Ball.onStart(ball)
+            ball.vx = 0
+            ball.vy = 0
         end,
-        onLost = function(self)
-            self.ay = math.min(self.ay + 30, 150)
+        onLost = function(ball)
+            ball.ay = math.min(ball.ay + 30, 150)
         end
     })
 
