@@ -15,6 +15,7 @@ local shaders = require('shaders')
 
 local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
+local scenes = require('track2.scenes')
 
 local Game = {
     META = {
@@ -59,7 +60,7 @@ function Game:init()
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
     self.border =imagepool.load('track2/border.png')
-    self.background = imagepool.load('track2/kitchen.png')
+    self.scene = scenes.kitchen()
 
     self.lyrics = require('track2.lyrics')
     self.lyricPos = 1
@@ -124,6 +125,8 @@ function Game:update(dt)
             self.textBox = self.nextChoices
             self.nextChoices = nil
         else
+            self.npc.phase = time[1] + time[2]/4 + time[3]/16
+
             local node = self:chooseDialog()
             if node then
                 self.textBox = TextBox.new({text = node.text, cantInterrupt = node.cantInterrupt, onInterrupt = node.onInterrupt})
@@ -154,6 +157,10 @@ function Game:update(dt)
         if not self.textBox:isAlive() then
             self.textBox = nil
         end
+    end
+
+    if self.scene then
+        self.scene:update(dt)
     end
 
     if util.arrayLT({17,1,0}, time) then
@@ -253,9 +260,6 @@ end
 function Game:chooseDialog()
     local minDistance, minNode
 
-    local now = self:musicPos()
-    self.npc.phase = now[1] + now[2]/4 + now[3]/16
-
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
@@ -285,10 +289,10 @@ function Game:draw()
 
         love.graphics.setBlendMode("alpha")
 
-        -- TODO draw scene
         if self.phase < 17 then
             love.graphics.setColor(255, 255, 255)
-            love.graphics.draw(self.background, 0, 0)
+
+            self.scene:draw()
 
             love.graphics.draw(self.border)
         end
