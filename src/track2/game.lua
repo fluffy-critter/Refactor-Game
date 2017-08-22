@@ -331,7 +331,8 @@ function Game:draw()
 
         love.graphics.setFont(fonts.debug)
         love.graphics.setColor(255,255,0)
-        love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos())))
+        love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
+            .. ' ' .. self.dialogState)
     end)
 
     self.scaled:renderTo(function()

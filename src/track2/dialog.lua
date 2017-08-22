@@ -450,6 +450,8 @@ local dialog = {
 
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: last_night" },
+
         {
             pos = {concern = 10},
             text = "Wait... you ACTUALLY don't know who I am?",
@@ -474,6 +476,8 @@ local dialog = {
 
     -- path where Greg has determined Rose is having brain problems
     brain_problems = {
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: brain_problems" },
+
         {
             pos = {phase = 10},
             text = "Ha ha ha, okay, this...%%% this explains so much...",
@@ -483,6 +487,8 @@ local dialog = {
 
     -- path where Greg is feeling alienated
     alienated = {
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: alienated" },
+
         {
             pos = {phase = 10},
             text = "Ha ha, wow, this is just... what the hell is going on here.",
@@ -514,6 +520,8 @@ local dialog = {
 
     -- path where Greg has given up on helping Rose
     gave_up = {
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: gave_up" },
+
         {
             pos = {phase = 12},
             text = "What does it matter? You won't even remember this anyway."
@@ -577,6 +585,5 @@ local dialog = {
     },
 
  }
-
 
 return dialog
