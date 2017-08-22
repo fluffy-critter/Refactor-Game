@@ -49,7 +49,7 @@ $(DEST)/.setup: .gitmodules
 	touch $(@)
 
 assets: $(DEST)/.assets
-$(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
+$(DEST)/.assets: $(shell find raw_assets -name '*.png')
 	mkdir -p $(DEST)
 	./update-art.sh
 	touch $(@)
@@ -80,6 +80,7 @@ $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/dep
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
 	cp osx/Info.plist $(@)/Contents && \
+	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love/$(NAME).love $(@)/Contents/Resources
 
 publish-osx: $(DEST)/.published-osx

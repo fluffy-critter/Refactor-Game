@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo "Someday this will build assets"
+echo "Someday this will build assets (maybe)"
