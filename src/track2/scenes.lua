@@ -20,38 +20,61 @@ end
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local sprite, quads = loadSprites()
+    local spriteSheet, quads = loadSprites()
 
-    local downAnimation = {
-        {quads.greg_down_0, .25},
-        {quads.greg_down_1, .25},
-        {quads.greg_down_0, .25},
-        {quads.greg_down_2, .25},
-    }
     local frameNum = 1
     local frameTime = 0
 
+    local rose = {
+        sheet = spriteSheet,
+        pos = {120, 112},
+        frame = quads.rose_kitchen
+    }
+
+    local greg = {
+        sheet = spriteSheet,
+        pos = {217, 0},
+        animation = nil,
+        animations = {
+            walk_down = {
+                {quads.greg_down_0, .25},
+                {quads.greg_down_1, .25},
+                {quads.greg_down_0, .25},
+                {quads.greg_down_2, .25},
+            }
+        },
+        frameTime = 0,
+        frameNum = 0,
+        frame = quads.greg_down_0
+    }
+
     return {
-        rosePos = {120, 112},
-        gregPos = {217, 0},
+        frames = quads,
+        rose = rose,
+        greg = greg,
+        sprites = {rose, greg},
 
         update = function(self, dt)
-            frameTime = frameTime + dt
-            if frameTime > downAnimation[frameNum][2] then
-                frameTime = 0
-                frameNum = frameNum + 1
-                if frameNum > #downAnimation then
-                    frameNum = 1
+            for _,sprite in pairs(self.sprites) do
+                if sprite.animation then
+                    sprite.frameTime = sprite.frameTime + dt
+                    if sprite.frameTime > sprite.animation[frameNum][2] then
+                        sprite.frameTime = 0
+                        sprite.frameNum = sprite.frameNum + 1
+                        if sprite.frameNum > #sprite.animation then
+                            sprite.frameNum = 1
+                        end
+                        sprite.frame = sprite.animation[sprite.frameNum][1]
+                    end
                 end
             end
-
-            self.gregPos[2] = self.gregPos[2] + dt*8
         end,
         draw = function(self)
             love.graphics.draw(backgroundLayer)
 
-            love.graphics.draw(sprite, quads.rose_kitchen, unpack(self.rosePos))
-            love.graphics.draw(sprite, downAnimation[frameNum][1], unpack(self.gregPos))
+            for _,sprite in pairs(self.sprites) do
+                love.graphics.draw(sprite.sheet, sprite.frame, unpack(sprite.pos))
+            end
 
             love.graphics.draw(foregroundLayer)
         end
