@@ -27,6 +27,7 @@ local fonts = require('fonts')
 
 local Game = {
     META = {
+        tracknum = 1,
         title = "little bouncing ball",
         duration = 5*60 + 26
     }

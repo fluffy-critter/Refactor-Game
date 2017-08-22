@@ -45,6 +45,8 @@ local input = require('input')
 local fonts = require('fonts')
 local imagepool = require('imagepool')
 
+local baseTitle = "Sockpuppet - Refactor"
+
 local Pie
 if PROFILE then
     local piefiller = require('thirdparty.piefiller')
@@ -102,7 +104,7 @@ local screen = {
 
 local function startGame(game)
     currentGame = game.new()
-    love.window.setTitle(currentGame.META.title)
+    love.window.setTitle(baseTitle .. ": " .. currentGame.META.title)
     playing.state = PlayState.starting
 end
 
@@ -191,7 +193,11 @@ function love.load(args)
 
     for n,track in ipairs(tracks) do
         mainmenu[n] = {
-            label = n .. ". " .. track.META.title,
+            label = string.format("%d. %s (%d:%d)",
+                track.META.tracknum,
+                track.META.title,
+                track.META.duration / 60,
+                track.META.duration % 60),
             onSelect = function()
                 startGame(track)
             end
@@ -263,6 +269,7 @@ function love.update(dt)
         if playing.fade <= 0 then
             currentGame.music:stop()
             currentGame = nil
+            love.window.setTitle(baseTitle)
             playing.state = PlayState.menu
         end
     end
@@ -345,6 +352,7 @@ function love.draw()
         love.graphics.setShader()
     else
         love.graphics.clear(0,0,0)
+        love.graphics.setBlendMode("alpha")
 
         -- draw menu
         local w = love.graphics:getWidth()
@@ -373,9 +381,12 @@ function love.draw()
         local y = 0
         for n,item in ipairs(menu) do
             if n == menuPos then
-                love.graphics.print(">", 0, y)
+                love.graphics.setColor(255,255,255,255)
+                love.graphics.print(">", 8, y + 8)
+            else
+                love.graphics.setColor(200,200,200,255)
             end
-            love.graphics.print(item.label, 16, y)
+            love.graphics.print(item.label, 24, y + 8)
 
             y = y + font:getHeight()
         end

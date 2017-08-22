@@ -19,7 +19,8 @@ local scenes = require('track2.scenes')
 
 local Game = {
     META = {
-        title = "strangers",
+        tracknum = 2,
+        title = "strangers [INCOMPLETE]",
         duration = 3*60 + 11
     }
 }
