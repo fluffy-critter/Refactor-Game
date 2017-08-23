@@ -8,7 +8,7 @@ Refactor: 2 - Strangers
 local cute = require('thirdparty.cute')
 local util = require('util')
 local notion = cute.notion
--- local check = cute.check
+local check = cute.check
 -- local minion = cute.minion
 -- local report = cute.report
 
@@ -120,31 +120,6 @@ local function generateDotFile()
     local queue = {startState}
     local visited = {}
 
-    local seen = {}
-    local function wasSeen(state)
-        local function compare(s1, s2)
-            if s1.node ~= s2.node then
-                return false
-            end
-            for k,v in pairs(s1.npc) do
-                if v ~= s2.npc[k] or 0 then
-                    return false
-                end
-            end
-            for k,v in pairs(s2.npc) do
-                if v ~= s1.npc[k] or 0 then
-                    return false
-                end
-            end
-            return true
-        end
-        for _,prior in ipairs(seen) do
-            if compare(prior, state) then
-                return true
-            end
-        end
-    end
-
     local links = {}
 
     local floop = 0
@@ -171,8 +146,6 @@ local function generateDotFile()
         local node = (from.npc.phase < 13) and game.chooseDialog(here)
 
         if node then
-            table.insert(seen, clone(from))
-
             visited[node] = (visited[node] or 0) + 1
 
             local postCounts = 0
@@ -257,7 +230,7 @@ end
 
 notion("dialog coverage", function()
     -- change to false when we want to generate dialog coverage
-    if true then
+    if true or false then
         return
     end
 
@@ -279,5 +252,5 @@ notion("dialog coverage", function()
         print("Not visited: " .. missing)
     end
 
-    check(#missing).is(0)
+    check(#unvisited).is(0)
 end)
