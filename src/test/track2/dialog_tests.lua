@@ -16,6 +16,9 @@ local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
 local Game = require('track2.game')
 
+-- whether to check dialog coverage
+local CheckCoverage = false
+
 notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
 
@@ -229,8 +232,7 @@ local function generateDotFile()
 end
 
 notion("dialog coverage", function()
-    -- change to false when we want to generate dialog coverage
-    if true or false then
+    if not CheckCoverage then
         return
     end
 
