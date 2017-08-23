@@ -28,8 +28,6 @@ Game instances are expected to have:
 
 ]]
 
-local cute = require('thirdparty.cute')
-
 setmetatable(_G, {
     __newindex = function(_, name, _)
         error("attempted to write to global variable " .. name, 2)
@@ -38,6 +36,8 @@ setmetatable(_G, {
 
 local PROFILE = false
 local DEBUG = false
+
+local cute = require('thirdparty.cute')
 
 local shaders = require('shaders')
 local util = require('util')
@@ -106,6 +106,8 @@ local function startGame(game)
     currentGame = game.new()
     love.window.setTitle(baseTitle .. ": " .. currentGame.META.title)
     playing.state = PlayState.starting
+    playing.speed = 1.0
+    playing.fade = 0
 end
 
 local menu

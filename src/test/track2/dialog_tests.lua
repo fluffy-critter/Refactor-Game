@@ -5,6 +5,12 @@ Refactor: 2 - Strangers
 
 ]]
 
+local cute = require('thirdparty.cute')
+local notion = cute.notion
+local check = cute.check
+local minion = cute.minion
+local report = cute.report
+
 local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
 

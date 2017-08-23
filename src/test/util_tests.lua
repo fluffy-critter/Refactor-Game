@@ -1,6 +1,12 @@
+local cute = require('thirdparty.cute')
+local notion = cute.notion
+local check = cute.check
+local minion = cute.minion
+local report = cute.report
+
 local util = require('util')
 
-notion("Enums thing the thing", function()
+notion("Enums form an appropriate equivalence class", function()
     local myEnum = util.enum("first", "second", "third")
 
     check(myEnum.first.val).is(1)
@@ -19,7 +25,7 @@ notion("Enums thing the thing", function()
     check(myEnum.third == myEnum(3)).is(true)
 end)
 
-notion("Enums sort lexically", function()
+notion("Enums compare correctly", function()
     local myEnum = util.enum("first", "second", "third")
 
     check(myEnum.second < myEnum.first).is(false)
@@ -41,6 +47,10 @@ notion("Enums sort lexically", function()
     check(myEnum.second > myEnum.first).is(true)
     check(myEnum.second > myEnum.second).is(false)
     check(myEnum.second > myEnum.third).is(false)
+
+    check(myEnum.second ~= myEnum.first).is(true)
+    check(myEnum.second ~= myEnum.second).is(false)
+    check(myEnum.second ~= myEnum.third).is(true)
 end)
 
 notion("applyDefaults works right", function()

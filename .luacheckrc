@@ -1,2 +1,2 @@
-globals = {"notion", "check", "os", "math", "love"}
+globals = {"os", "math", "love"}
 self = false

@@ -24,13 +24,13 @@ function shaders.load(filename)
 
     -- TODO this isn't quite LRU behavior but eh, good enough?
     for idx,used in ipairs(shaders.lru) do
-        if used == img then
+        if used == shader then
             local last = #shaders.lru
             shaders.lru[idx] = shaders.lru[last]
             table.remove(shaders.lru, last)
         end
     end
-    table.insert(shaders.lru, img)
+    table.insert(shaders.lru, shader)
     while #shaders.lru > 5 do
         table.remove(shaders.lru, 1)
     end
