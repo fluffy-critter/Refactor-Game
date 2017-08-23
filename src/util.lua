@@ -273,6 +273,10 @@ end
 
 -- Shallow copy a table
 function util.shallowCopy(tbl)
+    if type(tbl) ~= "table" then
+        return tbl
+    end
+
     local ret = {}
     for k,v in pairs(tbl) do
         ret[k] = v

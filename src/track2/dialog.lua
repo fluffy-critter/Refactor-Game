@@ -173,7 +173,7 @@ local dialog = {
             responses = {
                 {"What is?", {}, "normal"},
                 {"Sorry, do I know you?", {concern=3}, "brain_problems"},
-                {""}
+                {"I'm sorry.", {concern=5, confused=3, defense=-5}}
             }
         },
         {

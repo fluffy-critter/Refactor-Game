@@ -6,6 +6,7 @@ Refactor: 2 - Strangers
 ]]
 
 local cute = require('thirdparty.cute')
+local util = require('util')
 local notion = cute.notion
 -- local check = cute.check
 -- local minion = cute.minion
@@ -78,21 +79,34 @@ local function generateDotFile()
         end
     end
 
-    local function clone(tbl)
-        if type(tbl) ~= "table" then
-            return tbl
-        end
-
+    local function clone(state)
         local ret = {}
-        for k,v in pairs(tbl) do
-            if type(v) == "table" and k ~= "from" then
-                ret[k] = clone(v)
-            else
-                ret[k] = v
-            end
+        for k,v in pairs(state) do
+            ret[k] = (k ~= "from") and util.shallowCopy(v) or v
         end
 
         return ret
+    end
+
+    local function printState(state)
+        print(" node=" .. tostring(state.from))
+        if state.from then
+            print("    text=" .. state.from.text)
+            print("    pos=" .. (state.from.pos and posToStr(state.from.pos) or "nil"))
+        end
+        print(" state=" .. state.dialogState)
+        print(" dialogCounts=" .. tostring(state.dialogCounts))
+        for k,v in pairs(state.dialogCounts) do
+            print("   " .. tostring(k) .. ": " .. v)
+        end
+        print(" npc=" .. tostring(state.npc))
+        for k,v in pairs(state.npc) do
+            print("   " .. k .. " = " .. v)
+        end
+
+        if state.from and not state.dialogCounts[state.from] then
+            error("Something awry")
+        end
     end
 
     local startState = {
@@ -104,56 +118,47 @@ local function generateDotFile()
 
     -- queue of states to visit
     local queue = {startState}
-    local visited = {startState}
+    local visited = {}
 
-    local function deepCompare(tbl1, tbl2)
-        for k,v in pairs(tbl1) do
-            if not tbl2[k] then
+    local seen = {}
+    local function wasSeen(state)
+        local function compare(s1, s2)
+            if s1.node ~= s2.node then
                 return false
             end
-            if type(v) == "table" then
-                if type(tbl2[k]) ~= "table" or not deepCompare(v, tbl2[k]) then
+            for k,v in pairs(s1.npc) do
+                if v ~= s2.npc[k] or 0 then
                     return false
                 end
-            elseif v ~= tbl2[k] then
-                return false
             end
-        end
-        for k,v in pairs(tbl2) do
-            if not tbl1[k] then
-                return false
-            end
-            if type(v) == "table" then
-                if type(tbl1[k]) ~= "table" or not deepCompare(v, tbl1[k]) then
+            for k,v in pairs(s2.npc) do
+                if v ~= s1.npc[k] or 0 then
                     return false
                 end
-            elseif v ~= tbl1[k] then
-                return false
             end
+            return true
         end
-        return true
-    end
-
-    local function wasVisited(state)
-        for _,v in ipairs(visited) do
-            if deepCompare(v, state) then
+        for _,prior in ipairs(seen) do
+            if compare(prior, state) then
                 return true
             end
         end
-        return false
     end
 
     local links = {}
 
     local floop = 0
     while #queue > 0 and floop < 20000 do
-        print("queue size: " .. #queue)
-        local here = queue[1]
-        table.remove(queue, 1)
+        print(floop .. " queue size: " .. #queue)
+        local idx = math.random(1,#queue)
+        local here = queue[idx]
+        table.remove(queue, idx)
 
-        if floop % 100 == 0 then
-            for i,q in ipairs(queue) do
-                print(i .. ": node=" .. tostring(q.from) .. ' npc=' .. posToStr(q.npc))
+        floop = floop + 1
+        if floop % 200 == -1 then
+            for i,q in pairs(queue) do
+                print(i)
+                printState(q)
             end
         end
 
@@ -162,9 +167,14 @@ local function generateDotFile()
             prevCounts = prevCounts + v
         end
 
-        local node = game.chooseDialog(here)
+        local from = clone(here)
+        local node = (from.npc.phase < 13) and game.chooseDialog(here)
 
         if node then
+            table.insert(seen, clone(from))
+
+            visited[node] = (visited[node] or 0) + 1
+
             local postCounts = 0
             for _,v in pairs(here.dialogCounts) do
                 postCounts = postCounts + v
@@ -175,26 +185,29 @@ local function generateDotFile()
             -- if here.choiceText then
             --     choiceLink = choiceLink .. ' [label="' .. here.choiceText:gsub('"', '\\"') .. '"]'
             -- end
-            if not links[choiceLink] then
+            local novelLink = not links[choiceLink]
+            if novelLink then
                 print(choiceLink)
                 links[choiceLink] = true
                 file:write(choiceLink .. '\n')
-                floop = floop + 1
+            end
+
+            if node.setState then
+                here.dialogState = node.setState
             end
 
             if node.onReach then
                 node.onReach(here.npc)
             end
 
-            local there = clone(here)
-            there.from = node
+            here.from = node
 
             if node.responses then
                 local silence = {nil,{}}
 
                 for _,response in pairs(node.responses) do
                     if response[1] then
-                        local responded = clone(there)
+                        local responded = clone(here)
                         responded.choiceText = response[1]
                         for k,v in pairs(response[2]) do
                             responded.npc[k] = (responded.npc[k] or 0) + v
@@ -208,9 +221,7 @@ local function generateDotFile()
                         responded.npc.phase = responded.npc.phase + 0.5
                         responded.npc.silence_cur = 0
 
-                        if not wasVisited(responded) then
-                            table.insert(queue, responded)
-                        end
+                        table.insert(queue, responded)
                     else
                         silence = response
                     end
@@ -218,25 +229,55 @@ local function generateDotFile()
 
                 -- add the silence response
                 for k,v in pairs(silence[2]) do
-                    there.npc[k] = (there.npc[k] or 0) + v
+                    here.npc[k] = (here.npc[k] or 0) + v
                 end
-                there.npc.phase = there.npc.phase + 1
-                there.npc.silence_total = (there.npc.silence_total or 0) + 1
-                there.npc.silence_cur = (there.npc.silence_cur or 0) + 1
-                if not wasVisited(there) then
-                    table.insert(queue, there)
+                if silence[3] then
+                    here.dialogState = silence[3]
                 end
+                here.npc.silence_total = (here.npc.silence_total or 0) + 1
+                here.npc.silence_cur = (here.npc.silence_cur or 0) + 1
+
+                -- TODO track three box time changes: interrupted, closed, played through
+                here.npc.phase = here.npc.phase + 1
+                table.insert(queue, here)
             else
                 -- TODO track box time changes: interrupted, closed, played through
-                there.npc.phase = there.npc.phase + 1
-                if not wasVisited(there) then
-                    table.insert(queue, there)
-                end
+                here.npc.phase = here.npc.phase + 1
+
+                table.insert(queue, here)
             end
         end
     end
 
     file:write("}\n")
     file:close()
+
+    return visited
 end
--- generateDotFile()
+
+notion("dialog coverage", function()
+    -- change to false when we want to generate dialog coverage
+    if true then
+        return
+    end
+
+    local visited = generateDotFile()
+    local unvisited = {}
+
+    -- every node should have been visited at least once
+    for state,items in pairs(dialog) do
+        if type(items) == "table" then
+            for _,item in pairs(items) do
+                if not visited[item] then
+                    table.insert(unvisited, state .. ":" .. item.text)
+                end
+            end
+        end
+    end
+
+    for _,missing in ipairs(unvisited) do
+        print("Not visited: " .. missing)
+    end
+
+    check(#missing).is(0)
+end)
