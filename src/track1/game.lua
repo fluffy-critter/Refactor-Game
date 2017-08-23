@@ -210,6 +210,9 @@ function Game:init()
     self.scoreFont = fonts.centuryGothicDigits
 end
 
+function Game:start()
+end
+
 function Game:defer(item)
     table.insert(self.deferred, item)
 end

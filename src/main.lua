@@ -108,6 +108,8 @@ local function startGame(game)
     playing.state = PlayState.starting
     playing.speed = 1.0
     playing.fade = 0
+
+    currentGame:start()
 end
 
 local menu

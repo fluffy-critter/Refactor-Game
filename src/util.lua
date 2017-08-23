@@ -252,4 +252,32 @@ function util.cpairs(...)
     end
 end
 
+-- Like pairs(sequence) except it can take arbitrarily many tables.
+function util.mpairs(...)
+    local queue = {...}
+
+    local func, tbl, state = pairs(queue[1])
+    table.remove(queue, 1)
+
+    return function()
+        local ns, val = func(tbl, state)
+        while not ns and #queue > 0 do
+            func, tbl, state = pairs(queue[1])
+            ns, val = func(tbl, state)
+            table.remove(queue, 1)
+        end
+        state = ns
+        return ns, val
+    end, tbl, state
+end
+
+-- Shallow copy a table
+function util.shallowCopy(tbl)
+    local ret = {}
+    for k,v in pairs(tbl) do
+        ret[k] = v
+    end
+    return ret
+end
+
 return util

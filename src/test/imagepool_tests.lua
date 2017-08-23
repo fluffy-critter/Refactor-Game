@@ -63,7 +63,7 @@ notion("image configs are unique", function()
     check(img1 == img4).is(true)
     check(img1 == img5).is(false)
 
-    local img5 = imagepool.load('mainmenu/ground.png', {nearest = true, mipmaps = true})
+    local img6 = imagepool.load('mainmenu/ground.png', {nearest = true, mipmaps = true})
     check(img1 == img6).is(false)
 
     check(report('newImage').calls).is(4)

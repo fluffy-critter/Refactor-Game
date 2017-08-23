@@ -50,7 +50,6 @@ function Game:init()
     self.music = love.audio.newSource('music/02-strangers.mp3')
     self.phase = -1
     self.score = 0
-    self.music:play()
 
     self.canvas = love.graphics.newCanvas(256, 224)
     self.canvas:setFilter("nearest")
@@ -79,6 +78,10 @@ function Game:init()
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
+end
+
+function Game:start()
+    self.music:play()
 end
 
 function Game:onButtonPress(button, code, isRepeat)

@@ -1,8 +1,8 @@
 local cute = require('thirdparty.cute')
 local notion = cute.notion
 local check = cute.check
-local minion = cute.minion
-local report = cute.report
+-- local minion = cute.minion
+-- local report = cute.report
 
 local util = require('util')
 
@@ -124,6 +124,25 @@ notion("cpairs", function()
     check(concatted[2]).shallowMatches({t1, 2, 2})
     check(concatted[3]).shallowMatches({t1, 3, 3})
     check(concatted[4]).shallowMatches({t3, 1, 4})
+end)
+
+notion("mpairs", function()
+    local t1 = {a=4, b=99, c=20}
+    local t2 = {}
+    local t3 = {d=16, b=5}
+    local result = {}
+    local count = 0
+
+    for k,v in util.mpairs(t1, t2, t3) do
+        count = count + 1
+        result[k] = v
+    end
+
+    check(count).is(5)
+    check(result.a).is(4)
+    check(result.b).is(5)
+    check(result.c).is(20)
+    check(result.d).is(16)
 end)
 
 notion("clock", function()
