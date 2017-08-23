@@ -235,6 +235,7 @@ function Game:textFinished(textBox, node)
                 table.insert(choices, {
                     text = response[1],
                     onSelect = function()
+                        print(response[1])
                         self:onChoice(response)
                     end
                 })
@@ -284,7 +285,7 @@ function Game:chooseDialog()
                 distance = distance + dx*dx*(self.weights[k] or 1)
             end
             if not minDistance or distance < minDistance then
-                print("Considering: " .. node.text .. " d=" .. distance)
+                -- print("Considering: " .. node.text .. " d=" .. distance)
                 minNode = node
                 minDistance = distance
             end
@@ -292,7 +293,7 @@ function Game:chooseDialog()
     end
 
     if minNode then
-        print("Chose: " .. minNode.text .. " d=" .. minDistance)
+        print("NPC: " .. minNode.text .. " d=" .. minDistance)
         self.dialogCounts[minNode] = (self.dialogCounts[minNode] or 0) + 1
     end
 
@@ -333,6 +334,11 @@ function Game:draw()
         love.graphics.setColor(255,255,0)
         love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
             .. ' ' .. self.dialogState)
+        local y = fonts.debug:getHeight()
+        for k,v in pairs(self.npc) do
+            love.graphics.print(string.format("%s=%.1f", k, v), 0, y)
+            y = y + fonts.debug:getHeight()
+        end
     end)
 
     self.scaled:renderTo(function()
