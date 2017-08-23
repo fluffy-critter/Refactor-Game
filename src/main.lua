@@ -327,7 +327,6 @@ function love.draw()
         end
     end
 
-
     if currentGame then
         love.graphics.clear(32, 32, 32)
 
@@ -338,13 +337,14 @@ function love.draw()
         love.graphics.setColor(brt, brt, brt)
 
         if playing.state ~= PlayState.playing then
-            love.graphics.setShader(shaders.hueshift)
+            local shader = shaders.load("shaders/hueshift.fs")
+            love.graphics.setShader(shader)
             local saturation = playing.speed*.85 + .15
             local shift = (1 - playing.speed)*math.pi
             if playing.state == PlayState.resuming then
                 shift = -shift
             end
-            shaders.hueshift:send("basis", {
+            shader:send("basis", {
                 saturation * math.cos(shift),
                 saturation * math.sin(shift)
             })

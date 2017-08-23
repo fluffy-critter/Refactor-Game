@@ -127,6 +127,8 @@ function Randomizer:onInit()
     }
 
     print("images", #self.images, #self.quads)
+
+    self.shader = shaders.load("shaders/hueshift.fs")
 end
 
 function Randomizer:draw()
@@ -146,8 +148,9 @@ function Randomizer:draw()
         w = w * (math.random(0,1)*2 - 1)*alpha/255
         h = h * (math.random(0,1)*2 - 1)
 
-        love.graphics.setShader(shaders.hueshift)
-        shaders.hueshift:send("basis", {math.random()*2 - 1, math.random()*2 - 1})
+        local shader = self.shader
+        love.graphics.setShader(shader)
+        shader:send("basis", {math.random()*2 - 1, math.random()*2 - 1})
 
         love.graphics.draw(self.images[math.random(1,#self.images)],
             self.quads[math.random(1,#self.quads)],

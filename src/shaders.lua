@@ -6,14 +6,36 @@ Refactor
 Some useful shaders
 ]]
 
-local shaders = {
-    hueshift =  love.graphics.newShader("shaders/hueshift.fs"),
-    waterRipple = love.graphics.newShader("shaders/waterRipple.fs"),
-    waterReflect = love.graphics.newShader("shaders/waterReflect.fs"),
-    sphereDistort = love.graphics.newShader("shaders/sphereDistort.fs"),
-    gaussToneMap = love.graphics.newShader("shaders/gaussToneMap.fs"),
-    gaussBlur = love.graphics.newShader("shaders/gaussBlur.fs"),
-    crtScaler = love.graphics.newShader("shaders/crtScaler.fs"),
-}
+local shaders = {}
+
+shaders.pool = {}
+setmetatable(shaders.pool, {__mode="v"})
+
+shaders.lru = {}
+
+function shaders.load(filename)
+    local key = filename
+
+    local shader = shaders.pool[key]
+    if not shader then
+        shader = love.graphics.newShader(filename)
+        shaders.pool[key] = shader
+    end
+
+    -- TODO this isn't quite LRU behavior but eh, good enough?
+    for idx,used in ipairs(shaders.lru) do
+        if used == img then
+            local last = #shaders.lru
+            shaders.lru[idx] = shaders.lru[last]
+            table.remove(shaders.lru, last)
+        end
+    end
+    table.insert(shaders.lru, img)
+    while #shaders.lru > 5 do
+        table.remove(shaders.lru, 1)
+    end
+
+    return shader
+end
 
 return shaders

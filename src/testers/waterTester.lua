@@ -127,7 +127,8 @@ function waterTester:draw()
         -- love.graphics.draw(self.layers.arena)
     end)
 
-    return self.canvas;
+    return self.canvas
 end
 
+waterTester:init()
 return waterTester

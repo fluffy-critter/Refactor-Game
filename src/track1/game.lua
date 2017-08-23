@@ -71,6 +71,8 @@ function Game:init()
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.overlay = love.graphics.newCanvas(1280, 720)
 
+    self.shaders = {}
+
     local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
@@ -83,12 +85,16 @@ function Game:init()
             fresnel = 0.1,
             sampleRadius = 5.5,
         }
+        self.shaders.waterRipple = shaders.load("track1/waterRipple.fs")
+        self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     else
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
     self.layers.toneMap = love.graphics.newCanvas(1280, 720)
     self.layers.toneMapBack = love.graphics.newCanvas(1280, 720)
+    self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
+    self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
 
     self.bounds = {
         left = 32,
@@ -952,7 +958,7 @@ function Game:update(raw_dt)
 
     if self.waterParams then
         self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
-            shaders.waterRipple, {
+            self.shaders.waterRipple, {
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
                 damp = self.waterParams.damp,
                 fluidity = self.waterParams.fluidity,
@@ -1011,13 +1017,14 @@ function Game:draw()
         love.graphics.setColor(255, 255, 255, 255)
 
         if self.waterParams then
-            love.graphics.setShader(shaders.waterReflect)
-            shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
-            shaders.waterReflect:send("rsize", self.waterParams.rsize)
-            shaders.waterReflect:send("fresnel", self.waterParams.fresnel);
-            shaders.waterReflect:send("source", self.layers.arena)
-            shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
-            shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
+            local shader = self.shaders.waterReflect
+            love.graphics.setShader(shader)
+            shader:send("psize", {1.0/1280, 1.0/720})
+            shader:send("rsize", self.waterParams.rsize)
+            shader:send("fresnel", self.waterParams.fresnel);
+            shader:send("source", self.layers.arena)
+            shader:send("bgColor", {0, 0, 0, 0})
+            shader:send("waveColor", {0.1, 0, 0.5, 1})
             love.graphics.draw(self.layers.water)
             love.graphics.setShader()
         end
@@ -1033,13 +1040,13 @@ function Game:draw()
 
     if self.toneMap then
         util.mapShader(self.canvas, self.layers.toneMap,
-            shaders.gaussToneMap, {
+            self.shaders.gaussToneMap, {
                 sampleRadius = {1/1280, 0},
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
         self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            shaders.gaussBlur, {
+            self.shaders.gaussBlur, {
                 sampleRadius = {0, 1/720}
             })
 
