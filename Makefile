@@ -43,13 +43,13 @@ publish-wait:
 
 setup: $(DEST)/.setup
 $(DEST)/.setup: .gitmodules
+	@which luacheck 1>/dev/null || (echo \
+		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
+		&& false )
 	mkdir -p $(DEST)
 	git submodule update --init --recursive
 	git submodule update --recursive
 	touch $(@)
-	@which luacheck 1>/dev/null || (echo \
-		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
-		&& false )
 
 assets: $(DEST)/.assets
 $(DEST)/.assets: $(shell find raw_assets -name '*.png')
