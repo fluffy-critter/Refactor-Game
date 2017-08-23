@@ -17,7 +17,8 @@ local TextBox = require('track2.TextBox')
 local Game = require('track2.game')
 
 -- whether to check dialog coverage
-local CheckCoverage = false
+local CheckCoverage = true
+local MaxLinkChecks = 10 -- maximum number of times to consider a dialog path
 
 notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
@@ -50,7 +51,18 @@ local function generateDotFile()
         if not node then
             return "nil"
         end
-        return "node" .. tostring(node):sub(10)
+        return "node_" .. tostring(node):sub(10)
+    end
+
+    local statePools = {}
+    local function getPoolInfo(poolName)
+        if not statePools[poolName] then
+            statePools[poolName] = {
+                limits = {},
+                transitions = {}
+            }
+        end
+        return statePools[poolName]
     end
 
     local game = Game.new()
@@ -148,6 +160,18 @@ local function generateDotFile()
         local from = clone(here)
         local node = (from.npc.phase < 13) and game.chooseDialog(here)
 
+        local fromState = getPoolInfo(from.dialogState)
+        for k,v in pairs(from.npc) do
+            if not fromState.limits[k] then
+                fromState.limits[k] = {v,v}
+            else
+                fromState.limits[k] = {
+                    math.min(fromState.limits[k][1], v),
+                    math.max(fromState.limits[k][2], v)
+                }
+            end
+        end
+
         if node then
             visited[node] = (visited[node] or 0) + 1
 
@@ -161,15 +185,15 @@ local function generateDotFile()
             -- if here.choiceText then
             --     choiceLink = choiceLink .. ' [label="' .. here.choiceText:gsub('"', '\\"') .. '"]'
             -- end
-            local novelLink = not links[choiceLink]
-            if novelLink then
+            if not links[choiceLink] then
                 print(choiceLink)
-                links[choiceLink] = true
                 file:write(choiceLink .. '\n')
             end
+            links[choiceLink] = (links[choiceLink] or 0) + 1
 
             if node.setState then
                 here.dialogState = node.setState
+                fromState.transitions[node.setState] = true
             end
 
             if node.onReach then
@@ -178,7 +202,8 @@ local function generateDotFile()
 
             here.from = node
 
-            if node.responses then
+
+            if node.responses and links[choiceLink] < MaxLinkChecks then
                 local silence = {nil,{}}
 
                 for _,response in pairs(node.responses) do
@@ -190,14 +215,29 @@ local function generateDotFile()
                         end
                         if response[3] then
                             responded.dialogState = response[3]
+                            fromState.transitions[response[3]] = true
                         end
 
-                        -- TODO track three box time changes: interrupted, closed, played through
-                        -- TODO track three response time changes: fast, slow, silence
-                        responded.npc.phase = responded.npc.phase + 0.5
-                        responded.npc.silence_cur = 0
+                        -- interruption type: interrupted text, fast close, play through
+                        for _,interruption in ipairs({{true, true}, {true, false}, {false, false}}) do
+                            -- response speed: fast, slow
+                            for _,responseSpeed in ipairs({0.25, 0.5}) do
+                                local version = clone(responded)
+                                local time = responseSpeed + 0.5
 
-                        table.insert(queue, responded)
+                                if interruption[1] then
+                                    version.npc.interrupted = (version.npc.interrupted or 0) + 1
+                                    time = time - 0.25
+                                end
+                                if interruption[2] then
+                                    time = time - 0.25
+                                end
+
+                                version.npc.phase = version.npc.phase + time
+                                version.npc.silence_cur = 0
+                                table.insert(queue, version)
+                            end
+                        end
                     else
                         silence = response
                     end
@@ -209,18 +249,56 @@ local function generateDotFile()
                 end
                 if silence[3] then
                     here.dialogState = silence[3]
+                    fromState.transitions[silence[3]] = true
                 end
                 here.npc.silence_total = (here.npc.silence_total or 0) + 1
                 here.npc.silence_cur = (here.npc.silence_cur or 0) + 1
 
-                -- TODO track three box time changes: interrupted, closed, played through
-                here.npc.phase = here.npc.phase + 1
-                table.insert(queue, here)
-            else
-                -- TODO track box time changes: interrupted, closed, played through
-                here.npc.phase = here.npc.phase + 1
+                -- interruption type: interrupted text, fast close, play through
+                for _,interruption in ipairs({{true, true}, {true, false}, {false, false}}) do
+                    local version = clone(here)
+                    local time = 1.0
 
-                table.insert(queue, here)
+                    if interruption[1] then
+                        version.npc.interrupted = (version.npc.interrupted or 0) + 1
+                        time = time - 0.25
+                    end
+                    if interruption[2] then
+                        time = time - 0.25
+                    end
+
+                    table.insert(queue, version)
+                end
+            elseif not node.responses then
+                -- interruption type: interrupted text, fast close, play through
+                for _,interruption in ipairs({{true, true}, {true, false}, {false, false}}) do
+                    local version = clone(here)
+                    local time = 0.5
+
+                    if interruption[1] then
+                        version.npc.interrupted = (version.npc.interrupted or 0) + 1
+                        time = time - 0.25
+                    end
+                    if interruption[2] then
+                        time = time - 0.25
+                    end
+
+                    table.insert(queue, version)
+                end
+            end
+        end
+    end
+
+    for k,v in pairs(statePools) do
+        local stateNode = 'state_' .. k .. ' [shape=record label="' .. k
+        for name,vals in pairs(v.limits) do
+            stateNode = stateNode .. '|{' .. name .. '|' .. vals[1] .. '|' .. vals[2] .. '}'
+        end
+        stateNode = stateNode .. '"]'
+        file:write(stateNode .. '\n')
+        for dest in pairs(v.transitions) do
+            if dest ~= k then
+                file:write('state_' .. k .. ' -> state_' .. dest .. '\n')
             end
         end
     end
