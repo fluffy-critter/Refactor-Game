@@ -78,6 +78,11 @@ function Game:init()
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
+
+    self.printSound = love.audio.newSource("track2/printSound.wav", "static")
+    self.printSound:setVolume(0.2)
+    self.doneSound = love.audio.newSource("track2/doneSound.wav", "static")
+    self.doneSound:setVolume(0.5)
 end
 
 function Game:start()
@@ -134,7 +139,9 @@ function Game:update(dt)
                 self.textBox = TextBox.new({
                     text = node.text,
                     cantInterrupt = node.cantInterrupt,
-                    onInterrupt = node.onInterrupt
+                    onInterrupt = node.onInterrupt,
+                    printSound = self.printSound,
+                    doneSound = self.doneSound
                 })
 
                 local game = self

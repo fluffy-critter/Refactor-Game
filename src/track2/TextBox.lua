@@ -54,6 +54,9 @@ function TextBox:onInit()
         selectBlinkTime = 0.1, -- how long the select blinks after a movement
 
         charsPrinted = 0, -- number of characters printed
+
+        printSound = nil, -- Sound to play when a character prints
+        doneSound = nil,  -- Sound to play when text finishes naturally
     })
 
     self.state = TextBox.states.opening
@@ -127,6 +130,10 @@ function TextBox:update(dt)
             if self.onReady then
                 self:onReady()
             end
+            if self.doneSound then
+                self.doneSound:seek(0)
+                self.doneSound:play()
+            end
         else
             self.nextChar = self.nextChar - dt
             while self.nextChar <= 0 and self.charsPrinted < self.wrapped:len() do
@@ -139,7 +146,11 @@ function TextBox:update(dt)
                     self.nextChar = 0
                 else
                     self.nextChar = self.charTime
-                    -- TODO play sound?
+                    if self.printSound then
+                        self.printSound:stop()
+                        self.printSound:rewind()
+                        self.printSound:play()
+                    end
                 end
             end
         end

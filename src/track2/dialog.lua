@@ -82,7 +82,7 @@ local dialog = {
             text = "# Good morning, dear! #",
             responses = {
                 {"Uh... hi...", {concern=1}, "normal"},
-                {"Um... who are you...?", {concern=1, defense=1}, "last_night"},
+                {"Who are you...?", {concern=1, defense=1}, "last_night"},
                 {"What are you doing here?", {defense=1}, "alienated"},
                 {nil, {}, "silence"}
             }
@@ -279,8 +279,8 @@ local dialog = {
         {
             pos = {interrupted=12},
             text = "You know you're throwing off the timing of this whole dialog, right?",
-            onInterrupt=function(self)
-                self.text=self.text .. "\n... dammit"
+            onInterrupt = function(self)
+                self.text = self.text .. "\n... dammit"
             end
         },
         {
@@ -538,14 +538,29 @@ local dialog = {
         },
 
         {
-            pos = {phase=4},
+            pos = {phase=4, defense=0, anger=0},
             text = "Please stop looking at me like that. Like I'm a stranger...",
+            responses = {}
+        },
+        {
+            pos = {phase=4, defense=5, anger=0},
+            text = "Please stop looking at me like that. I'm not a stranger.",
+            responses = {}
+        },
+        {
+            pos = {phase=4, defense=0, anger=10},
+            text = "Stop looking at me like that. I'm not a stranger.",
+            responses = {}
+        },
+        {
+            pos = {phase=4, defense=10, anger=10},
+            text = "Stop looking at me like that. I'm not a stranger...% Am I?",
             responses = {}
         },
 
         {
             pos = {phase=5},
-            text = "We've been married so long.%.%.% I never thought your memories of ME would be the first to go.",
+            text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             responses = {}
         },
 
@@ -561,7 +576,7 @@ local dialog = {
         },
         {
             pos = {phase=6, defense=5, anger=10},
-            text = "But you DO have a family history of this.%.%.% Oh god.%.%.%",
+            text = "But you DO have a family history.%.%.% Oh.%%%\n\nOH.",
             responses = {}
         },
 
