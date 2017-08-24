@@ -20,6 +20,16 @@ local Game = require('track2.game')
 local CheckCoverage = true
 local MaxLinkChecks = 15 -- maximum number of times to consider a dialog path
 
+local function checkAllDialogs(dialog, func)
+    for state,items in pairs(dialog) do
+        if type(items) == "table" then
+            for _,item in pairs(items) do
+                func(state, item)
+            end
+        end
+    end
+end
+
 notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
 
@@ -28,21 +38,17 @@ notion("Text all fits within the dialog box", function()
         return #wrapped <= lines
     end
 
-    for state,items in pairs(dialog) do
-        if type(items) == "table" then
-            for _,item in pairs(items) do
-                if not checkLineCount(item.text, 3) then
-                    error(state .. ": text too large: " .. item.text)
-                end
+    checkAllDialogs(dialog, function(state,item)
+        if not checkLineCount(item.text, 3) then
+            error(state .. ": text too large: " .. item.text)
+        end
 
-                for _,response in pairs(item.responses or {}) do
-                    if not checkLineCount(response[1], 1) then
-                        error(state .. ": response too long: " .. response[1])
-                    end
-                end
+        for _,response in pairs(item.responses or {}) do
+            if not checkLineCount(response[1], 1) then
+                error(state .. ": response too long: " .. response[1])
             end
         end
-    end
+    end)
 end)
 
 --[[ generate a dotfile that represents all possible conversation paths ]]
@@ -84,7 +90,7 @@ local function generateDotFile()
     for state,items in pairs(dialog) do
         if type(items) == "table" then
             for _,item in pairs(items) do
-                local label = '{' .. state .. '|' .. item.text:gsub('"', '\\"'):gsub('\n', '--'):gsub('%%', '') .. '}'
+                local label = '{' .. state .. '|' .. item.text:gsub('"', '\\"'):gsub('\n', '\\n'):gsub('%%', '') .. '}'
                 local posDesc = posToStr(item.pos)
                 if posDesc then
                     label = label .. '|{' .. posDesc .. '}'
@@ -349,47 +355,98 @@ notion("dialog coverage", function()
     -- check(#unvisited).is(0)
 end)
 
-notion("Dialog response integrity", function()
-    for state,items in pairs(dialog) do
-        if type(items) == "table" then
-            for _,item in pairs(items) do
-                if item.responses then
-                    local errorText = state .. ':' .. item.text
-                    if #item.responses == 0 then
-                        print("WARNING: Empty response list for " .. errorText)
-                    end
+notion("Position attributes spelled right", function()
+    local speling = util.set(
+        "anger",
+        "concern",
+        "confused",
+        "defense",
+        "interrupted",
+        "phase",
+        "sequence",
+        "silence_cur",
+        "silence_total"
+    )
 
-                    if #item.responses > 4 then
-                        error(errorText .. " has " .. #item.responses)
-                    end
+    local set = {
+        -- attributes set by the dialog engine itself
+        silence_cur = 1,
+        silence_total = 1,
+        interrupted = 1,
+        phase = 1,
 
-                    local yesCount = 0
-                    local silenceCount = 0
-                    for idx,r in ipairs(item.responses) do
-                        if r[1] then
-                            yesCount = yesCount + 1
-                        else
-                            silenceCount = silenceCount + 1
-                        end
+        -- attributes set by special callbacks
+        sequence = 1,
+    }
+    local used = {}
 
-                        if not r[2] then
-                            error(errorText .. ": response " .. idx .. " has no modifiers")
-                        end
-
-                        if r[3] and not dialog[r[3]] then
-                            error(errorText .. ": response " .. idx .. " -> invalid state " .. r[3])
-                        end
-                    end
-
-                    if yesCount > 3 then
-                        error(errorText .. ": has " .. yesCount .. " verbal responses")
-                    end
-                    if silenceCount > 1 then
-                        error(errorText .. ": has " .. silenceCount .. " silent repsonses")
-                    end
-                end
+    local function checkPos(pos, where)
+        for k,_ in pairs(pos) do
+            if not speling[k] then
+                error("Check speling of " .. k)
             end
+            where[k] = (where[k] or 0) + 1
         end
     end
+    checkAllDialogs(dialog, function(state,item)
+        checkPos(item.pos, used)
+        for idx,response in ipairs(item.responses or {}) do
+            checkPos(response[2], set)
+        end
+    end)
+
+    for k in pairs(used) do
+        print('"' .. k .. '",')
+        if not set[k] then
+            error("Attribute " .. k .. " used but never set")
+        end
+    end
+
+    for k in pairs(set) do
+        print('"' .. k .. '",')
+        if not used[k] then
+            error("Attribute " .. k .. " set but never used")
+        end
+    end
+end)
+
+notion("Dialog response integrity", function()
+    checkAllDialogs(dialog, function(state,item)
+        if item.responses then
+            local errorText = state .. ':' .. item.text
+            if #item.responses == 0 then
+                print("WARNING: Empty response list for " .. errorText)
+            end
+
+            if #item.responses > 4 then
+                error(errorText .. " has " .. #item.responses)
+            end
+
+            local yesCount = 0
+            local silenceCount = 0
+            for idx,r in ipairs(item.responses) do
+                if r[1] then
+                    yesCount = yesCount + 1
+                else
+                    silenceCount = silenceCount + 1
+                end
+
+                if not r[2] then
+                    error(errorText .. ": response " .. idx .. " has no modifiers")
+                end
+
+                if r[3] and not dialog[r[3]] then
+                    error(errorText .. ": response " .. idx .. " -> invalid state " .. r[3])
+                end
+            end
+
+            if yesCount > 3 then
+                error(errorText .. ": has " .. yesCount .. " verbal responses")
+            end
+            if silenceCount > 1 then
+                error(errorText .. ": has " .. silenceCount .. " silent repsonses")
+            end
+        end
+    end)
 end)
 

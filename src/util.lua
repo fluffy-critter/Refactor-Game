@@ -284,4 +284,13 @@ function util.shallowCopy(tbl)
     return ret
 end
 
+-- Convert a list into a set
+function util.set(...)
+    local ret = {}
+    for _,v in ipairs({...}) do
+        ret[v] = true
+    end
+    return ret
+end
+
 return util

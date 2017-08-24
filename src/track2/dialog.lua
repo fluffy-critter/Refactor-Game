@@ -101,7 +101,7 @@ local dialog = {
             pos = {anger=5},
             text = "Good morning.",
             responses = {
-                {"...good morning...", {concern=1, tired=1}, "normal"},
+                {"...good morning...", {concern=1}, "normal"},
                 {"Who are you?", {concern=1, defense=7}, "last_night"},
                 {"What are you doing here?", {anger=3}, "alienated"},
                 {nil, {anger=1}, "silence"}
@@ -538,7 +538,7 @@ local dialog = {
         },
 
         {
-            pos = {phsae=4},
+            pos = {phase=4},
             text = "Please stop looking at me like that. Like I'm a stranger...",
             responses = {}
         },
@@ -598,7 +598,7 @@ local dialog = {
             text = "You don't... you don't remember anything, do you.",
             responses = {
                 {"I have no idea who you are.", {anger=-3, concern=1, confused=-3}},
-                {"Why are there pictures of us together?", {sad=5, anger=-5, concern=3}},
+                {"Why are there pictures of us together?", {anger=-5, concern=3}},
                 {"I'm feeling faint...", {anger=-10, concern=5}},
             }
         },
