@@ -589,35 +589,34 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {phase=11.5},
-            text = "Hey, are you okay? You're looking a bit wobbly.",
+            pos = {sequence=0},
+            text = "Yes, emergency services? It's my spouse, I think they're having a stroke.",
+            onReach = function(npc)
+                npc.sequence = 100
+            end
         },
         {
-            pos = {phase=12},
-            text = "Yes, emergency services? It's my spouse, I think they're having a stroke."
-        },
-        {
-            pos = {phase=12.5},
+            pos = {sequence=100, phase=12},
             text = "Someone is coming.... everything will be okay.",
             max_count=5
         },
         {
-            pos = {phase=12.5},
+            pos = {sequence=100, phase=12},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
             max_count=5
         },
         {
-            pos = {phase=12.5},
+            pos = {sequence=100, phase=12.3},
             text = "They'll be here soon.",
             max_count=5
         },
         {
-            pos = {phase=12.5},
+            pos = {sequence=100, phase=12.4},
             text = "I love you.%#%\n\nWe'll get through this.",
             max_count=5
         },
         {
-            pos = {phase=12.5},
+            pos = {sequence=100, phase=12.5},
             text = "It's okay, I'm here for you.",
             max_count=5
         },

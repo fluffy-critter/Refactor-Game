@@ -182,7 +182,7 @@ local function generateDotFile()
     local links = {}
 
     local floop = 0
-    while #queue > 0 and floop < 20000 do
+    while #queue > 0 and floop < 30000 do
         print(floop .. " queue size: " .. #queue)
         local idx = math.random(1,#queue)
         local here = queue[idx]
