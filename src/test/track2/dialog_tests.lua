@@ -20,8 +20,8 @@ local Game = require('track2.game')
 local CheckCoverage = true
 local MaxLinkChecks = 15 -- maximum number of times to consider a dialog path
 
-local function checkAllDialogs(dialog, func)
-    for state,items in pairs(dialog) do
+local function checkAllDialogs(dlog, func)
+    for state,items in pairs(dlog) do
         if type(items) == "table" then
             for _,item in pairs(items) do
                 func(state, item)
@@ -239,7 +239,7 @@ local function generateDotFile()
                             -- response speed: fast, slow
                             for _,responseSpeed in ipairs({0.25, 0.5}) do
                                 local version = clone(responded)
-                                local time = responseSpeed + 0.5
+                                local time = responseSpeed
 
                                 if interruption[1] then
                                     version.npc.interrupted = (version.npc.interrupted or 0) + 1
@@ -388,22 +388,20 @@ notion("Position attributes spelled right", function()
             where[k] = (where[k] or 0) + 1
         end
     end
-    checkAllDialogs(dialog, function(state,item)
+    checkAllDialogs(dialog, function(_,item)
         checkPos(item.pos, used)
-        for idx,response in ipairs(item.responses or {}) do
+        for _,response in ipairs(item.responses or {}) do
             checkPos(response[2], set)
         end
     end)
 
     for k in pairs(used) do
-        print('"' .. k .. '",')
         if not set[k] then
             error("Attribute " .. k .. " used but never set")
         end
     end
 
     for k in pairs(set) do
-        print('"' .. k .. '",')
         if not used[k] then
             error("Attribute " .. k .. " set but never used")
         end
