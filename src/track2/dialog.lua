@@ -191,17 +191,29 @@ local dialog = {
         {
             pos = {phase=7, defense=2, anger=5},
             text = "If this is about what I said last night, well%.%.%.%% you deserved it.",
-            responses = {}
+            responses = {
+                {"...What did you say?", {concern=2}, "brain_problems"},
+                {"I doubt it.", {defense=5}, "normal"},
+                {"Yeah, I guess I did.", {defense=-5}, "normal"}
+            }
         },
         {
             pos = {phase=8, defense=0, anger=0},
             text = "I'm just not sure why you're giving me the silent treatment, here...",
-            responses = {}
+            responses = {
+                {"I feel... numb...", {}, "stroke"},
+                {"Who are you?", {}, "brain_problems"},
+                {"Please just go away...", {}, "alienated"}
+            }
         },
         {
             pos = {phase=8, defense=2, anger=5},
             text = "So you can cut it out with the silent treatment.",
-            responses = {}
+            responses = {
+                {"Who are you?", {}, "brain_problems"},
+                {"Why are you even here?", {}, "last_night"},
+                {"Please. Go away.", {}, "alienated"},
+            }
         },
         {
             pos = {phase=9},
@@ -211,7 +223,11 @@ local dialog = {
         {
             pos = {phase=10, anger=0},
             text = "Hahaha...%% please...%% just tell me, what's going on...?",
-            responses = {}
+            responses = {
+                {"I feel... numb...", {}, "stroke"},
+                {"Who are you?", {}, "brain_problems"},
+                {"Please just go away...", {}, "alienated"}
+            }
         },
         {
             pos = {phase=10, anger=5},
@@ -509,12 +525,111 @@ local dialog = {
 
     -- path where Greg has determined Rose is having brain problems
     brain_problems = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: brain_problems" },
+        {
+            pos = {phase=2.5},
+            text = "Hon, are you feeling okay?",
+            responses = {}
+        },
+
+        {
+            pos = {phase=3},
+            text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
+            responses = {}
+        },
+
+        {
+            pos = {phsae=4},
+            text = "Please stop looking at me like that. Like I'm a stranger...",
+            responses = {}
+        },
+
+        {
+            pos = {phase=5},
+            text = "We've been married so long.%.%.% I never thought your memories of ME would be the first to go.",
+            responses = {}
+        },
+
+        {
+            pos = {phase=6, defense=0, anger=0},
+            text = "But you have a family history of this.%.%.%",
+            responses = {}
+        },
+        {
+            pos = {phase=6, defense=5, anger=0},
+            text = "But you DO have a family history of this.%.%.%",
+            responses = {}
+        },
+        {
+            pos = {phase=6, defense=5, anger=10},
+            text = "But you DO have a family history of this.%.%.% Oh god.%.%.%",
+            responses = {}
+        },
+
+        {
+            pos = {phase=7, defense=0},
+            text = "Can you remember anything about me? Anything at all?",
+            responses = {}
+        },
+        {
+            pos = {phase=7, defense=10},
+            text = "Surely you must remember SOMETHING about me...",
+            responses = {}
+        },
+
+        {
+            pos = {phase=8, anger=0},
+            text = "Our wedding day was the happiest I'd ever seen you...",
+            responses = {}
+        },
 
         {
             pos = {phase=10},
             text = "Ha ha ha, okay, this...%%% this explains so much...",
-            responses = {}
+            responses = {
+                {"What's so funny?", {concern=2, defense=1}},
+                {"Please don't laugh...", {concern=5, defense=-2, anger=-5}},
+                {"Explains what?", {concern=2, confused=-2}},
+                {nil, {}, "silence"}
+            }
+        },
+
+        {
+            pos = {phase=11},
+            text = "You don't... you don't remember anything, do you.",
+            responses = {
+                {"I have no idea who you are.", {anger=-3, concern=1, confused=-3}},
+                {"Why are there pictures of us together?", {sad=5, anger=-5, concern=3}},
+                {"I'm feeling faint...", {anger=-10, concern=5}},
+            }
+        },
+
+        {
+            pos = {phase=12, anger=2},
+            text = "I wonder how long this has been going on... Is this why you've been forgetting so much?",
+            responses = {
+                {"What have I forgotten?", {defense=2}},
+                {"I'm so confused.", {concern=3}},
+                {"What's going on?", {}}
+            }
+        },
+        {
+            pos = {phase=12, anger=0, concern=10},
+            text = "I wonder how long this has been going on... Let's go to the doctor.",
+            responses = {
+                {"What have I forgotten?", {defense=2}},
+                {"I'm so confused.", {concern=3}},
+                {"What's going on?", {}}
+            }
+        },
+        {
+            pos = {phase=13},
+            text = "Let's go to a doctor, okay?",
+            maxCount = 20,
+            responses = {
+                {"A doctor? Why?", {}},
+                {"I don't want to...", {}},
+                {"You're trying to trick me.", {}}
+            }
         }
     },
 
@@ -590,7 +705,7 @@ local dialog = {
     stroke = {
         {
             pos = {sequence=0},
-            text = "Yes, emergency services? It's my spouse, I think they're having a stroke.",
+            text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
             onReach = function(npc)
                 npc.sequence = 100
             end

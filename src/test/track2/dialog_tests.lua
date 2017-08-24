@@ -45,50 +45,6 @@ notion("Text all fits within the dialog box", function()
     end
 end)
 
-notion("Dialog response integrity", function()
-    for state,items in pairs(dialog) do
-        if type(items) == "table" then
-            for _,item in pairs(items) do
-                if item.responses then
-                    local errorText = state .. ':' .. item.text
-                    if #item.responses == 0 then
-                        print("WARNING: Empty response list for " .. errorText)
-                    end
-
-                    if #item.responses > 4 then
-                        error(errorText .. " has " .. #item.responses)
-                    end
-
-                    local yesCount = 0
-                    local silenceCount = 0
-                    for idx,r in ipairs(item.responses) do
-                        if r[1] then
-                            yesCount = yesCount + 1
-                        else
-                            silenceCount = silenceCount + 1
-                        end
-
-                        if not r[2] then
-                            error(errorText .. ": response " .. idx .. " has no modifiers")
-                        end
-
-                        if r[3] and not dialog[r[3]] then
-                            error(errorText .. ": response " .. idx .. " -> invalid state " .. r[3])
-                        end
-                    end
-
-                    if yesCount > 3 then
-                        error(errorText .. ": has " .. yesCount .. " verbal responses")
-                    end
-                    if silenceCount > 1 then
-                        error(errorText .. ": has " .. silenceCount .. " silent repsonses")
-                    end
-                end
-            end
-        end
-    end
-end)
-
 --[[ generate a dotfile that represents all possible conversation paths ]]
 local function generateDotFile()
     local function nodeName(node)
@@ -392,3 +348,48 @@ notion("dialog coverage", function()
 
     -- check(#unvisited).is(0)
 end)
+
+notion("Dialog response integrity", function()
+    for state,items in pairs(dialog) do
+        if type(items) == "table" then
+            for _,item in pairs(items) do
+                if item.responses then
+                    local errorText = state .. ':' .. item.text
+                    if #item.responses == 0 then
+                        print("WARNING: Empty response list for " .. errorText)
+                    end
+
+                    if #item.responses > 4 then
+                        error(errorText .. " has " .. #item.responses)
+                    end
+
+                    local yesCount = 0
+                    local silenceCount = 0
+                    for idx,r in ipairs(item.responses) do
+                        if r[1] then
+                            yesCount = yesCount + 1
+                        else
+                            silenceCount = silenceCount + 1
+                        end
+
+                        if not r[2] then
+                            error(errorText .. ": response " .. idx .. " has no modifiers")
+                        end
+
+                        if r[3] and not dialog[r[3]] then
+                            error(errorText .. ": response " .. idx .. " -> invalid state " .. r[3])
+                        end
+                    end
+
+                    if yesCount > 3 then
+                        error(errorText .. ": has " .. yesCount .. " verbal responses")
+                    end
+                    if silenceCount > 1 then
+                        error(errorText .. ": has " .. silenceCount .. " silent repsonses")
+                    end
+                end
+            end
+        end
+    end
+end)
+
