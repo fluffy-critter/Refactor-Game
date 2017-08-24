@@ -88,13 +88,13 @@ local dialog = {
             }
         },
         {
-            pos = {concern=2},
+            pos = {defense=2},
             text = "Good morning... how are you feeling today?",
             responses = {
                 {"I'm... fine...", {concern=1}, "normal"},
                 {"Uh, fine, but... who are you?", {concern=-1}, "brain_problems"},
-                {"What are you doing in my house?", {}, "alienated"},
-                {nil, {defense=1}, "silence"}
+                {"What are you doing in my house?", {defense=2}, "alienated"},
+                {nil, {}, "silence"}
             }
         },
         {
@@ -104,7 +104,7 @@ local dialog = {
                 {"...good morning...", {concern=1}, "normal"},
                 {"Who are you?", {concern=1, defense=7}, "last_night"},
                 {"What are you doing here?", {anger=3}, "alienated"},
-                {nil, {anger=1}, "silence"}
+                {nil, {}, "silence"}
             }
         }
     },
@@ -156,6 +156,7 @@ local dialog = {
                 {"I'm not sure what's going on.", {concern=3}, "normal"}
             }
         },
+
         {
             pos = {phase=6, anger=0},
             text = "This isn't like you.",
@@ -166,7 +167,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6, anger=5},
+            pos = {phase=6, anger=3},
             text = "This is just like you.",
             responses = {
                 {"What is?", {}, "normal"},
@@ -174,13 +175,18 @@ local dialog = {
                 {"I'm sorry.", {concern=5, confused=3, defense=-5}}
             }
         },
+
         {
             pos = {phase=7, defense=3},
             text = "Is this about what I said last night? It was only a joke.",
-            responses = {}
+            responses = {
+                {"And I'm sure it was funny.", {defense=3}, "brain_problems"},
+                {"Well it wasn't very funny.", {defense=-3, concern=-10, anger=-10}, "last_night"},
+                {"I don't remember what you said.", {concern=5}, "brain_problems"}
+            }
         },
         {
-            pos = {phase=7, defense=0, anger=0},
+            pos = {phase=7, defense=0},
             text = "Is this about what I said last night? I'm sorry, it was out of line.",
             responses = {
                 {"...What did you say?", {concern=2}, "brain_problems"},
@@ -189,7 +195,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, defense=2, anger=5},
+            pos = {phase=7, anger=5},
             text = "If this is about what I said last night, well%.%.%.%% you deserved it.",
             responses = {
                 {"...What did you say?", {concern=2}, "brain_problems"},
@@ -197,6 +203,7 @@ local dialog = {
                 {"Yeah, I guess I did.", {defense=-5}, "normal"}
             }
         },
+
         {
             pos = {phase=8, defense=0, anger=0},
             text = "I'm just not sure why you're giving me the silent treatment, here...",
@@ -218,7 +225,11 @@ local dialog = {
         {
             pos = {phase=9},
             text = "...",
-            responses = {}
+            responses = {
+                {"What?", {}, "normal"},
+                {"Yep.", {}, "alienated"},
+                {"Three dots", {}, "stroke"},
+            }
         },
         {
             pos = {phase=10, anger=0},
@@ -230,13 +241,13 @@ local dialog = {
             }
         },
         {
-            pos = {phase=10, anger=5},
+            pos = {phase=10, anger=10},
             text = "Ha ha, fine, don't tell me anything...",
             responses = {}
         },
 
         {
-            pos = {phase=11, anger=0, concern=3},
+            pos = {phase=11},
             text = "Are you... are you crying?",
             responses = {
                 {"no, I...", {}, "brain_problems"},
@@ -260,15 +271,15 @@ local dialog = {
             text = "Please say something.",
         },
         {
-            pos = {interrupted=8, phase=4},
+            pos = {interrupted=7},
             text = "Please say something. Anything.",
         },
         {
-            pos = {interrupted=10, phase=7},
+            pos = {interrupted=8},
             text = "I just want to know why you aren't talking...",
         },
         {
-            pos = {interrupted=11, anger=1},
+            pos = {interrupted=10},
             text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
             responses = {
                 {"Because it's funny", {}, "alienated"},
@@ -277,7 +288,7 @@ local dialog = {
             }
         },
         {
-            pos = {interrupted=12},
+            pos = {interrupted=11.5},
             text = "You know you're throwing off the timing of this whole dialog, right?",
             onInterrupt = function(self)
                 self.text = self.text .. "\n... dammit"
@@ -599,7 +610,7 @@ local dialog = {
 
         {
             pos = {phase=10},
-            text = "Ha ha ha, okay, this...%%% this explains so much...",
+            text = "Ha ha ha, okay, this.%.%.% this explains so much...",
             responses = {
                 {"What's so funny?", {concern=2, defense=1}},
                 {"Please don't laugh...", {concern=5, defense=-2, anger=-5}},

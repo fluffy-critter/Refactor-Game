@@ -74,7 +74,8 @@ function Game:init()
 
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
-        phase = 10
+        phase = 10,
+        interrupted = 20
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
