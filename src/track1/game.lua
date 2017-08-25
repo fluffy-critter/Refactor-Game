@@ -57,19 +57,19 @@ end
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
-    self.toneMap = true -- do the HDR thing
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
 
     local limits = love.graphics.getSystemLimits()
+    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     self.canvas = love.graphics.newCanvas(1280, 720)
 
     self.layers = {}
-    self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
-    self.layers.overlay = love.graphics.newCanvas(1280, 720)
+    self.layers.arena = love.graphics.newCanvas(1280, 720, pixelfmt, limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(1280, 720, pixelfmt)
 
     self.shaders = {}
 
@@ -91,10 +91,13 @@ function Game:init()
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
-    self.layers.toneMap = love.graphics.newCanvas(1280, 720)
-    self.layers.toneMapBack = love.graphics.newCanvas(1280, 720)
-    self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
-    self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
+    local tonemapFmt = util.selectCanvasFormat("rgba32f", "rgba8")
+    if tonemapFmt then
+        self.layers.toneMap = love.graphics.newCanvas(1280, 720, pixelfmt)
+        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, pixelfmt)
+        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
+        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
+    end
 
     self.bounds = {
         left = 32,
@@ -1041,7 +1044,7 @@ function Game:draw()
         love.graphics.print(self.score, 0, 0)
     end)
 
-    if self.toneMap then
+    if self.layers.toneMap then
         util.mapShader(self.canvas, self.layers.toneMap,
             self.shaders.gaussToneMap, {
                 sampleRadius = {1/1280, 0},
