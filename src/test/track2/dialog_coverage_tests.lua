@@ -152,13 +152,13 @@ local function generateDotFile()
         end
 
         if not node then
-            local choiceLink = nodeName(here.from) .. ' -> EARLY_EXIT'
+            local choiceLink = nodeName(here.from) .. ' -> ' .. (from.npc.phase < 13 and 'EARLY_EXIT' or 'END')
             if not links[choiceLink] then
                 print(choiceLink)
                 file:write(choiceLink .. '\n')
             end
             links[choiceLink] = (links[choiceLink] or 0) + 1
-            fromState.transitions.EARLY_EXIT = true
+            fromState.transitions.END = true
         end
 
         if node then

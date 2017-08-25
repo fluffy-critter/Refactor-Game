@@ -48,55 +48,40 @@ notion("Text all fits within the dialog box", function()
 end)
 
 
-notion("Position attributes spelled right", function()
-    local speling = util.set(
-        "anger",
-        "concern",
-        "confused",
-        "defense",
-        "interrupted",
-        "phase",
-        "sequence",
-        "silence_cur",
-        "silence_total"
-    )
-
+notion("State value speling", function()
     local set = {
         -- attributes set by the dialog engine itself
-        silence_cur = 1,
-        silence_total = 1,
-        interrupted = 1,
-        phase = 1,
+        silence_cur = "engine",
+        silence_total = "engine",
+        interrupted = "engine",
+        phase = "engine",
 
         -- attributes set by special callbacks
-        sequence = 1,
+        sequence = "special",
     }
     local used = {}
 
-    local function checkPos(pos, where)
+    local function checkPos(pos, where, status)
         for k,_ in pairs(pos) do
-            if not speling[k] then
-                error("Check speling of " .. k)
-            end
-            where[k] = (where[k] or 0) + 1
+            where[k] = status
         end
     end
-    checkAllDialogs(dialog, function(_,item)
-        checkPos(item.pos, used)
+    checkAllDialogs(dialog, function(status, item)
+        checkPos(item.pos, used, status .. ':' .. item.text)
         for _,response in ipairs(item.responses or {}) do
-            checkPos(response[2], set)
+            checkPos(response[2], set, status .. ':' .. item.text .. ':' .. (response[1] or 'silence'))
         end
     end)
 
-    for k in pairs(used) do
+    for k,v in pairs(used) do
         if not set[k] then
-            error("Attribute " .. k .. " used but never set")
+            error("Attribute " .. k .. " used in status " .. v .. " but never set")
         end
     end
 
-    for k in pairs(set) do
+    for k,v in pairs(set) do
         if not used[k] then
-            error("Attribute " .. k .. " set but never used")
+            error("Attribute " .. k .. " set in status " .. v .. " but never used")
         end
     end
 end)

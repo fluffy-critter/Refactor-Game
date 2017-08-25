@@ -51,7 +51,7 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(256, 224)
+    self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8", "rgb565"))
     self.canvas:setFilter("nearest")
 
     self.outputScale = 3
@@ -74,8 +74,8 @@ function Game:init()
 
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
-        phase = 10,
-        interrupted = 20
+        phase = 3,
+        interrupted = 3,
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
