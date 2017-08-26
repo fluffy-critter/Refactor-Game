@@ -81,9 +81,9 @@ function Game:init()
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
     self.printSound = love.audio.newSource("track2/printSound.wav", "static")
-    self.printSound:setVolume(0.2)
+    self.printSound:setVolume(0.3)
     self.doneSound = love.audio.newSource("track2/doneSound.wav", "static")
-    self.doneSound:setVolume(0.5)
+    self.doneSound:setVolume(0.2)
 end
 
 function Game:start()
@@ -250,7 +250,8 @@ function Game:textFinished(textBox, node)
                     onSelect = function()
                         print(response[1])
                         self:onChoice(response)
-                    end
+                    end,
+                    debugText = response[3]
                 })
             else
                 -- no text means this is the timeout option
@@ -344,14 +345,27 @@ function Game:draw()
         end
 
         love.graphics.setFont(fonts.debug)
-        love.graphics.setColor(255,255,0)
+        love.graphics.setColor(255,255,127)
         love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
             .. ' ' .. self.dialogState)
         local y = fonts.debug:getHeight()
         for k,v in pairs(self.npc) do
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.print(string.format("%s=%.1f", k, v), 1, y+1)
+            love.graphics.setColor(255, 255, 127)
             love.graphics.print(string.format("%s=%.1f", k, v), 0, y)
             y = y + fonts.debug:getHeight()
         end
+
+        if self.textBox and self.textBox.choices and self.textBox.index <= #self.textBox.choices then
+            local nextState = self.textBox.choices[self.textBox.index].debugText or self.dialogState or 'nil'
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.print("choice -> " .. nextState, 1, y+1)
+            love.graphics.setColor(255, 255, 255)
+            love.graphics.print("choice -> " .. nextState, 0, y)
+            -- y = y + fonts.debug:getHeight()
+        end
+
     end)
 
     self.scaled:renderTo(function()

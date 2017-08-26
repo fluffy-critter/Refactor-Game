@@ -6,7 +6,6 @@ Refactor: 2 - Strangers
 ]]
 
 local cute = require('thirdparty.cute')
-local util = require('util')
 local notion = cute.notion
 -- local check = cute.check
 -- local minion = cute.minion
@@ -14,7 +13,6 @@ local notion = cute.notion
 
 local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
-local Game = require('track2.game')
 
 local function checkAllDialogs(dlog, func)
     for state,items in pairs(dlog) do
@@ -57,7 +55,6 @@ notion("State value speling", function()
         phase = "engine",
 
         -- attributes set by special callbacks
-        sequence = "special",
     }
     local used = {}
 

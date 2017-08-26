@@ -518,7 +518,7 @@ local dialog = {
             responses = {
                 {"No.", {}, "brain_problems"},
                 {"You're my husband...right?", {}, "brain_problems"},
-                {"Of course I do.", {}, "normal"}
+                {"Of course I do.", {}, "wtf"}
             }
         },
 
@@ -730,34 +730,31 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {sequence=0},
+            pos = {phase=0},
             text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
-            onReach = function(npc)
-                npc.sequence = 100
-            end
         },
         {
-            pos = {sequence=1},
+            pos = {phase=-1},
             text = "Someone is coming.... everything will be okay.",
             max_count=5
         },
         {
-            pos = {sequence=2},
+            pos = {phase=-2},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
             max_count=5
         },
         {
-            pos = {sequence=2},
+            pos = {phase=-2},
             text = "They'll be here soon.",
             max_count=5
         },
         {
-            pos = {sequence=2},
+            pos = {phase=-2},
             text = "I love you.%#%\n\nWe'll get through this.",
             max_count=5
         },
         {
-            pos = {sequence=2},
+            pos = {phase=-2},
             text = "It's okay, I'm here for you.",
             max_count=5
         },

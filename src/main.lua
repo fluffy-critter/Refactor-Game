@@ -37,6 +37,14 @@ setmetatable(_G, {
 local PROFILE = false
 local DEBUG = false
 
+local Pie
+if PROFILE then
+    local piefiller = require('thirdparty.piefiller')
+    Pie = piefiller:new()
+    Pie:setKey("save_to_file","w")
+end
+
+
 local cute = require('thirdparty.cute')
 
 local shaders = require('shaders')
@@ -46,13 +54,6 @@ local fonts = require('fonts')
 local imagepool = require('imagepool')
 
 local baseTitle = "Sockpuppet - Refactor"
-
-local Pie
-if PROFILE then
-    local piefiller = require('thirdparty.piefiller')
-    Pie = piefiller:new()
-    Pie:setKey("save_to_file","w")
-end
 
 local function blitCanvas(canvas, aspect)
     local screenWidth = love.graphics.getWidth()
