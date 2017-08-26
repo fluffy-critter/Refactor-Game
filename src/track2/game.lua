@@ -14,6 +14,9 @@ local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
 local scenes = require('track2.scenes')
 
+local EventQueue = require('EventQueue')
+local Animator = require('Animator')
+
 local Game = {
     META = {
         tracknum = 2,
@@ -58,7 +61,6 @@ function Game:init()
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
     self.border =imagepool.load('track2/border.png')
-    self.scene = scenes.kitchen()
 
     self.lyrics = require('track2.lyrics')
     self.lyricPos = 1
@@ -84,10 +86,54 @@ function Game:init()
     self.printSound:setVolume(0.3)
     self.doneSound = love.audio.newSource("track2/doneSound.wav", "static")
     self.doneSound:setVolume(0.2)
+
+    self.eventQueue = EventQueue.new()
+    self.animator = Animator.new()
+
+    self.activeAnimations = {}
+end
+
+--[[
+    trigger an animation with a known end time, right now
+
+    anim - the Animation object
+    startTime - when to start the animation (default: next frame)
+    endTime - when to end the animation (default: anim.duration)
+]]
+function Game:addAnimation(anim, startTime, endTime)
+    self.eventQueue:addEvent(
+        startTime or {},
+        function(now)
+            if endTime then
+                anim.duration = clock.posToTime(endTime) - clock.posToTime(now)
+            end
+            self.animator:add(anim)
+        end)
 end
 
 function Game:start()
     self.music:play()
+
+    self.scene = scenes.kitchen()
+    local scene = self.scene
+
+    -- animation: Greg walking down the stairs
+    for y = 0, 10 do
+        self:addAnimation(
+            {
+                target = scene.greg,
+                endPos = {217, y*8 - 28},
+                easing = Animator.ease_out,
+                duration = 0.25,
+                onStart = function()
+                    scene.greg.frame = scene.frames.greg.down[2 + y % 2]
+                end,
+                onComplete = function()
+                    scene.greg.frame = scene.frames.greg.down[1]
+                end
+            },
+            {0, math.floor(y/4), y%4})
+    end
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -104,6 +150,9 @@ end
 
 function Game:update(dt)
     local time = self:musicPos()
+
+    self.eventQueue:runEvents(time)
+    self.animator:update(dt)
 
     if self.nextLyric and util.arrayLT(self.nextLyric[1], time) then
         self.lyricText = self.nextLyric[2]

@@ -32,7 +32,7 @@ function scenes.kitchen()
 
     local greg = Sprite.new({
         sheet = spriteSheet,
-        pos = {217, 0},
+        pos = {217, -40},
         animations = {
             walk_down = {
                 {quads.greg.down[1], .25},
@@ -43,7 +43,7 @@ function scenes.kitchen()
         },
         frame = quads.greg.down[1]
     })
-    greg.animation = greg.animations.walk_down
+    greg.animation = nil
 
     return {
         frames = quads,

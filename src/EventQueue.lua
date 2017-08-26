@@ -21,6 +21,8 @@ function EventQueue.new(obj)
 end
 
 function EventQueue:addEvent(when, what)
+    -- TODO normalize timepos to actual timecode
+
     table.insert(self.queue, {when = when, what = what})
     if not self.nextEvent or util.arrayLT(when, self.nextEvent) then
         self.nextEvent = when
@@ -46,8 +48,7 @@ function EventQueue:runEvents(time)
     local removes = {}
     self.nextEvent = nil
 
-    for idx = #self.queue,1,-1 do
-        local event = self.queue[idx]
+    for idx,event in ipairs(self.queue) do
         if not util.arrayLT(time, event.when) then
             event.what(time)
             table.insert(removes, idx)
@@ -56,8 +57,8 @@ function EventQueue:runEvents(time)
         end
     end
 
-    for _,r in ipairs(removes) do
-        self.queue[r] = self.queue[#self.queue]
+    for i = #removes,1,-1 do
+        self.queue[removes[i]] = self.queue[#self.queue]
         self.queue[#self.queue] = nil
     end
 end

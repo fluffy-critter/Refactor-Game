@@ -65,8 +65,7 @@ function Spawner:update(dt)
     local removes = {}
     self.nextEvent = nil
 
-    for idx = #self.queue,1,-1 do
-        local spawn = self.queue[idx]
+    for idx,spawn in ipairs(self.queue) do
         if spawn.when <= self.time then
             local obj = spawn.class.new(self.game, spawn.item)
             for _,tgt in pairs(spawn.targets) do
@@ -78,8 +77,8 @@ function Spawner:update(dt)
         end
     end
 
-    for _,r in ipairs(removes) do
-        self.queue[r] = self.queue[#self.queue]
+    for i = #removes,1,-1 do
+        self.queue[removes[i]] = self.queue[#self.queue]
         self.queue[#self.queue] = nil
     end
 end

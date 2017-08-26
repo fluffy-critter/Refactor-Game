@@ -208,12 +208,11 @@ function Game:init()
     self.toKill = {}
 
     self.eventQueue = EventQueue.new()
-    self:setGameEvents()
-
     self.scoreFont = fonts.centuryGothicDigits
 end
 
 function Game:start()
+    self:setGameEvents()
 end
 
 function Game:defer(item)
