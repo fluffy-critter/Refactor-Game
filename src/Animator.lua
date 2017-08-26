@@ -30,7 +30,7 @@ Animator.Easing = {
         return a + (b - a)*x*x
     end,
     ease_out = function(a, b, x)
-        return a + (b - a)*math.sqrt(x)
+        return b + (a - b)*(1 - x)*(1 - x)
     end
 }
 

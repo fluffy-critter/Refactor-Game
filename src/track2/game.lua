@@ -118,12 +118,12 @@ function Game:start()
     local scene = self.scene
 
     -- animation: Greg walking down the stairs
-    for y = 0, 10 do
+    for y = 0, 13 do
         self:addAnimation(
             {
                 target = scene.greg,
                 endPos = {217, y*8 - 28},
-                easing = Animator.ease_out,
+                easing = Animator.Easing.ease_out,
                 duration = 0.25,
                 onStart = function()
                     scene.greg.frame = scene.frames.greg.down[2 + y % 2]
