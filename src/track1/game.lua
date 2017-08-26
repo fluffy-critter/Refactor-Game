@@ -17,6 +17,7 @@ local FlappyBat = require('track1.FlappyBat')
 
 local Spawner = require('track1.Spawner')
 
+local EventQueue = require('EventQueue')
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
@@ -206,8 +207,7 @@ function Game:init()
     self.spawner = Spawner.new(self)
     self.toKill = {}
 
-    self.eventQueue = {}
-    self.nextEvent = nil
+    self.eventQueue = EventQueue.new()
     self:setGameEvents()
 
     self.scoreFont = fonts.centuryGothicDigits
@@ -221,10 +221,7 @@ function Game:defer(item)
 end
 
 function Game:addEvent(event)
-    table.insert(self.eventQueue, event)
-    if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-        self.nextEvent = event.when
-    end
+    self.eventQueue:addEvent(event)
 end
 
 function Game:setGameEvents()
@@ -516,7 +513,7 @@ function Game:setGameEvents()
         end
     }
 
-    self.eventQueue = {
+    self.eventQueue:addEvents({
         {
             when = {0},
             what = function()
@@ -700,9 +697,7 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.eyes.boss()
             end
         },
-    }
-
-    self.nextEvent = {0}
+    })
 end
 
 function Game:setPhase(phase)
@@ -741,27 +736,6 @@ function Game:onButtonPress(button)
     end
 end
 
-function Game:runEvents(time)
-    if not self.nextEvent or util.arrayLT(time, self.nextEvent) then
-        return
-    end
-
-    local removes = {}
-    self.nextEvent = nil
-
-    for idx,event in pairs(self.eventQueue) do
-        if not util.arrayLT(time, event.when) then
-            event.what(unpack(event.args or {}))
-            table.insert(removes, idx)
-        elseif not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-            self.nextEvent = event.when
-        end
-    end
-    for _,r in ipairs(removes) do
-        self.eventQueue[r] = nil
-    end
-end
-
 function Game:update(raw_dt)
     local p = self.paddle
     local b = self.bounds
@@ -773,7 +747,7 @@ function Game:update(raw_dt)
             self:setPhase(phase)
         end
 
-        self:runEvents(time)
+        self.eventQueue:runEvents(time)
     end
 
     if self.phase >= 11 then
