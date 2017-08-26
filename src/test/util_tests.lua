@@ -1,3 +1,12 @@
+--[[
+Refactor
+
+(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
+
+Utility library unit tests
+
+]]
+
 local cute = require('thirdparty.cute')
 local notion = cute.notion
 local check = cute.check

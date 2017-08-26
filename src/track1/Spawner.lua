@@ -23,6 +23,9 @@ end
 
 function Spawner:onInit()
     self.time = 0
+
+    -- TODO this could probably just use EventQueue
+
     self.nextEvent = nil
     self.queue = {}
 end
@@ -62,7 +65,8 @@ function Spawner:update(dt)
     local removes = {}
     self.nextEvent = nil
 
-    for idx,spawn in ipairs(self.queue) do
+    for idx = #self.queue,1,-1 do
+        local spawn = self.queue[idx]
         if spawn.when <= self.time then
             local obj = spawn.class.new(self.game, spawn.item)
             for _,tgt in pairs(spawn.targets) do
@@ -73,6 +77,7 @@ function Spawner:update(dt)
             self.nextEvent = spawn.when
         end
     end
+
     for _,r in ipairs(removes) do
         self.queue[r] = self.queue[#self.queue]
         self.queue[#self.queue] = nil

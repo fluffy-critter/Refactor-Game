@@ -25,7 +25,6 @@ function EventQueue:addEvent(when, what)
     if not self.nextEvent or util.arrayLT(when, self.nextEvent) then
         self.nextEvent = when
     end
-    print(#self.queue)
 end
 
 -- Copy in a bunch of events at once
@@ -36,7 +35,6 @@ function EventQueue:addEvents(tbl)
             self.nextEvent = event.when
         end
     end
-    print(#self.queue, unpack(self.nextEvent))
 end
 
 -- Run all the events up to and including the current time. Events get the time in their callback
@@ -48,7 +46,8 @@ function EventQueue:runEvents(time)
     local removes = {}
     self.nextEvent = nil
 
-    for idx,event in ipairs(self.queue) do
+    for idx = #self.queue,1,-1 do
+        local event = self.queue[idx]
         if not util.arrayLT(time, event.when) then
             event.what(time)
             table.insert(removes, idx)
@@ -56,6 +55,7 @@ function EventQueue:runEvents(time)
             self.nextEvent = event.when
         end
     end
+
     for _,r in ipairs(removes) do
         self.queue[r] = self.queue[#self.queue]
         self.queue[#self.queue] = nil
