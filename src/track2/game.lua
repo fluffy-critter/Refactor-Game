@@ -84,8 +84,13 @@ function Game:init()
 
     self.printSound = love.audio.newSource("track2/printSound.wav", "static")
     self.printSound:setVolume(0.3)
+    self.selectSound = love.audio.newSource("track2/selectSound.wav", "static")
+    self.selectSound:setVolume(0.2)
+
     self.doneSound = love.audio.newSource("track2/doneSound.wav", "static")
     self.doneSound:setVolume(0.2)
+    self.timeoutSound = love.audio.newSource("track2/timeoutSound.wav", "static")
+    self.timeoutSound:setVolume(0.2)
 
     self.eventQueue = EventQueue.new()
     self.animator = Animator.new()
@@ -218,6 +223,11 @@ function Game:update(dt)
         self.nextTimeout = nil
         if self.textBox then
             self.textBox:close()
+
+            if self.textBox.choices then
+                self.timeoutSound:seek(0)
+                self.timeoutSound:play()
+            end
         end
     end
 
@@ -310,7 +320,7 @@ function Game:textFinished(textBox, node)
 
         print("choices: " .. #choices)
 
-        self.nextChoices = TextBox.new({choices = choices, onClose = onClose})
+        self.nextChoices = TextBox.new({choices = choices, onClose = onClose, selectSound = self.selectSound})
     end
 
     self.nextDialog = self:getNextDialog()

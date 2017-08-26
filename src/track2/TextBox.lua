@@ -94,11 +94,21 @@ function TextBox:onButtonPress(key)
     end
 
     if self.choices and (key == 'up' or key == 'down') then
+        local play
         if key == 'up' and self.index > 1 then
             self.index = self.index - 1
+            play = true
         elseif key == 'down' and self.index < #self.choices then
             self.index = self.index + 1
+            play = true
         end
+
+        if play and self.selectSound then
+            self.selectSound:stop()
+            self.selectSound:seek(0)
+            self.selectSound:play()
+        end
+
         self.stateAge = 0
         return true
     end
