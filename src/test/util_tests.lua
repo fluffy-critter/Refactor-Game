@@ -188,3 +188,21 @@ notion("clock", function()
         check(clock.timeToPos(clock.posToTime({0,1,-1}))).shallowMatches({0,0,3})
     end)
 end)
+
+notion("runQueue", function()
+    local queue = {}
+
+    for i=1,10 do
+        table.insert(queue, i)
+    end
+
+    util.runQueue(queue, function(item)
+        return item % 2 == 0
+    end)
+
+    check(#queue).is(5)
+    for _,item in ipairs(queue) do
+        check(item % 2 == 1)
+    end
+
+end)
