@@ -23,8 +23,8 @@ notion("the queue functions", function()
         lastRan = when
     end
 
-    eq:addEvent({}, cb)
-    eq:addEvent({1}, cb)
+    eq:addEvent({when = {}, what = cb})
+    eq:addEvent({when = {1}, what = cb})
 
     check(#eq.queue).is(2)
     check(eq.nextEvent).shallowMatches({})
@@ -56,7 +56,7 @@ notion("the queue functions", function()
         print(k,v)
     end
 
-    eq:addEvent({11}, cb)
+    eq:addEvent({when = {11}, what = cb})
     eq:runEvents({10})
 
     print("after")

@@ -20,22 +20,22 @@ function EventQueue.new(obj)
     return self
 end
 
-function EventQueue:addEvent(when, what)
+function EventQueue:addEvent(event)
     -- TODO normalize timepos to actual timecode
 
-    table.insert(self.queue, {when = when, what = what})
-    if not self.nextEvent or util.arrayLT(when, self.nextEvent) then
-        self.nextEvent = when
+    assert(event.when)
+    assert(event.what)
+
+    table.insert(self.queue, event)
+    if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
+        self.nextEvent = event.when
     end
 end
 
 -- Copy in a bunch of events at once
 function EventQueue:addEvents(tbl)
     for _,event in ipairs(tbl) do
-        table.insert(self.queue, event)
-        if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-            self.nextEvent = event.when
-        end
+        self:addEvent(event)
     end
 end
 
