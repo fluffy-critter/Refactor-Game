@@ -294,4 +294,19 @@ function util.set(...)
     return ret
 end
 
+-- Run a function on a sequence as a queue; the function takes an item, and returns whether the item has been consumed
+function util.runQueue(queue, consume)
+    local removes = {}
+    for idx,item in ipairs(queue) do
+        if consume(item) then
+            table.insert(removes, idx)
+        end
+    end
+
+    for i = #removes,1,-1 do
+        queue[removes[i]] = queue[#queue]
+        queue[#queue] = nil
+    end
+end
+
 return util

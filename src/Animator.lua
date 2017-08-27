@@ -45,7 +45,12 @@ function Animator.new(o)
     return self
 end
 
-function Animator:add(anim)
+-- Add an animation to the system, preempting any animations that match the condition function
+function Animator:add(anim, preempt)
+    if preempt then
+        util.runQueue(self.queue, preempt)
+    end
+
     util.applyDefaults(anim, {
         easing = Animator.Easing.linear,
         duration = 1,
@@ -57,9 +62,7 @@ function Animator:add(anim)
 end
 
 function Animator:update(dt)
-    local removes = {}
-
-    for idx,anim in ipairs(self.queue) do
+    util.runQueue(self.queue, function(anim)
         if not anim.startPos then
             anim.startPos = util.shallowCopy(anim.target.pos)
         end
@@ -82,19 +85,14 @@ function Animator:update(dt)
                 anim.onComplete = nil
             end
 
-            table.insert(removes, idx)
+            return true
         else
             local t = anim.now / anim.duration
             for k,v in pairs(anim.startPos) do
                 anim.target.pos[k] = anim.easing(v, anim.endPos[k], t)
             end
         end
-    end
-
-    for i = #removes,1,-1 do
-        self.queue[removes[i]] = self.queue[#self.queue]
-        self.queue[#self.queue] = nil
-    end
+    end)
 end
 
 function Animator:isFinished()

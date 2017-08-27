@@ -856,30 +856,18 @@ function Game:update(raw_dt)
         end
 
         local function doPostUpdates(cur)
-            local removes = {}
-            for idx,thing in pairs(cur) do
+            util.runQueue(cur, function(thing)
                 thing:postUpdate(dt, rawt)
-                if not thing:isAlive() then
-                    table.insert(removes, idx)
-                end
-            end
-            for _,r in pairs(removes) do
-                cur[r] = nil
-            end
+                return not thing:isAlive()
+            end)
         end
 
         doPostUpdates(self.balls)
         doPostUpdates(self.actors)
 
-        local removes = {}
-        for idx,particle in pairs(self.particles) do
-            if not particle:update(dt) then
-                table.insert(removes, idx)
-            end
-        end
-        for _,r in pairs(removes) do
-            self.particles[r] = nil
-        end
+        util.runQueue(self.particles, function(particle)
+            return not particle:update(dt)
+        end)
     end
 
     for _ = 1, 8 do

@@ -106,14 +106,17 @@ end
     endTime - when to end the animation (default: anim.duration)
 ]]
 function Game:addAnimation(anim, startTime, endTime)
-    self.eventQueue:addEvent(
-        startTime or {},
-        function(now)
+    self.eventQueue:addEvent({
+        when = startTime or {},
+        what = function(now)
             if endTime then
                 anim.duration = clock.posToTime(endTime) - clock.posToTime(now)
             end
-            self.animator:add(anim)
-        end)
+            self.animator:add(anim, function(check)
+                return anim.target == check.target
+            end)
+        end
+    })
 end
 
 function Game:start()

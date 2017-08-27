@@ -45,22 +45,16 @@ function EventQueue:runEvents(time)
         return
     end
 
-    local removes = {}
     self.nextEvent = nil
 
-    for idx,event in ipairs(self.queue) do
+    util.runQueue(self.queue, function(event)
         if not util.arrayLT(time, event.when) then
             event.what(time)
-            table.insert(removes, idx)
+            return true
         elseif not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
             self.nextEvent = event.when
         end
-    end
-
-    for i = #removes,1,-1 do
-        self.queue[removes[i]] = self.queue[#self.queue]
-        self.queue[#self.queue] = nil
-    end
+    end)
 end
 
 return EventQueue

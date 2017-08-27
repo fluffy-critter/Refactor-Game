@@ -243,7 +243,11 @@ local dialog = {
         {
             pos = {phase=10},
             text = "Ha ha, fine, don't tell me anything...",
-            responses = {}
+            responses = {
+                {"I feel... numb...", {}, "stroke"},
+                {"Who are you?", {}, "brain_problems"},
+                {"Please just go away...", {}, "alienated"}
+            }
         },
 
         {
@@ -510,10 +514,38 @@ local dialog = {
 
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: last_night" },
+        {
+            pos = {phase=1},
+            text = "I'm sorry, hon. I really don't know what came over me last night.",
+            responses = {
+                {"It's okay.", {}, "normal"},
+                {"What happened?", {}},
+                {"... All right.", {}, "alienated"},
+            }
+        },
+
+        {
+            pos = {phase=2},
+            text = "Just... something you said set me off a little bit and you know how I get sometimes.",
+            responses = {
+                {"I do?", {}},
+                {"I'm sure it was okay.", {}},
+                {"I don't remember.", {}},
+            }
+        },
 
         {
             pos = {phase=5},
+            text = "But I mean, we've been married a while, I guess this was inevitable, right?",
+            responses = {
+                {"We're married?", {}, "brain_problems"},
+                {"Yeah, I guess so.", {}},
+                {"Who are you, again?", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=7},
             text = "Wait... you ACTUALLY don't know who I am?",
             responses = {
                 {"No.", {}, "brain_problems"},
@@ -523,14 +555,24 @@ local dialog = {
         },
 
         {
-            pos = {phase=10},
+            pos = {phase=10, samething=0},
             text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
-            responses = {}
+            responses = {
+                {"What are we talking about?", {}, "brain_problems"},
+                {"I think so...?", {samething=500}},
+                {"I don't even know.", {samething=500}},
+                {nil, {}, "silence"}
+            }
         },
         {
-            pos = {phase=10},
+            pos = {phase=10, samething=0},
             text = "Ha ha, what? Are we even talking about the same thing?",
-            responses = {}
+            responses = {
+                {"What are we talking about?", {}, "brain_problems"},
+                {"I think so...?", {samething=500}},
+                {"Probably not.", {}, "normal"},
+                {nil, {}, "silence"}
+            }
         }
     },
 
