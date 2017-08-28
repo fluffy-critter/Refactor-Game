@@ -146,7 +146,7 @@ function Game:start()
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},
         what = function()
-            self:setPosture(scene.greg, "next_to_rose")
+            self:setPose(scene.greg, "right_of_rose")
         end
     })
 end
@@ -218,8 +218,8 @@ function Game:update(dt)
                     node.onReach(self.npc)
                 end
 
-                if node.gregPosture then
-                    self:setPosture(self.kitchenScene.greg, node.posture)
+                if node.pose then
+                    self:setPose(self.kitchenScene.greg, node.pose)
                 end
             end
         end
@@ -387,40 +387,44 @@ function Game:chooseDialog()
     return minNode
 end
 
--- set a posture of the Greg NPC
-function Game:setPosture(sprite, postureName, after)
-    local posture = sprite.posture[postureName]
-    if not posture then
-        print("Warning: requested nonexistent posture " .. posture)
+-- set a pose of the Greg NPC
+function Game:setPose(sprite, poseName, after)
+    local pose = sprite.pose[poseName]
+    if not pose then
+        print("Warning: requested nonexistent pose " .. pose)
         return
     end
 
-    local dx = posture.pos[1] - sprite.pos[1]
-    local dy = posture.pos[2] - sprite.pos[2]
+    -- TODO: pathfinding? probably overkill...
 
-    local animation = sprite.mapAnimation and sprite:mapAnimation(dx, dy)
+    local dx = pose.pos[1] - sprite.pos[1]
+    local dy = pose.pos[2] - sprite.pos[2]
 
-    local duration = math.sqrt(dx*dx + dy*dy)/(posture.speed or 1)
+    local animation = sprite.mapAnimation and sprite:mapAnimation(dx, dy, pose)
+    local rate = animation and animation.walkRate or 24
+    local speed = pose.speed or 1
+
+    local duration = math.sqrt(dx*dx + dy*dy)/speed/rate
 
     self:addAnimation({
         target = sprite,
-        easing = posture.easing,
-        endPos = posture.pos,
+        easing = pose.easing,
+        endPos = pose.pos,
         duration = duration,
         onStart = function()
-            print("Started animation for " .. postureName)
+            print("Started animation for " .. poseName)
             sprite.animation = animation
-            sprite.animSpeed = posture.speed or 1
+            sprite.animRate = speed
         end,
         onComplete = function()
-            print("Completed animation for " .. postureName)
-            if sprite.animation.stop then
+            print("Completed animation for " .. poseName)
+            if sprite.animation and sprite.animation.stop then
                 sprite.frame = sprite.animation.stop
             end
             sprite.animation = nil
 
-            if posture.onComplete then
-                posture.onComplete(sprite)
+            if pose.onComplete then
+                pose.onComplete(sprite)
             end
 
             if after then

@@ -39,23 +39,45 @@ function scenes.kitchen()
                 {quads.greg.down[2], .25},
                 {quads.greg.down[1], .25},
                 {quads.greg.down[3], .25},
-                stop = quads.greg.down[1]
+                stop = quads.greg.down[1],
+                -- walkRate = 24,
             },
             walk_up = {
                 {quads.greg.up[1], .25},
                 {quads.greg.up[2], .25},
                 {quads.greg.up[1], .25},
                 {quads.greg.up[3], .25},
-                stop = quads.greg.up[1]
+                stop = quads.greg.up[1],
             }
         },
-        posture = {
+        pose = {
             next_to_rose = {
-                pos = {136, 104}
-            }
+                pos = {136,104}
+            },
+            next_to_rose_worried = {
+                pos = {136,104},
+                worried = true,
+                -- onComplete = function(sprite)
+                --     sprite.animation = greg.animations.stand_left_worried
+                -- end
+            },
+            right_of_rose = {
+                pos = {152,108}
+            },
+            bottom_of_stairs = {
+                pos = {217,80}
+            },
+            left_of_couch = {
+                pos = {200,128}
+            },
+            below_doors = {
+                pos = {147,90}
+            },
         },
-        mapAnimation = function(self, dx, dy)
-            if math.max(dx) < math.max(dy) then
+        mapAnimation = function(self, dx, dy, _)
+            -- TODO: pose (final arg) can choose 'worried' modifier etc.
+
+            if math.abs(dx) < math.abs(dy) then
                 return dy > 0 and self.animations.walk_down or self.animations.walk_up
             end
 

@@ -80,6 +80,7 @@ local dialog = {
         {
             pos = {},
             text = "# Good morning, dear! #",
+            pose = "right_of_rose",
             responses = {
                 {"Uh... hi...", {}, "normal"},
                 {"Who are you...?", {}, "last_night"},
@@ -90,6 +91,7 @@ local dialog = {
         {
             pos = {},
             text = "Good morning... how are you feeling today?",
+            pose = "left_of_couch",
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
@@ -746,23 +748,27 @@ local dialog = {
 
         {
             pos = {phase=12},
+            pose = "right_of_rose",
             text = "What does it matter? You won't even remember this anyway."
         },
         {
             pos = {phase=12},
             text = "% .%.%.% %%You don't even...% remember...%% me.",
+            pose = "right_of_rose",
             cantInterrupt=true
         },
 
         {
             pos = {phase=10},
             text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?",
+            pose = "left_of_couch",
             cantInterrupt=true
         },
 
         {
             pos = {phase=12.5},
             text = "I just can't do this anymore. Goodbye.",
+            pose = "below_doors",
             onReach=function(npc)
                 npc.gone=true
             end
@@ -773,6 +779,7 @@ local dialog = {
     stroke = {
         {
             pos = {phase=0},
+            pose = "next_to_rose_worried",
             text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
         },
         {
