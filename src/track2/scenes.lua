@@ -39,8 +39,28 @@ function scenes.kitchen()
                 {quads.greg.down[2], .25},
                 {quads.greg.down[1], .25},
                 {quads.greg.down[3], .25},
+                stop = quads.greg.down[1]
+            },
+            walk_up = {
+                {quads.greg.up[1], .25},
+                {quads.greg.up[2], .25},
+                {quads.greg.up[1], .25},
+                {quads.greg.up[3], .25},
+                stop = quads.greg.up[1]
             }
         },
+        posture = {
+            next_to_rose = {
+                pos = {136, 104}
+            }
+        },
+        mapAnimation = function(self, dx, dy)
+            if math.max(dx) < math.max(dy) then
+                return dy > 0 and self.animations.walk_down or self.animations.walk_up
+            end
+
+            return dx > 0 and self.animations.walk_right or self.animations.walk_left
+        end,
         frame = quads.greg.down[1]
     })
     greg.animation = nil

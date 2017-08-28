@@ -122,15 +122,16 @@ end
 function Game:start()
     self.music:play()
 
-    self.scene = scenes.kitchen()
-    local scene = self.scene
+    self.kitchenScene = scenes.kitchen()
+    self.scene = self.kitchenScene
 
     -- animation: Greg walking down the stairs
+    local scene = self.scene
     for y = 0, 13 do
         self:addAnimation(
             {
                 target = scene.greg,
-                endPos = {217, y*8 - 28},
+                endPos = {218, y*8 - 28},
                 easing = Animator.Easing.ease_out,
                 duration = 0.25,
                 onStart = function()
@@ -142,6 +143,12 @@ function Game:start()
             },
             {0, math.floor(y/4), y%4})
     end
+    self.eventQueue:addEvent({
+        when = {0, 3, 2.5},
+        what = function()
+            self:setPosture(scene.greg, "next_to_rose")
+        end
+    })
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -209,6 +216,10 @@ function Game:update(dt)
 
                 if node.onReach then
                     node.onReach(self.npc)
+                end
+
+                if node.gregPosture then
+                    self:setPosture(self.kitchenScene.greg, node.posture)
                 end
             end
         end
@@ -374,6 +385,49 @@ function Game:chooseDialog()
     end
 
     return minNode
+end
+
+-- set a posture of the Greg NPC
+function Game:setPosture(sprite, postureName, after)
+    local posture = sprite.posture[postureName]
+    if not posture then
+        print("Warning: requested nonexistent posture " .. posture)
+        return
+    end
+
+    local dx = posture.pos[1] - sprite.pos[1]
+    local dy = posture.pos[2] - sprite.pos[2]
+
+    local animation = sprite.mapAnimation and sprite:mapAnimation(dx, dy)
+
+    local duration = math.sqrt(dx*dx + dy*dy)/(posture.speed or 1)
+
+    self:addAnimation({
+        target = sprite,
+        easing = posture.easing,
+        endPos = posture.pos,
+        duration = duration,
+        onStart = function()
+            print("Started animation for " .. postureName)
+            sprite.animation = animation
+            sprite.animSpeed = posture.speed or 1
+        end,
+        onComplete = function()
+            print("Completed animation for " .. postureName)
+            if sprite.animation.stop then
+                sprite.frame = sprite.animation.stop
+            end
+            sprite.animation = nil
+
+            if posture.onComplete then
+                posture.onComplete(sprite)
+            end
+
+            if after then
+                after()
+            end
+        end
+    })
 end
 
 function Game:draw()
