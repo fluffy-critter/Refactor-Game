@@ -18,7 +18,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
         },
         onReach=function(npc), -- function to call if we've reached this state
         setState = "state", -- which state to switch to if we get to this point
-        max_count=..., -- Maximum number of times this fragment can appear (default: 1)
+        maxCount=..., -- Maximum number of times this fragment can appear (default: 1)
     },
 
 "pos" matches against attributes including the following:
@@ -43,35 +43,6 @@ local dialog = {
 
     -- things that are always available
     always = {
-        {
-            pos = {silence_total=2, silence_cur=1},
-            text = "You okay?",
-            responses = {
-                {"Yeah, I'm just... a bit preoccupied.", {}},
-                {"No.", {}},
-                {"Why are you even talking to me?", {}, "alienated"}
-            }
-        },
-        {
-            pos = {silence_total=3, silence_cur=1},
-            text = "What's with the cold shoulder?",
-            responses = {
-                {"What should I say?", {}},
-                {"Are you in the right home?", {}},
-                {"Who do you think you are?", {}, "alienated"},
-                {nil, {}, "silence"}
-            }
-        },
-        {
-            pos = {silence_total=6, silence_cur=1},
-            text = "So you're back on that now, huh?",
-            responses = {
-                {"Back to what?", {}},
-                {"I think you're confused.", {}},
-                {"Who are you and why are you in my home?", {}, "brain_problems"},
-                {nil, {}, "silence"}
-            }
-        },
 
     },
 
@@ -327,6 +298,16 @@ local dialog = {
     -- path where Greg thinks everything is normal
     normal = {
         {
+            pos = {silence_total=2, silence_cur=1},
+            text = "You okay?",
+            responses = {
+                {"Yeah, I'm just... a bit preoccupied.", {}},
+                {"No.", {}},
+                {"Why are you even talking to me?", {}, "alienated"}
+            }
+        },
+
+        {
             pos = {phase=1},
             text = "How are you this morning?",
             responses = {
@@ -484,6 +465,28 @@ local dialog = {
         { pos = {}, text = "DIALOG PATH INCOMPLETE: wtf" },
 
         {
+            pos = {silence_total=3, silence_cur=1},
+            text = "And now the cold shoulder?!",
+            responses = {
+                {"What should I say?", {}},
+                {"Are you in the right home?", {}},
+                {"Who do you think you are?", {}, "alienated"},
+                {nil, {}, "silence"}
+            }
+        },
+        {
+            pos = {silence_total=6, silence_cur=1},
+            text = "So you're back on that now, huh.",
+            responses = {
+                {"Back to what?", {}},
+                {"I think you're confused.", {}},
+                {"Who are you and why are you in my home?", {}, "brain_problems"},
+                {nil, {}, "silence"}
+            }
+        },
+
+
+        {
             pos = {phase=2},
             text = "Uh... what?",
             responses = {
@@ -583,6 +586,7 @@ local dialog = {
         {
             pos = {phase=4},
             text = "Say, have you eaten breakfast yet?",
+            pose = "kitchen",
             responses = {
                 {"Yeah.", {lastnight_breakfast=10}},
                 {"No.", {lastnight_breakfast=-10}},
@@ -592,21 +596,24 @@ local dialog = {
 
         {
             pos = {lastnight_breakfast=10},
-            text = "Really? Oh, you must have done the dishes already. Okay."
+            pose = "behind_rose",
+            text = "Really? Oh, you must have done the dishes already. Okay.",
         },
         {
             pos = {lastnight_breakfast=-10},
+            pose = "behind_rose",
             text = "Oh...% you really should eat something.% You know what the doctor said about that.%% " ..
-                "Um, sorry to nag you about that.% Again."
+                "Um, sorry to nag you about it...% Again..."
         },
 
         {
             pos = {lastnight_unsure_breakfast=100},
             text = "You%.%.%. aren't sure if you've had breakfast?%% Are you feeling okay?",
+            pose = "right_of_rose",
             responses = {
                 {"I don't know.", {}, "brain_problems"},
-                {"Yeah, I guess.", {lastnight_blackout=1}},
-                {"No... I'm not...", {}}
+                {"Yeah, I guess.", {lastnight_blackout=100}},
+                {"No... I'm not...", {}, "brain_problems"}
             }
         },
 
@@ -615,7 +622,7 @@ local dialog = {
             text = "But anyway...%% We've been married a while, I guess this was inevitable, right?",
             responses = {
                 {"We're married?", {}, "brain_problems"},
-                {"Yeah, I guess so.", {lastnight_ignorance=-1}},
+                {"Yeah, I guess so.", {lastnight_ignorance=-50}},
                 {"Who are you, again?", {}, "brain_problems"}
             }
         },
@@ -626,17 +633,17 @@ local dialog = {
                 "And you know how I worry about that.",
             pose = "couch_sitting",
             responses = {
-                {"Who are you?", {lastnight_joking=1}},
+                {"Who are you?", {lastnight_joking=10}},
                 {"Only lately?", {}, "wtf"},
                 {"I've been feeling strange.", {}, "normal"}
             }
         },
 
         {
-            pos = {phase=7, lastnight_joking=1},
+            pos = {phase=7, lastnight_joking=10},
             text = "Ha ha, very funny.",
             responses = {
-                {"I'm not kidding.", {lastnight_joking=-1}},
+                {"I'm not kidding.", {lastnight_joking=-10}},
                 {"Sorry...", {}, "normal"},
                 {"Yeah, I'm a comedy genius.", {}}
             }
@@ -647,40 +654,59 @@ local dialog = {
             pose = "right_of_rose",
             responses = {
                 {"No.", {}, "brain_problems"},
-                {"You're my husband...right?", {}},
+                {"You're my husband...right?", {lastnight_yeah_husband=100}},
                 {"Of course I do.", {}, "wtf"},
                 {nil, {}, "silence"}
             }
         },
 
         {
-            pos = {phase=9},
+            pos = {phase=9, lastnight_yeah_husband=0},
             text = "Heh... Come on, you know I don't like when you joke about this stuff.",
             responses = {
-                {"Good thing I'm not joking, then.", {lastnight_joking=-1}},
-                {"I don't know that.", {lastnight_ignorance=1}},
+                {"Good thing I'm not joking, then.", {lastnight_joking=-100}},
+                {"I don't know that.", {lastnight_ignorance=100}},
                 {"I don't even know who you are.", {}, "brain_problems"}
             }
         },
+        {
+            pos = {phase=9, lastnight_yeah_husband=100},
+            text = "Um, yeah...%% I am...%% Are you% sure% you're feeling okay?",
+            responses = {
+                {"No, I'm not.", {}, "brain_problems"},
+                {"Yeah, I think so?", {}, "normal"},
+                {"Everything seems weird.", {}}
+            }
+        },
+
 
         {
-            pos = {phase=10, fun=0},
+            pos = {phase=10, fun=0, lastnight_samething=0},
             text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
-                {"I think so...?", {}},
+                {"I think so...?", {lastnight_samething=1000}},
                 {"I don't even know.", {lastnight_ignorance=1}},
                 {nil, {}, "silence"}
             }
         },
         {
-            pos = {phase=10, fun=50},
+            pos = {phase=10, fun=50, lastnight_samething=0},
             text = "Ha ha, what? Are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
-                {"I think so...?", {}},
+                {"I think so...?", {lastnight_samething=1000}},
                 {"Probably not.", {}, "normal"},
                 {nil, {}, "silence"}
+            }
+        },
+        {
+            pos = {phase=10, lastnight_samething=1000},
+            text = "I'm just not sure what's going on here.",
+            responses = {
+                {"I'm sorry... I'm just in a strange mood.", {}},
+                {"Neither do I.", {}, "brain_problems"},
+                {"What's real anymore?", {}, "brain_problems"}
             }
         },
 
@@ -704,8 +730,19 @@ local dialog = {
             text = "Hon, are you feeling okay?",
             responses = {
                 {"Yeah.", {}},
-                {"No.", {}},
+                {"No.", {bp_not_okay=100}},
                 {"Who are you?", {}}
+            }
+        },
+
+        {
+            pos = {bp_not_okay=100},
+            text = "What's the matter?",
+            responses = {
+                {"I don't know who you are.", {}},
+                {"I don't know what any of this is.", {}},
+                {"Everything looks pixelated...", {}, "stroke"},
+                {nil, {}, "silence"}
             }
         },
 
@@ -713,37 +750,42 @@ local dialog = {
             pos = {phase=3},
             text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
             responses = {
-                {"Like what?", {}},
-                {"No I haven't...", {}},
-                {"Who are you?", {stranger=1}}
+                {"Like what?", {bp_stranger=0}},
+                {"No I haven't...", {bp_stranger=10,bp_yes_you_have=50}},
+                {"Who are you?", {bp_stranger=20}}
             }
         },
 
         {
-            pos = {phase=4, stranger=1},
+            pos = {bp_yes_you_have=50},
+            text = "Yes you have.% You just don't remember forgetting...% of course%.%.%."
+        },
+
+        {
+            pos = {phase=4, bp_stranger=0},
             text = "Please stop looking at me like that. Like I'm a stranger...",
             responses = {
-                {"But you are.", {}},
-                {"Sorry.", {}},
-                {"I don't know who you are.", {stranger=1}}
+                {"But you are.", {bp_stranger=1000}},
+                {"Sorry.", {bp_stranger=1000}},
+                {"I don't know who you are.", {bp_stranger=1000}}
             }
         },
         {
-            pos = {phase=4, stranger=0},
+            pos = {phase=4, bp_stranger=10},
             text = "Please stop looking at me like that. I'm not a stranger.",
             responses = {
-                {"But you are.", {}},
-                {"Sorry.", {}},
-                {"I don't know who you are.", {stranger=1}}
+                {"But you are.", {bp_stranger=1000}},
+                {"Sorry.", {bp_stranger=1000}},
+                {"I don't know who you are.", {bp_stranger=1}}
             }
         },
         {
-            pos = {phase=4, stranger=2},
+            pos = {phase=4, bp_stranger=20},
             text = "Stop looking at me like that. I'm not a stranger...% Am I?",
             responses = {
-                {"You are to me.", {stranger=1}},
-                {"Yes?", {}},
-                {"I don't know who you are.", {}}
+                {"You are to me.", {bp_stranger=1000}},
+                {"Yes?", {bp_stranger=1000}},
+                {"I don't know who you are.", {bp_stranger=1000}}
             }
         },
 
@@ -752,48 +794,60 @@ local dialog = {
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             responses = {
                 {"We're married?", {}},
-                {"How long, exactly?", {howlong=10}},
+                {"How long, exactly?", {bp_howlong=10}},
                 {"You're trying to trick me.", {}}
             }
         },
 
         {
-            pos = {howlong=10},
+            pos = {bp_howlong=10},
             text = "How long? Gosh, 15...? no, 17 years.",
         },
 
         {
-            pos = {phase=6, stranger=0},
+            pos = {phase=6, bp_family_history=0, fun=0},
             text = "But you have a family history of this.%.%.%",
+            onReach = function(npc) npc.bp_family_history=100 end,
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
-                {"How do you know that?", {}}
+                {"How do you know that?", {bp_howknow=100}},
+                {nil, {}}
             }
         },
         {
-            pos = {phase=6, stranger=1},
+            pos = {phase=6, bp_family_history=0, fun=50},
             text = "But you DO have a family history of this.%.%.%",
+            onReach = function(npc) npc.bp_family_history=100 end,
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
-                {"How do you know that?", {}}
+                {"How do you know that?", {bp_howknow=100}},
+                {nil, {}}
             }
         },
         {
-            pos = {phase=6, stranger=2},
+            pos = {phase=6, bp_family_history=0, fun=25},
             text = "But you DO have a family history.%.%.% Oh.%%%\n\nOH.",
             pose = "facing_down",
+            onReach = function(npc) npc.bp_family_history=100 end,
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
-                {"How do you know that?", {}}
+                {"How do you know that?", {bp_howknow=100}},
+                {nil, {}}
             }
         },
 
         {
-            pos = {phase=7, stranger=0},
+            pos = {bp_howknow=100},
+            text = "Because...% You told me about this?%% It's your deepest fear...?"
+        },
+
+        {
+            pos = {phase=7, bp_anything=0},
             text = "Can you remember anything about me? Anything at all?",
+            onReach = function(npc) npc.bp_anything=100 end,
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -801,9 +855,10 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, stranger=2},
+            pos = {phase=7, bp_anything=0},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
+            onReach = function(npc) npc.bp_anything=100 end,
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -813,16 +868,16 @@ local dialog = {
 
         {
             pos = {bp_guess_husband=10},
-            text = "Yeah, but do you actually remember that, or are you just guessing?%%Be honest.",
+            text = "Do you actually remember that, or are you really just guessing?%%Be honest.",
             pose = "next_to_rose",
             responses = {
                 {"I'm just guessing.", {}},
                 {"I do remember...", {}, "gave_up"},
-                {"What do you want me to say?", {bp_guess_husband=10}}
+                {"What do you want me to say?", {bp_guess_husband=30}}
             }
         },
         {
-            pos = {bp_guess_husband=20},
+            pos = {bp_guess_husband=40},
             pose = "right_of_rose",
             text = "I don't know...% That this is all just some sick joke?% That you took too far?% " ..
                 "That the person I love is%.%.%. still here with me?"
@@ -836,9 +891,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=10, fun=20},
+            pos = {phase=10, fun=20, bp_explains_so_much=0},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
+            onReach = function(npc) npc.bp_explains_so_much=100 end,
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -847,9 +903,10 @@ local dialog = {
             }
         },
         {
-            pos = {phase=10, fun=50},
+            pos = {phase=10, fun=50, bp_explains_so_much=0},
             text = "Ha ha ha, oh god.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
+            onReach = function(npc) npc.bp_explains_so_much=100 end,
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -870,9 +927,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=12},
+            pos = {phase=12, bp_i_wonder=0},
             text = "I wonder how long this has been going on... Is this why you've been so forgetful lately?",
             pos = "next_to_rose",
+            onReach = function(npc) npc.bp_i_wonder=100 end,
             responses = {
                 {"What have I forgotten?", {}},
                 {"I'm so confused.", {}},
@@ -880,29 +938,78 @@ local dialog = {
             }
         },
         {
-            pos = {phase=12},
+            pos = {phase=12, bp_i_wonder=0},
             text = "I wonder how long this has been going on... Let's go to the doctor.",
+            onReach = function(npc) npc.bp_i_wonder=100 end,
             responses = {
                 {"What have I forgotten?", {}},
                 {"I'm so confused.", {}},
                 {"What's going on?", {}}
             }
         },
+
         {
             pos = {phase=13},
             text = "Let's go to a doctor, okay?",
+            pos = "next_to_rose",
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
                 {"I don't want to...", {}},
-                {"You're trying to trick me.", {}}
+                {"You're trying to trick me.", {}},
+                {nil, {bp_sullen=10}}
             }
-        }
+        },
+        {
+            pos = {phase=13},
+            text = "Come on, let's see the doctor.",
+            pos = "next_to_rose",
+            maxCount = 20,
+            responses = {
+                {"A doctor? Why?", {}},
+                {"I don't want to...", {}},
+                {"You're trying to trick me.", {}},
+                {nil, {bp_sullen=10}}
+            }
+        },
+        {
+            pos = {phase=13, bp_sullen=10},
+            text = "Please don't be like this...%% Let's go to the doctor,% okay hon?",
+            pos = "below_doors",
+            maxCount = 20,
+            responses = {
+                {"A doctor? Why?", {}},
+                {"I don't want to...", {}},
+                {"You're trying to trick me.", {}},
+                {nil, {bp_sullen=10}}
+            }
+        },
     },
 
     -- path where Greg is feeling alienated
     alienated = {
         { pos = {}, text = "DIALOG PATH INCOMPLETE: alienated" },
+
+        {
+            pos = {silence_total=3, silence_cur=1},
+            text = "What's with the cold shoulder?",
+            responses = {
+                {"What should I say?", {}},
+                {"Are you in the right home?", {}},
+                {"Who do you think you are?", {}, "alienated"},
+                {nil, {}, "silence"}
+            }
+        },
+        {
+            pos = {silence_total=6, silence_cur=1},
+            text = "So you're back on that now, huh?",
+            responses = {
+                {"Back to what?", {}},
+                {"I think you're confused.", {}},
+                {"Who are you and why are you in my home?", {}, "brain_problems"},
+                {nil, {}, "silence"}
+            }
+        },
 
         {
             pos = {phase=10},
@@ -937,13 +1044,31 @@ local dialog = {
     anger = {
         { pos = {}, text = "DIALOG PATH INCOMPLETE: anger" },
 
+        {
+            pos = {silence_total=3, silence_cur=1},
+            text = "What's with the cold shoulder?",
+            responses = {
+                {"What should I say?", {}},
+                {"Are you in the right home?", {}},
+                {"Who do you think you are?", {}, "alienated"},
+                {nil, {}, "silence"}
+            }
+        },
+        {
+            pos = {silence_total=6, silence_cur=1},
+            text = "So you're back on that now, huh?",
+            responses = {
+                {"Back to what?", {}},
+                {"I think you're confused.", {}},
+                {"Who are you and why are you in my home?", {}, "brain_problems"},
+                {nil, {}, "silence"}
+            }
+        },
+
     },
 
     -- path where Greg has given up on helping Rose
     gave_up = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: gave_up" },
-
-
         {
             pos = {phase=10},
             text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?",
@@ -952,64 +1077,76 @@ local dialog = {
         },
 
         {
-            pos = {phase=11},
+            pos = {phase=10.5},
             pose = "right_of_rose",
             text = "What does it matter? You won't even remember this anyway.",
             cantInterrupt=true
         },
 
         {
-            pos = {phase=12},
+            pos = {phase=11},
             pose = "below_doors",
             text = "% .%.%.% %%You don't even...% remember...%% me.",
             cantInterrupt=true
         },
 
         {
-            pos = {phase=12.5},
+            pos = {phase=12},
             text = "I just can't do this anymore. Goodbye.",
             pose = "leaving",
             cantInterrupt=true,
+            maxCount=100,
         },
+
+        {
+            pos = {leaving=1000},
+            text = "I hope you get the help you need.",
+            pose = "leaving",
+            maxCount=100,
+        }
     },
 
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {phase=0},
+            pos = {},
             pose = "next_to_rose_worried",
             text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
+            onReach = function(npc)
+                npc.stroke_state = 1000
+            end
         },
+
         {
-            pos = {phase=-1},
+            pos = {phase=-1, stroke_state=1000},
             text = "Someone is coming.... everything will be okay.",
-            max_count=5
+            maxCount=5
         },
         {
-            pos = {phase=-2},
+            pos = {phase=-2, stroke_state=1000},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
-            max_count=5
+            maxCount=5
         },
         {
-            pos = {phase=-2},
+            pos = {phase=-2, stroke_state=1000},
             text = "They'll be here soon.",
-            max_count=5
+            maxCount=5
         },
         {
-            pos = {phase=-2},
+            pos = {phase=-2, stroke_state=1000},
             text = "I love you.%#%\n\nWe'll get through this.",
-            max_count=5
+            maxCount=5
         },
         {
-            pos = {phase=-2},
+            pos = {phase=-2, stroke_state=1000},
             text = "It's okay, I'm here for you.",
-            max_count=5
+            maxCount=5
         },
     },
 
     -- vacation time!
     vacation = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: VACATION", max_count=2000 }
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: VACATION", maxCount=2000 }
     }
 
  }

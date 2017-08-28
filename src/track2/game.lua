@@ -238,8 +238,11 @@ function Game:update(dt)
 
     if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
         if (self.textBox and self.textBox.state < TextBox.states.ready) then
-            -- we're a chatosaurus, extend the timeout by one measure
-            self.nextTimeout = self:getNextTimeout(1)
+            -- we're a chatosaurus, extend the timeout a little
+            local extend = self:getNextTimeout(0.5)
+            if util.arrayLT(self.nextTimeout, extend) then
+                self.nextTimeout = extend
+            end
         else
             self.nextTimeout = nil
             if self.textBox then
@@ -374,7 +377,7 @@ function Game:chooseDialog()
     local minDistance, minNode
 
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
-        if not self.dialogCounts[node] or self.dialogCounts[node] < (node.max_count or 1) then
+        if not self.dialogCounts[node] or self.dialogCounts[node] < (node.maxCount or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
@@ -406,8 +409,8 @@ function Game:setPose(sprite, poseName, after)
 
     -- TODO: pathfinding? probably overkill...
 
-    local dx = pose.pos[1] - sprite.pos[1]
-    local dy = pose.pos[2] - sprite.pos[2]
+    local dx = pose.pos and pose.pos[1] - sprite.pos[1] or 0
+    local dy = pose.pos and pose.pos[2] - sprite.pos[2] or 0
 
     local animation = sprite.mapAnimation and sprite:mapAnimation(dx, dy, pose)
     local rate = animation and animation.walkRate or 24

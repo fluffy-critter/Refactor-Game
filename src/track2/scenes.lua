@@ -80,12 +80,21 @@ function scenes.kitchen()
                 rate = 0.1
             },
             couch_sitting = {
-                pos = {220,128},
-                -- onComplete = function(sprite)
-                --     sprite.frame = quads.greg.sitting
-                -- end
+                pos = {204,124},
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.sitting
+                end
             },
             facing_down = {
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.down[1]
+                end
+            },
+            kitchen = {
+                pos = {88,38}
+            },
+            behind_rose = {
+                pos = {128, 60},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.down[1]
                 end
