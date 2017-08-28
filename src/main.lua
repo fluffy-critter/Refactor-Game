@@ -44,7 +44,6 @@ if PROFILE then
     Pie:setKey("save_to_file","w")
 end
 
-
 local cute = require('thirdparty.cute')
 
 local shaders = require('shaders')
@@ -89,7 +88,7 @@ local playing = {
     fade = 0
 }
 
-local menuVolume = 1
+local menuVolume = 0
 
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
@@ -192,6 +191,8 @@ function love.mousepressed(...)
 end
 
 function love.load(args)
+    math.randomseed(os.time())
+
     cute.go(args)
 
     love.mouse.setVisible(false)
@@ -221,7 +222,9 @@ function love.load(args)
 
     for _,loop in ipairs(bgLoops) do
         loop:setLooping(true)
+        loop:setVolume(0)
         loop:play()
+        loop:seek(math.random()*loop:getDuration())
     end
 end
 

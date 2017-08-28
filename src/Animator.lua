@@ -25,7 +25,9 @@ local Animator = {}
 -- easing functions, all in the form of (from, to, t) where t=0..1
 Animator.Easing = {
     linear = util.lerp,
-    smoothstep = util.smoothStep,
+    ease_inout = function(a, b, x)
+        return a + (b - a)*util.smoothStep(x)
+    end,
     ease_in = function(a, b, x)
         return a + (b - a)*x*x
     end,

@@ -14,7 +14,7 @@ local Game = require('track2.game')
 
 -- whether to check dialog coverage
 local CheckCoverage = true
-local MaxLinkChecks = 15 -- maximum number of times to consider a dialog path
+local MaxLinkChecks = 5 -- maximum number of times to consider a dialog path
 
 
 --[[ generate a dotfile that represents all possible conversation paths ]]
@@ -191,7 +191,6 @@ local function generateDotFile()
             end
 
             here.from = node
-
 
             if node.responses and links[choiceLink] < MaxLinkChecks then
                 local silence = {nil,{}}

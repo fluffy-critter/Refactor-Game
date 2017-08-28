@@ -78,29 +78,28 @@ local dialog = {
     -- starting point
     intro = {
         {
-            pos = {},
+            pos = {fun=1},
             text = "# Good morning, dear! #",
             pose = "right_of_rose",
             responses = {
-                {"Uh... hi...", {}, "normal"},
+                {"Hi...", {}, "normal"},
                 {"Who are you...?", {}, "last_night"},
                 {"What are you doing here?", {}, "alienated"},
                 {nil, {}, "silence"}
             }
         },
         {
-            pos = {},
+            pos = {fun=37},
             text = "Good morning... how are you feeling today?",
-            pose = "left_of_couch",
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
-                {"What are you doing in my house?", {}, "alienated"},
+                {"Who are you?", {}, "last_night"},
                 {nil, {}, "silence"}
             }
         },
         {
-            pos = {},
+            pos = {fun=50},
             text = "Good morning.",
             responses = {
                 {"...good morning...", {}, "normal"},
@@ -517,7 +516,7 @@ local dialog = {
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
         {
-            pos = {phase=1},
+            pos = {phase=2},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
             responses = {
                 {"It's okay.", {}, "normal"},
@@ -527,55 +526,173 @@ local dialog = {
         },
 
         {
-            pos = {phase=2},
-            text = "Just... something you said set me off a little bit and you know how I get sometimes.",
+            pos = {phase=3},
+            text = "Just... something you said set me off a little bit...% and...% you know how I get sometimes.",
             responses = {
-                {"I do?", {}},
+                {"I do?", {lastnight_ignorance=2}},
                 {"I'm sure it was okay.", {}},
-                {"I don't remember.", {}},
+                {"I don't remember.", {lastnight_ignorance=1}},
+            }
+        },
+
+        {
+            pos = {phase=3.5},
+            text = "But, we made it home safely... That taxi driver sure seemed uncomfortable though.",
+            responses = {
+                {"Taxi driver?", {lastnight_taxi=10}},
+                {"Ha ha, yeah...", {}},
+                {"I'm not sure what's going on.", {lastnight_blackout=100}}
+            }
+        },
+
+        {
+            pos = {lastnight_taxi=10},
+            text = "Sure,% I mean,% that SILENCE between us must have been%.%.%. weird?% I guess?",
+            responses = {
+                {"Sure...", {}},
+                {"Yeah... Weird...", {}},
+                {"I don't remember.", {lastnight_blackout=100}},
+            }
+        },
+
+        {
+            pos = {lastnight_blackout=100},
+            text = "I guess you had a bit too much to drink after all.%% You know that isn't good for you...",
+        },
+
+        {
+            pos = {lastnight_ignorance=100},
+            text = ".%.%.% Well, you should?",
+            responses = {
+                {"Why?", {}, "alienated"},
+                {"I don't understand.", {}, "brain_problems"},
+                {"Yeah, I guess so.", {lastnight_joking=10}}
+            }
+        },
+        {
+            pos = {lastnight_ignorance=200},
+            text = "Seriously, is everything okay?",
+            responses = {
+                {"Yeah.", {lastnight_joking=-10}},
+                {"No.", {}, "alienated"},
+                {"I have no idea who you are.", {}, "brain_problems"},
+                {nil, {}, "silence"}
+            }
+        },
+
+        {
+            pos = {phase=4},
+            text = "Say, have you eaten breakfast yet?",
+            responses = {
+                {"Yeah.", {lastnight_breakfast=10}},
+                {"No.", {lastnight_breakfast=-10}},
+                {"I'm not sure.", {lastnight_unsure_breakfast=100}},
+            }
+        },
+
+        {
+            pos = {lastnight_breakfast=10},
+            text = "Really? Oh, you must have done the dishes already. Okay."
+        },
+        {
+            pos = {lastnight_breakfast=-10},
+            text = "Oh...% you really should eat something.% You know what the doctor said about that.%% " ..
+                "Um, sorry to nag you about that.% Again."
+        },
+
+        {
+            pos = {lastnight_unsure_breakfast=100},
+            text = "You%.%.%. aren't sure if you've had breakfast?%% Are you feeling okay?",
+            responses = {
+                {"I don't know.", {}, "brain_problems"},
+                {"Yeah, I guess.", {lastnight_blackout=1}},
+                {"No... I'm not...", {}}
             }
         },
 
         {
             pos = {phase=5},
-            text = "But I mean, we've been married a while, I guess this was inevitable, right?",
+            text = "But anyway...%% We've been married a while, I guess this was inevitable, right?",
             responses = {
                 {"We're married?", {}, "brain_problems"},
-                {"Yeah, I guess so.", {}},
+                {"Yeah, I guess so.", {lastnight_ignorance=-1}},
                 {"Who are you, again?", {}, "brain_problems"}
             }
         },
 
         {
-            pos = {phase=7},
-            text = "Wait... you ACTUALLY don't know who I am?",
+            pos = {phase=6},
+            text = "I guess I'm just nervous that we're sort of drifting apart lately.% " ..
+                "And you know how I worry about that.",
+            pose = "couch_sitting",
+            responses = {
+                {"Who are you?", {lastnight_joking=1}},
+                {"Only lately?", {}, "wtf"},
+                {"I've been feeling strange.", {}, "normal"}
+            }
+        },
+
+        {
+            pos = {phase=7, lastnight_joking=1},
+            text = "Ha ha, very funny.",
+            responses = {
+                {"I'm not kidding.", {lastnight_joking=-1}},
+                {"Sorry...", {}, "normal"},
+                {"Yeah, I'm a comedy genius.", {}}
+            }
+        },
+        {
+            pos = {phase=8, lastnight_joking=0},
+            text = "Wait...% you...% actually don't know who I am?",
+            pose = "right_of_rose",
             responses = {
                 {"No.", {}, "brain_problems"},
-                {"You're my husband...right?", {}, "brain_problems"},
+                {"You're my husband...right?", {lastnight_joking=1},},
                 {"Of course I do.", {}, "wtf"}
             }
         },
 
         {
-            pos = {phase=10, samething=0},
+            pos = {phase=9, lastnight_joking=1},
+            text = "Heh... Come on, you know I don't like when you joke about this stuff.",
+            responses = {
+                {"Good thing I'm not joking, then.", {lastnight_joking=-1}},
+                {"I don't know that.", {lastnight_ignorance=1}},
+                {"I don't even know who you are.", {}, "brain_problems"}
+            }
+        },
+        {
+            pos = {phase=9, lastnight_joking=0},
+            text = "I just don't know what we should do next...%% I know, let's go on a vacation.",
+            responses = {
+                {"Yeah... take some more pictures...", {}, "vacation"},
+                {"Yeah... make some new memories...", {}, "vacation"},
+                {"But I don't even know you...", {}, "brain_problems"},
+                {nil, {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=10, lastnight_joking=0, fun=0},
             text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
-                {"I think so...?", {samething=500}},
-                {"I don't even know.", {samething=500}},
+                {"I think so...?", {}},
+                {"I don't even know.", {lastnight_ignorance=1}},
                 {nil, {}, "silence"}
             }
         },
         {
-            pos = {phase=10, samething=0},
+            pos = {phase=10, lastnight_joking=0, fun=50},
             text = "Ha ha, what? Are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
-                {"I think so...?", {samething=500}},
+                {"I think so...?", {}},
                 {"Probably not.", {}, "normal"},
                 {nil, {}, "silence"}
             }
-        }
+        },
+
     },
 
     -- path where Greg has determined Rose is having brain problems
@@ -583,78 +700,154 @@ local dialog = {
         {
             pos = {phase=2.5},
             text = "Hon, are you feeling okay?",
-            responses = {}
+            responses = {
+                {"Yeah.", {}},
+                {"No.", {}},
+                {"Who are you?", {}}
+            }
         },
 
         {
             pos = {phase=3},
             text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
-            responses = {}
+            responses = {
+                {"Like what?", {}},
+                {"No I haven't...", {}},
+                {"Who are you?", {stranger=1}}
+            }
         },
 
         {
-            pos = {phase=4},
+            pos = {phase=4, stranger=1},
             text = "Please stop looking at me like that. Like I'm a stranger...",
-            responses = {}
+            responses = {
+                {"But you are.", {}},
+                {"Sorry.", {}},
+                {"I don't know who you are.", {stranger=1}}
+            }
         },
         {
-            pos = {phase=4},
+            pos = {phase=4, stranger=0},
             text = "Please stop looking at me like that. I'm not a stranger.",
-            responses = {}
+            responses = {
+                {"But you are.", {}},
+                {"Sorry.", {}},
+                {"I don't know who you are.", {stranger=1}}
+            }
         },
         {
-            pos = {phase=4},
-            text = "Stop looking at me like that. I'm not a stranger.",
-            responses = {}
-        },
-        {
-            pos = {phase=4},
+            pos = {phase=4, stranger=2},
             text = "Stop looking at me like that. I'm not a stranger...% Am I?",
-            responses = {}
+            responses = {
+                {"You are to me.", {stranger=1}},
+                {"Yes?", {}},
+                {"I don't know who you are.", {}}
+            }
         },
 
         {
             pos = {phase=5},
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
-            responses = {}
+            responses = {
+                {"We're married?", {}},
+                {"How long, exactly?", {howlong=10}},
+                {"You're trying to trick me.", {}}
+            }
         },
 
         {
-            pos = {phase=6},
+            pos = {howlong=10},
+            text = "How long? Gosh, 15...? no, 17 years.",
+        },
+
+        {
+            pos = {phase=6, stranger=0},
             text = "But you have a family history of this.%.%.%",
-            responses = {}
+            responses = {
+                {"Of what?", {}},
+                {"No I don't...", {}},
+                {"How do you know that?", {}}
+            }
         },
         {
-            pos = {phase=6},
+            pos = {phase=6, stranger=1},
             text = "But you DO have a family history of this.%.%.%",
-            responses = {}
+            responses = {
+                {"Of what?", {}},
+                {"No I don't...", {}},
+                {"How do you know that?", {}}
+            }
         },
         {
-            pos = {phase=6},
+            pos = {phase=6, stranger=2},
             text = "But you DO have a family history.%.%.% Oh.%%%\n\nOH.",
-            responses = {}
+            pose = "facing_down",
+            responses = {
+                {"Of what?", {}},
+                {"No I don't...", {}},
+                {"How do you know that?", {}}
+            }
         },
 
         {
-            pos = {phase=7},
+            pos = {phase=7, stranger=0},
             text = "Can you remember anything about me? Anything at all?",
-            responses = {}
+            responses = {
+                {"You do seem familiar...", {}},
+                {"No, sorry...", {}},
+                {"I guess you're my husband?", {bp_guess_husband=10}}
+            }
         },
         {
-            pos = {phase=7},
+            pos = {phase=7, stranger=2},
             text = "Surely you must remember SOMETHING about me...",
-            responses = {}
+            pose = "left_of_couch",
+            responses = {
+                {"You do seem familiar...", {}},
+                {"No, sorry...", {}},
+                {"I guess you're my husband?", {bp_guess_husband=10}}
+            }
+        },
+
+        {
+            pos = {bp_guess_husband=10},
+            text = "Yeah, but do you actually remember that, or are you just guessing?%%Be honest.",
+            pose = "next_to_rose",
+            responses = {
+                {"I'm just guessing.", {}},
+                {"I do remember...", {}, "gave_up"},
+                {"What do you want me to say?", {bp_guess_husband=10}}
+            }
+        },
+        {
+            pos = {bp_guess_husband=20},
+            pose = "right_of_rose",
+            text = "I don't know...% That this is all just some sick joke?% That you took too far?% " ..
+                "That the person I love is%.%.%. still here with me?"
         },
 
         {
             pos = {phase=8},
             text = "Our wedding day was the happiest I'd ever seen you...",
+            pose = "bottom_of_stairs",
             responses = {}
         },
 
         {
-            pos = {phase=10},
+            pos = {phase=10, fun=20},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
+            pose = "bottom_of_stairs",
+            responses = {
+                {"What's so funny?", {}},
+                {"Please don't laugh...", {}},
+                {"Explains what?", {}},
+                {nil, {}, "silence"}
+            }
+        },
+        {
+            pos = {phase=10, fun=50},
+            text = "Ha ha ha, oh god.%.%.% this explains so much...",
+            pose = "bottom_of_stairs",
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -666,6 +859,7 @@ local dialog = {
         {
             pos = {phase=11},
             text = "You don't... you don't remember anything, do you.",
+            pose = "right_of_rose",
             responses = {
                 {"I have no idea who you are.", {}},
                 {"Why are there pictures of us together?", {}},
@@ -675,7 +869,8 @@ local dialog = {
 
         {
             pos = {phase=12},
-            text = "I wonder how long this has been going on... Is this why you've been forgetting so much?",
+            text = "I wonder how long this has been going on... Is this why you've been so forgetful lately?",
+            pos = "next_to_rose",
             responses = {
                 {"What have I forgotten?", {}},
                 {"I'm so confused.", {}},
@@ -746,17 +941,6 @@ local dialog = {
     gave_up = {
         { pos = {}, text = "DIALOG PATH INCOMPLETE: gave_up" },
 
-        {
-            pos = {phase=12},
-            pose = "right_of_rose",
-            text = "What does it matter? You won't even remember this anyway."
-        },
-        {
-            pos = {phase=12},
-            text = "% .%.%.% %%You don't even...% remember...%% me.",
-            pose = "right_of_rose",
-            cantInterrupt=true
-        },
 
         {
             pos = {phase=10},
@@ -766,12 +950,24 @@ local dialog = {
         },
 
         {
+            pos = {phase=11},
+            pose = "right_of_rose",
+            text = "What does it matter? You won't even remember this anyway.",
+            cantInterrupt=true
+        },
+
+        {
+            pos = {phase=12},
+            pose = "below_doors",
+            text = "% .%.%.% %%You don't even...% remember...%% me.",
+            cantInterrupt=true
+        },
+
+        {
             pos = {phase=12.5},
             text = "I just can't do this anymore. Goodbye.",
-            pose = "below_doors",
-            onReach=function(npc)
-                npc.gone=true
-            end
+            pose = "leaving",
+            cantInterrupt=true,
         },
     },
 
@@ -808,6 +1004,11 @@ local dialog = {
             max_count=5
         },
     },
+
+    -- vacation time!
+    vacation = {
+        { pos = {}, text = "DIALOG PATH INCOMPLETE: VACATION", max_count=2000 }
+    }
 
  }
 

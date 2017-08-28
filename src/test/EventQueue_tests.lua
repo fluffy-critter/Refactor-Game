@@ -51,18 +51,8 @@ notion("the queue functions", function()
     check(count).is(2)
     check(lastRan).shallowMatches({1})
 
-    print("before")
-    for k,v in pairs(eq.queue) do
-        print(k,v)
-    end
-
     eq:addEvent({when = {11}, what = cb})
     eq:runEvents({10})
-
-    print("after")
-    for k,v in pairs(eq.queue) do
-        print(k,v)
-    end
 
     check(count).is(4)
     check(#eq.queue).is(1)

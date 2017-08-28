@@ -9,6 +9,7 @@ local imagepool = require('imagepool')
 local quadtastic = require('thirdparty.libquadtastic')
 
 local Sprite = require('track2.Sprite')
+local Animator = require('Animator')
 
 local scenes = {}
 
@@ -62,7 +63,8 @@ function scenes.kitchen()
                 -- end
             },
             right_of_rose = {
-                pos = {152,108}
+                pos = {152,108},
+                easing = Animator.Easing.ease_inout
             },
             bottom_of_stairs = {
                 pos = {217,80}
@@ -73,6 +75,21 @@ function scenes.kitchen()
             below_doors = {
                 pos = {147,90}
             },
+            leaving = {
+                pos = {147,-80},
+                rate = 0.1
+            },
+            couch_sitting = {
+                pos = {220,153},
+                -- onComplete = function(sprite)
+                --     sprite.frame = quads.greg.sitting
+                -- end
+            },
+            facing_down = {
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.down[1]
+                end
+            }
         },
         mapAnimation = function(self, dx, dy, _)
             -- TODO: pose (final arg) can choose 'worried' modifier etc.

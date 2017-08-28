@@ -13,6 +13,7 @@ local notion = cute.notion
 
 local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
+local scenes = require('track2.scenes')
 
 local function checkAllDialogs(dlog, func)
     for state,items in pairs(dlog) do
@@ -27,8 +28,8 @@ end
 notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
 
-    local function checkLineCount(text, lines)
-        local _, wrapped = box:getWrappedText(text or "")
+    local function checkLineCount(text, lines, padRight)
+        local _, wrapped = box:getWrappedText(text or "", padRight)
         return #wrapped <= lines
     end
 
@@ -38,7 +39,7 @@ notion("Text all fits within the dialog box", function()
         end
 
         for _,response in pairs(item.responses or {}) do
-            if not checkLineCount(response[1], 1) then
+            if not checkLineCount(response[1], 1, 4) then
                 error(state .. ": response too long: " .. response[1])
             end
         end
@@ -53,6 +54,7 @@ notion("State value speling", function()
         silence_total = "engine",
         interrupted = "engine",
         phase = "engine",
+        fun = "engine",
 
         -- attributes set by special callbacks
     }
@@ -84,14 +86,15 @@ notion("State value speling", function()
 end)
 
 notion("Dialog response integrity", function()
+    local scene = scenes.kitchen()
+    local greg = scene.greg
+
     checkAllDialogs(dialog, function(state,item)
         if item.responses then
             local errorText = state .. ':' .. item.text
             if #item.responses == 0 then
                 print("WARNING: Empty response list for " .. errorText)
-            end
-
-            if #item.responses > 4 then
+            elseif #item.responses > 4 then
                 error(errorText .. " has " .. #item.responses)
             end
 
@@ -113,11 +116,16 @@ notion("Dialog response integrity", function()
                 end
             end
 
-            if yesCount > 3 then
+            -- if we have responses we always want exactly three spoken ones (but 0 is a warning)
+            if yesCount > 0 and yesCount ~= 3 then
                 error(errorText .. ": has " .. yesCount .. " verbal responses")
             end
             if silenceCount > 1 then
                 error(errorText .. ": has " .. silenceCount .. " silent repsonses")
+            end
+
+            if item.pose and not greg.pose[item.pose] then
+                error(errorText .. ": nonexistent pose " .. item.pose)
             end
         end
     end)

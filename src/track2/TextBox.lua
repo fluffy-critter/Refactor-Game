@@ -105,7 +105,7 @@ function TextBox:onButtonPress(key)
 
         if play and self.selectSound then
             self.selectSound:stop()
-            self.selectSound:seek(0)
+            self.selectSound:rewind()
             self.selectSound:play()
         end
 
@@ -116,8 +116,8 @@ function TextBox:onButtonPress(key)
     return false
 end
 
-function TextBox:getWrappedText(text)
-    local width, wrapped = self.font:getWrap(text, (self.right - self.left - 1)*8)
+function TextBox:getWrappedText(text, padRight)
+    local width, wrapped = self.font:getWrap(text, (self.right - self.left - 1)*8 - (padRight or 0))
     return width, wrapped
 end
 
@@ -141,7 +141,8 @@ function TextBox:update(dt)
                 self:onReady()
             end
             if self.doneSound then
-                self.doneSound:seek(0)
+                self.doneSound:stop()
+                self.doneSound:rewind()
                 self.doneSound:play()
             end
         else

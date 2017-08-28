@@ -72,12 +72,13 @@ function Game:init()
     self.dialogState = dialog.start_state
 
     -- the state of the NPC
-    self.npc = {}
+    self.npc = {fun = math.random(1,50)}
 
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
         phase = 3,
         interrupted = 3,
+        fun = 0.01
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
@@ -231,16 +232,20 @@ function Game:update(dt)
         end
     end
 
-    if self.nextTimeout
-        and not util.arrayLT(time, self.nextTimeout)
-        and not (self.textBox and self.textBox.state < TextBox.states.ready) then
-        self.nextTimeout = nil
-        if self.textBox then
-            self.textBox:close()
+    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
+        if (self.textBox and self.textBox.state < TextBox.states.ready) then
+            -- we're a chatosaurus, extend the timeout by one measure
+            self.nextTimeout = self:getNextTimeout(1)
+        else
+            self.nextTimeout = nil
+            if self.textBox then
+                self.textBox:close()
 
-            if self.textBox.choices then
-                self.timeoutSound:seek(0)
-                self.timeoutSound:play()
+                if self.textBox.choices then
+                    self.timeoutSound:stop()
+                    self.timeoutSound:rewind()
+                    self.timeoutSound:play()
+                end
             end
         end
     end
@@ -262,10 +267,10 @@ function Game:update(dt)
 end
 
 -- Get the next timeout for a textbox
-function Game:getNextTimeout()
+function Game:getNextTimeout(measures)
     local now = self:musicPos()
     -- go for at most two measures, minus half a beat
-    local nextTime = clock.posToTime({now[1], now[2] + 2, -0.5})
+    local nextTime = clock.posToTime({now[1], now[2] + (measures or 2), -0.5})
     local nextPos = clock.timeToPos(nextTime)
 
     return nextPos
@@ -372,7 +377,7 @@ function Game:chooseDialog()
                 distance = distance + dx*dx*(self.weights[k] or 1)
             end
             if not minDistance or distance < minDistance then
-                -- print("Considering: " .. node.text .. " d=" .. distance)
+                print("      d=" .. distance .. ": " .. node.text .. " d=" .. distance)
                 minNode = node
                 minDistance = distance
             end
@@ -391,7 +396,7 @@ end
 function Game:setPose(sprite, poseName, after)
     local pose = sprite.pose[poseName]
     if not pose then
-        print("Warning: requested nonexistent pose " .. pose)
+        print("Warning: requested nonexistent pose " .. poseName)
         return
     end
 
