@@ -219,8 +219,10 @@ function Game:update(dt)
                     game:textFinished(textBox, node)
                 end
 
-                if node.onReach then
-                    node.onReach(self.npc)
+                if node.setPos then
+                    for k,v in node.setPos do
+                        self.npc[k] = v
+                    end
                 end
 
                 if node.pose then

@@ -16,7 +16,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
                 adjustments to the parameter space,
                 name of pool to jump to (optional)
         },
-        onReach=function(npc), -- function to call if we've reached this state
+        setPos = {...}, -- set position flags if we've gotten here
         setState = "state", -- which state to switch to if we get to this point
         maxCount=..., -- Maximum number of times this fragment can appear (default: 1)
     },
@@ -806,8 +806,9 @@ local dialog = {
 
         {
             pos = {phase=6, bp_family_history=0, fun=0},
+
             text = "But you have a family history of this.%.%.%",
-            onReach = function(npc) npc.bp_family_history=100 end,
+            setPos = {bp_family_history=100},
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
@@ -818,7 +819,7 @@ local dialog = {
         {
             pos = {phase=6, bp_family_history=0, fun=50},
             text = "But you DO have a family history of this.%.%.%",
-            onReach = function(npc) npc.bp_family_history=100 end,
+            setPos = {bp_family_history=100},
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
@@ -830,7 +831,7 @@ local dialog = {
             pos = {phase=6, bp_family_history=0, fun=25},
             text = "But you DO have a family history.%.%.% Oh.%%%\n\nOH.",
             pose = "facing_down",
-            onReach = function(npc) npc.bp_family_history=100 end,
+            setPos = {bp_family_history=100},
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
@@ -847,7 +848,7 @@ local dialog = {
         {
             pos = {phase=7, bp_anything=0},
             text = "Can you remember anything about me? Anything at all?",
-            onReach = function(npc) npc.bp_anything=100 end,
+            setPos = {bp_anything=100},
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -858,7 +859,7 @@ local dialog = {
             pos = {phase=7, bp_anything=0},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
-            onReach = function(npc) npc.bp_anything=100 end,
+            setPos = {bp_anything=100},
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -894,7 +895,7 @@ local dialog = {
             pos = {phase=10, fun=20, bp_explains_so_much=0},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
-            onReach = function(npc) npc.bp_explains_so_much=100 end,
+            setPos = {bp_explains_so_much=100},
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -906,7 +907,7 @@ local dialog = {
             pos = {phase=10, fun=50, bp_explains_so_much=0},
             text = "Ha ha ha, oh god.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
-            onReach = function(npc) npc.bp_explains_so_much=100 end,
+            setPos = {bp_explains_so_much=100},
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -929,8 +930,8 @@ local dialog = {
         {
             pos = {phase=12, bp_i_wonder=0},
             text = "I wonder how long this has been going on... Is this why you've been so forgetful lately?",
-            pos = "next_to_rose",
-            onReach = function(npc) npc.bp_i_wonder=100 end,
+            pose = "next_to_rose",
+            setPos = {bp_i_wonder=100},
             responses = {
                 {"What have I forgotten?", {}},
                 {"I'm so confused.", {}},
@@ -940,7 +941,7 @@ local dialog = {
         {
             pos = {phase=12, bp_i_wonder=0},
             text = "I wonder how long this has been going on... Let's go to the doctor.",
-            onReach = function(npc) npc.bp_i_wonder=100 end,
+            setPos = {bp_i_wonder=100},
             responses = {
                 {"What have I forgotten?", {}},
                 {"I'm so confused.", {}},
@@ -951,7 +952,7 @@ local dialog = {
         {
             pos = {phase=13},
             text = "Let's go to a doctor, okay?",
-            pos = "next_to_rose",
+            pose = "next_to_rose",
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
@@ -963,7 +964,7 @@ local dialog = {
         {
             pos = {phase=13},
             text = "Come on, let's see the doctor.",
-            pos = "next_to_rose",
+            pose = "next_to_rose",
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
@@ -975,7 +976,7 @@ local dialog = {
         {
             pos = {phase=13, bp_sullen=10},
             text = "Please don't be like this...%% Let's go to the doctor,% okay hon?",
-            pos = "below_doors",
+            pose = "below_doors",
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
@@ -1094,6 +1095,7 @@ local dialog = {
             pos = {phase=12},
             text = "I just can't do this anymore. Goodbye.",
             pose = "leaving",
+            setPos = {leaving=1000},
             cantInterrupt=true,
             maxCount=100,
         },
@@ -1112,9 +1114,7 @@ local dialog = {
             pos = {},
             pose = "next_to_rose_worried",
             text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
-            onReach = function(npc)
-                npc.stroke_state = 1000
-            end
+            setPos = {stroke_state=1000}
         },
 
         {

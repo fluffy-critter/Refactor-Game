@@ -61,12 +61,15 @@ notion("State value speling", function()
     local used = {}
 
     local function checkPos(pos, where, status)
-        for k,_ in pairs(pos) do
-            where[k] = status
+        if pos then
+            for k,_ in pairs(pos) do
+                where[k] = status
+            end
         end
     end
     checkAllDialogs(dialog, function(status, item)
         checkPos(item.pos, used, status .. ':' .. item.text)
+        checkPos(item.setPos, set, status .. ':' .. item.text)
         for _,response in ipairs(item.responses or {}) do
             checkPos(response[2], set, status .. ':' .. item.text .. ':' .. (response[1] or 'silence'))
         end
