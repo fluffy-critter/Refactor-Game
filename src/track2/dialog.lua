@@ -529,9 +529,9 @@ local dialog = {
             pos = {phase=3},
             text = "Just... something you said set me off a little bit...% and...% you know how I get sometimes.",
             responses = {
-                {"I do?", {lastnight_ignorance=2}},
+                {"I do?", {lastnight_ignorance=200}},
                 {"I'm sure it was okay.", {}},
-                {"I don't remember.", {lastnight_ignorance=1}},
+                {"I don't remember.", {lastnight_ignorance=100}},
             }
         },
 
@@ -647,13 +647,14 @@ local dialog = {
             pose = "right_of_rose",
             responses = {
                 {"No.", {}, "brain_problems"},
-                {"You're my husband...right?", {lastnight_joking=1},},
-                {"Of course I do.", {}, "wtf"}
+                {"You're my husband...right?", {}},
+                {"Of course I do.", {}, "wtf"},
+                {nil, {}, "silence"}
             }
         },
 
         {
-            pos = {phase=9, lastnight_joking=1},
+            pos = {phase=9},
             text = "Heh... Come on, you know I don't like when you joke about this stuff.",
             responses = {
                 {"Good thing I'm not joking, then.", {lastnight_joking=-1}},
@@ -661,19 +662,9 @@ local dialog = {
                 {"I don't even know who you are.", {}, "brain_problems"}
             }
         },
-        {
-            pos = {phase=9, lastnight_joking=0},
-            text = "I just don't know what we should do next...%% I know, let's go on a vacation.",
-            responses = {
-                {"Yeah... take some more pictures...", {}, "vacation"},
-                {"Yeah... make some new memories...", {}, "vacation"},
-                {"But I don't even know you...", {}, "brain_problems"},
-                {nil, {}, "brain_problems"}
-            }
-        },
 
         {
-            pos = {phase=10, lastnight_joking=0, fun=0},
+            pos = {phase=10, fun=0},
             text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
@@ -683,13 +674,24 @@ local dialog = {
             }
         },
         {
-            pos = {phase=10, lastnight_joking=0, fun=50},
+            pos = {phase=10, fun=50},
             text = "Ha ha, what? Are we even talking about the same thing?",
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
                 {"I think so...?", {}},
                 {"Probably not.", {}, "normal"},
                 {nil, {}, "silence"}
+            }
+        },
+
+        {
+            pos = {phase=10.5},
+            text = "I just don't know what we should do next...%% I know, let's go on a vacation.",
+            responses = {
+                {"Yeah... take some more pictures...", {}, "vacation"},
+                {"Yeah... make some new memories...", {}, "vacation"},
+                {"But I don't even know you...", {}, "brain_problems"},
+                {nil, {}, "brain_problems"}
             }
         },
 

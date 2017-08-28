@@ -5,6 +5,8 @@ Refactor: 2 - Strangers
 
 ]]
 
+local DEBUG = true
+
 local util = require('util')
 local shaders = require('shaders')
 local imagepool = require('imagepool')
@@ -72,13 +74,15 @@ function Game:init()
     self.dialogState = dialog.start_state
 
     -- the state of the NPC
-    self.npc = {fun = math.random(1,50)}
+    self.npc = {fun = math.random()*50}
 
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
         phase = 3,
         interrupted = 3,
-        fun = 0.01
+        fun = 0.01,
+        silence_cur = 10,
+        silence_total = 7
     }
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
@@ -469,28 +473,29 @@ function Game:draw()
             love.graphics.print(self.lyricText, 256 - width - 1, 0)
         end
 
-        love.graphics.setFont(fonts.debug)
-        love.graphics.setColor(255,255,127)
-        love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
-            .. ' ' .. self.dialogState)
-        local y = fonts.debug:getHeight()
-        for k,v in pairs(self.npc) do
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.print(string.format("%s=%.1f", k, v), 1, y+1)
-            love.graphics.setColor(255, 255, 127)
-            love.graphics.print(string.format("%s=%.1f", k, v), 0, y)
-            y = y + fonts.debug:getHeight()
-        end
+        if DEBUG then
+            love.graphics.setFont(fonts.debug)
+            love.graphics.setColor(255,255,127)
+            love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
+                .. ' ' .. self.dialogState)
+            local y = fonts.debug:getHeight()
+            for k,v in pairs(self.npc) do
+                love.graphics.setColor(0, 0, 0)
+                love.graphics.print(string.format("%s=%.1f", k, v), 1, y+1)
+                love.graphics.setColor(255, 255, 127)
+                love.graphics.print(string.format("%s=%.1f", k, v), 0, y)
+                y = y + fonts.debug:getHeight()
+            end
 
-        if self.textBox and self.textBox.choices and self.textBox.index <= #self.textBox.choices then
-            local nextState = self.textBox.choices[self.textBox.index].debugText or self.dialogState or 'nil'
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.print("choice -> " .. nextState, 1, y+1)
-            love.graphics.setColor(255, 255, 255)
-            love.graphics.print("choice -> " .. nextState, 0, y)
-            -- y = y + fonts.debug:getHeight()
+            if self.textBox and self.textBox.choices and self.textBox.index <= #self.textBox.choices then
+                local nextState = self.textBox.choices[self.textBox.index].debugText or self.dialogState or 'nil'
+                love.graphics.setColor(0, 0, 0)
+                love.graphics.print("choice -> " .. nextState, 1, y+1)
+                love.graphics.setColor(255, 255, 255)
+                love.graphics.print("choice -> " .. nextState, 0, y)
+                -- y = y + fonts.debug:getHeight()
+            end
         end
-
     end)
 
     self.scaled:renderTo(function()
