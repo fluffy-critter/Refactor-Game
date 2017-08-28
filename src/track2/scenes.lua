@@ -80,7 +80,7 @@ function scenes.kitchen()
                 rate = 0.1
             },
             couch_sitting = {
-                pos = {220,153},
+                pos = {220,128},
                 -- onComplete = function(sprite)
                 --     sprite.frame = quads.greg.sitting
                 -- end
