@@ -332,7 +332,7 @@ local dialog = {
             text = "What's the matter?",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
-                {"What are you doing here?", {}, "last_night"},
+                {"What are you doing here?", {nrm_what_doing=100}, "last_night"},
                 {"Why are you in my house?", {}, "wtf"}
             }
         },
@@ -397,7 +397,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=5, normal_wemarried=0, normal_sorry=100},
+            pos = {phase=5, normal_wemarried=0, normal_whathuh=100},
             text = ".%.%.%Aaaanyway. We've been married for so long, I guess we were overdue " ..
                 "for an argument eventually, right?",
             setPos = {normal_wemarried=100},
@@ -539,7 +539,7 @@ local dialog = {
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
         {
-            pos = {phase=2},
+            pos = {phase=2, nrm_what_doing=100},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
             responses = {
                 {"It's okay.", {}, "normal"},
@@ -549,7 +549,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=3},
+            pos = {phase=3, nrm_what_doing=0},
             text = "Just... something you said set me off a little bit...% and...% you know how I get sometimes.",
             responses = {
                 {"I do?", {lastnight_ignorance=200}},
@@ -559,7 +559,12 @@ local dialog = {
         },
 
         {
-            pos = {phase=3.5},
+            pos = {phase=3, nrm_what_doing=100},
+            text = "I just took a walk after we got home,% to clear my head.% You were already asleep when I got back.",
+        },
+
+        {
+            pos = {phase=3.5, nrm_what_doing=0},
             text = "But, we made it home safely... That taxi driver sure seemed uncomfortable though.",
             responses = {
                 {"Taxi driver?", {lastnight_taxi=10}},

@@ -241,7 +241,7 @@ function Game:update(dt)
     if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
         if (self.textBox and self.textBox.state < TextBox.states.ready) then
             -- we're a chatosaurus, extend the timeout a little
-            local extend = self:getNextTimeout(1)
+            local extend = self:getNextTimeout(1.5)
             if util.arrayLT(self.nextTimeout, extend) then
                 self.nextTimeout = extend
             end
