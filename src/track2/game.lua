@@ -220,7 +220,7 @@ function Game:update(dt)
                 end
 
                 if node.setPos then
-                    for k,v in node.setPos do
+                    for k,v in pairs(node.setPos) do
                         self.npc[k] = v
                     end
                 end

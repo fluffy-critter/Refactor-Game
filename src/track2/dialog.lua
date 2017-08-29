@@ -308,17 +308,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=1},
-            text = "How are you this morning?",
-            responses = {
-                {"... Fine ...", {}},
-                {"What are you doing here?", {}, "last_night"},
-                {"Confused.", {}, "brain_problems"}
-            }
-        },
-
-        {
-            pos = {phase=2},
+            pos = {phase=2, normal_tired=0},
             text = "Have you had breakfast already?",
             responses = {
                 {"Not yet.", {}},
@@ -329,6 +319,7 @@ local dialog = {
         {
             pos = {phase=2},
             text = "You're looking tired. Didn't you sleep well?",
+            setPos = {normal_tired=100},
             responses = {
                 {"Not particularly...", {}},
                 {"How did you get in here?", {}, "wtf"},
@@ -346,7 +337,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=3},
+            pos = {phase=3, normal_solastnight=0},
             text = "It's a beautiful morning, isn't it?",
             responses = {
                 {"Yeah...", {}},
@@ -355,55 +346,80 @@ local dialog = {
             }
         },
         {
-            pos = {phase=3},
+            pos = {phase=3, normal_camehome=0},
             text = "So, last night...",
             responses = {
-                {"What about it?", {}},
+                {"What about it?", {normal_solastnight=100}},
                 {"I'm sorry, but who are you?", {}, "brain_problems"},
                 {"What happened?", {}, "last_night"}
             }
         },
 
         {
-            pos = {phase=4},
+            pos = {phase=4, normal_camehome=0},
             text = "When we got home last night I was worried about you.",
+            setPos = {normal_camehome=100},
             responses = {
-                {"We came home together?", {}},
+                {"We came home together?", {normal_whathuh=100}},
                 {"This is my home...", {}, "brain_problems"},
                 {"What happened last night?", {}, "last_night"}
             }
         },
         {
-            pos = {phase=4},
+            pos = {phase=4, normal_camehome=0},
             text = "When we got home last night I was afraid I'd upset you.",
+            setPos = {normal_camehome=100},
             responses = {
                 {"Why would you think that?", {}},
-                {"That's okay...", {}},
+                {"That's okay...", {normal_sorry=100}},
                 {"I don't even know who you are.", {}, "brain_problems"}
             }
         },
         {
-            pos = {phase=4},
+            pos = {phase=4, normal_camehome=0},
             text = "I'm a bit frustrated about last night.",
             responses = {
                 {"What happened?", {}, "last_night"},
-                {"Did I promise you something?", {}},
+                {"Did I promise you something?", {normal_camehome=100, normal_whathuh=100}},
                 {"So you went home with a stranger, huh?", {}, "brain_problems"}
             }
         },
 
         {
-            pos = {phase=5},
-            text = "But I mean, we've been married for so long, I guess we were overdue for an argument.",
+            pos = {normal_whathuh=100},
+            text = ".%.%.%What?",
             responses = {
-                {"I don't remember it.", {}},
+                {"Huh?", {}},
+                {"Okay?", {}, "wtf"},
+                {"Sorry.", {normal_sorry=100}}
+            }
+        },
+
+        {
+            pos = {phase=5, normal_wemarried=0, normal_sorry=100},
+            text = ".%.%.%Aaaanyway. We've been married for so long, I guess we were overdue " ..
+                "for an argument eventually, right?",
+            setPos = {normal_wemarried=100},
+            responses = {
+                {"I don't remember it.", {normal_sorry=-100}},
                 {"Sorry, what was it about?", {}, "brain_problems"},
-                {"Sorry...", {}}
+                {"Yeah, I guess so...", {}}
             }
         },
         {
-            pos = {phase=5},
+            pos = {phase=5, normal_wemarried=0, normal_sorry=0},
+            text = "But I mean, we've been married for so long, I guess we were overdue for an argument.",
+            setPos = {normal_wemarried=100},
+            responses = {
+                {"I don't remember it.", {}},
+                {"Sorry, what was it about?", {}, "brain_problems"},
+                {"Sorry...", {normal_sorry=100}}
+            }
+        },
+        {
+            pos = {phase=5, normal_wemarried=0},
             text = "We've been married HOW long? Why didn't you tell me how you felt before?",
+            setPos = {normal_wemarried=100},
             responses = {
                 {"We're... married?", {}, "brain_problems"},
                 {"I... guess it just didn't come up.", {}},
@@ -412,8 +428,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=6},
+            pos = {phase=6, normal_wemarried=100, normal_undercontrol=0, normal_sorry=100},
             text = "I guess I'm just surprised, is all. I thought you'd gotten past your anxiety problems...",
+            setPos = {normal_undercontrol=100},
             responses = {
                 {"How do you know about that?", {}, "brain_problems"},
                 {"I don't even know who you are.", {}, "wtf"},
@@ -421,20 +438,22 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6},
+            pos = {phase=6, normal_wemarried=200, normal_undercontrol=0, normal_sorry=0},
             text = "You told me you had that under control.",
+            setPos = {normal_undercontrol=100},
             responses = {
                 {"Had what under control?", {}, "brain_problems"},
-                {"I'm sorry for whatever I did.", {}},
+                {"I'm sorry for whatever I did.", {normal_undercontrol=100}},
                 {"What are you talking about?", {}, "brain_problems"}
             }
         },
         {
-            pos = {phase=6},
+            pos = {phase=6, normal_wemarried=150, normal_undercontrol=0, normal_sorry=0},
             text = "You seemed to have it under control%.%.%.% until last night.",
+            setPos = {normal_undercontrol=100},
             responses = {
-                {"Had what under control?", {}},
-                {"I'm sorry for whatever I did.", {}},
+                {"Had what under control?", {normal_undercontrol=200}},
+                {"I'm sorry for whatever I did.", {normal_undercontrol=150}, "last_night"},
                 {"What are you talking about?", {}}
             }
         },
@@ -633,14 +652,14 @@ local dialog = {
                 "And you know how I worry about that.",
             pose = "couch_sitting",
             responses = {
-                {"Who are you?", {lastnight_joking=10}},
+                {"Who are you?", {lastnight_joking_sardonic=150}},
                 {"Only lately?", {}, "wtf"},
                 {"I've been feeling strange.", {}, "normal"}
             }
         },
 
         {
-            pos = {phase=7, lastnight_joking=10},
+            pos = {phase=7, lastnight_joking_sardonic=150},
             text = "Ha ha, very funny.",
             responses = {
                 {"I'm not kidding.", {lastnight_joking=-10}},
