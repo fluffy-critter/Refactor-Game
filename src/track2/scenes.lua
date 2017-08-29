@@ -36,32 +36,32 @@ function scenes.kitchen()
         pos = {217, -40},
         animations = {
             walk_down = {
-                {quads.greg.down[1], .25},
-                {quads.greg.down[2], .25},
-                {quads.greg.down[1], .25},
-                {quads.greg.down[3], .25},
+                {quads.greg.down[1], .2},
+                {quads.greg.down[2], .2},
+                {quads.greg.down[1], .2},
+                {quads.greg.down[3], .2},
                 stop = quads.greg.down[1],
                 -- walkRate = 24,
             },
             walk_up = {
-                {quads.greg.up[1], .25},
-                {quads.greg.up[2], .25},
-                {quads.greg.up[1], .25},
-                {quads.greg.up[3], .25},
+                {quads.greg.up[1], .2},
+                {quads.greg.up[2], .2},
+                {quads.greg.up[1], .2},
+                {quads.greg.up[3], .2},
                 stop = quads.greg.up[1],
             },
             walk_left = {
-                {quads.greg.left[1], .25},
-                {quads.greg.left[2], .25},
-                {quads.greg.left[1], .25},
-                {quads.greg.left[3], .25},
+                {quads.greg.left[1], .2},
+                {quads.greg.left[2], .2},
+                {quads.greg.left[1], .2},
+                {quads.greg.left[3], .2},
                 stop = quads.greg.left[1],
             },
             walk_right = {
-                {quads.greg.right[1], .25},
-                {quads.greg.right[2], .25},
-                {quads.greg.right[1], .25},
-                {quads.greg.right[3], .25},
+                {quads.greg.right[1], .2},
+                {quads.greg.right[2], .2},
+                {quads.greg.right[1], .2},
+                {quads.greg.right[3], .2},
                 stop = quads.greg.right[1],
             }
         },
@@ -78,7 +78,6 @@ function scenes.kitchen()
             },
             right_of_rose = {
                 pos = {152,108},
-                easing = Animator.Easing.ease_inout
             },
             bottom_of_stairs = {
                 pos = {217,80}
@@ -90,8 +89,9 @@ function scenes.kitchen()
                 pos = {147,90}
             },
             leaving = {
-                pos = {147,-80},
-                rate = 0.1
+                pos = {147,-80}, -- TODO we'll probably want to open the door when he's near it
+                rate = 0.2,
+                easing = Animator.Easing.ease_in
             },
             couch_sitting = {
                 pos = {204,124},

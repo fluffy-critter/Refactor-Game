@@ -62,6 +62,7 @@ local dialog = {
         {
             pos = {fun=37},
             text = "Good morning... how are you feeling today?",
+            pose = "left_of_couch",
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
@@ -317,7 +318,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=2},
+            pos = {phase=2,normal_tired=0},
             text = "You're looking tired. Didn't you sleep well?",
             setPos = {normal_tired=100},
             responses = {
@@ -327,7 +328,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=2},
+            pos = {phase=2,normal_tired=0},
             text = "What's the matter?",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
@@ -346,7 +347,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=3, normal_camehome=0},
+            pos = {phase=3, normal_camehome=0, normal_tired=0},
             text = "So, last night...",
             responses = {
                 {"What about it?", {normal_solastnight=100}},
@@ -356,7 +357,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=4, normal_camehome=0},
+            pos = {phase=4, normal_camehome=0, normal_tired=50},
             text = "When we got home last night I was worried about you.",
             setPos = {normal_camehome=100},
             responses = {
@@ -366,7 +367,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=4, normal_camehome=0},
+            pos = {phase=4, normal_camehome=0, normal_tired=100},
             text = "When we got home last night I was afraid I'd upset you.",
             setPos = {normal_camehome=100},
             responses = {
@@ -683,8 +684,8 @@ local dialog = {
             pos = {phase=9, lastnight_yeah_husband=0},
             text = "Heh... Come on, you know I don't like when you joke about this stuff.",
             responses = {
-                {"Good thing I'm not joking, then.", {lastnight_joking=-100}},
-                {"I don't know that.", {lastnight_ignorance=100}},
+                {"Good thing I'm not joking, then.", {lastnight_joking=-10}},
+                {"I don't know that.", {lastnight_ignorance=100,lastnight_joking=-10}},
                 {"I don't even know who you are.", {}, "brain_problems"}
             }
         },
@@ -888,10 +889,10 @@ local dialog = {
 
         {
             pos = {bp_guess_husband=10},
-            text = "Do you actually remember that, or are you really just guessing?%%Be honest.",
+            text = "Do you actually remember that, or are you really just guessing?%% Be honest.",
             pose = "next_to_rose",
             responses = {
-                {"I'm just guessing.", {}},
+                {"I'm just guessing.", {bp_just_guessing=100}},
                 {"I do remember...", {}, "gave_up"},
                 {"What do you want me to say?", {bp_guess_husband=30}}
             }
@@ -904,10 +905,45 @@ local dialog = {
         },
 
         {
-            pos = {phase=8},
+            pos = {phase=8,bp_just_guessing=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
             pose = "bottom_of_stairs",
             responses = {}
+        },
+        {
+            pos = {phase=8,bp_just_guessing=100},
+            text = "Yeah...%% That's what I thought...",
+            pose = "bottom_of_stairs",
+            responses = {}
+        },
+
+        {
+            pos = {phase=9},
+            text = "We've worked so hard on everything...%% Building this home together...%% I was hoping it " ..
+                " wouldn't turn out this way.",
+            pose = "left_of_couch",
+            responses = {
+                {"I think I love you.", {}},
+                {"Please don't leave me.", {bp_dont_leave=100}},
+                {"I'm scared.", {bp_so_scared=100}},
+                {nil, {bp_left_hanging=100}}
+            }
+        },
+
+        {
+            pos = {bp_dont_leave=100},
+            text = "No, of course I'm not going to just leave you...%% " ..
+                "Don't you know me better than--%%\nOh.%% Right.%%",
+        },
+
+        {
+            pos = {bp_left_hanging=100},
+            text = "Yeah, I dunno what to say either.",
+        },
+
+        {
+            pos = {bp_so_scared=100},
+            text = "Yeah%.%.%. Me too."
         },
 
         {

@@ -241,7 +241,7 @@ function Game:update(dt)
     if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
         if (self.textBox and self.textBox.state < TextBox.states.ready) then
             -- we're a chatosaurus, extend the timeout a little
-            local extend = self:getNextTimeout(0.5)
+            local extend = self:getNextTimeout(1)
             if util.arrayLT(self.nextTimeout, extend) then
                 self.nextTimeout = extend
             end
@@ -506,9 +506,9 @@ function Game:draw()
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(255, 255, 255)
-        local shader = self.crtScaler
-        love.graphics.setShader(shader)
-        shader:send("screenSize", {256, 224})
+        -- local shader = self.crtScaler
+        -- love.graphics.setShader(shader)
+        -- shader:send("screenSize", {256, 224})
         love.graphics.draw(self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
         love.graphics.setShader()
     end)

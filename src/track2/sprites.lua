@@ -27,8 +27,6 @@ return {
     },
   },
   rose = {
-    bench = {x = 48, y = 0, w = 16, h = 39},
-    hospital = {x = 24, y = 0, w = 16, h = 24},
-    kitchen = {x = 0, y = 0, w = 16, h = 29},
+    kitchen = {x = 0, y = 0, w = 16, h = 34},
   },
 }
