@@ -49,6 +49,20 @@ function scenes.kitchen()
                 {quads.greg.up[1], .25},
                 {quads.greg.up[3], .25},
                 stop = quads.greg.up[1],
+            },
+            walk_left = {
+                {quads.greg.left[1], .25},
+                {quads.greg.left[2], .25},
+                {quads.greg.left[1], .25},
+                {quads.greg.left[3], .25},
+                stop = quads.greg.left[1],
+            },
+            walk_right = {
+                {quads.greg.right[1], .25},
+                {quads.greg.right[2], .25},
+                {quads.greg.right[1], .25},
+                {quads.greg.right[3], .25},
+                stop = quads.greg.right[1],
             }
         },
         pose = {
