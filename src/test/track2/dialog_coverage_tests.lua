@@ -105,7 +105,8 @@ local function generateDotFile()
             dialogState = dialog.start_state,
             npc = {phase = 1},
             dialogCounts = {},
-            weights = game.weights
+            weights = game.weights,
+            offsets = game.offsets
         }
         util.applyDefaults(startState.npc, starts.pos)
         -- insert multiple times to account for nondeterminism

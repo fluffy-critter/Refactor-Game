@@ -127,8 +127,16 @@ notion("Dialog response integrity", function()
                 error(errorText .. ": has " .. silenceCount .. " silent repsonses")
             end
 
-            if item.pose and not greg.pose[item.pose] then
-                error(errorText .. ": nonexistent pose " .. item.pose)
+            if item.pose then
+                if type(item.pose) == 'string' and not greg.pose[item.pose] then
+                    error(errorText .. ": nonexistent pose " .. item.pose)
+                elseif type(item.pose) == 'table' then
+                    for _,p in ipairs(item.pose) do
+                        if not greg.pose[p] then
+                            error(errorText .. ": nonexistent pose " .. p)
+                        end
+                    end
+                end
             end
         end
     end)
