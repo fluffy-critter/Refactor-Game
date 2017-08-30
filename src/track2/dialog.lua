@@ -62,7 +62,7 @@ local dialog = {
         {
             pos = {fun=37},
             text = "Good morning... how are you feeling today?",
-            pose = "left_of_couch",
+            pose = {"left_of_couch", "facing_left"},
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
