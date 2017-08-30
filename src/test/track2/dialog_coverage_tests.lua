@@ -13,9 +13,10 @@ local dialog = require('track2.dialog')
 local Game = require('track2.game')
 
 -- whether to check dialog coverage
-local CheckCoverage = true
-local MaxLinkChecks = 5 -- maximum number of times to consider a dialog path
-
+local CheckCoverage = false
+local MaxLinkChecks = 2 -- maximum number of times to consider a dialog path
+local MaxNodeVisits = 4 -- maximum number of times to consider a node total
+local MaxNodeTimeVisits = 1 -- maximum number of times to consider a node in time
 
 --[[ generate a dotfile that represents all possible conversation paths ]]
 local function generateDotFile()
@@ -116,9 +117,10 @@ local function generateDotFile()
     end
 
     local links = {}
+    local boxphasecounts = {}
 
     local floop = 0
-    while #queue > 0 and floop < 50000 do
+    while #queue > 0 and floop < 70000 do
         print(floop .. " queue size: " .. #queue)
         local idx = math.random(1,#queue)
         local here = queue[idx]
@@ -165,6 +167,10 @@ local function generateDotFile()
 
         if node then
             visited[node] = (visited[node] or 0) + 1
+            boxphasecounts[node] = (boxphasecounts[node] or {})
+            local bpc = boxphasecounts[node]
+            local phs = math.floor(here.npc.phase*4)
+            bpc[phs] = (bpc[phs] or 0) + 1
 
             local postCounts = 0
             for _,v in pairs(here.dialogCounts) do
@@ -193,7 +199,10 @@ local function generateDotFile()
 
             here.from = node
 
-            if node.responses and links[choiceLink] < MaxLinkChecks then
+            if node.responses
+                and links[choiceLink] <= MaxLinkChecks
+                and bpc[phs] <= MaxNodeTimeVisits
+                and visited[node] <= MaxNodeVisits then
                 local silence = {nil,{}}
 
                 for _,response in pairs(node.responses) do
