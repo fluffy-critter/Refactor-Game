@@ -252,11 +252,11 @@ local dialog = {
             text = "Please say something. Anything.",
         },
         {
-            pos = {interrupted=9.1},
+            pos = {interrupted=9},
             text = "I just want to know why you aren't talking...",
         },
         {
-            pos = {interrupted=10.2},
+            pos = {interrupted=10},
             text = "I mean...%% Why are you skipping my text% if you don't% have anything% to say?",
             responses = {
                 {"Because it's funny", {}, "alienated"},
@@ -265,7 +265,7 @@ local dialog = {
             }
         },
         {
-            pos = {interrupted=11.5},
+            pos = {interrupted=11},
             text = "You know you're throwing off the timing of this whole dialog, right?",
             onInterrupt = function(self)
                 self.text = self.text .. "\n... dammit"
@@ -276,7 +276,7 @@ local dialog = {
             text = "Okay, now I just KNOW you're doing this to see what I say."
         },
         {
-            pos = {interrupted=14},
+            pos = {interrupted=15},
             text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%%"
                 .. " from now on.%%%.%%%.%%%.%%%.%%%",
             cantInterrupt=true
@@ -539,8 +539,9 @@ local dialog = {
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
         {
-            pos = {phase=2, nrm_what_doing=100},
+            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
+            setPos = {ln_whatcameover=100},
             responses = {
                 {"It's okay.", {}, "normal"},
                 {"What happened?", {}},
@@ -549,8 +550,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=3, nrm_what_doing=0},
+            pos = {phase=3, nrm_what_doing=0, ln_whatcameover=100},
             text = "Just... something you said set me off a little bit...% and...% you know how I get sometimes.",
+            pose = "left_of_couch",
             responses = {
                 {"I do?", {lastnight_ignorance=200}},
                 {"I'm sure it was okay.", {}},
@@ -752,7 +754,9 @@ local dialog = {
     brain_problems = {
         {
             pos = {phase=2.5},
+            setPos = {bp_prerequisite=100},
             text = "Hon, are you feeling okay?",
+            pose = "right_of_rose",
             responses = {
                 {"Yeah.", {}},
                 {"No.", {bp_not_okay=100}},
@@ -763,6 +767,7 @@ local dialog = {
         {
             pos = {bp_not_okay=100},
             text = "What's the matter?",
+            setPos = {bp_prerequisite=100},
             responses = {
                 {"I don't know who you are.", {}},
                 {"I don't know what any of this is.", {}},
@@ -772,8 +777,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=3},
+            pos = {phase=3, bp_prerequisite=100},
             text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
+            pose = "facing_right",
             responses = {
                 {"Like what?", {bp_stranger=0}},
                 {"No I haven't...", {bp_stranger=10,bp_yes_you_have=50}},
@@ -782,13 +788,14 @@ local dialog = {
         },
 
         {
-            pos = {bp_yes_you_have=50},
+            pos = {bp_yes_you_have=50, bp_prerequisite=100},
             text = "Yes you have.% You just don't remember forgetting...% of course%.%.%."
         },
 
         {
             pos = {phase=4, bp_stranger=0},
             text = "Please stop looking at me like that. Like I'm a stranger...",
+            pose = "right_of_rose",
             responses = {
                 {"But you are.", {bp_stranger=1000}},
                 {"Sorry.", {bp_stranger=1000}},
@@ -797,6 +804,8 @@ local dialog = {
         },
         {
             pos = {phase=4, bp_stranger=10},
+            setPos = {bp_prerequisite=100},
+            pose = {"right_of_rose", "facing_left"},
             text = "Please stop looking at me like that. I'm not a stranger.",
             responses = {
                 {"But you are.", {bp_stranger=1000}},
@@ -807,6 +816,7 @@ local dialog = {
         {
             pos = {phase=4, bp_stranger=20},
             text = "Stop looking at me like that. I'm not a stranger...% Am I?",
+            pose = {"right_of_rose", "facing_right"},
             responses = {
                 {"You are to me.", {bp_stranger=1000}},
                 {"Yes?", {bp_stranger=1000}},
@@ -815,7 +825,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=5},
+            pos = {phase=5, bp_prerequisite=100},
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             responses = {
                 {"We're married?", {}},
@@ -830,7 +840,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=6, bp_family_history=0, fun=0},
+            pos = {phase=6, bp_family_history=0, fun=0, bp_prerequisite=100},
 
             text = "But you have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
@@ -842,7 +852,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6, bp_family_history=0, fun=50},
+            pos = {phase=6, bp_family_history=0, fun=50, bp_prerequisite=100},
             text = "But you DO have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
             responses = {
@@ -884,7 +894,7 @@ local dialog = {
             pos = {phase=7, bp_anything=0},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
-            setPos = {bp_anything=100},
+            setPos = {bp_anything=100, bp_prerequisite=100},
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -923,7 +933,18 @@ local dialog = {
         },
 
         {
-            pos = {phase=9},
+            pos = {phase=5, bp_prerequisite=0},
+            text = "Wait...%% Do you not...% know who I am?",
+            setPos = {bp_prerequisite=100},
+            responses = {
+                {"You do seem familiar...", {}},
+                {"No, sorry...", {}},
+                {"I guess you're my husband?", {bp_guess_husband=10}}
+            }
+        },
+
+        {
+            pos = {phase=9, bp_prerequisite=100},
             text = "We've worked so hard on everything...%% Building this home together...%% I was hoping it " ..
                 " wouldn't turn out this way.",
             pose = "left_of_couch",
@@ -952,7 +973,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=10, fun=20, bp_explains_so_much=0},
+            pos = {phase=10, fun=20, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
             setPos = {bp_explains_so_much=100},
@@ -964,7 +985,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=10, fun=50, bp_explains_so_much=0},
+            pos = {phase=10, fun=50, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, oh god.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
             setPos = {bp_explains_so_much=100},
@@ -1010,7 +1031,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=13},
+            pos = {phase=13, bp_sullen=0},
             text = "Let's go to a doctor, okay?",
             pose = "next_to_rose",
             maxCount = 20,

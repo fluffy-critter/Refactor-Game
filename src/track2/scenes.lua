@@ -104,6 +104,16 @@ function scenes.kitchen()
                     sprite.frame = quads.greg.down[1]
                 end
             },
+            facing_right = {
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.right[1]
+                end
+            },
+            facing_left = {
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.left[1]
+                end
+            },
             kitchen = {
                 pos = {88,38}
             },
