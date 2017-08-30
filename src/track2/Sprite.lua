@@ -36,6 +36,7 @@ function Sprite:update(dt)
         if not self.frameNum then
             self.frameNum = 1
         end
+        self.frame = self.animation[self.frameNum][1]
 
         self.frameTime = self.frameTime + dt*self.animSpeed
         if self.frameTime > self.animation[self.frameNum][2] then
@@ -44,7 +45,6 @@ function Sprite:update(dt)
             if self.frameNum > #self.animation then
                 self.frameNum = 1
             end
-            self.frame = self.animation[self.frameNum][1]
         end
     end
 end
