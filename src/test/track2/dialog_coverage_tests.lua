@@ -14,9 +14,10 @@ local Game = require('track2.game')
 
 -- whether to check dialog coverage
 local CheckCoverage = false
-local MaxLinkChecks = 2 -- maximum number of times to consider a dialog path
-local MaxNodeVisits = 4 -- maximum number of times to consider a node total
-local MaxNodeTimeVisits = 1 -- maximum number of times to consider a node in time
+local MaxLinkChecks = 5 -- maximum number of times to consider a dialog path
+local MaxNodeVisits = 15 -- maximum number of times to consider a node total
+local MaxNodeTimeVisits = 3 -- maximum number of times to consider a node in time
+local TestDuration = 250000 -- how many probes to try
 
 --[[ generate a dotfile that represents all possible conversation paths ]]
 local function generateDotFile()
@@ -120,7 +121,7 @@ local function generateDotFile()
     local boxphasecounts = {}
 
     local floop = 0
-    while #queue > 0 and floop < 70000 do
+    while #queue > 0 and floop < TestDuration do
         print(floop .. " queue size: " .. #queue)
         local idx = math.random(1,#queue)
         local here = queue[idx]

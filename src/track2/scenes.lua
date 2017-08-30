@@ -79,6 +79,9 @@ function scenes.kitchen()
             right_of_rose = {
                 pos = {152,108},
             },
+            left_of_stairs = {
+                pos = {182,118},
+            },
             bottom_of_stairs = {
                 pos = {217,80}
             },

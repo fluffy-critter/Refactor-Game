@@ -605,6 +605,7 @@ local dialog = {
         {
             pos = {lastnight_blackout=100},
             text = "I guess you had a bit too much to drink after all.%% You know that isn't good for you...",
+            pose = {"right_of_rose", "facing_left"}
         },
 
         {
@@ -619,6 +620,7 @@ local dialog = {
         {
             pos = {lastnight_ignorance=200},
             text = "Seriously, is everything okay?",
+            pose = {"left_of_stairs", "facing_left"},
             responses = {
                 {"Yeah.", {lastnight_joking=-10}},
                 {"No.", {}, "alienated"},
@@ -720,10 +722,19 @@ local dialog = {
             responses = {
                 {"No, I'm not.", {}, "brain_problems"},
                 {"Yeah, I think so?", {}, "normal"},
-                {"Everything seems weird.", {}}
+                {"Everything seems weird.", {lastnight_feeling_weird=100}}
             }
         },
 
+        {
+            pos = {phase=9, lastnight_feeling_weird=100},
+            text = "Yeah,% I guess we have a lot of things to work through.",
+            responses = {
+                {"Maybe you could tell me about yourself.", {}},
+                {"I'm not sure what's going on.", {}},
+                {"But... who are you?", {}, "brain_problems"}
+            }
+        },
 
         {
             pos = {phase=10, fun=0, lastnight_samething=0},
@@ -746,7 +757,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=10, lastnight_samething=1000},
+            pos = {phase=10.5, lastnight_samething=1000},
             text = "I'm just not sure what's going on here.",
             responses = {
                 {"I'm sorry... I'm just in a strange mood.", {}},
@@ -754,9 +765,8 @@ local dialog = {
                 {"What's real anymore?", {}, "brain_problems"}
             }
         },
-
         {
-            pos = {phase=10.5},
+            pos = {phase=10.5, lastnight_samething=0},
             text = "I just don't know what we should do next...%% I know, let's go on a vacation.",
             responses = {
                 {"Yeah... take some more pictures...", {}, "vacation"},
@@ -926,10 +936,10 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6, bp_family_history=0, fun=25},
-            text = "But you DO have a family history.%.%.% Oh.%%%\n\nOH.",
+            pos = {phase=6, bp_family_history=0, bp_prerequisite=0},
+            text = "You do have a family history of.%.%.% Oh.%%%\n\nOH.",
             pose = "facing_down",
-            setPos = {bp_family_history=100},
+            setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
                 {"Of what?", {}},
                 {"No I don't...", {}},
@@ -954,10 +964,10 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, bp_anything=0},
+            pos = {phase=7, bp_anything=0, bp_prerequisite=100},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
-            setPos = {bp_anything=100, bp_prerequisite=100},
+            setPos = {bp_anything=100},
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -966,7 +976,7 @@ local dialog = {
         },
 
         {
-            pos = {bp_guess_husband=10},
+            pos = {bp_guess_husband=10, bp_prerequisite=100},
             text = "Do you actually know that, or are you really just guessing?%% Be honest.",
             pose = {"next_to_rose", "facing_down"},
             responses = {
@@ -1278,7 +1288,7 @@ local dialog = {
         {
             pos = {},
             pose = "next_to_rose_worried",
-            text = "Yes, emergency services? It's my spouse, something's very wrong with them.",
+            text = "Emergency services? It's my spouse, something's very wrong with them.",
             setPos = {stroke_state=1000}
         },
 

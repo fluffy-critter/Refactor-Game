@@ -93,6 +93,8 @@ function Game:init()
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
+    self.music:setVolume(0.1)
+
     self.printSound = love.audio.newSource("track2/printSound.wav", "static")
     self.printSound:setVolume(0.3)
     self.selectSound = love.audio.newSource("track2/selectSound.wav", "static")
