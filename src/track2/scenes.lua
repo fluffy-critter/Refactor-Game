@@ -96,12 +96,23 @@ function scenes.kitchen()
             couch_sitting = {
                 pos = {204,124},
                 onComplete = function(sprite)
-                    sprite.frame = quads.greg.sitting
+                    sprite.frame = quads.greg.sitting.normal
+                end
+            },
+            couch_sitting_thinking = {
+                pos = {204,124},
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.sitting.thinking
                 end
             },
             facing_down = {
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.down[1]
+                end
+            },
+            facing_up = {
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.up[1]
                 end
             },
             facing_right = {
