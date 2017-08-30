@@ -245,14 +245,10 @@ local dialog = {
         },
         {
             pos = {interrupted=6},
-            text = "Please say something.",
+            text = "Please say something.%% Anything.",
         },
         {
             pos = {interrupted=8},
-            text = "Please say something. Anything.",
-        },
-        {
-            pos = {interrupted=9},
             text = "I just want to know why you aren't talking...",
         },
         {
@@ -265,35 +261,22 @@ local dialog = {
             }
         },
         {
-            pos = {interrupted=11},
+            pos = {interrupted=12},
             text = "You know you're throwing off the timing of this whole dialog, right?",
             onInterrupt = function(self)
                 self.text = self.text .. "\n... dammit"
             end
         },
         {
-            pos = {interrupted=13},
+            pos = {interrupted=14},
             text = "Okay, now I just KNOW you're doing this to see what I say."
         },
         {
-            pos = {interrupted=15},
+            pos = {interrupted=16},
             text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%%"
                 .. " from now on.%%%.%%%.%%%.%%%.%%%",
             cantInterrupt=true
         },
-    },
-
-    sidebar_going_somewhere = {
-        {
-            pos = {},
-            text = "What? No, I was just wondering if you'd eaten.",
-            responses = {
-                {"Oh, my mind was elsewhere.", {}, "normal"},
-                {"So you aren't abducting me, then?", {}, "brain_problems"},
-                {"I'm not hungry.", {}, "normal"},
-                {nil, {}, "silence"}
-            }
-        }
     },
 
     -- path where Greg thinks everything is normal
@@ -309,12 +292,23 @@ local dialog = {
         },
 
         {
+            pos = {nrm_going_somewhere=500},
+            text = "What? No, I was just wondering if you'd eaten.",
+            responses = {
+                {"Oh, my mind was elsewhere.", {}, "alienated"},
+                {"So you aren't abducting me, then?", {}, "brain_problems"},
+                {"I'm not hungry.", {}},
+                {nil, {}, "silence"}
+            }
+        },
+
+        {
             pos = {phase=2, normal_tired=0},
             text = "Have you had breakfast already?",
             responses = {
                 {"Not yet.", {}},
                 {"No...", {}},
-                {"Are we going somewhere?", {}, "sidebar_going_somewhere"},
+                {"Are we going somewhere?", {nrm_going_somewhere=500}},
             }
         },
         {
@@ -771,14 +765,59 @@ local dialog = {
             responses = {
                 {"I don't know who you are.", {}},
                 {"I don't know what any of this is.", {}},
-                {"Everything looks pixelated...", {}, "stroke"},
+                {"Everything looks pixelated...", {bp_pixelated=1000,bp_prerequisite=-100}},
                 {nil, {}, "silence"}
+            }
+        },
+
+        {
+            pos = {bp_pixelated=1000},
+            text = ".%.%.%Pixelated?%% What...% do you mean by that,% exactly?",
+            pose = "facing_left",
+            responses = {
+                {"Everything's made of rectangles.", {bp_pixelated=500}}, -- outval=1500
+                {"It's all blurry and 240p.", {bp_pixelated=1000}}, -- outval=2000
+                {"I'm seeing our words.", {bp_pixelated=1500}}, -- outval=2500
+            }
+        },
+
+        {
+            pos = {bp_pixelated=1500},
+            text = "I%.%.%. have no idea what you mean by that.",
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"And everything's so blurry.", {bp_pixelated=500}}, -- outval=2000
+                {"The song is about us.", {}, "stroke"},
+                {"I can see your ellipsis.", {bp_pixelated=1000}}, -- outval=2500
+            }
+        },
+
+        {
+            pos = {bp_pixelated=2000},
+            text = ".%.%.%Maybe we should go to the eye doctor, then?",
+            pose = {"next_to_rose", "facing_down"},
+            responses = {
+                {"I don't want to go.", {}},
+                {"My sprite isn't big enough for glasses.", {}, "stroke"},
+                {"Third dialog choice.", {bp_pixelated=500}}, -- outval=2500
+            }
+        },
+
+        {
+            pos = {bp_pixelated=2500},
+            text = "What the%.%.%. Are you messing with me?% What's all this about?",
+            pose = {"below_doors", "facing_left"},
+            responses = {
+                {"The player is in control.", {}, "stroke"},
+                {"We are just shapes.", {}, "stroke"},
+                {"Who are you?", {}}
             }
         },
 
         {
             pos = {phase=3, bp_prerequisite=100},
             text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
+            setPos = {bp_prerequisite=100},
             pose = "facing_right",
             responses = {
                 {"Like what?", {bp_stranger=0}},
@@ -904,8 +943,8 @@ local dialog = {
 
         {
             pos = {bp_guess_husband=10},
-            text = "Do you actually remember that, or are you really just guessing?%% Be honest.",
-            pose = "next_to_rose",
+            text = "Do you actually know that, or are you really just guessing?%% Be honest.",
+            pose = {"next_to_rose", "facing_down"},
             responses = {
                 {"I'm just guessing.", {bp_just_guessing=100}},
                 {"I do remember...", {}, "gave_up"},
@@ -915,7 +954,7 @@ local dialog = {
         {
             pos = {bp_guess_husband=40},
             pose = "right_of_rose",
-            text = "I don't know...% That this is all just some sick joke?% That you took too far?% " ..
+            text = "I don't know...% That this is all just a weird joke?% That you took too far?% " ..
                 "That the person I love is%.%.%. still here with me?"
         },
 
@@ -1070,8 +1109,6 @@ local dialog = {
 
     -- path where Greg is feeling alienated
     alienated = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: alienated" },
-
         {
             pos = {silence_total=3, silence_cur=1},
             text = "What's with the cold shoulder?",
@@ -1100,23 +1137,23 @@ local dialog = {
         },
 
         {
-            pos = {interrupted=5, phase=2},
+            pos = {interrupted=2},
             text = "Could you let me finish?"
         },
         {
-            pos = {interrupted=10, phase=3},
+            pos = {interrupted=4},
             text = "Could you please let me finish?"
         },
         {
-            pos = {interrupted=15, phase=4},
+            pos = {interrupted=7},
             text = "Could you PLEASE let me finish?"
         },
         {
-            pos = {interrupted=20, phase=5},
+            pos = {interrupted=9},
             text = "I don't really like being talked over, you know."
         },
         {
-            pos = {interrupted=20, phase=5},
+            pos = {interrupted=12},
             text = "I don't like being talked over.%%\nStop it.%%",
             cantInterrupt=true
         },
@@ -1147,9 +1184,32 @@ local dialog = {
             }
         },
 
+        {
+            pos = {phase=11},
+            text = "I don't know who the hell you think you are but...%% " ..
+                "this is all just too much for me to deal with.",
+            pose={"below_doors","facing_down"}
+        },
+
+        {
+            pos = {phase=12},
+            text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.\nGoodbye.",
+            setPos = {leaving=1000},
+            pose={"below_doors","facing_up"}
+
+        },
+
+        {
+            pos = {leaving=1000},
+            text = "I hope you get the help you need.",
+            pose = "leaving",
+            maxCount=100,
+        }
+
+
     },
 
-    -- path where Greg has given up on helping Rose
+    -- path where Greg has given up on helping Rose due to brain problems
     gave_up = {
         {
             pos = {phase=10},
@@ -1204,22 +1264,22 @@ local dialog = {
             maxCount=5
         },
         {
-            pos = {phase=-2, stroke_state=1000},
+            pos = {phase=-1, stroke_state=1000},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
             maxCount=5
         },
         {
-            pos = {phase=-2, stroke_state=1000},
+            pos = {phase=-1, stroke_state=1000},
             text = "They'll be here soon.",
             maxCount=5
         },
         {
-            pos = {phase=-2, stroke_state=1000},
+            pos = {phase=-1, stroke_state=1000},
             text = "I love you.%#%\n\nWe'll get through this.",
             maxCount=5
         },
         {
-            pos = {phase=-2, stroke_state=1000},
+            pos = {phase=-1, stroke_state=1000},
             text = "It's okay, I'm here for you.",
             maxCount=5
         },
