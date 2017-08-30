@@ -85,6 +85,12 @@ function Game:init()
         silence_total = 7
     }
 
+    -- how much to bias an axis by, if it's present in the match rule
+    self.offsets = {
+        silence_cur = 2,
+        silence_total = 2
+    }
+
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
     self.printSound = love.audio.newSource("track2/printSound.wav", "static")
@@ -151,7 +157,7 @@ function Game:start()
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},
         what = function()
-            self:setPose(scene.greg, "right_of_rose")
+            self:setPoseSequence(scene.greg, {"bottom_of_stairs", "right_of_rose"})
         end
     })
 end
@@ -226,7 +232,11 @@ function Game:update(dt)
                 end
 
                 if node.pose then
-                    self:setPose(self.kitchenScene.greg, node.pose)
+                    if type(node.pose) == "table" then
+                        self:setPoseSequence(self.kitchenScene.greg, node.pose)
+                    else
+                        self:setPose(self.kitchenScene.greg, node.pose)
+                    end
                 end
             end
         end
@@ -383,7 +393,7 @@ function Game:chooseDialog()
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
-                distance = distance + dx*dx*(self.weights[k] or 1)
+                distance = distance + dx*dx*(self.weights[k] or 1) + (self.offsets[k] or 1)
             end
             if not minDistance or distance < minDistance then
                 print("      d=" .. distance .. ": " .. node.text .. " d=" .. distance)
@@ -415,7 +425,7 @@ function Game:setPose(sprite, poseName, after)
     local dy = pose.pos and pose.pos[2] - sprite.pos[2] or 0
 
     local animation = sprite.mapAnimation and sprite:mapAnimation(dx, dy, pose)
-    local rate = animation and animation.walkRate or 24
+    local rate = animation and animation.walkRate or 32
     local speed = pose.speed or 1
 
     local duration = math.sqrt(dx*dx + dy*dy)/speed/rate
@@ -446,6 +456,22 @@ function Game:setPose(sprite, poseName, after)
             end
         end
     })
+end
+
+-- run a sequence of poses
+function Game:setPoseSequence(sprite, poseList)
+    local remain = util.shallowCopy(poseList)
+
+    local function consume()
+        local pose = remain[1]
+        if not pose then
+            return
+        end
+        table.remove(remain, 1)
+
+        self:setPose(sprite, pose, consume)
+    end
+    consume()
 end
 
 function Game:draw()
