@@ -9,7 +9,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
 
     poolName = {
         pos = {...}, -- position in the parameter space
-        text = "...", -- text displayed by the NPC
+        text = "...", -- text displayed by the NPC (required, even if ended=true)
         responses = { -- choice box to create afterwards (if nil, just select another dialog)
             { "responseText", {paramchanges}, "poolChange" } --
                 text to show (nil=silence),
@@ -19,6 +19,7 @@ dialog top-level object contains named pools; each pool contains a bunch of frag
         setPos = {...}, -- set position flags if we've gotten here
         setState = "state", -- which state to switch to if we get to this point
         maxCount=..., -- Maximum number of times this fragment can appear (default: 1)
+        ended = true, -- indicates the dialog is now over
     },
 
 "pos" matches against attributes including the following:
@@ -1352,11 +1353,10 @@ local dialog = {
 
         {
             pos = {phase=12},
-            text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.\nGoodbye.",
+            text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.",
             setState = "gave_up",
             setPos = {leaving=1000},
-            pose={"below_doors","facing_up"}
-
+            pose={"below_doors","pause","facing_up"}
         },
     },
 
@@ -1387,8 +1387,8 @@ local dialog = {
 
         {
             pos = {phase=12},
-            text = "I just can't do this anymore. Goodbye.",
-            pose = "leaving",
+            text = "I just can't do this anymore.",
+            pose = {"below_doors", "facing_up"},
             setPos = {leaving=1000},
             cantInterrupt=true,
             maxCount=100,
@@ -1397,9 +1397,16 @@ local dialog = {
         {
             pos = {leaving=1000},
             text = "I hope you get the help you need.",
-            pose = "leaving",
-            maxCount=100,
+            pose = {"below_doors","leaving","pause","gone"},
+            setPos = {gone=1000}
+        },
+
+        {
+            pos = {gone=1000},
+            text = "",
+            ended = true
         }
+
     },
 
     -- state where Greg believes Rose is having a stroke

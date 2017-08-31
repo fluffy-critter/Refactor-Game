@@ -5,7 +5,7 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = true
+local DEBUG = false
 
 local util = require('util')
 local shaders = require('shaders')
@@ -221,7 +221,7 @@ function Game:update(dt)
             self.npc.phase = time[1] + time[2]/4 + time[3]/16
 
             local node = self:chooseDialog()
-            if node then
+            if node and not node.ended then
                 self.textBox = TextBox.new({
                     text = node.text,
                     cantInterrupt = node.cantInterrupt,
@@ -456,7 +456,7 @@ function Game:setPose(sprite, poseName, after)
         target = sprite,
         easing = pose.easing,
         endPos = pose.pos,
-        duration = duration,
+        duration = pose.duration or duration,
         onStart = function()
             print("Started animation for " .. poseName)
             sprite.animation = animation

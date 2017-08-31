@@ -114,9 +114,14 @@ function scenes.kitchen()
                 pos = {147,90}
             },
             leaving = {
-                pos = {147,-80}, -- TODO we'll probably want to open the door when he's near it
-                rate = 0.2,
-                easing = Animator.Easing.ease_in
+                pos = {149,2},
+                speed = 0.75,
+                easing = Animator.Easing.ease_inout,
+                -- TODO: onComplete sets open-door to visible
+            },
+            gone = {
+                pos = {149,-40},
+                -- TODO: onComplete sets closed-door to visible
             },
             couch_sitting = {
                 pos = {204,124},
@@ -150,6 +155,9 @@ function scenes.kitchen()
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.down[1]
                 end
+            },
+            pause = {
+                duration = 1
             }
         },
         mapAnimation = function(self, dx, dy, pose)
@@ -160,10 +168,10 @@ function scenes.kitchen()
             end
 
             if math.abs(dx) < math.abs(dy) then
-                return dy > 0 and self.animations.walk_down or self.animations.walk_up
+                return (dy > 0 and self.animations.walk_down) or (dy < 0 and self.animations.walk_up)
             end
 
-            return dx > 0 and self.animations.walk_right or self.animations.walk_left
+            return (dx > 0 and self.animations.walk_right) or (dx < 0 and self.animations.walk_left)
         end,
         frame = quads.greg.down[1]
     })
@@ -176,9 +184,11 @@ function scenes.kitchen()
 
         layers = {
             {sheet = backgroundLayer},
+            -- open_door, -- two states: invisible, open
             greg,
             {sheet = foregroundLayer},
-            rose
+            rose,
+            -- closed_door  -- three states: invisible, closed
         },
 
         update = function(self, dt)
