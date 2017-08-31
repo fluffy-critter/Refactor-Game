@@ -131,24 +131,16 @@ function scenes.kitchen()
                 end
             },
             facing_down = {
-                onComplete = function(sprite)
-                    sprite.frame = quads.greg.down[1]
-                end
+                animation = {quads.greg.down[1], 1}
             },
             facing_up = {
-                onComplete = function(sprite)
-                    sprite.frame = quads.greg.up[1]
-                end
+                animation = {quads.greg.up[1], 1}
             },
             facing_right = {
-                onComplete = function(sprite)
-                    sprite.frame = quads.greg.right[1]
-                end
+                animation = {quads.greg.right[1], 1}
             },
             facing_left = {
-                onComplete = function(sprite)
-                    sprite.frame = quads.greg.left[1]
-                end
+                animation = {quads.greg.left[1], 1}
             },
             kitchen = {
                 pos = {88,38}
@@ -160,8 +152,12 @@ function scenes.kitchen()
                 end
             }
         },
-        mapAnimation = function(self, dx, dy, _)
+        mapAnimation = function(self, dx, dy, pose)
             -- TODO: pose (final arg) can choose 'worried' modifier etc.
+
+            if pose.animation then
+                return pose.animation
+            end
 
             if math.abs(dx) < math.abs(dy) then
                 return dy > 0 and self.animations.walk_down or self.animations.walk_up

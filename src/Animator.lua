@@ -10,7 +10,8 @@ Properties used on the animation objects:
 easing - easing function
 duration - time in seconds
 onComplete - callback to call when finished
-target - target sprite (uses pos attribute)
+target - target sprite
+property - which propertybag to tween on the target (default: "pos")
 startPos - starting position (defaults to current target position)
 endPos - ending position (defaults to start position)
 
@@ -57,7 +58,8 @@ function Animator:add(anim, preempt)
         easing = Animator.Easing.linear,
         duration = 1,
         onComplete = nil,
-        now = 0
+        now = 0,
+        property = "pos"
     })
 
     table.insert(self.queue, anim)
@@ -66,7 +68,7 @@ end
 function Animator:update(dt)
     util.runQueue(self.queue, function(anim)
         if not anim.startPos then
-            anim.startPos = util.shallowCopy(anim.target.pos)
+            anim.startPos = util.shallowCopy(anim.target[anim.property])
         end
         if not anim.endPos then
             anim.endPos = util.shallowCopy(anim.startPos)
@@ -80,7 +82,7 @@ function Animator:update(dt)
         anim.now = anim.now + dt
         if anim.now >= anim.duration then
             for k,v in pairs(anim.endPos) do
-                anim.target.pos[k] = v
+                anim.target[anim.property][k] = v
             end
             if anim.onComplete then
                 anim:onComplete()
@@ -91,7 +93,7 @@ function Animator:update(dt)
         else
             local t = anim.now / anim.duration
             for k,v in pairs(anim.startPos) do
-                anim.target.pos[k] = anim.easing(v, anim.endPos[k], t)
+                anim.target[anim.property][k] = anim.easing(v, anim.endPos[k], t)
             end
         end
     end)

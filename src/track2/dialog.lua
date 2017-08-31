@@ -1075,6 +1075,7 @@ local dialog = {
         {
             pos = {bp_howhappy=100},
             text = "You were ecstatic.%% Over the moon.%% We both were%.%.%. and we didn't want it to ever end.",
+            pose = "facing_left",
             rose = "crying",
         },
 
