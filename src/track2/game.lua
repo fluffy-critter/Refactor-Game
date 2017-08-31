@@ -269,23 +269,24 @@ function Game:update(dt)
         end
     end
 
-    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
-        if (self.textBox and self.textBox.state < TextBox.states.ready) then
+    if (self.textBox and self.textBox.state < TextBox.states.ready) then
+        local extend = self:getNextTimeout(2)
+        if util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
-            local extend = self:getNextTimeout(1.5)
-            if util.arrayLT(self.nextTimeout, extend) then
-                self.nextTimeout = extend
-            end
-        else
-            self.nextTimeout = nil
-            if self.textBox then
-                self.textBox:close()
+            print("Extending timeout from " .. table.concat(self.nextTimeout,':') .. " to " .. table.concat(extend,':'))
+            self.nextTimeout = extend
+        end
+    end
 
-                if self.textBox.choices then
-                    self.timeoutSound:stop()
-                    self.timeoutSound:rewind()
-                    self.timeoutSound:play()
-                end
+    if self.nextTimeout and not util.arrayLT(time, self.nextTimeout) then
+        self.nextTimeout = nil
+        if self.textBox then
+            self.textBox:close()
+
+            if self.textBox.choices then
+                self.timeoutSound:stop()
+                self.timeoutSound:rewind()
+                self.timeoutSound:play()
             end
         end
     end

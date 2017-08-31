@@ -96,7 +96,7 @@ notion("Dialog response integrity", function()
         if item.responses then
             local errorText = state .. ':' .. item.text
             if #item.responses == 0 then
-                print("WARNING: Empty response list for " .. errorText)
+                error("Empty response list for " .. errorText)
             elseif #item.responses > 4 then
                 error(errorText .. " has " .. #item.responses)
             end

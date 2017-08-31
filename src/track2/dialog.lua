@@ -915,14 +915,20 @@ local dialog = {
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             responses = {
                 {"We're married?", {}},
-                {"How long, exactly?", {bp_howlong=10}},
+                {"How long, exactly?", {bp_howlong=100}},
                 {"You're trying to trick me.", {}}
             }
         },
 
         {
-            pos = {bp_howlong=10},
-            text = "How long? Gosh, 15...? no, 17 years.",
+            pos = {bp_howlong=100, bp_already_said_when=0},
+            setPos = {bp_howlong=0, bp_already_said_when=500},
+            text = "How long?%% Gosh, 15...?% no,% 17 years.",
+        },
+        {
+            pos = {bp_howlong=100, bp_already_said_when=500},
+            setPos = {bp_howlong=0},
+            text = "17 years ago. Did you forget already?"
         },
 
         {
@@ -931,8 +937,8 @@ local dialog = {
             text = "But you have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
             responses = {
-                {"Of what?", {}},
-                {"No I don't...", {}},
+                {"Of what?", {bp_ofwhat=100}},
+                {"No I don't...", {bp_denial=100}},
                 {"How do you know that?", {bp_howknow=100}},
                 {nil, {}}
             }
@@ -943,7 +949,7 @@ local dialog = {
             setPos = {bp_family_history=100},
             responses = {
                 {"Of what?", {}},
-                {"No I don't...", {}},
+                {"No I don't...", {bp_no_history=100}},
                 {"How do you know that?", {bp_howknow=100}},
                 {nil, {}}
             }
@@ -962,12 +968,35 @@ local dialog = {
         },
 
         {
+            pos = {bp_ofwhat=100},
+            pose = {"left_of_couch", "facing_right"},
+            text = ".%.%.%Of senile dementia.%% Of...% forgetting everything.",
+            responses = {
+                {"No I don't...", {bp_denial=100}},
+                {"How do you know that?", {bp_howknow=100}},
+                {"Oh.", {}}
+            }
+        },
+
+        {
             pos = {bp_howknow=100},
             text = "Because...% You told me about this?%% It's your deepest fear...?"
         },
         {
             pos = {bp_no_history=100},
             text = "What about your mom?%% And your grandma,% and great-aunt?%%\n.%.%.%Have you forgotten them too?"
+        },
+
+        {
+            pos = {bp_denial=100},
+            setPos = {bp_denial=200},
+            text = "When this happened to your mom% she insisted% it wasn't happening,% " ..
+                "that your grandma was a fluke.%% \"Strong genes.\""
+        },
+        {
+            pos = {bp_denial=200},
+            text = "You told me not to let you just deny it if it ever happened...%% happened% to you.%% " ..
+                "So.%% Please,% don't deny it."
         },
 
         {
@@ -1013,13 +1042,54 @@ local dialog = {
             pos = {phase=8,bp_just_guessing=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
             pose = "bottom_of_stairs",
-            responses = {}
+            responses = {
+                {"When was that, exactly?", {bp_when_married=1000}},
+                {"How happy was I?", {bp_howhappy=100}},
+                {"I don't remember it at all.", {}}
+            }
         },
         {
             pos = {phase=8,bp_just_guessing=100},
             text = "Yeah...%% That's what I thought...",
             pose = "bottom_of_stairs",
-            responses = {}
+            responses = {
+                {"I'm sorry.", {}},
+                {"It was worth a shot...", {}, "gave_up"},
+                {"I don't have a choice.", {bp_havenochoice=100}}
+            }
+        },
+
+        {
+            pos = {bp_when_married=1000, bp_already_said_when=0},
+            setPos = {bp_when_married=0,bp_already_said_when=500},
+            text = "15 years ago? .%.%.% No, it was " .. string.sub(os.date('%Y'), 1, 3) .. "X...%%" ..
+                "17 years ago."
+        },
+        {
+            pos = {bp_when_married=1000, bp_already_said_when=500},
+            setPos = {bp_when_married=0},
+            text = "17 years ago, in " .. string.sub(os.date('%Y'), 1, 3) .. "X.%% I just told you that...%%" ..
+                "Did you forget already?"
+        },
+
+        {
+            pos = {bp_howhappy=100},
+            text = "You were ecstatic.%% Over the moon.%% We both were%.%.%. and we didn't want it to ever end.",
+            rose = "crying",
+        },
+
+        {
+            pos = {bp_havenochoice=100},
+            text = "What do you mean by that?",
+            responses = {
+                {"I don't know our backstory.", {}},
+                {"I didn't choose to forget you.", {bp_havenochoice=100}},
+                {"This game didn't give me the option.", {anger_notagame=500}, "anger"},
+            }
+        },
+        {
+            pos = {bp_havenochoice=200},
+            text = "Oh%.%.%. Right,% of course."
         },
 
         {
@@ -1185,7 +1255,11 @@ local dialog = {
         {
             pos = {phase=10},
             text = "Ha ha, wow, this is just... what the hell is going on here.",
-            responses = {}
+            responses = {
+                {"I don't know.", {}},
+                {"Who the hell are you?", {}, "gave_up"},
+                {"Who are you?", {}, "brain_problems"}
+            }
         },
 
         {
@@ -1209,11 +1283,39 @@ local dialog = {
             text = "I don't like being talked over.%%\nStop it.%%",
             cantInterrupt=true
         },
+
+        {
+            pos = {phase=12},
+            text = "I'm sorry, but I just can't do this anymore.",
+            setState = "gave_up",
+            responses = {
+                {"Can't do what?", {}},
+                {"Please don't leave me.", {}},
+                {"I'm sorry.", {}},
+            }
+        }
     },
 
     -- path where Greg gets really angry at Rose
     anger = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: anger" },
+        {
+            pos = {anger_notagame=500},
+            text = "What...?%% Is this...%% some sort of GAME to you?",
+            responses = {
+                {"That's not what I meant.", {anger_whatdidyoumean=100}},
+                {"No, of course not.", {}},
+                {"Yeah, I downloaded it.", {}, "stroke"}
+            }
+        },
+        {
+            pos = {anger_whatdidyoumean=100},
+            text = "Then what DID you mean by that?",
+            responses = {
+                {"I don't know what's going on.", {}, "brain_problems"},
+                {"I'm not sure.", {}},
+                {"Ignore me.", {}, "wtf"}
+            }
+        },
 
         {
             pos = {silence_total=3, silence_cur=1},
@@ -1246,19 +1348,11 @@ local dialog = {
         {
             pos = {phase=12},
             text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.\nGoodbye.",
+            setState = "gave_up",
             setPos = {leaving=1000},
             pose={"below_doors","facing_up"}
 
         },
-
-        {
-            pos = {leaving=1000},
-            text = "I hope you get the help you need.",
-            pose = "leaving",
-            maxCount=100,
-        }
-
-
     },
 
     -- path where Greg has given up on helping Rose due to brain problems
