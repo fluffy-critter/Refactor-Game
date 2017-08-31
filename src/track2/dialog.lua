@@ -902,7 +902,7 @@ local dialog = {
         {
             pos = {phase=4, bp_stranger=20},
             text = "Stop looking at me like that. I'm not a stranger...% Am I?",
-            pose = {"right_of_rose", "facing_right"},
+            pose = {"right_of_rose", "left_of_couch", "facing_left"},
             responses = {
                 {"You are to me.", {bp_stranger=1000}},
                 {"Yes?", {bp_stranger=1000}},
@@ -1062,13 +1062,13 @@ local dialog = {
         {
             pos = {bp_when_married=1000, bp_already_said_when=0},
             setPos = {bp_when_married=0,bp_already_said_when=500},
-            text = "15 years ago? .%.%.% No, it was " .. string.sub(os.date('%Y'), 1, 3) .. "X...%%" ..
-                "17 years ago."
+            text = "15 years ago? .%.%.% No, it was " .. os.date('%Y', os.time() - 27182818) .. ", in " ..
+                os.date('%B', os.time() - 27182818) .. "...%% 17 years ago."
         },
         {
             pos = {bp_when_married=1000, bp_already_said_when=500},
             setPos = {bp_when_married=0},
-            text = "17 years ago, in " .. string.sub(os.date('%Y'), 1, 3) .. "X.%% I just told you that...%%" ..
+            text = "17 years ago, in " .. os.date('%Y', os.time() - 27182818) .. ".%% I just told you that...%%" ..
                 "Did you forget already?"
         },
 
