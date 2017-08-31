@@ -658,7 +658,7 @@ local dialog = {
             pose = "right_of_rose",
             responses = {
                 {"I don't know.", {}, "brain_problems"},
-                {"Yeah, I guess.", {lastnight_blackout=100}},
+                {"Yeah, I guess.", {lastnight_blackout=100,lastnight_feeling_okay=100}},
                 {"No... I'm not...", {}, "brain_problems"}
             }
         },
@@ -699,6 +699,7 @@ local dialog = {
             pos = {phase=8, lastnight_joking=0},
             text = "Wait...% you...% actually don't know who I am?",
             pose = "right_of_rose",
+            setPos = {bp_prerequisite=100},
             responses = {
                 {"No.", {}, "brain_problems"},
                 {"You're my husband...right?", {lastnight_yeah_husband=100}},
@@ -717,8 +718,17 @@ local dialog = {
             }
         },
         {
-            pos = {phase=9, lastnight_yeah_husband=100},
+            pos = {phase=9, lastnight_yeah_husband=100, lastnight_feeling_okay=100},
             text = "Um, yeah...%% I am...%% Are you% sure% you're feeling okay?",
+            responses = {
+                {"No, I'm not.", {}, "brain_problems"},
+                {"Yeah, I think so?", {}, "normal"},
+                {"Everything seems weird.", {lastnight_feeling_weird=100}}
+            }
+        },
+        {
+            pos = {phase=9, lastnight_yeah_husband=100, lastnight_feeling_okay=0},
+            text = "Um, yeah...%% I am...%% Are you feeling okay?",
             responses = {
                 {"No, I'm not.", {}, "brain_problems"},
                 {"Yeah, I think so?", {}, "normal"},
@@ -942,7 +952,7 @@ local dialog = {
             setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
                 {"Of what?", {}},
-                {"No I don't...", {}},
+                {"No I don't...", {bp_no_history=100}},
                 {"How do you know that?", {bp_howknow=100}},
                 {nil, {}}
             }
@@ -952,11 +962,15 @@ local dialog = {
             pos = {bp_howknow=100},
             text = "Because...% You told me about this?%% It's your deepest fear...?"
         },
+        {
+            pos = {bp_no_history=100},
+            text = "What about your mom?%% And your grandma,% and great-aunt?%%\n.%.%.%Have you forgotten them too?"
+        },
 
         {
             pos = {phase=7, bp_anything=0},
             text = "Can you remember anything about me? Anything at all?",
-            setPos = {bp_anything=100},
+            setPos = {bp_anything=100,bp_prerequisite=100},
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -1049,7 +1063,7 @@ local dialog = {
             pos = {phase=10, fun=20, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
-            setPos = {bp_explains_so_much=100},
+            setPos = {bp_explains_so_much=100,bp_prerequisite=100},
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -1061,7 +1075,7 @@ local dialog = {
             pos = {phase=10, fun=50, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, oh god.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
-            setPos = {bp_explains_so_much=100},
+            setPos = {bp_explains_so_much=100,bp_prerequisite=100},
             responses = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {}},
@@ -1074,6 +1088,7 @@ local dialog = {
             pos = {phase=11},
             text = "You don't... you don't remember anything, do you.",
             pose = "right_of_rose",
+            setPos = {bp_prerequisite=100},
             responses = {
                 {"I have no idea who you are.", {}},
                 {"Why are there pictures of us together?", {}},
@@ -1110,7 +1125,7 @@ local dialog = {
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
-                {"I don't want to...", {}},
+                {"I don't want to...", {bp_sullen=10}},
                 {"You're trying to trick me.", {}},
                 {nil, {bp_sullen=10}}
             }
@@ -1122,7 +1137,7 @@ local dialog = {
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
-                {"I don't want to...", {}},
+                {"I don't want to...", {bp_sullen=10}},
                 {"You're trying to trick me.", {}},
                 {nil, {bp_sullen=10}}
             }
