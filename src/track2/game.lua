@@ -496,6 +496,7 @@ function Game:draw()
                 return not scene:draw()
             end)
 
+            love.graphics.setColor(255, 255, 255)
             love.graphics.draw(self.border)
         end
 

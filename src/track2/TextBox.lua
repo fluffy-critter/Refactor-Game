@@ -205,6 +205,8 @@ function TextBox:draw()
     local right = self.right*8
     local bottom = top + (rows + 1)*8
 
+    love.graphics.setColor(255, 255, 255)
+
     -- draw top row
     love.graphics.draw(self.image, self.quads[1], left, top)
     for x = left + 8, right - 8, 8 do
