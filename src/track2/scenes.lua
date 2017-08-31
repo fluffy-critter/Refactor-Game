@@ -7,6 +7,7 @@ Refactor: 2 - Strangers
 
 local imagepool = require('imagepool')
 local quadtastic = require('thirdparty.libquadtastic')
+local util = require('util')
 
 local Sprite = require('track2.Sprite')
 local Animator = require('Animator')
@@ -178,6 +179,26 @@ function scenes.kitchen()
                 else
                     love.graphics.draw(thing.sheet, unpack(thing.pos or {}))
                 end
+            end
+            return true
+        end
+    }
+end
+
+function scenes.phase11(duration)
+    local image = imagepool.load("track2/phase11-pan.png", {nearest=true})
+    local panSize = image:getWidth() - 256
+    local time = 0
+
+    return {
+        update = function(_, dt)
+            time = time + dt
+        end,
+        draw = function()
+            -- TODO alpha?
+            if time < duration then
+                love.graphics.draw(image, -util.smoothStep(time/duration)*panSize)
+                return true
             end
         end
     }

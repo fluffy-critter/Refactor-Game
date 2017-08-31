@@ -93,7 +93,7 @@ function Game:init()
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
-    self.music:setVolume(0.1)
+    -- self.music:setVolume(0.1)
 
     self.printSound = love.audio.newSource("track2/printSound.wav", "static")
     self.printSound:setVolume(0.3)
@@ -136,10 +136,10 @@ function Game:start()
     self.music:play()
 
     self.kitchenScene = scenes.kitchen()
-    self.scene = self.kitchenScene
+    self.scenes = {self.kitchenScene}
 
     -- animation: Greg walking down the stairs
-    local scene = self.scene
+    local scene = self.kitchenScene
     for y = 0, 13 do
         self:addAnimation(
             {
@@ -160,6 +160,13 @@ function Game:start()
         when = {0, 3, 2.5},
         what = function()
             self:setPoseSequence(scene.greg, {"bottom_of_stairs", "right_of_rose"})
+        end
+    })
+
+    self.eventQueue:addEvent({
+        when = {11},
+        what = function()
+            table.insert(self.scenes, scenes.phase11(16*60/BPM))
         end
     })
 end
@@ -278,9 +285,9 @@ function Game:update(dt)
         end
     end
 
-    if self.scene then
-        self.scene:update(dt)
-    end
+    util.runQueue(self.scenes, function(scene)
+        scene:update(dt)
+    end)
 
     if util.arrayLT({17,1,0}, time) then
         self.gameOver = true
@@ -485,7 +492,9 @@ function Game:draw()
         if self.phase < 17 then
             love.graphics.setColor(255, 255, 255)
 
-            self.scene:draw()
+            util.runQueue(self.scenes, function(scene)
+                return not scene:draw()
+            end)
 
             love.graphics.draw(self.border)
         end
