@@ -1232,6 +1232,8 @@ local dialog = {
 
     -- path where Greg is feeling alienated
     alienated = {
+        { pos={}, text="DIALOG PATH INCOMPLETE: alienated"},
+
         {
             pos = {silence_total=3, silence_cur=1},
             text = "What's with the cold shoulder?",
@@ -1299,6 +1301,8 @@ local dialog = {
 
     -- path where Greg gets really angry at Rose
     anger = {
+        { pos={}, text="DIALOG PATH INCOMPLETE: anger"},
+
         {
             pos = {anger_notagame=500},
             text = "What...?%% Is this...%% some sort of GAME to you?",
@@ -1358,6 +1362,8 @@ local dialog = {
 
     -- path where Greg has given up on helping Rose due to brain problems
     gave_up = {
+        { pos={}, text="DIALOG PATH INCOMPLETE: gave_up"},
+
         {
             pos = {phase=10},
             text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?",
