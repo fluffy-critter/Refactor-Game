@@ -188,7 +188,7 @@ function scenes.kitchen()
 end
 
 function scenes.phase11(duration)
-    local image = imagepool.load("track2/phase11-pan.png", {nearest=true})
+    local image = imagepool.load("track2/phase11-pan.png", {nearest=false})
     local blurSize = 3
     local panSize = image:getWidth() - 256 - blurSize
     local time = 0
@@ -204,19 +204,20 @@ function scenes.phase11(duration)
                 return false
             end
 
-            local p = -math.floor(util.smoothStep(x)*panSize + 0.5)
+            local p = math.floor(-util.smoothStep(x)*panSize + 0.5)
 
             love.graphics.setColor(255,255,255,255)
             if x < 0.5 then
-                love.graphics.draw(image, -util.smoothStep(x)*panSize)
+                love.graphics.draw(image, p)
             else
                 local k = (x - 0.5)*2
                 local b = k*blurSize
-                love.graphics.draw(image, math.floor(p + b + 0.5))
+                love.graphics.draw(image, p + b + 0.5)
                 love.graphics.setColor(255,255,255,128)
-                love.graphics.draw(image, math.floor(p - b + 0.5))
-                local brt = 255*(1 - k*k)
-                love.graphics.setColor(brt,brt,brt,128)
+                love.graphics.draw(image, p - b + 0.5)
+                -- local brt = 255*(1 - k*k)
+                local brt = 255
+                love.graphics.setColor(brt,brt,brt,64)
                 love.graphics.draw(image, p)
             end
             return true

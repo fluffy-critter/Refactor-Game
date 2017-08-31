@@ -544,9 +544,9 @@ function Game:draw()
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(255, 255, 255)
-        -- local shader = self.crtScaler
-        -- love.graphics.setShader(shader)
-        -- shader:send("screenSize", {256, 224})
+        local shader = self.crtScaler
+        love.graphics.setShader(shader)
+        shader:send("screenSize", {256, 224})
         love.graphics.draw(self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
         love.graphics.setShader()
     end)
