@@ -167,6 +167,7 @@ function Game:start()
         when = {11},
         what = function()
             table.insert(self.scenes, scenes.phase11(16*60/BPM))
+            self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
         end
     })
 end
@@ -246,6 +247,17 @@ function Game:update(dt)
                     else
                         self:setPose(self.kitchenScene.greg, node.pose)
                     end
+                end
+
+                if node.rose then
+                    print("setting rose animation to " .. node.rose)
+                    local anim = self.kitchenScene.rose.animations[node.rose]
+                    if not anim then
+                        print("Warning: animation doesn't exist")
+                    else
+                        print(#anim .. " frames")
+                    end
+                    self.kitchenScene.rose.animation = self.kitchenScene.rose.animations[node.rose]
                 end
             end
         end

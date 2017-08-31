@@ -30,8 +30,28 @@ function scenes.kitchen()
     local rose = Sprite.new({
         sheet = spriteSheet,
         pos = {120, 112},
-        frame = quads.rose.kitchen
+        frame = quads.rose.kitchen.normal,
+        animations = {
+            normal = {
+                {quads.rose.kitchen.normal, 3},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 2},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 5},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 0.5},
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            closed = {
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            crying = {
+                {quads.rose.kitchen.cry[1], 2/3},
+                {quads.rose.kitchen.cry[2], 2/3},
+            }
+        }
     })
+    rose.animation = rose.animations.normal
 
     local greg = Sprite.new({
         sheet = spriteSheet,
@@ -188,10 +208,11 @@ function scenes.kitchen()
 end
 
 function scenes.phase11(duration)
-    local image = imagepool.load("track2/phase11-pan.png", {nearest=false})
-    local blurSize = 3
+    local image = imagepool.load("track2/phase11-pan.png", {nearest=false}) -- round at blit time, let shaders interp
+    local blurSize = 1
     local panSize = image:getWidth() - 256 - blurSize
     local time = 0
+    local shader = shaders.load('shaders/gaussBlur.fs')
 
     return {
         update = function(_, dt)
@@ -212,13 +233,10 @@ function scenes.phase11(duration)
             else
                 local k = (x - 0.5)*2
                 local b = k*blurSize
-                love.graphics.draw(image, p + b + 0.5)
-                love.graphics.setColor(255,255,255,128)
-                love.graphics.draw(image, p - b + 0.5)
-                -- local brt = 255*(1 - k*k)
-                local brt = 255
-                love.graphics.setColor(brt,brt,brt,64)
+                love.graphics.setShader(shader)
+                shader:send("sampleRadius", {b/image:getWidth(), 0})
                 love.graphics.draw(image, p)
+                love.graphics.setShader()
             end
             return true
         end

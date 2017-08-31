@@ -220,6 +220,7 @@ local dialog = {
             pos = {phase=10},
             text = "Hahaha...%% please...%% just tell me, what's going on...?",
             pose = {"right_of_rose", "facing_left"},
+            rose = "closed",
             responses = {
                 {"I feel... numb...", {}, "stroke"},
                 {"Who are you?", {}, "brain_problems"},
@@ -230,6 +231,7 @@ local dialog = {
             pos = {phase=10},
             text = "Ha ha, fine, don't tell me anything...",
             pose = {"left_of_couch", "facing_right"},
+            rose = "closed",
             responses = {
                 {"I feel... numb...", {}, "stroke"},
                 {"Who are you?", {}, "brain_problems"},
@@ -778,6 +780,7 @@ local dialog = {
         {
             pos = {phase=10.5, lastnight_samething=0},
             text = "I just don't know what we should do next...%% I know, let's go on a vacation.",
+            rose = "closed",
             responses = {
                 {"Yeah... take some more pictures...", {}, "vacation"},
                 {"Yeah... make some new memories...", {}, "vacation"},

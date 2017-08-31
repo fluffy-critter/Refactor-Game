@@ -33,7 +33,7 @@ end
 
 function Sprite:update(dt)
     if self.animation then
-        if not self.frameNum then
+        if not self.frameNum or self.frameNum > #self.animation then
             self.frameNum = 1
         end
         self.frame = self.animation[self.frameNum][1]

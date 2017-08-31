@@ -1,4 +1,5 @@
 return {
+  {x = 24, y = 0, w = 16, h = 31},
   _META = {
     image_path = "./sprites.png",
     version = "v0.6.2",
@@ -30,6 +31,13 @@ return {
     },
   },
   rose = {
-    kitchen = {x = 0, y = 0, w = 16, h = 34},
+    kitchen = {
+      blink = {x = 24, y = 0, w = 16, h = 31},
+      cry = {
+        {x = 48, y = 0, w = 16, h = 31},
+        {x = 72, y = 0, w = 16, h = 31},
+      },
+      normal = {x = 0, y = 0, w = 16, h = 34},
+    },
   },
 }
