@@ -171,6 +171,17 @@ function Game:start()
             self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
         end
     })
+
+    --[[
+    at {12,3} fade to white until {13}
+    at {13} choose a set of scenes based on ending dialog state:
+
+    wtf - psychiatrist/therapist + vacation + park bench together -> kitchen/greg sitting next to rose at table
+    brain_problems, stroke - hospital -> kitchen/greg sitting on couch, thinking
+    gave_up - alone on park bench -> kitchen/no greg
+
+    others - ???
+    ]]
 end
 
 function Game:onButtonPress(button, code, isRepeat)

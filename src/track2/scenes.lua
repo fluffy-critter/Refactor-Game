@@ -97,13 +97,6 @@ function scenes.kitchen()
                     sprite.frame = quads.greg.kneeling
                 end
             },
-            next_to_rose_worried = {
-                pos = {136,104},
-                worried = true,
-                -- onComplete = function(sprite)
-                --     sprite.animation = greg.animations.stand_left_worried
-                -- end
-            },
             right_of_rose = {
                 pos = {152,108},
             },

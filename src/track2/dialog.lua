@@ -136,7 +136,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=6},
+            pos = {phase=6, angry=0},
             text = "This isn't like you.",
             pose = "facing_left",
             responses = {
@@ -146,7 +146,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6},
+            pos = {phase=6, angry=1},
             text = "This is just like you.",
             pose = {"below_doors", "facing_right"},
             responses = {
@@ -516,8 +516,6 @@ local dialog = {
 
     -- path where Greg is feeling attacked out of the blue
     wtf = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: wtf" },
-
         {
             pos = {silence_total=3, silence_cur=1},
             text = "And now the cold shoulder?!",
@@ -539,10 +537,10 @@ local dialog = {
             }
         },
 
-
         {
             pos = {phase=2},
             text = "Uh... what?",
+            pose = {"right_of_rose", "facing_left"},
             responses = {
                 {"You heard me.", {}},
                 {"Who are you?", {}, "brain_problems"},
@@ -551,8 +549,9 @@ local dialog = {
         },
 
         {
-            pos = {},
+            pos = {phase=3},
             text = "What the hell is wrong with you today?!",
+            pose = {"bottom_of_stairs", "facing_right"},
             responses = {
                 {"What do you mean?", {}},
                 {"I don't like strangers in my house.", {}, "brain_problems"},
@@ -560,14 +559,174 @@ local dialog = {
             }
         },
         {
-            pos = {},
+            pos = {phase=4},
             text = "Why are you being like this?",
+            pose = {"bottom_of_stairs", "facing_left"},
             responses = {
                 {"Like what?", {}},
                 {"You're intruding!", {}, "alienated"},
                 {"Who are you?", {}, "brain_problems"}
             }
-        }
+        },
+        {
+            pos = {phase=5},
+            text = "Oh, come on. We have one little fight after,% what,% 15 years of marriage and now " ..
+                "suddenly%.%.%. What the hell.",
+            pose = "facing_right",
+            setPos = {angry=1},
+            responses = {
+                {"I don't know what you're talking about.", {}},
+                {"Marriage?", {wtf_marriage=100}},
+                {"Who are you?!", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {wtf_marriage=100},
+            text = "Yes, marriage.%% You know,% that thing we did?% With the rabbi?% And the wine glass?",
+            pose = "facing_left",
+            responses = {
+                {"I know what marriage is.", {wtf_marriage=100}},
+                {"I don't remember it.", {}, "brain_problems"},
+                {"Clearly a mistake.", {}, "anger"}
+            }
+        },
+        {
+            pos = {wtf_marriage=200},
+            text = "Well, CONGRATULATIONS.",
+            pose = "facing_right",
+            responses = {
+                {"I don't know who YOU are.", {}, "brain_problems"},
+                {"How can we be married?", {wtf_marriage=100}},
+                {"Thanks, what do I win?", {wtf_sweepstakes=100}}
+            }
+        },
+        {
+            pos = {wtf_marriage=300},
+            text = "Right now I'm wondering the same thing.",
+            pose = "facing_up",
+            responses = {
+                {"I don't even know who you are.", {}, "brain_problems"},
+                {"Ouch.", {}, "alienated"},
+                {"I just want you to leave.", {}, "gave_up"}
+            }
+        },
+
+        {
+            pos = {wtf_sweepstakes=100},
+            text = "What.%% The HELL.%% Has gotten% into% you.",
+            responses = {
+                {"I'm sorry.", {}, "alienated"},
+                {"I don't know.", {}, "anger"},
+                {"You must be losing it.", {}}
+            }
+        },
+
+        {
+            pos = {phase=6},
+            text = "Seriously?%% One of us is losing it and I don't think it's me.",
+            pose = {"right_of_rose", "couch_sitting"},
+            responses = {
+                {"Please, go away.", {}, "alienated"},
+                {"I don't even know who you are.", {}, "brain_problems"},
+                {"Maybe this is fun for me.", {}}
+            }
+        },
+
+        {
+            pos = {phase=7},
+            text = "Look,% I don't know what's going on here,% but clearly something has upset you.%% " ..
+                "Mind telling me what the hell is going on?",
+            pose = {"facing_down", "pause", "left_of_couch", "facing_down"},
+            responses = {
+                {"You aren't my spouse.", {}, "alienated"},
+                {"I don't know who you are.", {}, "last_night"},
+                {"I guess we're married?", {bp_guess_husband=10}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=8},
+            text = "The past 15 years.% No, 17.%% They were great, until last night%.%.%. What the hell happened?",
+            pose = {"right_of_rose", "bottom_of_stairs", "facing_right"},
+            responses = {
+                {"I don't know.", {}, "gave_up"},
+                {"This is all new to me.", {}},
+                {"I still don't know who you are.", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=9},
+            text = "I thought we had such a happy home together...%% Was that the dream,% or is this the nightmare?",
+            pose = "facing_down",
+            rose = "closed",
+            responses = {
+                {"I don't know.", {}, "alienated"},
+                {"You're dreaming.", {}},
+                {"I'd like to wake up.", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=10},
+            text = "Heh...%% Look at us, one little argument% and we're just% falling apart.%% How does anyone " ..
+                "make anything work?",
+            pose = "facing_left",
+            rose = "normal",
+            responses = {
+                {"Maybe we start from the beginning.", {}},
+                {"I really don't know.", {}},
+                {"I have to tell you something.", {wtf_tellyousomething=100}}
+            }
+        },
+
+        {
+            pos = {wtf_tellyousomething=100},
+            text = "What is it?",
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"I don't know who you are.", {}},
+                {"I don't know who I am.", {}},
+                {"Nothing makes sense.", {}}
+            }
+        },
+
+        {
+            pos = {phase=11},
+            text = "We've had so many good times together.%% Can we just...% I dunno,% go back to how things were?",
+            pose = {"right_of_rose", "facing_right"},
+            rose = "closed",
+            responses = {
+                {"How were they?", {}},
+                {"I want to...", {}},
+                {"I don't know.", {}}
+            }
+        },
+
+        {
+            pos = {phase=12},
+            text = "I'm just so worried...%% But we can make things work, right?",
+            pose = {"next_to_rose", "facing_left"},
+            rose = "crying",
+            responses = {
+                {"I hope so...", {}},
+                {"I doubt it...", {}},
+                {"Let's try...", {}}
+            }
+        },
+
+        {
+            pos = {phase=13},
+            text = "I think I know someone we can talk to.",
+            maxCount = 20,
+        },
+        {
+            pos = {phase=13},
+            text = "We just need to keep an open mind.",
+            maxCount = 20,
+        },
+
     },
 
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
