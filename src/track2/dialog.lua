@@ -44,7 +44,6 @@ local dialog = {
 
     -- things that are always available
     always = {
-
     },
 
     -- starting point
@@ -883,7 +882,7 @@ local dialog = {
             pos = {phase=3, bp_prerequisite=100},
             text = "Lately you've been forgetting a lot of stuff...%% I wonder...",
             setPos = {bp_prerequisite=100},
-            pose = "facing_right",
+            pose = {"facing_right", "pause", "pause", "facing_left"},
             responses = {
                 {"Like what?", {bp_stranger=0}},
                 {"No I haven't...", {bp_stranger=10,bp_yes_you_have=50}},
@@ -931,6 +930,7 @@ local dialog = {
         {
             pos = {phase=5, bp_prerequisite=100},
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
+            pose = {"right_of_rose", "facing_left"},
             setPos = {told_was_husband=500},
             responses = {
                 {"We're married?", {}},
@@ -943,6 +943,7 @@ local dialog = {
             pos = {bp_howlong=100, bp_already_said_when=0},
             setPos = {bp_howlong=0, bp_already_said_when=500},
             text = "How long?%% Gosh, 15...?% no,% 17 years.",
+            pose = "facing_left",
         },
         {
             pos = {bp_howlong=100, bp_already_said_when=500},
@@ -966,7 +967,7 @@ local dialog = {
             text = "But you DO have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
             responses = {
-                {"Of what?", {}},
+                {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_no_history=100}},
                 {"How do you know that?", {bp_howknow=100}},
             }
@@ -977,7 +978,7 @@ local dialog = {
             pose = "facing_down",
             setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
-                {"Of what?", {}},
+                {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_no_history=100}},
                 {"How do you know that?", {bp_howknow=100}},
             }
@@ -1136,7 +1137,7 @@ local dialog = {
         {
             pos = {phase=9, bp_prerequisite=100},
             text = "We've worked so hard on everything...%% Building this home together...%% I was hoping it " ..
-                " wouldn't turn out this way.",
+                "wouldn't turn out this way.",
             pose = "left_of_couch",
             responses = {
                 {"I think I love you.", {}},
@@ -1150,6 +1151,7 @@ local dialog = {
             pos = {bp_dont_leave=100},
             text = "No, of course I'm not going to just leave you...%% " ..
                 "Don't you know me better than--%% ...Oh.%% Right.%%",
+            pose = {"next_to_rose", "facing_left"}
         },
 
         {
@@ -1193,9 +1195,9 @@ local dialog = {
             pose = "right_of_rose",
             setPos = {bp_prerequisite=100},
             responses = {
+                {"I don't believe you.", {}},
                 {"I have no idea who you are.", {}},
-                {"Why are there pictures of us together?", {}},
-                {"I'm feeling faint...", {}},
+                {"Where did those pictures come from?", {}},
             }
         },
 
@@ -1441,34 +1443,39 @@ local dialog = {
     stroke = {
         {
             pos = {},
-            pose = "next_to_rose_worried",
             text = "Emergency services? It's my spouse, something's very wrong with them.",
+            pose = "on_phone",
             setPos = {stroke_state=1000}
         },
 
         {
             pos = {phase=-1, stroke_state=1000},
             text = "Someone is coming.... everything will be okay.",
+            pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
             pos = {phase=-1, stroke_state=1000},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
+            pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
             pos = {phase=-1, stroke_state=1000},
             text = "They'll be here soon.",
+            pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
             pos = {phase=-1, stroke_state=1000},
             text = "I love you.%#%\n\nWe'll get through this.",
+            pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
             pos = {phase=-1, stroke_state=1000},
             text = "It's okay, I'm here for you.",
+            pose = {"kneeling_by_rose"},
             maxCount=5
         },
     },

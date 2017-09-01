@@ -91,6 +91,12 @@ function scenes.kitchen()
             next_to_rose = {
                 pos = {136,104}
             },
+            kneeling_by_rose = {
+                pos = {135,115},
+                onComplete = function(sprite)
+                    sprite.frame = quads.greg.kneeling
+                end
+            },
             next_to_rose_worried = {
                 pos = {136,104},
                 worried = true,
@@ -148,7 +154,10 @@ function scenes.kitchen()
                 animation = {stop=quads.greg.right[1]}
             },
             facing_left = {
-                animation = {stop=quads.greg.left[1], 1}
+                animation = {stop=quads.greg.left[1]}
+            },
+            on_phone = {
+                animation = {stop=quads.greg.phone}
             },
             kitchen = {
                 pos = {88,38}

@@ -5,7 +5,7 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = false
+local DEBUG = true
 
 local util = require('util')
 local shaders = require('shaders')
@@ -155,7 +155,7 @@ function Game:start()
                 end
             },
             {0, math.floor(y/4), y%4},
-            {0, math.floor(y/4), y%4 + 0.25})
+            {0, math.floor(y/4), y%4 + 0.5})
     end
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},

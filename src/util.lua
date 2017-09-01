@@ -232,12 +232,12 @@ function util.clock(BPM, limits, ofs)
         return timeToPos(posToTime(pos))
     end
 
-    local addOffset = function(time, ofs)
+    local addOffset = function(time, delta)
         local newPos = {}
         for k,v in ipairs(time) do
-            newPos[k] = v + (ofs[k] or 0)
+            newPos[k] = v + (delta[k] or 0)
         end
-        return noramlize(newPos)
+        return normalize(newPos)
     end
 
     return {
