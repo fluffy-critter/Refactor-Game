@@ -640,8 +640,8 @@ local dialog = {
             pose = {"facing_down", "pause", "left_of_couch", "facing_down"},
             responses = {
                 {"You aren't my spouse.", {}, "alienated"},
-                {"I don't know who you are.", {}, "last_night"},
-                {"I guess we're married?", {bp_guess_husband=10}, "brain_problems"}
+                {"I don't know who you are.", {}, "brain_problems"},
+                {"Who ARE you?!", {}},
             }
         },
 
@@ -682,7 +682,7 @@ local dialog = {
         },
 
         {
-            pos = {wtf_tellyousomething=100},
+            pos = {phase=11,wtf_tellyousomething=100},
             text = "What is it?",
             pose = {"right_of_rose", "facing_left"},
             responses = {
@@ -693,7 +693,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=11},
+            pos = {phase=11,wtf_tellyousomething=0},
             text = "We've had so many good times together.%% Can we just...% I dunno,% go back to how things were?",
             pose = {"right_of_rose", "facing_right"},
             rose = "closed",
@@ -1323,6 +1323,18 @@ local dialog = {
             text = "Yeah%.%.%. Me too."
         },
 
+        {
+            pos = {phase=10, bp_explains_so_much=0, bp_prerequisite=0},
+            text = "Ha ha ha, I just realized...%% This is what happened to your mom.%% Oh crap.",
+            pose = "bottom_of_stairs",
+            setPos = {bp_explains_so_much=100,bp_prerequisite=100},
+            responses = {
+                {"My mom?", {}},
+                {"Please don't laugh...", {}},
+                {"Explains what?", {}},
+                {nil, {}, "silence"}
+            }
+        },
         {
             pos = {phase=10, fun=20, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, okay, this.%.%.% this explains so much...",
