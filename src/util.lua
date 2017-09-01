@@ -200,6 +200,8 @@ Returns an object with methods:
 
 timeToPos - converts a numerical position to a position array
 posToTime - converts a position array to a numerical position
+normalize - normalize an offset array with the proper modulus
+addOffset - add an offset array to a position array, returning a new position array
 ]]
 function util.clock(BPM, limits, ofs)
     ofs = ofs or 0
@@ -226,7 +228,24 @@ function util.clock(BPM, limits, ofs)
         return beat*60/BPM + ofs
     end
 
-    return {timeToPos = timeToPos, posToTime = posToTime}
+    local normalize = function(pos)
+        return timeToPos(posToTime(pos))
+    end
+
+    local addOffset = function(time, ofs)
+        local newPos = {}
+        for k,v in ipairs(time) do
+            newPos[k] = v + (ofs[k] or 0)
+        end
+        return noramlize(newPos)
+    end
+
+    return {
+        timeToPos = timeToPos,
+        posToTime = posToTime,
+        normalize = normalize,
+        addOffset = addOffset
+    }
 end
 
 -- Like ipairs(sequence) except it can take arbitrarily many tables. Returns tbl,idx,value

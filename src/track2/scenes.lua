@@ -120,8 +120,11 @@ function scenes.kitchen()
                 -- TODO: onComplete sets open-door to visible
             },
             gone = {
-                pos = {149,-40},
-                -- TODO: onComplete sets closed-door to visible
+                pos = {149,-20},
+                onComplete = function(sprite)
+                    -- TODO: set open-door to invisible, closed-door to visible
+                    sprite.frame = nil
+                end
             },
             couch_sitting = {
                 pos = {204,124},
@@ -136,16 +139,16 @@ function scenes.kitchen()
                 end
             },
             facing_down = {
-                animation = {quads.greg.down[1], 1}
+                animation = {stop=quads.greg.down[1]}
             },
             facing_up = {
-                animation = {quads.greg.up[1], 1}
+                animation = {stop=quads.greg.up[1]}
             },
             facing_right = {
-                animation = {quads.greg.right[1], 1}
+                animation = {stop=quads.greg.right[1]}
             },
             facing_left = {
-                animation = {quads.greg.left[1], 1}
+                animation = {stop=quads.greg.left[1], 1}
             },
             kitchen = {
                 pos = {88,38}
@@ -161,16 +164,20 @@ function scenes.kitchen()
             }
         },
         mapAnimation = function(self, dx, dy, pose)
+            print("mapAnimation dx=" .. dx .. " dy=" .. dy .. " pose=" .. tostring(pose))
             -- TODO: pose (final arg) can choose 'worried' modifier etc.
 
             if pose.animation then
+                print("  pose provides animation of " .. #pose.animation .. " frames")
                 return pose.animation
             end
 
             if math.abs(dx) < math.abs(dy) then
+                print("  vertical " .. dy)
                 return (dy > 0 and self.animations.walk_down) or (dy < 0 and self.animations.walk_up)
             end
 
+            print("  horizontal " .. dx)
             return (dx > 0 and self.animations.walk_right) or (dx < 0 and self.animations.walk_left)
         end,
         frame = quads.greg.down[1]
@@ -183,10 +190,10 @@ function scenes.kitchen()
         greg = greg,
 
         layers = {
-            {sheet = backgroundLayer},
+            {image = backgroundLayer},
             -- open_door, -- two states: invisible, open
             greg,
-            {sheet = foregroundLayer},
+            {image = foregroundLayer},
             rose,
             -- closed_door  -- three states: invisible, closed
         },
@@ -204,8 +211,8 @@ function scenes.kitchen()
             for _,thing in ipairs(self.layers) do
                 if thing.frame then
                     love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
-                else
-                    love.graphics.draw(thing.sheet, unpack(thing.pos or {}))
+                elseif thing.image then
+                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
                 end
             end
             return true

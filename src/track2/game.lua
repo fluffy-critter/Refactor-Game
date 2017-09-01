@@ -154,7 +154,8 @@ function Game:start()
                     scene.greg.frame = scene.frames.greg.down[1]
                 end
             },
-            {0, math.floor(y/4), y%4})
+            {0, math.floor(y/4), y%4},
+            {0, math.floor(y/4), y%4 + 0.25})
     end
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},
