@@ -551,7 +551,7 @@ local dialog = {
         {
             pos = {phase=3},
             text = "What the hell is wrong with you today?!",
-            pose = {"bottom_of_stairs", "facing_right"},
+            pose = {"bottom_of_stairs", "facing_left"},
             responses = {
                 {"What do you mean?", {}},
                 {"I don't like strangers in my house.", {}, "brain_problems"},
@@ -876,9 +876,8 @@ local dialog = {
             pos = {phase=8, lastnight_joking=0},
             text = "Wait...% you...% actually don't know who I am?",
             pose = "right_of_rose",
-            setPos = {bp_prerequisite=100},
             responses = {
-                {"No.", {}, "brain_problems"},
+                {"No.", {bp_prerequisite=100}, "brain_problems"},
                 {"You're my husband...right?", {lastnight_yeah_husband=100}},
                 {"Of course I do.", {}, "wtf"},
                 {nil, {}, "silence"}
@@ -928,7 +927,7 @@ local dialog = {
             pos = {phase=10, fun=0, lastnight_samething=0},
             text = "Ha ha ha, oh gosh, are we even talking about the same thing?",
             responses = {
-                {"What are we talking about?", {}, "brain_problems"},
+                {"What are we talking about?", {lastnight_what_talking=200}},
                 {"I think so...?", {lastnight_samething=1000}},
                 {"I don't even know.", {lastnight_ignorance=1}},
                 {nil, {}, "silence"}
@@ -940,7 +939,7 @@ local dialog = {
             responses = {
                 {"What are we talking about?", {}, "brain_problems"},
                 {"I think so...?", {lastnight_samething=1000}},
-                {"Probably not.", {}, "normal"},
+                {"Probably not.", {}, "anger"},
                 {nil, {}, "silence"}
             }
         },
@@ -964,6 +963,17 @@ local dialog = {
                 {nil, {}, "brain_problems"}
             }
         },
+
+        {
+            pos = {lastnight_what_talking=200},
+            text = "I'm not even sure now. I thought about our fight last night...?",
+            responses = {
+                {
+                    {"What fight?", {}, "brain_problems"},
+                    {""}
+                }
+            }
+        }
 
     },
 
@@ -1043,10 +1053,15 @@ local dialog = {
             setPos = {bp_prerequisite=100},
             pose = {"facing_right", "pause", "pause", "facing_left"},
             responses = {
-                {"Like what?", {bp_stranger=0}},
+                {"Like what?", {bp_stranger=0,bp_likewhat=200}},
                 {"No I haven't...", {bp_stranger=10,bp_yes_you_have=50}},
                 {"Who are you?", {bp_stranger=20}}
             }
+        },
+
+        {
+            pos = {bp_likewhat=200},
+            text = "Well, like who I am, to start with.",
         },
 
         {
@@ -1089,7 +1104,7 @@ local dialog = {
         {
             pos = {phase=5, bp_prerequisite=100},
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
-            pose = {"right_of_rose", "facing_left"},
+            pose = {"right_of_rose", "facing_right"},
             setPos = {told_was_husband=500},
             responses = {
                 {"We're married?", {}},
@@ -1297,7 +1312,7 @@ local dialog = {
             pos = {phase=9, bp_prerequisite=100},
             text = "We've worked so hard on everything...%% Building this home together...%% I was hoping it " ..
                 "wouldn't turn out this way.",
-            pose = "left_of_couch",
+            pose = {"left_of_couch", "pause", "facing_right", "pause", "pause", "facing_left"},
             responses = {
                 {"I think I love you.", {}},
                 {"Please don't leave me.", {bp_dont_leave=100}},
@@ -1309,7 +1324,7 @@ local dialog = {
         {
             pos = {bp_dont_leave=100},
             text = "No, of course I'm not going to just leave you...%% " ..
-                "Don't you know me better than--%% ...Oh.%% Right.%%",
+                "Don't you know me better than...%% ...Oh.",
             pose = {"next_to_rose", "facing_left"}
         },
 

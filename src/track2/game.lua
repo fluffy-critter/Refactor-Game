@@ -52,6 +52,9 @@ end
 function Game:init()
     self.BPM = BPM
 
+    self.transcript = love.filesystem.newFile("strangers-" .. os.date("%Y%m%d-%H%M%S") .. ".txt")
+    self.transcript:open("w")
+
     self.music = love.audio.newSource('music/02-strangers.mp3')
     self.phase = -1
     self.score = 0
@@ -209,6 +212,11 @@ function Game:start()
 end
 
 function Game:onButtonPress(button, code, isRepeat)
+    -- TODO maybe tie all the game audio into a single proxy object?
+    if self.music:getPitch() < 0.5 then
+        return
+    end
+
     if button == 'skip' then
         print("tryin' ta skip")
         self:seekMusic({self.phase + 1})
@@ -226,15 +234,21 @@ function Game:update(dt)
     self.eventQueue:runEvents(time)
     self.animator:update(dt)
 
+    if time[1] > self.phase then
+        print("phase = " .. self.phase)
+        self.phase = time[1]
+
+        self:transcribe('--' .. self.phase .. '--')
+    end
+
     if self.nextLyric and util.arrayLT(self.nextLyric[1], time) then
         self.lyricText = self.nextLyric[2]
         self.lyricPos = self.lyricPos + 1
         self.nextLyric = self.lyrics[self.lyricPos]
-    end
 
-    if time[1] > self.phase then
-        print("phase = " .. self.phase)
-        self.phase = time[1]
+        if self.lyricText then
+            self:transcribe('♪ ' .. self.lyricText)
+        end
     end
 
     if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
@@ -247,8 +261,13 @@ function Game:update(dt)
         else
             self.npc.phase = time[1] + time[2]/4 + time[3]/16
 
+            self:transcribe(self.dialogState)
+            self:transcribe(self.npc)
+
             local node = self:chooseDialog()
             if node and not node.ended then
+                self:transcribe("<NPC> " .. node.text)
+
                 self.textBox = TextBox.new({
                     text = node.text,
                     cantInterrupt = node.cantInterrupt,
@@ -330,6 +349,9 @@ function Game:update(dt)
     end)
 
     if util.arrayLT({17,1,0}, time) then
+        if self.transcript then
+            self.transcript:close()
+        end
         self.gameOver = true
     end
 end
@@ -426,7 +448,28 @@ function Game:onChoice(response)
         print("state now " .. self.dialogState)
     end
 
+    self:transcribe("<you> " .. (response[1] or "(silence)"))
+
     self.nextDialog = self:getNextDialog()
+end
+
+function Game:transcribe(...)
+    if not self.transcript then
+        return
+    end
+
+    for _,arg in ipairs({...}) do
+        if type(arg) == "table" then
+            for k,v in pairs(arg) do
+                self.transcript:write('\t' .. k .. '=' .. v)
+            end
+            self.transcript:write('\n')
+        else
+            self.transcript:write(tostring(arg) .. '\n')
+        end
+    end
+
+    self.transcript:flush()
 end
 
 -- Get the next conversation node from the dialog tree
