@@ -9,11 +9,14 @@ Properties used on the animation objects:
 
 easing - easing function
 duration - time in seconds
-onComplete - callback to call when finished
-target - target sprite
+
+target - target sbject
 property - which propertybag to tween on the target (default: "pos")
 startPos - starting position (defaults to current target position)
 endPos - ending position (defaults to start position)
+
+onStart - callback to call when animation initiates (param: target)
+onComplete - callback to call when finished (param: target)
 
 startPos and endPos need to have the same indices.
 
@@ -67,16 +70,16 @@ end
 
 function Animator:update(dt)
     util.runQueue(self.queue, function(anim)
+        if anim.onStart then
+            anim:onStart()
+            anim.onStart = nil
+        end
+
         if not anim.startPos then
             anim.startPos = util.shallowCopy(anim.target[anim.property])
         end
         if not anim.endPos then
             anim.endPos = util.shallowCopy(anim.startPos)
-        end
-
-        if anim.onStart then
-            anim:onStart()
-            anim.onStart = nil
         end
 
         anim.now = anim.now + dt
@@ -85,7 +88,7 @@ function Animator:update(dt)
                 anim.target[anim.property][k] = v
             end
             if anim.onComplete then
-                anim:onComplete()
+                anim:onComplete(anim.target)
                 anim.onComplete = nil
             end
 

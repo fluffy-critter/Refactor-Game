@@ -242,7 +242,13 @@ function scenes.phase11(duration)
 
             local p = math.floor(-util.smoothStep(x)*panSize + 0.5)
 
-            love.graphics.setColor(255,255,255,255)
+            if x < 0.02 then
+                love.graphics.setColor(255,255,255,x*50*255)
+            elseif x < 0.98 then
+                love.graphics.setColor(255,255,255,255)
+            else
+                love.graphics.setColor(255,255,255,(1 - x)*50*255)
+            end
             if x < 0.5 then
                 love.graphics.draw(image, p)
             else

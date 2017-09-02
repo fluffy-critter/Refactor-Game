@@ -56,7 +56,7 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8", "rgb565"))
+    self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
     self.canvas:setFilter("nearest")
 
     self.outputScale = 3
@@ -108,7 +108,7 @@ function Game:init()
     self.eventQueue = EventQueue.new()
     self.animator = Animator.new()
 
-    self.activeAnimations = {}
+    self.flashColor = {0,0,0,0}
 end
 
 --[[
@@ -172,9 +172,21 @@ function Game:start()
         end
     })
 
+    -- at {12,3,0.5} fade to white until {13}
+    self:addAnimation({
+        target = self,
+        property = "flashColor",
+        startPos = {255,255,255,0},
+        endPos = {255,255,255,255},
+        onStart = function(target)
+            target.flashColor = {0,0,0,0}
+        end,
+    }, {12,3,.5}, {13})
+
+    local flashOut = {0,0,255,0}
+
     --[[
-    at {12,3} fade to white until {13}
-    at {13} choose a set of scenes based on ending dialog state:
+    at {13} choose a set of scenes based on ending dialog state; also change flashOut based on situation
 
     wtf - psychiatrist/therapist + vacation + park bench together -> kitchen/greg sitting next to rose at table
     brain_problems, stroke - hospital -> kitchen/greg sitting on couch, thinking
@@ -182,6 +194,15 @@ function Game:start()
 
     others - ???
     ]]
+
+    self:addAnimation({
+        target = self,
+        property = "flashColor",
+        startPos = {255,255,255,255},
+        endPos = flashOut,
+        easing = Animator.Easing.ease_out,
+    }, {13}, {13,0,1})
+
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -211,15 +232,6 @@ function Game:update(dt)
     if time[1] > self.phase then
         print("phase = " .. self.phase)
         self.phase = time[1]
-
-        -- if self.phase == 0 then
-            -- text format testing
-            -- self.textBox = TextBox.new({
-            --                 text = "You know you're throwing off the timing of this whole dialog, right?",
-            --                 -- cantInterrupt = true
-            -- })
-            -- self.textBox = TextBox.new({choices={{text="arghl"}}})
-        -- end
     end
 
     if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
@@ -525,6 +537,11 @@ function Game:draw()
             love.graphics.draw(self.border)
         end
 
+        if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then
+            love.graphics.setColor(unpack(self.flashColor))
+            love.graphics.rectangle("fill", 0, 0, 256, 224)
+        end
+
         if self.textBox then
             self.textBox:draw()
         end
@@ -564,6 +581,7 @@ function Game:draw()
                 -- y = y + fonts.debug:getHeight()
             end
         end
+
     end)
 
     self.scaled:renderTo(function()
