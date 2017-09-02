@@ -1118,6 +1118,19 @@ local dialog = {
             setPos = {bp_howlong=0, bp_already_said_when=500},
             text = "How long?%% Gosh, 15...?% no,% 17 years.",
             pose = "facing_left",
+            responses = {
+                {"So we're married, then.", {}},
+                {"Which one is it?", {bp_howlong=1000}},
+                {"That's a long time.", {bp_longtime=500}}
+            }
+        },
+        {
+            pos = {bp_howlong=1000},
+            text = "17. You know I can't do math under pressure."
+        },
+        {
+            pos = {bp_longtime=500},
+            text = "Yes.%% Yes, it is."
         },
         {
             pos = {bp_howlong=100, bp_already_said_when=500},
@@ -1147,7 +1160,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6, bp_family_history=0, bp_prerequisite=0},
+            pos = {phase=6, bp_family_history=0, bp_prerequisite=0, wtf_marriage=0},
             text = "You do have a family history of.%.%.% Oh.%%%\n\nOH.",
             pose = "facing_down",
             setPos = {bp_family_history=100, bp_prerequisite=100},
@@ -1155,6 +1168,30 @@ local dialog = {
                 {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_no_history=100}},
                 {"How do you know that?", {bp_howknow=100}},
+            }
+        },
+
+        {
+            pos = {bp_prerequisite=0, wtf_marriage=100},
+            text = "You don't rememb.%.%.% Oh.%%\n\nThis is it...% Your family history...",
+            pose = "facing_down",
+            setPos = {bp_family_history=100, bp_prerequisite=100},
+            responses = {
+                {"Of what?", {bp_ofwhat=100}},
+                {"I don't know what you're talking about.", {bp_no_history=100}},
+                {"Why bring that up?", {bp_howknow=100}},
+            }
+        },
+
+        {
+            pos = {bp_prerequisite=0, wtf_marriage=200},
+            text = "You don't know who.%.%.% Oh.%%\n\nThis is it...% Your family history...",
+            pose = "facing_down",
+            setPos = {bp_family_history=100, bp_prerequisite=100},
+            responses = {
+                {"Of what?", {bp_ofwhat=100}},
+                {"I don't know what you're talking about.", {bp_no_history=100}},
+                {"Why bring that up?", {bp_howknow=100}},
             }
         },
 
@@ -1197,7 +1234,7 @@ local dialog = {
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
-                {"I guess you're my husband?", {bp_guess_husband=10}}
+                {"I guess you're my husband?", {bp_guess_husband=100}}
             }
         },
         {
@@ -1208,12 +1245,12 @@ local dialog = {
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
-                {"I guess you're my husband?", {bp_guess_husband=10}}
+                {"I guess you're my husband?", {bp_guess_husband=100}}
             }
         },
 
         {
-            pos = {bp_guess_husband=10, bp_prerequisite=100, told_was_husband=0},
+            pos = {bp_guess_husband=100, bp_prerequisite=100, told_was_husband=0},
             text = "Do you actually know that, or are you really just guessing?%% Be honest.",
             pose = {"next_to_rose", "facing_down"},
             responses = {
@@ -1223,19 +1260,19 @@ local dialog = {
             }
         },
         {
-            pos = {bp_guess_husband=40},
+            pos = {bp_guess_husband=130},
             pose = "right_of_rose",
             text = "I don't know...% That this is all just a weird joke?% That you took too far?% " ..
                 "That the person I love is%.%.%. still here with me?"
         },
         {
-            pos = {bp_guess_husband=50},
+            pos = {bp_guess_husband=200},
             pose = "facing_left",
             setPos = {bp_guessed_husband=200},
             text = "Yeah, that's still true.%% But I mean, do you know anything else?"
         },
         {
-            pos = {bp_guess_husband=10, told_was_husband=500},
+            pos = {bp_guess_husband=100, told_was_husband=500},
             text = "Welll%.%.%. yeah,% but I mean% I literally just told you that.",
         },
 
@@ -1304,7 +1341,7 @@ local dialog = {
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
-                {"I guess you're my husband?", {bp_guess_husband=10}}
+                {"I guess you're my husband?", {bp_guess_husband=100}}
             }
         },
 

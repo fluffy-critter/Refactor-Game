@@ -597,11 +597,11 @@ function Game:draw()
             local width = font:getWrap(self.lyricText, 256)
 
             love.graphics.setColor(0, 0, 0, 127)
-            love.graphics.rectangle("fill", 256 - width - 4, 0, width + 4, 14)
+            love.graphics.rectangle("fill", 0, 0, width + 4, 14)
 
             love.graphics.setFont(font)
             love.graphics.setColor(255, 255, 255)
-            love.graphics.print(self.lyricText, 256 - width - 1, 0)
+            love.graphics.print(self.lyricText, 2, 0)
         end
 
         if DEBUG then
