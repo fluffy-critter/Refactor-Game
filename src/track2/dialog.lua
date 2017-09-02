@@ -937,7 +937,7 @@ local dialog = {
             pos = {phase=10, fun=50, lastnight_samething=0},
             text = "Ha ha, what? Are we even talking about the same thing?",
             responses = {
-                {"What are we talking about?", {}, "brain_problems"},
+                {"What are we talking about?", {lastnight_what_talking=200}},
                 {"I think so...?", {lastnight_samething=1000}},
                 {"Probably not.", {}, "anger"},
                 {nil, {}, "silence"}
@@ -967,11 +967,11 @@ local dialog = {
         {
             pos = {lastnight_what_talking=200},
             text = "I'm not even sure now. I thought about our fight last night...?",
+            setState = "brain_problems",
             responses = {
-                {
-                    {"What fight?", {}, "brain_problems"},
-                    {""}
-                }
+                {"What fight?", {}},
+                {"I'm talking about a stranger in my home.", {}},
+                {"Who won?", {}, "alienated"}
             }
         }
 

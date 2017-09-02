@@ -7,7 +7,7 @@ Refactor: 2 - Strangers
 
 local cute = require('thirdparty.cute')
 local notion = cute.notion
--- local check = cute.check
+local check = cute.check
 -- local minion = cute.minion
 -- local report = cute.report
 
@@ -25,6 +25,22 @@ local function checkAllDialogs(dlog, func)
     end
 end
 
+notion("Correct types", function()
+    checkAllDialogs(dialog, function(state,item)
+        print(state, item.text)
+        check(type(item.text)).is("string")
+        for _,response in ipairs(item.responses or {}) do
+            if response[1] then
+                check(type(response[1])).is("string")
+            end
+            check(type(response[2])).is("table")
+            if response[3] then
+                check(type(response[3])).is("string")
+            end
+        end
+    end)
+end)
+
 notion("Text all fits within the dialog box", function()
     local box = TextBox.new({text="asdf"})
 
@@ -34,11 +50,13 @@ notion("Text all fits within the dialog box", function()
     end
 
     checkAllDialogs(dialog, function(state,item)
+        print(state, item.text)
         if not checkLineCount(item.text, 3) then
             error(state .. ": text too large: " .. item.text)
         end
 
-        for _,response in pairs(item.responses or {}) do
+        for _,response in ipairs(item.responses or {}) do
+            print('', response[1])
             if not checkLineCount(response[1], 1, 4) then
                 error(state .. ": response too long: " .. response[1])
             end

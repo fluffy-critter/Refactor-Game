@@ -20,6 +20,7 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
+.PHONY: commit-check
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup tests checks
 
@@ -31,8 +32,7 @@ clean:
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
 
-publish-precheck: checks tests
-	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
+publish-precheck: commit-check checks tests
 
 publish-status:
 	butler status $(TARGET)
@@ -40,6 +40,9 @@ publish-status:
 
 publish-wait:
 	@ while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
+
+commit-check:
+	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
 setup: $(DEST)/.setup
 $(DEST)/.setup: .gitmodules
