@@ -5,7 +5,7 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = true
+local DEBUG = false
 
 local util = require('util')
 local shaders = require('shaders')
@@ -588,10 +588,10 @@ function Game:draw()
     end)
 
     self.back:renderTo(function()
-        love.graphics.setColor(255, 255, 255, 127)
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setColor(255, 255, 255, 90)
         love.graphics.draw(self.canvas)
     end)
-    self.back, self.canvas = self.canvas, self.back
 
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
@@ -599,7 +599,7 @@ function Game:draw()
         local shader = self.crtScaler
         love.graphics.setShader(shader)
         shader:send("screenSize", {256, 224})
-        love.graphics.draw(self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
+        love.graphics.draw(self.back, 0, 0, 0, self.outputScale, self.outputScale)
         love.graphics.setShader()
     end)
     return self.scaled, 4/3
