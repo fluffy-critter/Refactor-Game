@@ -1,7 +1,7 @@
 return {
   _META = {
     image_path = "./sprites.png",
-    version = "v0.6.2",
+    version = "v0.6.2-41-gf6792b6",
   },
   greg = {
     down = {
@@ -9,7 +9,7 @@ return {
       {x = 24, y = 48, w = 16, h = 40},
       {x = 48, y = 48, w = 16, h = 40},
     },
-    kneeling = {x = 120, y = 0, w = 16, h = 38},
+    kneeling = {x = 120, y = 0, w = 16, h = 40},
     left = {
       {x = 0, y = 96, w = 16, h = 40},
       {x = 24, y = 96, w = 16, h = 40},
@@ -38,7 +38,7 @@ return {
         {x = 48, y = 0, w = 16, h = 31},
         {x = 72, y = 0, w = 16, h = 31},
       },
-      normal = {x = 0, y = 0, w = 16, h = 34},
+      normal = {x = 0, y = 0, w = 16, h = 32},
     },
   },
 }

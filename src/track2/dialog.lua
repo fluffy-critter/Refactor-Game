@@ -1070,7 +1070,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=4, bp_stranger=0},
+            pos = {phase=4, bp_stranger=0, asked_about_breakfast=0},
             text = "Please stop looking at me like that. Like I'm a stranger...",
             pose = "right_of_rose",
             responses = {
@@ -1080,7 +1080,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=4, bp_stranger=10},
+            pos = {phase=4, bp_stranger=10, asked_about_breakfast=0},
             setPos = {bp_prerequisite=100},
             pose = {"right_of_rose", "facing_left"},
             text = "Please stop looking at me like that. I'm not a stranger.",
@@ -1091,13 +1091,34 @@ local dialog = {
             }
         },
         {
-            pos = {phase=4, bp_stranger=20},
+            pos = {phase=4, bp_stranger=20, asked_about_breakfast=0},
             text = "Stop looking at me like that. I'm not a stranger...% Am I?",
             pose = {"right_of_rose", "left_of_couch", "facing_left"},
             responses = {
                 {"You are to me.", {bp_stranger=1000}},
                 {"Yes?", {bp_stranger=1000}},
                 {"I don't know who you are.", {bp_stranger=1000}}
+            }
+        },
+        {
+            pos = {that_look=100},
+            text = "That look, like I'm some kind of stranger.",
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"You are to me.", {bp_stranger=1000}},
+                {"Sorry...", {bp_stranger=1000}},
+                {"I don't know who you are.", {bp_stranger=1000}}
+            }
+        },
+
+        {
+            pos = {phase=4, bp_stranger=0, asked_about_breakfast=500},
+            text = "...%% What's with that look?",
+            pose = "facing_left",
+            responses = {
+                {"What look?", {bp_that_look=100}},
+                {"Who are you?", {}},
+                {"Meh.", {}, "alienated"}
             }
         },
 
@@ -1231,6 +1252,7 @@ local dialog = {
             pos = {phase=7, bp_anything=0, bp_guessed_husband=0},
             text = "Can you remember anything about me? Anything at all?",
             setPos = {bp_anything=100,bp_prerequisite=100},
+            pose = "facing_left",
             responses = {
                 {"You do seem familiar...", {}},
                 {"No, sorry...", {}},
@@ -1273,7 +1295,8 @@ local dialog = {
         },
         {
             pos = {bp_guess_husband=100, told_was_husband=500},
-            text = "Welll%.%.%. yeah,% but I mean% I literally just told you that.",
+            text = "Wellll%.%.%. yeah,% but I mean% I literally just told you that.",
+            pose = "facing_left",
         },
 
         {
@@ -1382,7 +1405,7 @@ local dialog = {
             setPos = {bp_explains_so_much=100,bp_prerequisite=100},
             responses = {
                 {"My mom?", {}},
-                {"Please don't laugh...", {}},
+                {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
                 {nil, {}, "silence"}
             }
@@ -1410,6 +1433,11 @@ local dialog = {
                 {"Explains what?", {}},
                 {nil, {}, "silence"}
             }
+        },
+
+        {
+            pos = {bp_dont_laugh=100},
+            text = "Sorry, it's just...%% It's either that or cry, you know?",
         },
 
         {
@@ -1453,9 +1481,9 @@ local dialog = {
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
-                {"I don't want to...", {bp_sullen=10}},
+                {"I don't want to...", {bp_sullen=100}},
                 {"You're trying to trick me.", {}},
-                {nil, {bp_sullen=10}}
+                {nil, {bp_sullen=100}}
             }
         },
         {
@@ -1465,13 +1493,13 @@ local dialog = {
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
-                {"I don't want to...", {bp_sullen=10}},
+                {"I don't want to...", {bp_sullen=100}},
                 {"You're trying to trick me.", {}},
-                {nil, {bp_sullen=10}}
+                {nil, {bp_sullen=100}}
             }
         },
         {
-            pos = {phase=13, bp_sullen=10},
+            pos = {phase=13, bp_sullen=100},
             text = "Please don't be like this...%% Let's go to the doctor,% okay hon?",
             pose = "below_doors",
             maxCount = 20,
@@ -1479,7 +1507,7 @@ local dialog = {
                 {"A doctor? Why?", {}},
                 {"I don't want to...", {}},
                 {"You're trying to trick me.", {}},
-                {nil, {bp_sullen=10}}
+                {nil, {bp_sullen=100}}
             }
         },
     },
