@@ -17,7 +17,9 @@ Game instances are expected to have:
     music - an object that presents at least the following subset of the audio source API:
         pause()
         resume()
+        stop()
         setPitch(multiplier)
+        setVolume(multiplier)
         tell()
         isPlaying()
 

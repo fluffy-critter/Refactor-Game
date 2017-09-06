@@ -55,6 +55,7 @@ function Game:init()
     self.transcript = love.filesystem.newFile("strangers-" .. os.date("%Y%m%d-%H%M%S") .. ".txt")
     self.transcript:open("w")
 
+    -- TODO factor this out into a thingything
     self.sounds = {}
     self.music = {
         pause = function()
@@ -67,9 +68,19 @@ function Game:init()
                 v:resume()
             end
         end,
+        stop = function()
+            for _,v in pairs(self.sounds) do
+                v:stop()
+            end
+        end,
         setPitch = function(_, p)
             for _,v in pairs(self.sounds) do
                 v:setPitch(p)
+            end
+        end,
+        setVolume = function(_, p)
+            for _,v in pairs(self.sounds) do
+                v:setVolume(p)
             end
         end,
         tell = function()
@@ -195,12 +206,19 @@ function Game:start()
         end
     })
 
-    self.eventQueue:addEvent({
-        when = {11,2},
-        what = function()
-            table.insert(self.scenes, scenes.phase11(16*60/BPM))
-            self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
-        end
+    self.eventQueue:addEvents({
+        {
+            when = {11},
+            what = function()
+                table.insert(self.scenes, scenes.phase11(16*60/BPM))
+            end
+        },
+        {
+            when = {11,2},
+            what = function()
+                self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
+            end
+        }
     })
 
     -- at {12,3,0.5} fade to white until {13}

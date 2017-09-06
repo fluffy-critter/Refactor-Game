@@ -19,6 +19,6 @@ function love.conf(t)
 
     t.version = "0.10.2"
 
-    t.identity = "Sockpuppet-Refactor"
+    t.identity = "biz.beesbuzz.Refactor"
     t.window.title = "Sockpuppet - Refactor"
 end

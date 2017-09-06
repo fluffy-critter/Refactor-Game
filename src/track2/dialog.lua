@@ -850,6 +850,7 @@ local dialog = {
             text = "Say, have you eaten breakfast yet?",
             setPos = {asked_about_breakfast=500},
             pose = "kitchen",
+            rose = "eyes_left",
             responses = {
                 {"Yeah.", {lastnight_breakfast=100}},
                 {"No.", {lastnight_breakfast=-100}},
@@ -861,10 +862,12 @@ local dialog = {
             pos = {lastnight_breakfast=100},
             pose = "behind_rose",
             text = "Really? Oh, you must have done the dishes already. Okay.",
+            rose = "normal",
         },
         {
             pos = {lastnight_breakfast=-100},
             pose = "behind_rose",
+            rose = "normal",
             text = "Oh...% you really should eat something.% You know what the doctor said about that.%% " ..
                 "Um, sorry to nag you about it...% Again..."
         },
@@ -873,6 +876,7 @@ local dialog = {
             pos = {lastnight_unsure_breakfast=100},
             text = "You%.%.%. aren't sure if you've had breakfast?%% Are you feeling okay?",
             pose = "right_of_rose",
+            rose = "eyes_left",
             responses = {
                 {"I don't know.", {}, "brain_problems"},
                 {"Yeah, I guess.", {lastnight_blackout=100,lastnight_feeling_okay=100}},
@@ -894,6 +898,7 @@ local dialog = {
             pos = {phase=6},
             text = "I guess I'm just nervous that we're sort of drifting apart lately.% " ..
                 "And you know how I worry about that.",
+            rose = "eyes_right",
             pose = "couch_sitting_thinking",
             responses = {
                 {"Who are you?", {lastnight_joking_sardonic=150}},
@@ -1168,7 +1173,7 @@ local dialog = {
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             pose = {"right_of_rose", "facing_right"},
             rose = "eyes_right",
-            setPos = {told_was_husband=500},
+            setPos = {told_was_husband=500, bp_guess_husband=0},
             responses = {
                 {"We're married?", {}},
                 {"How long, exactly?", {bp_howlong=100}},
@@ -1228,7 +1233,7 @@ local dialog = {
         {
             pos = {phase=6, bp_family_history=0, bp_prerequisite=0, wtf_marriage=0},
             text = "You do have a family history of.%.%.% Oh.%%%\n\nOH.",
-            pose = "facing_down",
+            pose = {"facing_right", "pause", "pause", "facing_down"},
             rose = "eyes_right",
             setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
