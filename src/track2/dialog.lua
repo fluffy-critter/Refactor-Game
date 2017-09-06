@@ -39,6 +39,9 @@ track stuff.
 
 ]]
 
+-- TODO game should store the previously-played game, this thing changes based on it
+local prevTrackDescription = "bouncing balls"
+
 local dialog = {
     start_state = "intro",
 
@@ -51,6 +54,7 @@ local dialog = {
         {
             pos = {fun=1},
             text = "# Good morning, dear! #",
+            rose = "eyes_right",
             responses = {
                 {"Hi...", {}, "normal"},
                 {"Who are you...?", {}, "last_night"},
@@ -61,6 +65,7 @@ local dialog = {
         {
             pos = {fun=37},
             text = "Good morning... how are you feeling today?",
+            rose = "eyes_right",
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
@@ -72,6 +77,7 @@ local dialog = {
             pos = {fun=50},
             text = "Good morning.",
             pose = "facing_down",
+            rose = "eyes_right",
             responses = {
                 {"...good morning...", {}, "normal"},
                 {"Who are you?", {}, "last_night"},
@@ -87,6 +93,7 @@ local dialog = {
             pos = {phase=2},
             text = "I said, good morning.",
             pose = "right_of_rose",
+            rose = "normal",
             responses = {
                 {"Um... hello.", {}, "normal"},
                 {"Oh, sorry, I didn't hear you.", {}, "normal"},
@@ -117,6 +124,7 @@ local dialog = {
             pos = {phase=4},
             text = "Why are you looking at me like that?",
             pose = "facing_left",
+            rose = "eyes_right",
             responses = {
                 {"Like what?", {}, "normal"},
                 {"What are you doing here?", {}, "last_night"},
@@ -127,6 +135,7 @@ local dialog = {
             pos = {phase=5},
             text = "What's wrong?%% You can talk to me.",
             pose = {"next_to_rose", "facing_left"},
+            rose = "normal",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
                 {"You're intruding.", {}, "alienated"},
@@ -159,6 +168,7 @@ local dialog = {
             pos = {phase=7},
             text = "Is this about what I said last night? It was only a joke.",
             pose = {"below_doors", "facing_right"},
+            rose = "eyes_right",
             responses = {
                 {"And I'm sure it was funny.", {}, "brain_problems"},
                 {"Well it wasn't very funny.", {}, "last_night"},
@@ -169,6 +179,7 @@ local dialog = {
             pos = {phase=7},
             text = "Is this about what I said last night? I'm sorry, it was out of line.",
             pose = {"below_doors", "facing_left"},
+            rose = "normal",
             responses = {
                 {"...What did you say?", {}, "brain_problems"},
                 {"Yes, it was.", {}, "normal"},
@@ -179,6 +190,7 @@ local dialog = {
             pos = {phase=7},
             text = "If this is about what I said last night, well%.%.%.%% you deserved it.",
             pose = {"below_doors", "facing_right"},
+            rose = "eyes_left",
             responses = {
                 {"...What did you say?", {}, "brain_problems"},
                 {"I doubt it.", {}, "normal"},
@@ -190,6 +202,7 @@ local dialog = {
             pos = {phase=8},
             text = "I'm just not sure why you're giving me the silent treatment, here...",
             pose = {"below_doors", "facing_up"},
+            rose = "eyes_left",
             responses = {
                 {"I feel... numb...", {}, "stroke"},
                 {"Who are you?", {}, "brain_problems"},
@@ -200,6 +213,7 @@ local dialog = {
             pos = {phase=8},
             text = "So you can cut it out with the silent treatment.",
             pose = {"below_doors", "facing_right"},
+            rose = "normal",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
                 {"Why are you even here?", {}, "last_night"},
@@ -293,6 +307,7 @@ local dialog = {
             pos = {interrupted=16},
             text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%%"
                 .. " from now on.%%%.%%%.%%%.%%%.%%%",
+            rose = "eyes_right",
             pose = {
                 "bottom_of_stairs", "left_of_stairs", "bottom_of_stairs", "left_of_stairs",
                 "left_of_couch",
@@ -307,6 +322,7 @@ local dialog = {
         {
             pos = {silence_total=2, silence_cur=1},
             text = "You okay?",
+            rose = "eyes_left",
             responses = {
                 {"Yeah, I'm just... a bit preoccupied.", {}},
                 {"No.", {}},
@@ -318,6 +334,7 @@ local dialog = {
             pos = {nrm_going_somewhere=500},
             text = "What? No, I was just wondering if you'd eaten.",
             pose = {"right_of_rose", "facing_left"},
+            rose = "eyes_right",
             responses = {
                 {"Oh, my mind was elsewhere.", {}, "alienated"},
                 {"So you aren't abducting me, then?", {}, "brain_problems"},
@@ -328,13 +345,15 @@ local dialog = {
         {
             pos = {nrm_no_breakfast=500},
             text = "Oh.%% You know what your doctor said...%% How you should always have breakfast? %.%.%. " ..
-                "Sorry to nag, I know you hate that."
+                "Sorry to nag, I know you hate that.",
+            rose = "eyes_left",
         },
 
         {
             pos = {phase=2, normal_tired=0, asked_about_breakfast=0},
             text = "Have you had breakfast already?",
             pose = "kitchen",
+            rose = "normal",
             setPos = {asked_about_breakfast=500},
             responses = {
                 {"Not yet.", {}},
@@ -355,6 +374,7 @@ local dialog = {
         {
             pos = {phase=2,normal_tired=0},
             text = "What's the matter?",
+            rose = "eyes_right",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
                 {"What are you doing here?", {nrm_what_doing=100}, "last_night"},
@@ -365,6 +385,7 @@ local dialog = {
         {
             pos = {phase=3, normal_solastnight=0},
             text = "It's a beautiful morning, isn't it?",
+            rose = "normal",
             responses = {
                 {"Yeah...", {}},
                 {"Why are you in my house?", {}, "wtf"},
@@ -428,6 +449,7 @@ local dialog = {
             text = ".%.%.%Aaaanyway. We've been married for so long, I guess we were overdue " ..
                 "for an argument eventually, right?",
             pose = {"bottom_of_stairs", "facing_right"},
+            rose = "eyes_right",
             setPos = {normal_wemarried=100},
             responses = {
                 {"I don't remember it.", {normal_sorry=-100}},
@@ -439,6 +461,7 @@ local dialog = {
             pos = {phase=5, normal_wemarried=0, normal_sorry=0},
             text = "But I mean, we've been married for so long, I guess we were overdue for an argument.",
             pose = {"bottom_of_stairs", "facing_right"},
+            rose = "eyes_right",
             setPos = {normal_wemarried=100},
             responses = {
                 {"I don't remember it.", {}},
@@ -450,6 +473,7 @@ local dialog = {
             pos = {phase=5, normal_wemarried=0},
             text = "We've been married HOW long? Why didn't you tell me how you felt before?",
             pose = {"bottom_of_stairs", "facing_left"},
+            rose = "eyes_right",
             setPos = {normal_wemarried=100},
             responses = {
                 {"We're... married?", {}, "brain_problems"},
@@ -551,6 +575,7 @@ local dialog = {
             pos = {phase=3},
             text = "What the hell is wrong with you today?!",
             pose = {"bottom_of_stairs", "facing_left"},
+            rose = "normal",
             responses = {
                 {"What do you mean?", {}},
                 {"I don't like strangers in my house.", {}, "brain_problems"},
@@ -561,6 +586,7 @@ local dialog = {
             pos = {phase=4},
             text = "Why are you being like this?",
             pose = {"bottom_of_stairs", "facing_left"},
+            rose = "normal",
             responses = {
                 {"Like what?", {}},
                 {"You're intruding!", {}, "alienated"},
@@ -1323,7 +1349,7 @@ local dialog = {
         {
             pos = {phase=8,bp_just_guessing=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
-            pose = {"facing_left", "pause", "left_of_stairs", "bottom_of_stairs", "facing_right"},
+            pose = {"facing_left", "pause", "bottom_of_stairs", "facing_right"},
             responses = {
                 {"When was that, exactly?", {bp_when_married=1000}},
                 {"How happy was I?", {bp_howhappy=100}},
@@ -1591,7 +1617,7 @@ local dialog = {
             responses = {
                 {"Not a game...", {}},
                 {"Yeah, it's called 'Refactor'", {}, "brain_problems"},
-                {"I want the bouncing balls back.", {}, "brain_problems"}
+                {"I want the " .. prevTrackDescription .. " back.", {}, "brain_problems"}
             }
         },
 
@@ -1605,9 +1631,9 @@ local dialog = {
             },
         },
         {
-            pos = {phase=2, mention_lastnight=0, alien_stillmad=0},
+            pos = {phase=2, mention_lastnight=0, alien_asked_stillmad=0},
             text = "Still mad at me about last night, huh?",
-            setPos = {mention_lastnight=100, alien_stillmad=100},
+            setPos = {mention_lastnight=100, alien_asked_stillmad=100},
             responses = {
                 {"I guess.", {}},
                 {"Last night?", {}, "last_night"},
@@ -1615,9 +1641,9 @@ local dialog = {
             }
         },
         {
-            pos = {phase=2, mention_lastnight=100, alien_stillmad=0},
+            pos = {phase=2, mention_lastnight=100, alien_asked_stillmad=0},
             text = "Still mad at me about it, huh?",
-            setPos = {alien_stillmad=100},
+            setPos = {alien_asked_stillmad=100},
             responses = {
                 {"I guess.", {}},
                 {"What happened?", {}, "last_night"},

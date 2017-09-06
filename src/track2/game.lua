@@ -171,7 +171,7 @@ function Game:start()
     })
 
     self.eventQueue:addEvent({
-        when = {11},
+        when = {11,2},
         what = function()
             table.insert(self.scenes, scenes.phase11(16*60/BPM))
             self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
@@ -248,7 +248,7 @@ function Game:update(dt)
         print("phase = " .. self.phase)
         self.phase = time[1]
 
-        self:transcribe('--' .. self.phase .. '--')
+        -- self:transcribe('--' .. self.phase .. '--')
     end
 
     if self.nextLyric and util.arrayLT(self.nextLyric[1], time) then
@@ -257,7 +257,7 @@ function Game:update(dt)
         self.nextLyric = self.lyrics[self.lyricPos]
 
         if self.lyricText then
-            self:transcribe('♪ ' .. self.lyricText)
+            self:transcribe('\t♪ ' .. self.lyricText)
         end
     end
 
@@ -271,8 +271,7 @@ function Game:update(dt)
         else
             self.npc.phase = time[1] + time[2]/4 + time[3]/16
 
-            self:transcribe(self.dialogState)
-            self:transcribe(self.npc)
+            self:transcribe("\t" .. self.dialogState, self.npc)
 
             local node = self:chooseDialog()
             if node and not node.ended then
@@ -468,16 +467,24 @@ function Game:transcribe(...)
         return
     end
 
-    for _,arg in ipairs({...}) do
+    for idx,arg in ipairs({...}) do
+        if idx > 1 then
+            self.transcript:write('\t')
+        end
         if type(arg) == "table" then
+            self.transcript:write('[')
+            local sep = ''
             for k,v in pairs(arg) do
-                self.transcript:write('\t' .. k .. '=' .. v)
+                self.transcript:write(sep)
+                sep = ','
+                self.transcript:write(k .. '=' .. v)
             end
-            self.transcript:write('\n')
+            self.transcript:write(']')
         else
-            self.transcript:write(tostring(arg) .. '\n')
+            self.transcript:write(tostring(arg))
         end
     end
+    self.transcript:write('\n')
 
     self.transcript:flush()
 end

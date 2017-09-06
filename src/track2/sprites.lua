@@ -42,7 +42,11 @@ return {
         {x = 48, y = 0, w = 16, h = 31},
         {x = 72, y = 0, w = 16, h = 31},
       },
+      eyes_left = {x = 168, y = 0, w = 16, h = 31},
+      eyes_right = {x = 144, y = 0, w = 16, h = 31},
       normal = {x = 0, y = 0, w = 16, h = 32},
+    },
+    normal = {
     },
   },
 }
