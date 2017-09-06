@@ -40,13 +40,13 @@ local clock = util.clock(BPM, {4, 4}, 0.25)
 
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    return clock.timeToPos(self.music:tell())
+    return clock.timeToPos(self.sounds.music:tell())
 end
 
 --[[ seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param
 that adjusts it by seconds ]]
 function Game:seekMusic(pos, timeOfs)
-    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
+    self.sounds.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
 function Game:init()
@@ -55,7 +55,32 @@ function Game:init()
     self.transcript = love.filesystem.newFile("strangers-" .. os.date("%Y%m%d-%H%M%S") .. ".txt")
     self.transcript:open("w")
 
-    self.music = love.audio.newSource('music/02-strangers.mp3')
+    self.sounds = {}
+    self.music = {
+        pause = function()
+            for _,v in pairs(self.sounds) do
+                v:pause()
+            end
+        end,
+        resume = function()
+            for _,v in pairs(self.sounds) do
+                v:resume()
+            end
+        end,
+        setPitch = function(_, p)
+            for _,v in pairs(self.sounds) do
+                v:setPitch(p)
+            end
+        end,
+        tell = function()
+            return self.sounds.music:tell()
+        end,
+        isPlaying = function()
+            return self.sounds.music:isPlaying()
+        end
+    }
+
+    self.sounds.music = love.audio.newSource('music/02-strangers.mp3')
     self.phase = -1
     self.score = 0
 
@@ -99,17 +124,17 @@ function Game:init()
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
-    -- self.music:setVolume(0.1)
+    -- self.sounds.music:setVolume(0.1)
 
-    self.printSound = love.audio.newSource("track2/printSound.wav", "static")
-    self.printSound:setVolume(0.3)
-    self.selectSound = love.audio.newSource("track2/selectSound.wav", "static")
-    self.selectSound:setVolume(0.2)
+    self.sounds.print = love.audio.newSource("track2/printSound.wav", "static")
+    self.sounds.print:setVolume(0.3)
+    self.sounds.select = love.audio.newSource("track2/selectSound.wav", "static")
+    self.sounds.select:setVolume(0.2)
 
-    self.doneSound = love.audio.newSource("track2/doneSound.wav", "static")
-    self.doneSound:setVolume(0.2)
-    self.timeoutSound = love.audio.newSource("track2/timeoutSound.wav", "static")
-    self.timeoutSound:setVolume(0.2)
+    self.sounds.done = love.audio.newSource("track2/doneSound.wav", "static")
+    self.sounds.done:setVolume(0.2)
+    self.sounds.timeout = love.audio.newSource("track2/timeoutSound.wav", "static")
+    self.sounds.timeout:setVolume(0.2)
 
     self.eventQueue = EventQueue.new()
     self.animator = Animator.new()
@@ -139,7 +164,7 @@ function Game:addAnimation(anim, startTime, endTime)
 end
 
 function Game:start()
-    self.music:play()
+    self.sounds.music:play()
 
     self.kitchenScene = scenes.kitchen()
     self.scenes = {self.kitchenScene}
@@ -223,7 +248,7 @@ end
 
 function Game:onButtonPress(button, code, isRepeat)
     -- TODO maybe tie all the game audio into a single proxy object?
-    if self.music:getPitch() < 0.5 then
+    if self.sounds.music:getPitch() < 0.5 then
         return
     end
 
@@ -281,8 +306,8 @@ function Game:update(dt)
                     text = node.text,
                     cantInterrupt = node.cantInterrupt,
                     onInterrupt = node.onInterrupt,
-                    printSound = self.printSound,
-                    doneSound = self.doneSound
+                    printSound = self.sounds.print,
+                    doneSound = self.sounds.done
                 })
 
                 local game = self
@@ -339,9 +364,9 @@ function Game:update(dt)
             self.textBox:close()
 
             if self.textBox.choices then
-                self.timeoutSound:stop()
-                self.timeoutSound:rewind()
-                self.timeoutSound:play()
+                self.sounds.timeout:stop()
+                self.sounds.timeout:rewind()
+                self.sounds.timeout:play()
             end
         end
     end
@@ -438,7 +463,7 @@ function Game:textFinished(textBox, node)
 
         print("choices: " .. #choices)
 
-        self.nextChoices = TextBox.new({choices = choices, onClose = onClose, selectSound = self.selectSound})
+        self.nextChoices = TextBox.new({choices = choices, onClose = onClose, selectSound = self.sounds.select})
     end
 
     self.nextDialog = self:getNextDialog()
