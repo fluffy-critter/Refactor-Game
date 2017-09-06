@@ -161,12 +161,14 @@ notion("Dialog response integrity", function()
 end)
 
 notion("Transition reasonable ranges", function()
+    local minPhase = {}
     local maxPhase = {}
 
     -- set the max phases
     checkAllDialogs(dialog, function(state, item)
         if item.pos.phase then
-            maxPhase[state] = math.max(maxPhase[state] or 0, item.pos.phase + 0.5)
+            maxPhase[state] = math.max(item.pos.phase + 0.5, maxPhase[state] or item.pos.phase)
+            minPhase[state] = math.min(item.pos.phase - 1, minPhase[state] or item.pos.phase)
         end
     end)
 
@@ -174,6 +176,10 @@ notion("Transition reasonable ranges", function()
         local max = maxPhase[dest] or 0
         if when > max then
             error(src .. ": wants to transition to " .. dest .. " at " .. when .. ", max=" .. max)
+        end
+        local min = minPhase[dest] or 0
+        if when < min then
+            error(src .. ": wants to transition to " .. dest .. " at " .. when .. ", min=" .. min)
         end
     end
 

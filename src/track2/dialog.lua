@@ -1631,10 +1631,22 @@ local dialog = {
             text = "Why are you down here by yourself?",
             responses = {
                 {"Aren't I normally here by myself?", {}, "wtf"},
-                {"Oh... I forgot I had company.", {}, "brain_problems"},
+                {"Oh... I forgot I had company.", {alien_company=100}},
                 {"It's morning.", {alien_nonanswer=100}}
             },
         },
+
+        {
+            pos = {alien_company=100},
+            text = "... Company?",
+            setState = "brain_problems",
+            responses = {
+                {"Yeah, you.", {}},
+                {"Do I know you?", {}},
+                {"Who are you?", {}, "last_night"}
+            }
+        },
+
         {
             pos = {phase=2, mention_lastnight=0, alien_asked_stillmad=0},
             text = "Still mad at me about last night, huh?",
@@ -1787,7 +1799,7 @@ local dialog = {
 
     -- path where Greg gets really angry at Rose
     anger = {
-        { pos={}, text="DIALOG PATH INCOMPLETE: anger"},
+        { pos={phase=2}, text="DIALOG PATH INCOMPLETE: anger"},
 
         {
             pos = {anger_notagame=500},
@@ -1890,7 +1902,7 @@ local dialog = {
 
         {
             pos = {phase=3,gu_prereq=500},
-            -- This is metatextual.
+            -- ATTN data-miners: This is metatextual.
             text = "If you don't have a memory of an experience, can you really say that you've experienced it?",
             pose = "facing_down",
             responses = {
@@ -2051,6 +2063,9 @@ local dialog = {
 
     -- state where Greg believes Rose is having a stroke
     stroke = {
+        -- starts at 3
+        { pos = {phase=3}, text = "DIALOG PATH INCOMPLETE: stroke", maxCount=2000 },
+
         {
             pos = {phase=10.5},
             text = "Emergency services? It's my spouse, something's very wrong with them.",
@@ -2093,7 +2108,7 @@ local dialog = {
     -- vacation time!
     vacation = {
         -- starts at 11
-        { pos = {phase=15}, text = "DIALOG PATH INCOMPLETE: VACATION", maxCount=2000 }
+        { pos = {phase=11}, text = "DIALOG PATH INCOMPLETE: vacation", maxCount=2000 }
     }
 
  }
