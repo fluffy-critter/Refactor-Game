@@ -194,8 +194,11 @@ function Game:start()
     --[[
     at {13} choose a set of scenes based on ending dialog state; also change flashOut based on situation
 
-    wtf - psychiatrist/therapist + vacation + park bench together -> kitchen/greg sitting next to rose at table
+    wtf, alienated - psychiatrist/therapist + vacation + park bench together -> kitchen/greg sitting next to
+        rose at table (alienated he leans against them)
+
     brain_problems, stroke - hospital -> kitchen/greg sitting on couch, thinking
+
     gave_up - alone on park bench -> kitchen/no greg
 
     others - ???

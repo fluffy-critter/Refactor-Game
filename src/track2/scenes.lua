@@ -53,6 +53,18 @@ function scenes.kitchen()
     })
     rose.animation = rose.animations.normal
 
+    local openDoor = Sprite.new({
+        sheet = spriteSheet,
+        pos = {128,8},
+        frame = nil
+    })
+
+    local closedDoor = Sprite.new({
+        sheet = spriteSheet,
+        pos = {144,0},
+        frame = nil
+    })
+
     local greg = Sprite.new({
         sheet = spriteSheet,
         pos = {217, -40},
@@ -116,12 +128,18 @@ function scenes.kitchen()
                 pos = {149,2},
                 speed = 0.75,
                 easing = Animator.Easing.ease_inout,
-                -- TODO: onComplete sets open-door to visible
+                onComplete = function()
+                    -- open the door
+                    openDoor.frame = quads.door.open
+                end
             },
             gone = {
                 pos = {149,-20},
                 onComplete = function(sprite)
-                    -- TODO: set open-door to invisible, closed-door to visible
+                    -- close the door
+                    openDoor.frame = nil
+                    closedDoor.frame = quads.door.closed
+                    -- disappear completely
                     sprite.frame = nil
                 end
             },
@@ -193,11 +211,11 @@ function scenes.kitchen()
 
         layers = {
             {image = backgroundLayer},
-            -- open_door, -- two states: invisible, open
+            openDoor,
             greg,
+            closedDoor,
             {image = foregroundLayer},
             rose,
-            -- closed_door  -- three states: invisible, closed
         },
 
         update = function(self, dt)

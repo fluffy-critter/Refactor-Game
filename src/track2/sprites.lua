@@ -1,7 +1,11 @@
 return {
   _META = {
     image_path = "./sprites.png",
-    version = "v0.6.2-41-gf6792b6",
+    version = "v0.6.2",
+  },
+  door = {
+    closed = {x = 0, y = 144, w = 24, h = 32},
+    open = {x = 32, y = 144, w = 48, h = 40},
   },
   greg = {
     down = {
