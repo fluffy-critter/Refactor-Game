@@ -224,7 +224,7 @@ local dialog = {
             pos = {phase=9},
             text = "...",
             responses = {
-                {"What?", {}, "normal"},
+                {"What?", {}, "wtf"},
                 {"Yep.", {}, "alienated"},
                 {"Three dots", {}, "stroke"},
             }
@@ -395,6 +395,7 @@ local dialog = {
         {
             pos = {phase=3, normal_camehome=0, normal_tired=0},
             text = "So, last night...",
+            rose = "eyes_left",
             responses = {
                 {"What about it?", {normal_solastnight=100}},
                 {"I'm sorry, but who are you?", {}, "brain_problems"},
@@ -415,6 +416,7 @@ local dialog = {
         {
             pos = {phase=4, normal_camehome=0, normal_tired=100},
             text = "When we got home last night I was afraid I'd upset you.",
+            rose = "eyes_left",
             setPos = {normal_camehome=100},
             responses = {
                 {"Why would you think that?", {}},
@@ -437,6 +439,7 @@ local dialog = {
             pos = {normal_whathuh=100},
             text = ".%.%.%What?",
             pose = "facing_left",
+            rose = "eyes_right",
             responses = {
                 {"Huh?", {}},
                 {"Okay?", {}, "wtf"},
@@ -473,7 +476,7 @@ local dialog = {
             pos = {phase=5, normal_wemarried=0},
             text = "We've been married HOW long? Why didn't you tell me how you felt before?",
             pose = {"bottom_of_stairs", "facing_left"},
-            rose = "eyes_right",
+            rose = "eyes_left",
             setPos = {normal_wemarried=100},
             responses = {
                 {"We're... married?", {}, "brain_problems"},
@@ -507,6 +510,7 @@ local dialog = {
             pos = {phase=6, normal_wemarried=150, normal_undercontrol=0, normal_sorry=0},
             text = "You seemed to have it under control%.%.%.% until last night.",
             pose = {"right_of_rose", "facing_up"},
+            rose = "eyes_left",
             setPos = {normal_undercontrol=100},
             responses = {
                 {"Had what under control?", {normal_undercontrol=200}},
@@ -528,6 +532,7 @@ local dialog = {
         {
             pos = {phase=7.5},
             text = "Where did everything go so wrong?",
+            rose = "normal",
             responses = {
                 {"When you went home with a stranger?", {}, "brain_problems"},
                 {"Who can tell.", {}, "alienated"},
@@ -934,7 +939,7 @@ local dialog = {
             setPos = {told_was_husband=500},
             responses = {
                 {"No, I'm not.", {}, "brain_problems"},
-                {"Yeah, I think so?", {}, "normal"},
+                {"Yeah, I think so?", {}},
                 {"Everything seems weird.", {lastnight_feeling_weird=100}}
             }
         },
@@ -943,7 +948,7 @@ local dialog = {
             text = "Um, yeah...%% I am...%% Are you feeling okay?",
             responses = {
                 {"No, I'm not.", {}, "brain_problems"},
-                {"Yeah, I think so?", {}, "normal"},
+                {"Yeah, I think so?", {}},
                 {"Everything seems weird.", {lastnight_feeling_weird=100}}
             }
         },
@@ -2087,7 +2092,7 @@ local dialog = {
 
     -- vacation time!
     vacation = {
-        { pos = {}, text = "DIALOG PATH INCOMPLETE: VACATION", maxCount=2000 }
+        { pos = {phase=15}, text = "DIALOG PATH INCOMPLETE: VACATION", maxCount=2000 }
     }
 
  }

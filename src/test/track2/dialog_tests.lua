@@ -160,3 +160,36 @@ notion("Dialog response integrity", function()
     end)
 end)
 
+notion("Transition reasonable ranges", function()
+    local maxPhase = {}
+
+    -- set the max phases
+    checkAllDialogs(dialog, function(state, item)
+        if item.pos.phase then
+            maxPhase[state] = math.max(maxPhase[state] or 0, item.pos.phase + 0.5)
+        end
+    end)
+
+    local function testExtent(src, dest, when)
+        local max = maxPhase[dest] or 0
+        if when > max then
+            error(src .. ": wants to transition to " .. dest .. " at " .. when .. ", max=" .. max)
+        end
+    end
+
+    -- check the max phases
+    checkAllDialogs(dialog, function(state, item)
+        if item.pos.phase then
+            local errorText = state .. ':' .. item.text
+            if item.setState then
+                testExtent(errorText, item.setState, item.pos.phase)
+            end
+
+            for idx,r in ipairs(item.responses or {}) do
+                if r[3] then
+                    testExtent(errorText .. ':' .. idx, r[3], item.pos.phase)
+                end
+            end
+        end
+    end)
+end)
