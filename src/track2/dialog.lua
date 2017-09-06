@@ -1034,6 +1034,7 @@ local dialog = {
         {
             pos = {bp_not_okay=100},
             text = "What's the matter?",
+            rose = "eyes_left",
             setPos = {bp_prerequisite=100},
             responses = {
                 {"I don't know who you are.", {}},
@@ -1166,6 +1167,7 @@ local dialog = {
             pos = {phase=5, bp_prerequisite=100},
             text = "We've been married so long...% I never thought your memories of ME would be the first to go.",
             pose = {"right_of_rose", "facing_right"},
+            rose = "eyes_right",
             setPos = {told_was_husband=500},
             responses = {
                 {"We're married?", {}},
@@ -1204,6 +1206,7 @@ local dialog = {
 
             text = "But you have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
+            rose = "eyes_right",
             responses = {
                 {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_denial=100}},
@@ -1215,6 +1218,7 @@ local dialog = {
             text = "But you DO have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
             pose = "facing_down",
+            rose = "normal",
             responses = {
                 {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_no_history=100}},
@@ -1225,6 +1229,7 @@ local dialog = {
             pos = {phase=6, bp_family_history=0, bp_prerequisite=0, wtf_marriage=0},
             text = "You do have a family history of.%.%.% Oh.%%%\n\nOH.",
             pose = "facing_down",
+            rose = "eyes_right",
             setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
                 {"Of what?", {bp_ofwhat=100}},
@@ -1670,6 +1675,7 @@ local dialog = {
         {
             pos = {phase=3},
             text = "Well, you're just a bundle of sunshine this morning.",
+            rose = "eyes_left",
             responses = {
                 {"Yeah... You know me...", {}, "normal"},
                 {"Get out.", {}, "wtf"},
@@ -1689,6 +1695,7 @@ local dialog = {
             pos = {phase=5},
             text = "C'mon, spouses are supposed to be open with each other.%% Could you please just " ..
                 "tell me what's going on?",
+            rose = "normal",
             responses = {
                 {"Spouses?", {}, "brain_problems"},
                 {"You're getting ahead of yourself.", {}},
@@ -1698,6 +1705,8 @@ local dialog = {
         {
             pos = {phase=6},
             text = "Look, I get it, you're stressed out about things lately...%% But why can't you just open up to me?",
+            rose = "eyes_left",
+            pose = "facing_right",
             responses = {
                 {"Why should I?", {}},
                 {"But I don't know you.", {}, "brain_problems"},
@@ -1707,6 +1716,7 @@ local dialog = {
         {
             pos = {phase=7},
             text = "I...%% uh...%% What?",
+            rose = "eyes_right",
             responses = {
                 {"I don't even know you.", {}, "wtf"},
                 {"... Never mind.", {}},
@@ -1727,6 +1737,8 @@ local dialog = {
             pos = {phase=9},
             text = "Lately things have been so strained between us, and I'm feeling like you're pushing me away for " ..
                 "some reason. Why?",
+            rose = "normal",
+            pose = {"right_of_rose", "facing_left"},
             responses = {
                 {"I have no idea what you're talking about.", {}, "wtf"},
                 {"I don't even know who you are.", {}, "brain_problems"},
@@ -1736,6 +1748,7 @@ local dialog = {
         {
             pos = {phase=10},
             text = "Ha ha, okay, this is just...%% Sad. I don't want things to end this way.",
+            rose = "eyes_right",
             responses = {
                 {"They're ending?", {}},
                 {"Wait. Don't leave.", {alien_dont_leave=100}},
@@ -1745,6 +1758,7 @@ local dialog = {
         {
             pos = {phase=10.1},
             text = "Ha ha, wow, this is just... what the hell is going on here.",
+            pose = {"bottom_of_stairs", "facing_left"},
             responses = {
                 {"I don't know.", {}},
                 {"Who the hell are you?", {}, "gave_up"},
@@ -1755,6 +1769,8 @@ local dialog = {
             pos = {phase=11},
             text = "When we met, you said you couldn't be in love for very long. I thought I proved you wrong. " ..
                 " %.%.%. Maybe you were right.",
+            pose = "facing_right",
+            rose = "eyes_left",
             responses = {
                 {"Maybe so.", {}},
                 {"I'm sorry.", {alien_dont_leave=100}},
@@ -1764,6 +1780,7 @@ local dialog = {
         {
             pos = {phase=11.5},
             text = "I worry about you. But... is the feeling even mutual?",
+            pose = "facing_left",
             responses = {
                 {"How can I?", {}},
                 {"I'm sorry.", {alien_dont_leave=100}},

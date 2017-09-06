@@ -126,7 +126,8 @@ function scenes.kitchen()
             kneeling_by_rose = {
                 pos = {135,115},
                 onComplete = function(sprite)
-                    sprite.frame = quads.greg.kneeling
+                    sprite.frame = quads.greg.clench
+                    sprite.pos = {139,115}
                 end
             },
             right_of_rose = {
@@ -189,6 +190,9 @@ function scenes.kitchen()
             },
             on_phone = {
                 animation = {stop=quads.greg.phone}
+            },
+            clench = {
+                animation = {stop=quads.greg.clench}
             },
             kitchen = {
                 pos = {88,38}
