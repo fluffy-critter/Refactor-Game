@@ -734,7 +734,7 @@ local dialog = {
         {
             pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
-            setPos = {ln_whatcameover=100},
+            setPos = {ln_whatcameover=100,mention_lastnight=100},
             responses = {
                 {"It's okay.", {}, "normal"},
                 {"What happened?", {}},
@@ -1147,7 +1147,7 @@ local dialog = {
         },
         {
             pos = {bp_howlong=1000},
-            text = "17. You know I can't do math under pressure."
+            text = "17.%% You know I can't do math under pressure."
         },
         {
             pos = {bp_longtime=500},
@@ -1442,10 +1442,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=11},
+            pos = {phase=11, bp_prerequisite=100},
             text = "You don't... you don't remember anything, do you.",
             pose = "right_of_rose",
-            setPos = {bp_prerequisite=100},
             responses = {
                 {"I don't believe you.", {}},
                 {"I have no idea who you are.", {}},
@@ -1454,7 +1453,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=12, bp_i_wonder=0},
+            pos = {phase=12, bp_i_wonder=0, bp_prerequisite=100},
             text = "I wonder how long this has been going on... Is this why you've been so forgetful lately?",
             pose = "next_to_rose",
             setPos = {bp_i_wonder=100},
@@ -1465,7 +1464,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=12, bp_i_wonder=0},
+            pos = {phase=12, bp_i_wonder=0, bp_prerequisite=100},
             text = "I wonder how long this has been going on... Let's go to the doctor.",
             setPos = {bp_i_wonder=100},
             responses = {
@@ -1476,7 +1475,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=13, bp_sullen=0},
+            pos = {phase=13, bp_sullen=0, bp_prerequisite=100},
             text = "Let's go to a doctor, okay?",
             pose = "next_to_rose",
             maxCount = 20,
@@ -1488,7 +1487,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=13},
+            pos = {phase=13, bp_prerequisite=100},
             text = "Come on, let's see the doctor.",
             pose = "next_to_rose",
             maxCount = 20,
@@ -1500,7 +1499,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=13, bp_sullen=100},
+            pos = {phase=13, bp_sullen=100, bp_prerequisite=100},
             text = "Please don't be like this...%% Let's go to the doctor,% okay hon?",
             pose = "below_doors",
             maxCount = 20,
@@ -1569,41 +1568,149 @@ local dialog = {
         },
 
         {
-            pos = {phase=1},
-            text = "Why are you down here by yourself?",
-            responses = {},
+            pos = {alien_nonanswer=100},
+            text = "...%% I guess, but that's not really what I asked.",
         },
         {
-            pos = {phase=2},
+            pos = {alien_nonanswer=200},
+            text = "Hmm... technically true, but... what?",
+        },
+        {
+            pos = {alien_nonanswer=300},
+            text = "I feel like you're playing a game here.",
+            responses = {
+                {"Not a game...", {}},
+                {"Yeah, it's called 'Refactor'", {}, "brain_problems"},
+                {"I want the bouncing balls back.", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=1},
+            text = "Why are you down here by yourself?",
+            responses = {
+                {"Aren't I normally here by myself?", {}, "wtf"},
+                {"Oh... I forgot I had company.", {}, "brain_problems"},
+                {"It's morning.", {alien_nonanswer=100}}
+            },
+        },
+        {
+            pos = {phase=2, mention_lastnight=0},
             text = "Still mad at me about last night, huh?",
-            responses = {}
+            responses = {
+                {"I guess.", {}},
+                {"Last night?", {}, "last_night"},
+                {"No...", {}, "normal"}
+            }
+        },
+        {
+            pos = {phase=2, mention_lastnight=100},
+            text = "Still mad at me about it, huh?",
+            responses = {
+                {"I guess.", {}},
+                {"What happened?", {}, "last_night"},
+                {"No...", {}, "normal"}
+            }
         },
         {
             pos = {phase=3},
             text = "Well, you're just a bundle of sunshine this morning.",
-            responses = {}
+            responses = {
+                {"Yeah... You know me...", {}, "normal"},
+                {"Get out.", {}, "wtf"},
+                {"Would you rather an icy stare?", {}}
+            }
         },
         {
             pos = {phase=4},
             text = "You're awfully upset at me. What the heck is going on lately?",
-            responses = {}
+            responses = {
+                {"Time keeps on passing.", {alien_nonanswer=100}},
+                {"Lately...?", {}, "normal"},
+                {"Trying to figure something out.", {}}
+            }
         },
         {
             pos = {phase=5},
             text = "C'mon, spouses are supposed to be open with each other.%% Could you please just " ..
                 "tell me what's going on?",
-            responses = {}
+            responses = {
+                {"Spouses?", {}, "brain_problems"},
+                {"You're getting ahead of yourself.", {}},
+                {"I don't know what's going on.", {alien_dont_leave=-50}}
+            }
+        },
+        {
+            pos = {phase=7},
+            text = "I...%% uh...%% What?",
+            responses = {
+                {"I don't even know you.", {}, "wtf"},
+                {"... Never mind.", {}},
+                {"Yes.", {alien_nonanswer=100}}
+            },
+        },
+        {
+            pos = {phase=8},
+            text = "Do you think us marrying was a mistake?",
+            responses = {
+                {"No...", {alien_dont_leave=100}},
+                {"Maybe?", {}},
+                {"Only if it was a mistake.", {alien_nonanswer=100}}
+            }
+        },
+        {
+            pos = {phase=9},
+            text = "Lately things have been so strained between us, and I'm feeling like you're pushing me away for " ..
+                "some reason. Why?",
+            responses = {
+                {"I have no idea what you're talking about.", {}, "wtf"},
+                {"I don't even know who you are.", {}, "brain_problems"},
+                {"I'm not sure.", {}}
+            }
+        },
+        {
+            pos = {phase=10},
+            text = "Ha ha, okay, this is just...%% Sad. I don't want things to end this way.",
+            responses = {
+                {"They're ending?", {}},
+                {"Wait. Don't leave.", {alien_dont_leave=100}},
+                {"Who are you? Am I on a prank show?", {}, "brain_problems"}
+            }
+        },
+        {
+            pos = {phase=11},
+            text = "When we met, you said you couldn't be in love for very long. I thought I proved you wrong. " ..
+                " %.%.%. Maybe you were right.",
+            responses = {
+                {"Maybe so.", {}},
+                {"I'm sorry.", {alien_dont_leave=100}},
+                {"Ugh, melodrama.", {}, "gave_up"}
+            }
         },
 
 
         {
-            pos = {phase=12},
+            pos = {phase=12, alien_dont_leave=0},
             text = "I'm sorry, but I just can't do this anymore.",
+            pose = "below_doors",
             setState = "gave_up",
             responses = {
                 {"Can't do what?", {}},
-                {"Please don't leave me.", {}},
+                {"Please don't leave me.", {}, "alienated"},
                 {"I'm sorry.", {}},
+                {nil, {}}
+            }
+        },
+
+        {
+            pos = {phase=12, alien_dont_leave=150},
+            text = "Look, I% kinda% want to leave you, but that's not the adult thing to do.%% " ..
+                " Let's work on this,% together,% okay?",
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"Okay...", {}},
+                {"I guess...", {}},
+                {"But who are you?", {}, "brain_problems"}
             }
         }
     },
