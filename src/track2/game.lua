@@ -5,7 +5,7 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = false
+local DEBUG = true
 
 local util = require('util')
 local shaders = require('shaders')
@@ -166,7 +166,7 @@ function Game:start()
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},
         what = function()
-            self:setPoseSequence(scene.greg, {"bottom_of_stairs", "right_of_rose"})
+            self:setPoseSequence(scene.greg, {"bottom_of_stairs", "right_of_rose", "facing_left"})
         end
     })
 
@@ -615,12 +615,15 @@ function Game:draw()
         end
 
         if DEBUG then
+            local y = fonts.debug:getHeight()
+
             love.graphics.setFont(fonts.debug)
             love.graphics.setColor(255,255,127)
             love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
-                .. ' ' .. self.dialogState)
-            local y = fonts.debug:getHeight()
-            for k,v in pairs(self.npc) do
+                .. ' ' .. self.dialogState, 0, y)
+            y = y + fonts.debug:getHeight()
+
+            for k,v in pairs({} or self.npc) do
                 love.graphics.setColor(0, 0, 0)
                 love.graphics.print(string.format("%s=%.1f", k, v), 1, y+1)
                 love.graphics.setColor(255, 255, 127)

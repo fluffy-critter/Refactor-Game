@@ -51,7 +51,6 @@ local dialog = {
         {
             pos = {fun=1},
             text = "# Good morning, dear! #",
-            pose = "right_of_rose",
             responses = {
                 {"Hi...", {}, "normal"},
                 {"Who are you...?", {}, "last_night"},
@@ -62,7 +61,6 @@ local dialog = {
         {
             pos = {fun=37},
             text = "Good morning... how are you feeling today?",
-            pose = {"left_of_couch", "facing_left"},
             responses = {
                 {"I'm... fine...", {}, "normal"},
                 {"Uh, fine, but... who are you?", {}, "brain_problems"},
@@ -73,6 +71,7 @@ local dialog = {
         {
             pos = {fun=50},
             text = "Good morning.",
+            pose = "facing_down",
             responses = {
                 {"...good morning...", {}, "normal"},
                 {"Who are you?", {}, "last_night"},
@@ -637,7 +636,7 @@ local dialog = {
             pos = {phase=7},
             text = "Look,% I don't know what's going on here,% but clearly something has upset you.%% " ..
                 "Mind telling me what the hell is going on?",
-            pose = {"facing_down", "pause", "left_of_couch", "facing_down"},
+            pose = {"facing_down", "pause", "left_of_couch", "facing_left"},
             responses = {
                 {"You aren't my spouse.", {}, "alienated"},
                 {"I don't know who you are.", {}, "brain_problems"},
@@ -732,8 +731,18 @@ local dialog = {
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
         {
-            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0},
+            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0, mention_lastnight=0},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
+            setPos = {ln_whatcameover=100,mention_lastnight=100},
+            responses = {
+                {"It's okay.", {}, "normal"},
+                {"What happened?", {}},
+                {"... All right.", {}, "alienated"},
+            }
+        },
+        {
+            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0, mention_lastnight=100},
+            text = "I'm sorry, hon. I really don't know what came over me.",
             setPos = {ln_whatcameover=100,mention_lastnight=100},
             responses = {
                 {"It's okay.", {}, "normal"},
@@ -1114,7 +1123,7 @@ local dialog = {
         {
             pos = {phase=4, bp_stranger=0, asked_about_breakfast=500},
             text = "...%% What's with that look?",
-            pose = "facing_left",
+            pose = {"right_of_rose", "facing_left"},
             responses = {
                 {"What look?", {bp_that_look=100}},
                 {"Who are you?", {}},
@@ -1188,8 +1197,19 @@ local dialog = {
             setPos = {bp_family_history=100, bp_prerequisite=100},
             responses = {
                 {"Of what?", {bp_ofwhat=100}},
-                {"No I don't...", {bp_no_history=100}},
+                {"No I don't...", {bp_denying_what=100}},
                 {"How do you know that?", {bp_howknow=100}},
+            }
+        },
+
+        {
+            pos = {bp_denying_what=100},
+            text = "What are you denying, exactly?",
+            pose = "facing_left",
+            responses = {
+                {"I don't know, but I don't have it.", {bp_no_history=100}},
+                {"I'm not sure.", {bp_ofwhat=100}},
+                {"That thing you said.", {}}
             }
         },
 
@@ -1230,7 +1250,7 @@ local dialog = {
 
         {
             pos = {bp_howknow=100},
-            text = "Because...% You told me about this?%% It's your deepest fear...?"
+            text = "Because...% You told me about this?%% It's your biggest fear...?"
         },
         {
             pos = {bp_no_history=100},
@@ -1303,7 +1323,7 @@ local dialog = {
         {
             pos = {phase=8,bp_just_guessing=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
-            pose = "bottom_of_stairs",
+            pose = {"facing_left", "pause", "left_of_stairs", "bottom_of_stairs", "facing_right"},
             responses = {
                 {"When was that, exactly?", {bp_when_married=1000}},
                 {"How happy was I?", {bp_howhappy=100}},
@@ -1536,16 +1556,6 @@ local dialog = {
         },
 
         {
-            pos = {phase=10},
-            text = "Ha ha, wow, this is just... what the hell is going on here.",
-            responses = {
-                {"I don't know.", {}},
-                {"Who the hell are you?", {}, "gave_up"},
-                {"Who are you?", {}, "brain_problems"}
-            }
-        },
-
-        {
             pos = {interrupted=2},
             text = "Could you let me finish?"
         },
@@ -1595,8 +1605,9 @@ local dialog = {
             },
         },
         {
-            pos = {phase=2, mention_lastnight=0},
+            pos = {phase=2, mention_lastnight=0, alien_stillmad=0},
             text = "Still mad at me about last night, huh?",
+            setPos = {mention_lastnight=100, alien_stillmad=100},
             responses = {
                 {"I guess.", {}},
                 {"Last night?", {}, "last_night"},
@@ -1604,8 +1615,9 @@ local dialog = {
             }
         },
         {
-            pos = {phase=2, mention_lastnight=100},
+            pos = {phase=2, mention_lastnight=100, alien_stillmad=0},
             text = "Still mad at me about it, huh?",
+            setPos = {alien_stillmad=100},
             responses = {
                 {"I guess.", {}},
                 {"What happened?", {}, "last_night"},
@@ -1641,6 +1653,15 @@ local dialog = {
             }
         },
         {
+            pos = {phase=6},
+            text = "Look, I get it, you're stressed out about things lately...%% But why can't you just open up to me?",
+            responses = {
+                {"Why should I?", {}},
+                {"But I don't know you.", {}, "brain_problems"},
+                {"It's a secret to everyone.", {}, "wtf"}
+            }
+        },
+        {
             pos = {phase=7},
             text = "I...%% uh...%% What?",
             responses = {
@@ -1652,6 +1673,7 @@ local dialog = {
         {
             pos = {phase=8},
             text = "Do you think us marrying was a mistake?",
+            pose = "facing_left",
             responses = {
                 {"No...", {alien_dont_leave=100}},
                 {"Maybe?", {}},
@@ -1678,6 +1700,15 @@ local dialog = {
             }
         },
         {
+            pos = {phase=10.1},
+            text = "Ha ha, wow, this is just... what the hell is going on here.",
+            responses = {
+                {"I don't know.", {}},
+                {"Who the hell are you?", {}, "gave_up"},
+                {"Who are you?", {}, "brain_problems"}
+            }
+        },
+        {
             pos = {phase=11},
             text = "When we met, you said you couldn't be in love for very long. I thought I proved you wrong. " ..
                 " %.%.%. Maybe you were right.",
@@ -1687,7 +1718,15 @@ local dialog = {
                 {"Ugh, melodrama.", {}, "gave_up"}
             }
         },
-
+        {
+            pos = {phase=11.5},
+            text = "I worry about you. But... is the feeling even mutual?",
+            responses = {
+                {"How can I?", {}},
+                {"I'm sorry.", {alien_dont_leave=100}},
+                {"No.", {alien_dont_leave=-100}}
+            }
+        },
 
         {
             pos = {phase=12, alien_dont_leave=0},
@@ -1820,6 +1859,7 @@ local dialog = {
 
         {
             pos = {phase=3,gu_prereq=500},
+            -- This is metatextual.
             text = "If you don't have a memory of an experience, can you really say that you've experienced it?",
             pose = "facing_down",
             responses = {
@@ -1845,21 +1885,23 @@ local dialog = {
             pos = {phase=5,gu_prereq=500},
             text = "We've been married for so long...%% I worry about us drifting apart.%% I'm afraid of losing "..
                 "you%.%.%.",
-            onInterrupt = function(self)
-                self.text = "...but maybe you're already lost."
-            end,
             pose = {"below_doors", "facing_up"},
+            setPos = {gu_already_lost=500},
             responses = {
                 {"We're married?", {}},
                 {"What's going on?", {}},
                 {"Who ARE you?", {}}
             }
         },
+        {
+            pos = {gu_already_lost=500},
+            text = "...but maybe you're already lost."
+        },
 
         {
             pos = {phase=6,gu_prereq=500},
-            text = "You were always afraid to lose yourself...%% and I always brushed it off.%% " ..
-                "Now I realize that this IS going to be difficult.%% For me.",
+            text = "You were always afraid of this...%% and I always brushed it off.%% " ..
+                "Now I realize that this IS going to be difficult...%% for me.",
             pose = {"right_of_rose", "facing_right"},
             responses = {
                 {"What are you talking about?", {}},
@@ -1906,6 +1948,7 @@ local dialog = {
         {
             pos = {gu_sorry=100},
             text = "Are you, though? %.%.%.CAN you be?",
+            pose = {"right_of_rose", "facing_left"},
             responses = {
                 {"No.", {}},
                 {"I can try.", {}},
@@ -1915,7 +1958,19 @@ local dialog = {
 
         {
             pos = {gu_sorry=200},
-            text = "You don't even KNOW me."
+            text = "You don't even KNOW me.",
+            pose = "facing_right",
+            responses = {
+                {"I don't...", {}},
+                {"But you know me...", {gu_youknowme=100}},
+                {"I want to.", {}}
+            }
+        },
+
+        {
+            pos = {gu_youknowme=100},
+            text = "Is that even enough, though?%% For me to love someone who won't...% can't...% " ..
+                " even remember who I am?"
         },
 
         {
