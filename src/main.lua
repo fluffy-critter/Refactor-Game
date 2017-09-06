@@ -303,10 +303,7 @@ function love.update(dt)
         currentGame.music:setPitch(playing.speed)
     end
 
-    local mul = 1
-    if love.keyboard.isDown('s') then
-        mul = 0.1
-    end
+    local mul = playing.speed
 
     if currentGame and playing.state ~= PlayState.paused then
         currentGame:update(dt*mul)
