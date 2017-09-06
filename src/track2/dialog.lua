@@ -1277,7 +1277,7 @@ local dialog = {
             pose = {"next_to_rose", "facing_down"},
             responses = {
                 {"I'm just guessing.", {bp_just_guessing=100}},
-                {"I do remember...", {}, "gave_up"},
+                {"I do remember...", {gu_prereq=500}, "gave_up"},
                 {"What do you want me to say?", {bp_guess_husband=30}}
             }
         },
@@ -1426,10 +1426,10 @@ local dialog = {
             pos = {phase=10, fun=50, bp_explains_so_much=0, bp_prerequisite=100},
             text = "Ha ha ha, oh god.%.%.% this explains so much...",
             pose = "bottom_of_stairs",
-            setPos = {bp_explains_so_much=100,bp_prerequisite=100},
+            setPos = {bp_explains_so_much=100,bp_prerequisite=100,gu_prereq=500},
             responses = {
                 {"What's so funny?", {}},
-                {"Please don't laugh...", {}},
+                {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
                 {nil, {}, "silence"}
             }
@@ -1448,7 +1448,7 @@ local dialog = {
             responses = {
                 {"I don't believe you.", {}},
                 {"I have no idea who you are.", {}},
-                {"Where did those pictures come from?", {}},
+                {"Why are you trying to confuse me?", {}},
             }
         },
 
@@ -1636,14 +1636,148 @@ local dialog = {
             pos = {phase=12},
             text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.",
             setState = "gave_up",
-            setPos = {leaving=1000},
+            setPos = {leaving=1000,gu_prereq=500},
             pose={"below_doors","pause","facing_up"}
         },
     },
 
     -- path where Greg has given up on helping Rose due to brain problems
     gave_up = {
-        { pos={}, text="DIALOG PATH INCOMPLETE: gave_up"},
+        {
+            pos = {interrupted=4},
+            text = "Please, I...%% I know you want to say something but..."
+        },
+        {
+            pos = {interrupted=7},
+            text = "This is hard for me to talk about, and I really want to get through it, okay?",
+        },
+        {
+            pos = {interrupted=10},
+            text = "I%.%.%. understand you're confused.%% This is really hard for me too.",
+        },
+
+        {
+            pos = {gu_prereq=0},
+            setPos = {gu_prereq=500},
+            text = "Oh%.%.%. oh god, I know exactly what's going on here."
+        },
+
+        {
+            pos = {phase=1,gu_prereq=500},
+            text = "Hi, hon...",
+            pose = "right_of_rose",
+            responses = {
+                {"Hello... you...", {}},
+                {"Good morning.", {}},
+                {"Who are you?", {}},
+            }
+        },
+
+        {
+            pos = {phase=2,gu_prereq=500},
+            text = "Our memories are what define us as a person.",
+            pose = "facing_right",
+            responses = {
+                {"...Okay?", {}},
+                {"Sure.", {}},
+                {"I don't understand.", {}}
+            }
+        },
+
+        {
+            pos = {phase=3,gu_prereq=500},
+            text = "If you don't have a memory of an experience, can you really say that you've experienced it?",
+            pose = "facing_down",
+            responses = {
+                {"What are you getting at?", {}},
+                {"I'm not sure where this is going.", {}},
+                {"Why are you talking about this?", {}},
+            }
+        },
+
+        {
+            pos = {phase=4,gu_prereq=500},
+            text = "In a sense, one's memories, while not the sole indelible basis of one's personality, are perhaps " ..
+                "the most singularly defining characteristic of one's \"self.\" To lose that is to find oblivion.",
+            pose = "facing_left",
+            responses = {
+                {"Who are you?", {}},
+                {"What are you doing here?", {}},
+                {"This is all fascinating but...", {}},
+            }
+        },
+
+        {
+            pos = {phase=5,gu_prereq=500},
+            text = "We've been married for so long...%% I worry about us drifting apart.%% I'm afraid of losing "..
+                "you%.%.%. but maybe you're already lost.",
+            pose = {"below_doors", "facing_up"},
+            responses = {
+                {"We're married?", {}},
+                {"What's going on?", {}},
+                {"Who ARE you?", {}}
+            }
+        },
+
+        {
+            pos = {phase=6,gu_prereq=500},
+            text = "You've always had so much fear around losing your memories...%% and I always brushed it off.%%" ..
+                " Now I realize that this is%.%.%. going to be difficult.%% For me.",
+            pose = {"right_of_rose", "facing_right"},
+            responses = {
+                {"What are you talking about?", {}},
+            }
+        },
+
+        {
+            pos = {phase=7,gu_prereq=500},
+            text = "I love you.%% These past 17 years have been %so% wonderful for me.%% For both of us.",
+            pose = "facing_left",
+            responses = {
+                {"Are you breaking up with me?", {}},
+                {"I really don't know.", {}},
+                {"Who are you?", {}}
+            }
+        },
+
+        {
+            pos = {phase=8,gu_prereq=500},
+            text = "What do you remember?%% How long have we lived here together?%% How long have you lived here " ..
+                "at all?",
+            pose = "facing_right",
+            responses = {
+                {"How long?", {}},
+                {"Who are you?", {}},
+                {"Seems like forever.", {}}
+            }
+        },
+
+        {
+            pos = {phase=9,gu_prereq=500},
+            text = "You look at me like I'm a stranger,% like I don't belong here,% like I'm just someone you " ..
+                "picked up last night,% like...",
+            pose = "facing_down",
+            responses = {
+                {"Who are you?", {}},
+                {"But we did just meet.", {}},
+                {"I'm sorry.", {gu_sorry=100}}
+            }
+        },
+
+        {
+            pos = {gu_sorry=100},
+            text = "Are you, though? %.%.%.CAN you be?",
+            responses = {
+                {"No.", {}},
+                {"I can try.", {}},
+                {"Of course.", {gu_sorry=100}}
+            }
+        },
+
+        {
+            pos = {gu_sorry=200},
+            text = "You don't even KNOW me."
+        },
 
         {
             pos = {phase=10},
@@ -1693,38 +1827,38 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {},
+            pos = {phase=10.5},
             text = "Emergency services? It's my spouse, something's very wrong with them.",
             pose = "on_phone",
             setPos = {stroke_state=1000}
         },
 
         {
-            pos = {phase=-1, stroke_state=1000},
+            pos = {phase=13, stroke_state=1000},
             text = "Someone is coming.... everything will be okay.",
             pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
-            pos = {phase=-1, stroke_state=1000},
+            pos = {phase=13, stroke_state=1000},
             text = "Shh, shh, it's okay...%% Everything will be fine...%#%#%#",
             pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
-            pos = {phase=-1, stroke_state=1000},
+            pos = {phase=13, stroke_state=1000},
             text = "They'll be here soon.",
             pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
-            pos = {phase=-1, stroke_state=1000},
+            pos = {phase=13, stroke_state=1000},
             text = "I love you.%#%\n\nWe'll get through this.",
             pose = {"kneeling_by_rose"},
             maxCount=5
         },
         {
-            pos = {phase=-1, stroke_state=1000},
+            pos = {phase=13, stroke_state=1000},
             text = "It's okay, I'm here for you.",
             pose = {"kneeling_by_rose"},
             maxCount=5
