@@ -5,7 +5,7 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = true
+local DEBUG = false
 
 local util = require('util')
 local shaders = require('shaders')
@@ -200,6 +200,13 @@ function Game:start()
 
     others - ???
     ]]
+
+    self.eventQueue:addEvent({
+        when = {13},
+        what = function()
+            self.scenes = {scenes.missing()}
+        end
+    })
 
     self:addAnimation({
         target = self,

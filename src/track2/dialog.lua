@@ -1174,6 +1174,7 @@ local dialog = {
             pos = {phase=6, bp_family_history=0, fun=50, bp_prerequisite=100},
             text = "But you DO have a family history of this.%.%.%",
             setPos = {bp_family_history=100},
+            pose = "facing_down",
             responses = {
                 {"Of what?", {bp_ofwhat=100}},
                 {"No I don't...", {bp_no_history=100}},
@@ -1514,8 +1515,6 @@ local dialog = {
 
     -- path where Greg is feeling alienated
     alienated = {
-        { pos={}, text="DIALOG PATH INCOMPLETE: alienated"},
-
         {
             pos = {silence_total=3, silence_cur=1},
             text = "What's with the cold shoulder?",
@@ -1568,6 +1567,34 @@ local dialog = {
             text = "I don't like being talked over.%%\nStop it.%%",
             cantInterrupt=true
         },
+
+        {
+            pos = {phase=1},
+            text = "Why are you down here by yourself?",
+            responses = {},
+        },
+        {
+            pos = {phase=2},
+            text = "Still mad at me about last night, huh?",
+            responses = {}
+        },
+        {
+            pos = {phase=3},
+            text = "Well, you're just a bundle of sunshine this morning.",
+            responses = {}
+        },
+        {
+            pos = {phase=4},
+            text = "You're awfully upset at me. What the heck is going on lately?",
+            responses = {}
+        },
+        {
+            pos = {phase=5},
+            text = "C'mon, spouses are supposed to be open with each other.%% Could you please just " ..
+                "tell me what's going on?",
+            responses = {}
+        },
+
 
         {
             pos = {phase=12},

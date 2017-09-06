@@ -264,4 +264,16 @@ function scenes.phase11(duration)
     }
 end
 
+function scenes.missing()
+    return {
+        update = function() end,
+        draw = function()
+            love.graphics.clear(0,0,0)
+            love.graphics.setColor(255,255,255)
+            love.graphics.print("(scene missing)", 64, 128)
+            return true
+        end
+    }
+end
+
 return scenes
