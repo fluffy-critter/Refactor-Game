@@ -2092,6 +2092,7 @@ local dialog = {
 
     -- vacation time!
     vacation = {
+        -- starts at 11
         { pos = {phase=15}, text = "DIALOG PATH INCOMPLETE: VACATION", maxCount=2000 }
     }
 
