@@ -1101,7 +1101,7 @@ local dialog = {
             }
         },
         {
-            pos = {that_look=100},
+            pos = {bp_that_look=100},
             text = "That look, like I'm some kind of stranger.",
             pose = {"right_of_rose", "facing_left"},
             responses = {
@@ -1627,7 +1627,7 @@ local dialog = {
 
         {
             pos = {phase=11},
-            text = "I don't know who the hell you think you are but...%% " ..
+            text = "I don't know who the hell you think you are all the sudden but...%% " ..
                 "this is all just too much for me to deal with.",
             pose={"below_doors","facing_down"}
         },
@@ -1697,8 +1697,8 @@ local dialog = {
 
         {
             pos = {phase=4,gu_prereq=500},
-            text = "In a sense, one's memories, while not the sole indelible basis of one's personality, are perhaps " ..
-                "the most singularly defining characteristic of one's \"self.\" To lose that is to find oblivion.",
+            text = "One's memories are% perhaps% " ..
+                "the most obvious defining characteristic of one's self. To lose that is to find oblivion.",
             pose = "facing_left",
             responses = {
                 {"Who are you?", {}},
@@ -1710,7 +1710,10 @@ local dialog = {
         {
             pos = {phase=5,gu_prereq=500},
             text = "We've been married for so long...%% I worry about us drifting apart.%% I'm afraid of losing "..
-                "you%.%.%. but maybe you're already lost.",
+                "you%.%.%.",
+            onInterrupt = function(self)
+                self.text = "...but maybe you're already lost."
+            end,
             pose = {"below_doors", "facing_up"},
             responses = {
                 {"We're married?", {}},
@@ -1721,11 +1724,13 @@ local dialog = {
 
         {
             pos = {phase=6,gu_prereq=500},
-            text = "You've always had so much fear around losing your memories...%% and I always brushed it off.%%" ..
-                " Now I realize that this is%.%.%. going to be difficult.%% For me.",
+            text = "You were always afraid to lose yourself...%% and I always brushed it off.%% " ..
+                "Now I realize that this IS going to be difficult.%% For me.",
             pose = {"right_of_rose", "facing_right"},
             responses = {
                 {"What are you talking about?", {}},
+                {"What is difficult?", {}},
+                {"I don't...", {}}
             }
         },
 
