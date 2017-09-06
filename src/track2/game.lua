@@ -18,6 +18,7 @@ local scenes = require('track2.scenes')
 
 local EventQueue = require('EventQueue')
 local Animator = require('Animator')
+local SoundGroup = require('SoundGroup')
 
 local Game = {
     META = {
@@ -40,13 +41,13 @@ local clock = util.clock(BPM, {4, 4}, 0.25)
 
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    return clock.timeToPos(self.sounds.music:tell())
+    return clock.timeToPos(self.music:tell())
 end
 
 --[[ seeks the music to a particular spot, using the same format as musicPos(), with an additional timeOfs param
 that adjusts it by seconds ]]
 function Game:seekMusic(pos, timeOfs)
-    self.sounds.music:seek(clock.posToTime(pos) + (timeOfs or 0))
+    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
 function Game:init()
@@ -55,43 +56,12 @@ function Game:init()
     self.transcript = love.filesystem.newFile("strangers-" .. os.date("%Y%m%d-%H%M%S") .. ".txt")
     self.transcript:open("w")
 
-    -- TODO factor this out into a thingything
     self.sounds = {}
-    self.music = {
-        pause = function()
-            for _,v in pairs(self.sounds) do
-                v:pause()
-            end
-        end,
-        resume = function()
-            for _,v in pairs(self.sounds) do
-                v:resume()
-            end
-        end,
-        stop = function()
-            for _,v in pairs(self.sounds) do
-                v:stop()
-            end
-        end,
-        setPitch = function(_, p)
-            for _,v in pairs(self.sounds) do
-                v:setPitch(p)
-            end
-        end,
-        setVolume = function(_, p)
-            for _,v in pairs(self.sounds) do
-                v:setVolume(p)
-            end
-        end,
-        tell = function()
-            return self.sounds.music:tell()
-        end,
-        isPlaying = function()
-            return self.sounds.music:isPlaying()
-        end
-    }
+    self.music = SoundGroup.new({
+        bgm = love.audio.newSource('music/02-strangers.mp3'),
+        sounds = self.sounds
+    })
 
-    self.sounds.music = love.audio.newSource('music/02-strangers.mp3')
     self.phase = -1
     self.score = 0
 
@@ -104,7 +74,7 @@ function Game:init()
     self.outputScale = 3
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
-    self.border =imagepool.load('track2/border.png')
+    self.border = imagepool.load('track2/border.png')
 
     self.lyrics = require('track2.lyrics')
     self.lyricPos = 1
@@ -135,7 +105,7 @@ function Game:init()
 
     self.crtScaler = shaders.load("track2/crtScaler.fs")
 
-    -- self.sounds.music:setVolume(0.1)
+    -- self.music.bgm:setVolume(0.1)
 
     self.sounds.print = love.audio.newSource("track2/printSound.wav", "static")
     self.sounds.print:setVolume(0.3)
@@ -175,7 +145,7 @@ function Game:addAnimation(anim, startTime, endTime)
 end
 
 function Game:start()
-    self.sounds.music:play()
+    self.music:play()
 
     self.kitchenScene = scenes.kitchen()
     self.scenes = {self.kitchenScene}
@@ -265,8 +235,7 @@ function Game:start()
 end
 
 function Game:onButtonPress(button, code, isRepeat)
-    -- TODO maybe tie all the game audio into a single proxy object?
-    if self.sounds.music:getPitch() < 0.5 then
+    if self.music:getPitch() < 0.5 then
         return
     end
 
