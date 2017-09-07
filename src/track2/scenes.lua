@@ -198,10 +198,7 @@ function scenes.kitchen()
                 pos = {88,38}
             },
             behind_rose = {
-                pos = {128, 60},
-                onComplete = function(sprite)
-                    sprite.frame = quads.greg.down[1]
-                end
+                pos = {128, 60}
             },
             pause = {
                 duration = 1
@@ -306,13 +303,128 @@ function scenes.phase11(duration)
     }
 end
 
-function scenes.missing()
+function scenes.missing(label)
     return {
         update = function() end,
         draw = function()
             love.graphics.clear(0,0,0)
             love.graphics.setColor(255,255,255)
-            love.graphics.print("(scene missing)", 64, 128)
+            love.graphics.print("(scene missing: " .. label .. ")", 64, 128)
+            return true
+        end
+    }
+end
+
+function scenes.endKitchen(version)
+    local backgroundLayer = imagepool.load('track2/kitchen.png')
+    local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
+    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
+
+    local rose = Sprite.new({
+        sheet = spriteSheet,
+        pos = {120, 112},
+        frame = quads.rose.kitchen.normal,
+        animations = {
+            normal = {
+                {quads.rose.kitchen.normal, 3},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 2},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 5},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.normal, 0.5},
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            eyes_right = {
+                {quads.rose.kitchen.eyes_right, 2},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_right, 3},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_right, 4},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_right, 0.6},
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            eyes_left = {
+                {quads.rose.kitchen.eyes_left, 4},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_left, 1},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_left, 3},
+                {quads.rose.kitchen.blink, 0.1},
+                {quads.rose.kitchen.eyes_left, 0.3},
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            closed = {
+                {quads.rose.kitchen.blink, 0.1},
+            },
+            crying = {
+                {quads.rose.kitchen.cry[1], 2/3},
+                {quads.rose.kitchen.cry[2], 2/3},
+            }
+        }
+    })
+
+
+    local layers = {
+        {image = backgroundLayer},
+        rose
+    }
+
+    -- does Greg exist?
+    if version == "wtf" then
+        table.insert(layers, Sprite.new({
+            sheet = spriteSheet,
+            pos = {96,113},
+            frame = quads.greg.down[1],
+        }))
+        rose.animation = rose.animations.normal
+    elseif version == "alienated" then
+        table.insert(layers, Sprite.new({
+            sheet = spriteSheet,
+            pos = {104,113},
+            -- frame = quads.greg.leaning,
+        }))
+        rose.frame = quads.rose.kitchen.blink
+    elseif version == "vacation" then
+        table.insert(layers, Sprite.new({
+            sheet = spriteSheet,
+            pos = {104,113},
+            -- frame = quads.greg.leaning,
+        }))
+        rose.animation = rose.animations.eyes_left
+    elseif version == "brain_problems" or version == "stroke" then
+        table.insert(layers, Sprite.new({
+            sheet = spriteSheet,
+            pos = {204,126},
+            frame = quads.greg.sitting.thinking
+        }))
+        rose.animation = rose.animations.eyes_right
+    else
+        print(version .. ": nobody's there?")
+        rose.animation = rose.animations.normal
+    end
+
+    table.insert(layers, {image = foregroundLayer})
+
+    return {
+        layers = layers,
+        update = function(self, dt)
+            for _,layer in ipairs(self.layers) do
+                if layer.update then
+                    layer:update(dt)
+                end
+            end
+        end,
+        draw = function(self)
+            love.graphics.setColor(255,255,255)
+            for _,thing in ipairs(self.layers) do
+                if thing.frame then
+                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
+                elseif thing.image then
+                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
+                end
+            end
             return true
         end
     }

@@ -202,8 +202,6 @@ function Game:start()
         end,
     }, {12,3,.5}, {13})
 
-    local flashOut = {0,0,255,0}
-
     --[[
     at {13} choose a set of scenes based on ending dialog state; also change flashOut based on situation
 
@@ -220,17 +218,64 @@ function Game:start()
     self.eventQueue:addEvent({
         when = {13},
         what = function()
-            self.scenes = {scenes.missing()}
+            -- choose a set of scenes based on dialog state
+
+            local flashOut = {0,0,255,0}
+
+            local sceneStack = nil
+
+            if self.dialogState == "wtf" or self.dialogState == "alienated" then
+                flashOut = {127,0,255,0}
+                -- sceneStack = {scenes.therapist(), scenes.vacation(), scenes.parkbench(true)}
+                -- self.miniGame = CardGame.new()
+            elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
+                flashOut = {255,255,0,0}
+                -- sceneStack = {scenes.hospital(), scenes.therapist(), scenes.kitchen("flashes")}
+                -- self.miniGame = CardGame.new()
+            elseif self.dialogState == "gave_up" then
+                flashOut = {0,0,255,0}
+                -- sceneStack = {scenes.parkbench(false)}
+                -- self.miniGame = PigeonGame.new()
+            elseif self.dialogState == "vacation" then
+                flashOut = {255,0,255,0}
+                -- sceneStack = {scenes.vacation()}
+            end
+
+            self.scenes = sceneStack or {scenes.missing(self.dialogState)}
+
+            -- set the fade to the new scenes
+            self:addAnimation({
+                target = self,
+                property = "flashColor",
+                startPos = {255,255,255,255},
+                endPos = flashOut,
+                easing = Animator.Easing.ease_out,
+            }, {13}, {13,0,1})
+
+            -- set the fade at the end of the instrumental
+            self:addAnimation({
+                target = self,
+                property = "flashColor",
+                startPos = {0,0,0,0},
+                endPos = {0,0,0,255},
+                easing = Animator.Easing.ease_out,
+            }, {14,3,3}, {15,0,0})
+            self:addAnimation({
+                target = self,
+                property = "flashColor",
+                startPos = {0,0,0,255},
+                endPos = {0,0,0,0},
+                easing = Animator.Easing.ease_out,
+            }, {15,0,0}, {15,1,0})
+            self.eventQueue:addEvent({
+                when = {15},
+                what = function()
+                    self.scenes = {scenes.endKitchen(self.dialogState)}
+                end
+            })
         end
     })
 
-    self:addAnimation({
-        target = self,
-        property = "flashColor",
-        startPos = {255,255,255,255},
-        endPos = flashOut,
-        easing = Animator.Easing.ease_out,
-    }, {13}, {13,0,1})
 
 end
 
