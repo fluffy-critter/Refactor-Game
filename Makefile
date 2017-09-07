@@ -32,7 +32,7 @@ clean:
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
 
-publish-precheck: commit-check checks tests
+publish-precheck: commit-check checks test-bundle
 
 publish-status:
 	butler status $(TARGET)
@@ -63,6 +63,9 @@ $(DEST)/.assets: $(shell find raw_assets -name '*.png')
 # TODO grab the binary out of the appropriate platform version
 tests: setup
 	love $(SRC) --cute-headless
+
+test-bundle: setup $(DEST)/love/$(NAME).love
+	love $(DEST)/love/$(NAME).love --cute-headless
 
 checks: setup
 	find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
