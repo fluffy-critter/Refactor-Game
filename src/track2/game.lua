@@ -23,7 +23,7 @@ local SoundGroup = require('SoundGroup')
 local Game = {
     META = {
         tracknum = 2,
-        title = "strangers [INCOMPLETE]",
+        title = "strangers [PLAYTEST READY]",
         duration = 3*60 + 11
     }
 }
