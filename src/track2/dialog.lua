@@ -97,7 +97,7 @@ local dialog = {
             responses = {
                 {"Um... hello.", {}, "normal"},
                 {"Oh, sorry, I didn't hear you.", {}, "normal"},
-                {"Mmhmm.", {}, "anger"}
+                {"Mmhmm.", {}, "wtf"}
             }
         },
         {
@@ -107,7 +107,7 @@ local dialog = {
             responses = {
                 {"Um... hello.", {}, "normal"},
                 {"Oh, sorry, I didn't hear you.", {}, "normal"},
-                {"Mmhmm.", {}, "anger"}
+                {"Mmhmm.", {}, "wtf"}
             }
         },
         {
@@ -618,7 +618,7 @@ local dialog = {
             responses = {
                 {"I know what marriage is.", {wtf_marriage=100}},
                 {"I don't remember it.", {}, "brain_problems"},
-                {"Clearly a mistake.", {}, "anger"}
+                {"Clearly a mistake.", {}}
             }
         },
         {
@@ -647,19 +647,31 @@ local dialog = {
             text = "What.%% The HELL.%% Has gotten% into% you.",
             responses = {
                 {"I'm sorry.", {}, "alienated"},
-                {"I don't know.", {}, "anger"},
-                {"You must be losing it.", {}}
+                {"I don't know.", {}},
+                {"You must be losing it.", {wtf_losing_it=300}}
             }
         },
 
         {
-            pos = {phase=6},
+            pos = {wtf_losing_it=300},
             text = "Seriously?%% One of us is losing it and I don't think it's me.",
             pose = {"right_of_rose", "couch_sitting"},
             responses = {
                 {"Please, go away.", {}, "alienated"},
                 {"I don't even know who you are.", {}, "brain_problems"},
                 {"Maybe this is fun for me.", {}}
+            }
+        },
+
+        {
+            pos = {phase=6},
+            text = "This is so out of character for you...%% Are you having a migraine or something? " ..
+                "%...% Do you need a nap?",
+            pose = "facing_right",
+            responses = {
+                {"Please, go away.", {}, "alienated"},
+                {"Who ARE you?", {}, "brain_problems"},
+                {"Yeah, and a juice box and a cookie.", {}}
             }
         },
 
@@ -984,7 +996,7 @@ local dialog = {
             responses = {
                 {"What are we talking about?", {lastnight_what_talking=200}},
                 {"I think so...?", {lastnight_samething=1000}},
-                {"Probably not.", {}, "anger"},
+                {"Probably not.", {}, "wtf"},
                 {nil, {}, "silence"}
             }
         },
@@ -1409,13 +1421,32 @@ local dialog = {
             responses = {
                 {"I don't know our backstory.", {}},
                 {"I didn't choose to forget you.", {bp_havenochoice=100}},
-                {"This game didn't give me the option.", {anger_notagame=500}, "anger"},
+                {"This game didn't give me the option.", {bp_notagame=500}},
             }
         },
         {
             pos = {bp_havenochoice=200},
             pose = "facing_right",
             text = "Oh%.%.%. Right,% of course."
+        },
+
+        {
+            pos = {bp_notagame=500},
+            text = "What...?%% Is this...%% some sort of GAME to you?",
+            responses = {
+                {"That's not what I meant.", {bp_whatdidyoumean=100}},
+                {"No, of course not.", {}},
+                {"Yeah, I downloaded it.", {}, "stroke"}
+            }
+        },
+        {
+            pos = {bp_whatdidyoumean=100},
+            text = "Then what DID you mean by that?",
+            responses = {
+                {"I don't know what's going on.", {}},
+                {"I'm not sure.", {}},
+                {"Ignore me.", {}, "wtf"}
+            }
         },
 
         {
@@ -1816,66 +1847,6 @@ local dialog = {
                 {"But who are you?", {}, "brain_problems"}
             }
         }
-    },
-
-    -- path where Greg gets really angry at Rose
-    anger = {
-        { pos={phase=2}, text="DIALOG PATH INCOMPLETE: anger"},
-
-        {
-            pos = {anger_notagame=500},
-            text = "What...?%% Is this...%% some sort of GAME to you?",
-            responses = {
-                {"That's not what I meant.", {anger_whatdidyoumean=100}},
-                {"No, of course not.", {}},
-                {"Yeah, I downloaded it.", {}, "stroke"}
-            }
-        },
-        {
-            pos = {anger_whatdidyoumean=100},
-            text = "Then what DID you mean by that?",
-            responses = {
-                {"I don't know what's going on.", {}, "brain_problems"},
-                {"I'm not sure.", {}},
-                {"Ignore me.", {}, "wtf"}
-            }
-        },
-
-        {
-            pos = {silence_total=3, silence_cur=1},
-            text = "What's with the cold shoulder?",
-            responses = {
-                {"What should I say?", {}},
-                {"Are you in the right home?", {}},
-                {"Who do you think you are?", {}, "alienated"},
-                {nil, {}, "silence"}
-            }
-        },
-        {
-            pos = {silence_total=6, silence_cur=1},
-            text = "So you're back on that now, huh?",
-            responses = {
-                {"Back to what?", {}},
-                {"I think you're confused.", {}},
-                {"Who are you and why are you in my home?", {}, "brain_problems"},
-                {nil, {}, "silence"}
-            }
-        },
-
-        {
-            pos = {phase=11},
-            text = "I don't know who the hell you think you are all the sudden but...%% " ..
-                "this is all just too much for me to deal with.",
-            pose={"below_doors","facing_down"}
-        },
-
-        {
-            pos = {phase=12},
-            text = "I worry about you a lot.%% But I have to worry about myself,% too%.%.%.",
-            setState = "gave_up",
-            setPos = {leaving=1000,gu_prereq=500},
-            pose={"below_doors","pause","facing_up"}
-        },
     },
 
     -- path where Greg has given up on helping Rose due to brain problems
