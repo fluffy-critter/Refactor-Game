@@ -216,3 +216,33 @@ notion("Transitions are meaningful", function()
         end
     end)
 end)
+
+notion("Poses getting set enough", function()
+    local posesSet = {}
+    local rosesSet = {}
+    local count = {}
+
+    checkAllDialogs(dialog, function(state, item)
+        if not item.pos.phase or item.pos.phase < 11 then
+            count[state] = (count[state] or 0) + 1
+            if item.pose then
+                posesSet[state] = (posesSet[state] or 0) + 1
+            end
+            if item.rose then
+                rosesSet[state] = (rosesSet[state] or 0) + 1
+            end
+        end
+    end)
+
+    for k,v in pairs(count) do
+        print(k, v, posesSet[k], rosesSet[k])
+        local poseRatio = (posesSet[k] or 0)/v
+        if poseRatio < 0.5 then
+            error(string.format("%s: only setting %.0f%% of poses", k, poseRatio*100))
+        end
+        local roseRatio = (rosesSet[k] or 0)/v
+        if roseRatio < 0.25 then
+            error(string.format("%s: only setting %.0f%% of roses", k, roseRatio*100))
+        end
+    end
+end)
