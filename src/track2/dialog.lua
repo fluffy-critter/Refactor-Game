@@ -2055,13 +2055,74 @@ local dialog = {
 
     -- state where Greg believes Rose is having a stroke
     stroke = {
-        -- starts at 3
-        { pos = {phase=3}, text = "DIALOG PATH INCOMPLETE: stroke", maxCount=2000 },
+        {
+            pos = {phase=3},
+            text = "Hon? %.%.%. Are you feeling okay?",
+            pose = {"next_to_rose", "facing_left"},
+            rose = "closed",
+            responses = {
+                {"I'm not sure...", {}},
+                {"I'm FINE.", {}, "wtf"},
+                {"Who are you?", {}, "brain_problems"}
+            }
+        },
+
+        {
+            pos = {phase=4},
+            text = "What's going on?% Are you feeling% okay?",
+            responses = {
+                {"I'm not sure...", {}},
+                {"I'm kinda dizzy?", {}},
+                {"I don't know who you are?", {}}
+            }
+        },
+
+        {
+            pos = {phase=5},
+            text = "Can you feel your face? Try to wiggle your fingers.",
+            responses = {
+                {"I can't move my hands.", {stroke_nomovehands=100}},
+                {"Numb...", {}},
+                {"What?", {}}
+            }
+        },
+
+        {
+            pos = {stroke_nomovehands=100},
+            text = "You can't? Not even a little?",
+            responses = {
+                {"I don't have the frames.", {}},
+                {"They're like little squares.", {}},
+                {"No...", {}}
+            }
+        },
+
+        {
+            pos = {phase=6},
+            text = "Could you try repeating this sentence? \"Everything is fine, and I'm doing okay.\"",
+            rose = "eyes_right",
+            responses = {
+                {"But I'm not...", {}},
+                {"I don't think I have enough characters.", {}},
+                {"Why?", {}}
+            }
+        },
+
+        {
+            pos = {phase=7},
+            text = "Your speech is pretty slurred, and I think you might be having a stroke. Let's get you to " ..
+                "the hospital, okay?",
+            responses = {
+                {"What do you mean?", {}},
+                {"I feel fine...", {}},
+                {"Who ARE you?!", {}}
+            }
+        },
 
         {
             pos = {phase=10.5},
             text = "Emergency services? It's my spouse, something's very wrong with them.",
-            pose = "on_phone",
+            pose = {"right_of_rose", "on_phone"},
             setPos = {stroke_state=1000}
         },
 
@@ -2069,6 +2130,7 @@ local dialog = {
             pos = {phase=13, stroke_state=1000},
             text = "Someone is coming.... everything will be okay.",
             pose = {"kneeling_by_rose"},
+            rose = "crying",
             maxCount=5
         },
         {
@@ -2099,7 +2161,6 @@ local dialog = {
 
     -- vacation time!
     vacation = {
-        -- starts at 11
         { pos = {phase=11}, text = "DIALOG PATH INCOMPLETE: vacation", maxCount=2000 }
     }
 
