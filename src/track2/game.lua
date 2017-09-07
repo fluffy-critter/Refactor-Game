@@ -74,7 +74,7 @@ function Game:init()
     self.outputScale = 3
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
-    self.border = imagepool.load('track2/border.png')
+    self.border = imagepool.load('track2/border.png', {premultiply=true})
 
     self.lyrics = require('track2.lyrics')
     self.lyricPos = 1
@@ -653,16 +653,18 @@ function Game:draw()
                 return not scene:draw()
             end)
 
+            love.graphics.setBlendMode("alpha", "premultiplied")
             love.graphics.setColor(255, 255, 255)
             if self.phase >= 13 and self.phase < 15 then
                 -- throb the border during the instrumental
                 local musicPos = self:musicPos()
                 local size = ((musicPos[1] - 13)*16 + musicPos[2]*4 + musicPos[3])*0.07/32
-                local throb = 1 + size - size*(musicPos[3]%1)
+                local throb = 1 + size*(1 - math.sqrt(musicPos[3]%1))
                 love.graphics.draw(self.border, 128, 112, 0, throb, throb, 128, 112)
             else
                 love.graphics.draw(self.border)
             end
+            love.graphics.setBlendMode("alpha")
         end
 
         if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then

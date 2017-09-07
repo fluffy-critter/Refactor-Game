@@ -54,11 +54,8 @@ $(DEST)/.setup: .gitmodules
 	git submodule update --recursive
 	touch $(@)
 
-assets: $(DEST)/.assets
-$(DEST)/.assets: $(shell find raw_assets -name '*.png')
-	mkdir -p $(DEST)
-	./update-art.sh
-	touch $(@)
+assets:
+	@ ./update-art.sh
 
 # TODO grab the binary out of the appropriate platform version
 tests: setup
@@ -144,3 +141,6 @@ publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
+
+
+#### asset rules go down here
