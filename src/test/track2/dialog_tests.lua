@@ -199,3 +199,20 @@ notion("Transition reasonable ranges", function()
         end
     end)
 end)
+
+notion("Transitions are meaningful", function()
+    checkAllDialogs(dialog, function(state, item)
+        if item.responses then
+            local errorText = state .. ':' .. item.text
+            for idx,r in ipairs(item.responses) do
+                if not r[1] and not r[2] and not r[3] then
+                    error(errorText .. " has spurious silence " .. idx)
+                end
+
+                if (r[3] == state and not item.setState) or (r[3] and r[3] == item.setState) then
+                    error(errorText .. " has spurious transition " .. idx)
+                end
+            end
+        end
+    end)
+end)

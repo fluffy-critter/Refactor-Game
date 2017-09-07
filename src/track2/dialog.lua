@@ -1581,7 +1581,7 @@ local dialog = {
             responses = {
                 {"What should I say?", {}},
                 {"Are you in the right home?", {}},
-                {"Who do you think you are?", {}, "alienated"},
+                {"Who do you think you are?", {}, "wtf"},
                 {nil, {}, "silence"}
             }
         },
@@ -1802,7 +1802,6 @@ local dialog = {
                 {"Can't do what?", {}},
                 {"Please don't leave me.", {}, "alienated"},
                 {"I'm sorry.", {}},
-                {nil, {}}
             }
         },
 
