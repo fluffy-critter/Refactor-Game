@@ -657,7 +657,7 @@ function Game:draw()
             if self.phase >= 13 and self.phase < 15 then
                 -- throb the border during the instrumental
                 local musicPos = self:musicPos()
-                local size = ((musicPos[1] - 13)*16 + musicPos[2]*4 + musicPos[3])*0.1/32
+                local size = ((musicPos[1] - 13)*16 + musicPos[2]*4 + musicPos[3])*0.07/32
                 local throb = 1 + size - size*(musicPos[3]%1)
                 love.graphics.draw(self.border, 128, 112, 0, throb, throb, 128, 112)
             else

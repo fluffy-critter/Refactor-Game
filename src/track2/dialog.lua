@@ -2056,7 +2056,7 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {phase=3},
+            pos = {phase=5},
             text = "Hon? %.%.%. Are you feeling okay?",
             pose = {"next_to_rose", "facing_left"},
             rose = "closed",
@@ -2068,8 +2068,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=4},
+            pos = {phase=6},
             text = "What's going on?% Are you feeling% okay?",
+            pose = {"next_to_rose", "facing_left"},
             responses = {
                 {"I'm not sure...", {}},
                 {"I'm kinda dizzy?", {}},
@@ -2078,8 +2079,9 @@ local dialog = {
         },
 
         {
-            pos = {phase=5},
+            pos = {phase=7},
             text = "Can you feel your face? Try to wiggle your fingers.",
+            pose = {"next_to_rose", "facing_left"},
             responses = {
                 {"I can't move my hands.", {stroke_nomovehands=100}},
                 {"Numb...", {}},
@@ -2090,6 +2092,7 @@ local dialog = {
         {
             pos = {stroke_nomovehands=100},
             text = "You can't? Not even a little?",
+            pose = {"next_to_rose", "facing_left"},
             responses = {
                 {"I don't have the frames.", {}},
                 {"They're like little squares.", {}},
@@ -2098,9 +2101,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=6},
+            pos = {phase=8},
             text = "Could you try repeating this sentence? \"Everything is fine, and I'm doing okay.\"",
             rose = "eyes_right",
+            pose = {"next_to_rose", "facing_left"},
             responses = {
                 {"But I'm not...", {}},
                 {"I don't think I have enough characters.", {}},
@@ -2109,9 +2113,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=7},
+            pos = {phase=9},
             text = "Your speech is pretty slurred, and I think you might be having a stroke. Let's get you to " ..
                 "the hospital, okay?",
+            pose = {"next_to_rose", "facing_left"},
             responses = {
                 {"What do you mean?", {}},
                 {"I feel fine...", {}},
