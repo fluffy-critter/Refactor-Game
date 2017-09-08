@@ -12,9 +12,7 @@ local shaders = require('shaders')
 local imagepool = require('imagepool')
 local fonts = require('fonts')
 
-local dialog = require('track2.dialog')
 local TextBox = require('track2.TextBox')
-local scenes = require('track2.scenes')
 
 local EventQueue = require('EventQueue')
 local Animator = require('Animator')
@@ -80,10 +78,13 @@ function Game:init()
     self.lyricPos = 1
     self.nextLyric = self.lyrics[self.lyricPos]
 
+    self.scenes = love.filesystem.load('track2/scenes.lua')()
+    self.dialog = love.filesystem.load('track2/dialog.lua')()
+
     self.dialogCounts = {} -- sideband data for how many times each dialog has been seen
     self.nextDialog = {1} -- when to show the next dialog box
     self.nextTimeout = nil -- when the next dialog timeout is to occur
-    self.dialogState = dialog.start_state
+    self.dialogState = self.dialog.start_state
 
     -- the state of the NPC
     self.npc = {fun = math.random()*50}
@@ -147,8 +148,8 @@ end
 function Game:start()
     self.music:play()
 
-    self.kitchenScene = scenes.kitchen()
-    self.scenes = {self.kitchenScene}
+    self.kitchenScene = self.scenes.kitchen()
+    self.sceneStack = {self.kitchenScene}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -180,7 +181,7 @@ function Game:start()
         {
             when = {11},
             what = function()
-                table.insert(self.scenes, scenes.phase11(16*60/BPM))
+                table.insert(self.sceneStack, self.scenes.phase11(16*60/BPM))
             end
         },
         {
@@ -222,26 +223,39 @@ function Game:start()
 
             local flashOut = {0,0,255,0}
 
-            local sceneStack = nil
+            local selections
 
             if self.dialogState == "wtf" or self.dialogState == "alienated" then
                 flashOut = {127,0,255,0}
-                -- sceneStack = {scenes.therapist(), scenes.vacation(), scenes.parkbench(true)}
+                -- selections = {self.scenes.therapist(), self.scenes.vacation(), self.scenes.parkbench(true)}
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
-                -- sceneStack = {scenes.hospital(), scenes.therapist(), scenes.kitchen("flashes")}
+                -- selections = {scenes.hospital(), scenes.therapist(), various kitchen variants, scenes.doctor()}
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
                 flashOut = {0,0,255,0}
-                -- sceneStack = {scenes.parkbench(false)}
+                -- selections = {parkbench(false)}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
-                -- sceneStack = {scenes.vacation()}
+                -- selections = {self.scenes.vacation()}
             end
 
-            self.scenes = sceneStack or {scenes.missing(self.dialogState)}
+            if selections and #selections > 1 then
+                -- cycle through the selections every other beat
+                for when in clock.iterator({13}, {15,0,-1}, {0,0,2}) do
+                    self.eventQueue:addEvent({
+                        when = when, what = function()
+                            self.sceneStack = {selections[idx]}
+                        end
+                    })
+                end
+            elseif selections and #selections == 1 then
+                self.sceneStack = selections
+            else
+                self.sceneStack = {self.scenes.missing(self.dialogState)}
+            end
 
             -- set the fade to the new scenes
             self:addAnimation({
@@ -270,7 +284,7 @@ function Game:start()
             self.eventQueue:addEvent({
                 when = {15},
                 what = function()
-                    self.scenes = {scenes.endKitchen(self.dialogState)}
+                    self.sceneStack = {self.scenes.endKitchen(self.dialogState)}
                 end
             })
         end
@@ -330,7 +344,7 @@ function Game:update(dt)
 
             self:transcribe("\t" .. self.dialogState, self.npc)
 
-            local node = self:chooseDialog()
+            local node = self:chooseDialog(self.dialog)
             if node and not node.ended then
                 self:transcribe("<NPC> " .. node.text)
 
@@ -410,7 +424,7 @@ function Game:update(dt)
         end
     end
 
-    util.runQueue(self.scenes, function(scene)
+    util.runQueue(self.sceneStack, function(scene)
         scene:update(dt)
     end)
 
@@ -547,7 +561,7 @@ function Game:transcribe(...)
 end
 
 -- Get the next conversation node from the dialog tree
-function Game:chooseDialog()
+function Game:chooseDialog(dialog)
     if self.npc.gone then
         return nil
     end
@@ -649,7 +663,7 @@ function Game:draw()
         if self.phase < 17 then
             love.graphics.setColor(255, 255, 255)
 
-            util.runQueue(self.scenes, function(scene)
+            util.runQueue(self.sceneStack, function(scene)
                 return not scene:draw()
             end)
 

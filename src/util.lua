@@ -242,7 +242,8 @@ function util.clock(BPM, limits, ofs)
     end
 
     local iterator = function(startTime, endTime, delta)
-        local pos = startTime
+        local pos = normalize(startTime)
+        endTime = normalize(endTime)
         return function()
             if util.arrayLT(endTime, pos) then
                 return nil

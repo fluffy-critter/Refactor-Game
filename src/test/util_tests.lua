@@ -203,7 +203,7 @@ notion("clock", function()
 
     notion("iteration", function()
         local posArr = {}
-        for t in clock.iterator({1,2,0}, {1,5,1}, {0,0,2}) do
+        for t in clock.iterator({1,3,-4}, {1,5,1}, {0,0,2}) do
             table.insert(posArr, t)
         end
 
