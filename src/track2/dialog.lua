@@ -40,13 +40,40 @@ track stuff.
 ]]
 
 -- TODO game should store the previously-played game, this thing changes based on it
-local prevTrackDescription = "bouncing balls"
+local function prevTrackDescription()
+    return "bouncing balls"
+end
 
 local dialog = {
     start_state = "intro",
 
     -- things that are always available
     always = {
+        {
+            pos = {what_doing=1000},
+            text = "What's with the tone?%% I just took a walk after we got home,% to clear my head.%% " ..
+                "You were already asleep when I got back.",
+            pose = "facing_left",
+            rose = "eyes_right",
+            responses = {
+                {"I see.", {}},
+                {"Why come here?", {}, "wtf"},
+                {"Who let you in?", {who_let_you_in=1000}}
+            }
+        },
+
+        {
+            pos = {who_let_you_in=1000},
+            text = "Um%.%.%. I did?%% With my key?",
+            pose = "facing_left",
+            rose = "normal",
+            responses = {
+                {"Why do you have a key?", {}, "wtf"},
+                {"You live here?", {}, "brain_problems"},
+                {"Oh.", {}}
+            }
+        }
+
     },
 
     -- starting point
@@ -59,7 +86,7 @@ local dialog = {
             responses = {
                 {"Hi...", {}, "normal"},
                 {"Who are you...?", {}, "last_night"},
-                {"What are you doing here?", {}, "alienated"},
+                {"What are you doing here?", {what_doing=1000}, "alienated"},
                 {nil, {}, "silence"}
             }
         },
@@ -82,7 +109,7 @@ local dialog = {
             responses = {
                 {"...good morning...", {}, "normal"},
                 {"Who are you?", {}, "last_night"},
-                {"What are you doing here?", {}, "alienated"},
+                {"What are you doing here?", {what_doing=1000}, "alienated"},
                 {nil, {}, "silence"}
             }
         }
@@ -378,7 +405,7 @@ local dialog = {
             rose = "eyes_right",
             responses = {
                 {"Who are you?", {}, "brain_problems"},
-                {"What are you doing here?", {nrm_what_doing=100}, "last_night"},
+                {"What are you doing here?", {what_doing=1000}, "last_night"},
                 {"Why are you in my house?", {}, "wtf"}
             }
         },
@@ -428,7 +455,7 @@ local dialog = {
         {
             pos = {phase=4, normal_camehome=0},
             text = "I'm a bit frustrated about last night.",
-            pose = "facing_right",
+            pose = "facing_left",
             responses = {
                 {"What happened?", {}, "last_night"},
                 {"Did I promise you something?", {normal_camehome=100, normal_whathuh=100}},
@@ -775,7 +802,7 @@ local dialog = {
     -- path where Greg thinks "who are you?" is metaphorically, about his behavior last night
     last_night = {
         {
-            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0, mention_lastnight=0},
+            pos = {phase=2, what_doing=0, ln_whatcameover=0, mention_lastnight=0},
             text = "I'm sorry, hon. I really don't know what came over me last night.",
             pose = "facing_left",
             setPos = {ln_whatcameover=100,mention_lastnight=100},
@@ -786,7 +813,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=2, nrm_what_doing=0, ln_whatcameover=0, mention_lastnight=100},
+            pos = {phase=2, what_doing=0, ln_whatcameover=0, mention_lastnight=100},
             text = "I'm sorry, hon. I really don't know what came over me.",
             pose = {"right_of_rose", "facing_left"},
             setPos = {ln_whatcameover=100,mention_lastnight=100},
@@ -798,7 +825,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=3, nrm_what_doing=0, ln_whatcameover=100},
+            pos = {phase=3, what_doing=0, ln_whatcameover=100},
             text = "Just... something you said set me off a little bit...% and...% you know how I get sometimes.",
             pose = {"left_of_couch", "facing_right"},
             responses = {
@@ -809,13 +836,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=3, nrm_what_doing=100},
-            text = "What's with the tone?%% I just took a walk after we got home,% to clear my head.%% " ..
-                "You were already asleep when I got back.",
-        },
-
-        {
-            pos = {phase=3.5, nrm_what_doing=0},
+            pos = {phase=3.5, what_doing=0},
             text = "But, we made it home safely... That taxi driver sure seemed uncomfortable though.",
             responses = {
                 {"Taxi driver?", {lastnight_taxi=10}},
@@ -1317,7 +1338,7 @@ local dialog = {
 
         {
             pos = {bp_ofwhat=100},
-            pose = {"left_of_couch", "facing_right"},
+            pose = "left_of_couch",
             text = ".%.%.%Of senile dementia.%% Of...% forgetting everything.",
             rose = "normal",
             responses = {
@@ -1714,7 +1735,7 @@ local dialog = {
             responses = {
                 {"Not a game...", {}},
                 {"Yeah, it's called 'Refactor'", {}, "brain_problems"},
-                {"I want the " .. prevTrackDescription .. " back.", {}, "brain_problems"}
+                {"I want the " .. prevTrackDescription() .. " back.", {}, "brain_problems"}
             }
         },
 
@@ -1775,7 +1796,7 @@ local dialog = {
         {
             pos = {phase=4},
             text = "You're awfully upset at me. What the heck is going on lately?",
-            pose = "couch_sitting_thinking",
+            pose = "couch_sitting",
             responses = {
                 {"Time keeps on passing.", {alien_nonanswer=100}},
                 {"Lately...?", {}, "normal"},
@@ -2073,21 +2094,21 @@ local dialog = {
         },
 
         {
-            pos = {phase=10},
+            pos = {phase=10,gu_prereq=500},
             text = "Ha ha.%.%.% everything we've been through...%% it's just meaningless now, isn't it?",
             pose = "left_of_couch",
             cantInterrupt=true
         },
 
         {
-            pos = {phase=10.5},
+            pos = {phase=10.5,gu_prereq=500},
             pose = "right_of_rose",
             text = "What does it matter? You won't even remember this anyway.",
             cantInterrupt=true
         },
 
         {
-            pos = {phase=11},
+            pos = {phase=11,gu_prereq=500},
             pose = "below_doors",
             text = "% .%.%.% %%You don't even...% remember...%% me.",
             rose = "normal",
@@ -2095,7 +2116,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=12},
+            pos = {phase=12,gu_prereq=500},
             text = "I just can't do this anymore.",
             pose = {"below_doors", "facing_up"},
             setPos = {leaving=1000},
@@ -2104,7 +2125,7 @@ local dialog = {
         },
 
         {
-            pos = {leaving=1000},
+            pos = {phase=12,gu_prereq=500,leaving=1000},
             text = "I hope you get the help you need.",
             pose = {"below_doors","leaving","pause","gone"},
             setPos = {gone=1000}
@@ -2121,7 +2142,7 @@ local dialog = {
     -- state where Greg believes Rose is having a stroke
     stroke = {
         {
-            pos = {phase=5},
+            pos = {phase=5, stroke_state=0},
             text = "Hon? %.%.%. Are you feeling okay?",
             pose = {"next_to_rose", "facing_left"},
             rose = "closed",
@@ -2133,7 +2154,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=6},
+            pos = {phase=6, stroke_state=0},
             text = "What's going on?% Are you feeling% okay?",
             pose = {"next_to_rose", "facing_left"},
             responses = {
@@ -2144,7 +2165,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=7},
+            pos = {phase=7, stroke_state=0},
             text = "Can you feel your face? Try to wiggle your fingers.",
             pose = {"next_to_rose", "facing_left"},
             responses = {
@@ -2159,7 +2180,7 @@ local dialog = {
             text = "You can't? Not even a little?",
             pose = {"next_to_rose", "facing_left"},
             responses = {
-                {"I don't have the frames.", {}},
+                {"Nobody drew the frames for that.", {}},
                 {"They're like little squares.", {}},
                 {"No...", {}}
             }
@@ -2167,7 +2188,7 @@ local dialog = {
 
         {
             pos = {phase=8},
-            text = "Could you try repeating this sentence? \"Everything is fine, and I'm doing okay.\"",
+            text = "Could you try repeating this sentence? \"Everything is going to be fine, and I'm doing okay.\"",
             rose = "eyes_right",
             pose = {"next_to_rose", "facing_left"},
             responses = {
