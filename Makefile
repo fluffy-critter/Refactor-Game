@@ -71,8 +71,8 @@ run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
 # .love bundle
-love-bundle: setup $(DEST)/love/$(NAME).love
-$(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f) $(DEST)/.assets
+love-bundle: setup assets $(DEST)/love/$(NAME).love
+$(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
 	rm -f ../$(@) && \
