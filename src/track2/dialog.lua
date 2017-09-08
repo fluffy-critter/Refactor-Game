@@ -1149,14 +1149,14 @@ local dialog = {
             pose = {"facing_right", "pause", "pause", "facing_left"},
             rose = "eyes_right",
             responses = {
-                {"Like what?", {bp_stranger=0,bp_likewhat=200}},
+                {"Like what?", {bp_stranger=0,bp_likewhat=100}},
                 {"No I haven't...", {bp_stranger=10,bp_yes_you_have=50}},
                 {"Who are you?", {bp_stranger=20}}
             }
         },
 
         {
-            pos = {bp_likewhat=200},
+            pos = {bp_likewhat=100},
             text = "Well, like who I am, to start with.",
             rose = "normal"
         },
@@ -1617,7 +1617,7 @@ local dialog = {
             pose = "next_to_rose",
             setPos = {bp_i_wonder=100},
             responses = {
-                {"What have I forgotten?", {}},
+                {"What have I forgotten?", {bp_likewhat=100}},
                 {"I'm so confused.", {}},
                 {"What's going on?", {}}
             }
@@ -1627,7 +1627,7 @@ local dialog = {
             text = "I wonder how long this has been going on... Let's go to the doctor.",
             setPos = {bp_i_wonder=100},
             responses = {
-                {"What have I forgotten?", {}},
+                {"What have I forgotten?", {bp_likewhat=100}},
                 {"I'm so confused.", {}},
                 {"What's going on?", {}}
             }
@@ -1660,14 +1660,31 @@ local dialog = {
         {
             pos = {phase=13, bp_sullen=100, bp_prerequisite=100},
             text = "Please don't be like this...%% Let's go to the doctor,% okay hon?",
+            setPos = {bp_sullen=0},
             pose = "below_doors",
             maxCount = 20,
             responses = {
                 {"A doctor? Why?", {}},
                 {"I don't want to...", {}},
-                {"You're trying to trick me.", {}},
+                {"What have I forgotten?", {bp_likewhat=100}},
                 {nil, {bp_sullen=100}}
             }
+        },
+
+        {
+            pos = {bp_likewhat=200},
+            setPos = {bp_likewhat=100},
+            text = "You've forgotten who I am..."
+        },
+        {
+            pos = {bp_likewhat=200},
+            setPos = {bp_likewhat=100},
+            text = "You've forgotten what we're married..."
+        },
+        {
+            pos = {bp_likewhat=200},
+            setPos = {bp_likewhat=100},
+            text = "You've forgotten that I love you..."
         },
     },
 
