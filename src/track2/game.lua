@@ -227,29 +227,64 @@ function Game:start()
 
             if self.dialogState == "wtf" or self.dialogState == "alienated" then
                 flashOut = {127,0,255,0}
-                -- selections = {self.scenes.therapist(), self.scenes.vacation(), self.scenes.parkbench(true)}
+                selections = {
+                    self.scenes.missing("therapist"),
+                    self.scenes.missing("vacation"),
+                    self.scenes.missing("parkbench"),
+                }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
-                -- selections = {scenes.hospital(), scenes.therapist(), various kitchen variants, scenes.doctor()}
+                selections = {
+                    self.scenes.missing("hospital"),
+                    self.scenes.missing("doctor"),
+                    self.kitchenScene,
+                    self.scenes.missing("therapist"),
+                    self.kitchenScene,
+                    self.scenes.missing("parkbench"),
+                    self.kitchenScene,
+                    self.scenes.missing("doctor"),
+                }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
                 flashOut = {0,0,255,0}
-                -- selections = {parkbench(false)}
+                selections = {self.scenes.missing("parkbench")}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
-                -- selections = {self.scenes.vacation()}
+                selections = {self.scenes.missing("vacation")}
             end
 
             if selections and #selections > 1 then
+                -- collate a list of greg poses
+                local gregPoses = {}
+                local rosePoses = {}
+
+                -- TODO this should really just be sets of positions and frames/animations (including greg crying)
+                for v in pairs(self.kitchenScene.greg.pose) do
+                    table.insert(gregPoses, v)
+                end
+
+                for _,v in pairs(self.kitchenScene.rose.animations) do
+                    table.insert(rosePoses, v)
+                end
+
                 -- cycle through the selections every other beat
+                local idx = 1
                 for when in clock.iterator({13}, {15,0,-1}, {0,0,2}) do
+                    print(idx)
+                    local which = selections[idx]
                     self.eventQueue:addEvent({
                         when = when, what = function()
-                            self.sceneStack = {selections[idx]}
+                            print(which)
+                            self.sceneStack = {which}
+
+                            -- TODO just pop greg to a pose
+                            self:setPose(self.kitchenScene.greg, gregPoses[math.random(#gregPoses)])
+                            self.kitchenScene.rose.animation = rosePoses[math.random(#rosePoses)]
                         end
                     })
+                    idx = (idx % #selections) + 1
                 end
             elseif selections and #selections == 1 then
                 self.sceneStack = selections
