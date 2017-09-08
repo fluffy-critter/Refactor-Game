@@ -187,6 +187,35 @@ notion("clock", function()
         check(clock.timeToPos(clock.posToTime({0,8,0}))).shallowMatches({1,0,0})
         check(clock.timeToPos(clock.posToTime({0,1,-1}))).shallowMatches({0,0,3})
     end)
+
+    notion("normalize", function()
+        check(clock.normalize({0,0,0})).shallowMatches({0,0,0})
+        check(clock.normalize({0,0,4})).shallowMatches({0,1,0})
+        check(clock.normalize({0,8,0})).shallowMatches({1,0,0})
+        check(clock.normalize({0,8,-1})).shallowMatches({0,7,3})
+        check(clock.normalize({1,0,-1})).shallowMatches({0,7,3})
+    end)
+
+    notion("addOffset", function()
+        check(clock.addOffset({1}, {0,0,1})).shallowMatches({1,0,1})
+        check(clock.addOffset({1}, {0,0,-1})).shallowMatches({0,7,3})
+    end)
+
+    notion("iteration", function()
+        local posArr = {}
+        for t in clock.iterator({1,2,0}, {1,5,1}, {0,0,2}) do
+            table.insert(posArr, t)
+        end
+
+        check(#posArr).is(7)
+        check(posArr[1]).shallowMatches({1,2,0})
+        check(posArr[2]).shallowMatches({1,2,2})
+        check(posArr[3]).shallowMatches({1,3,0})
+        check(posArr[4]).shallowMatches({1,3,2})
+        check(posArr[5]).shallowMatches({1,4,0})
+        check(posArr[6]).shallowMatches({1,4,2})
+        check(posArr[7]).shallowMatches({1,5,0})
+    end)
 end)
 
 notion("runQueue", function()

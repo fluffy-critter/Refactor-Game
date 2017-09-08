@@ -198,10 +198,11 @@ ofs - time offset for the start of the clock
 
 Returns an object with methods:
 
-timeToPos - converts a numerical position to a position array
-posToTime - converts a position array to a numerical position
-normalize - normalize an offset array with the proper modulus
-addOffset - add an offset array to a position array, returning a new position array
+timeToPos(time) - converts a numerical position to a position array
+posToTime(pos) - converts a position array to a numerical position
+normalize(pos) - normalize an offset array with the proper modulus
+addOffset(pos, delta) - add an offset array to a position array, returning a new position array
+iterator(startTime, endTime, delta) - returns an iterator that starts at startTime, ends at endTime, incrs by delta
 ]]
 function util.clock(BPM, limits, ofs)
     ofs = ofs or 0
@@ -234,17 +235,31 @@ function util.clock(BPM, limits, ofs)
 
     local addOffset = function(time, delta)
         local newPos = {}
-        for k,v in ipairs(time) do
-            newPos[k] = v + (delta[k] or 0)
+        for k,v in ipairs(delta) do
+            newPos[k] = v + (time[k] or 0)
         end
         return normalize(newPos)
+    end
+
+    local iterator = function(startTime, endTime, delta)
+        local pos = startTime
+        return function()
+            if util.arrayLT(endTime, pos) then
+                return nil
+            end
+
+            local ret = util.shallowCopy(pos)
+            pos = addOffset(pos, delta)
+            return ret
+        end
     end
 
     return {
         timeToPos = timeToPos,
         posToTime = posToTime,
         normalize = normalize,
-        addOffset = addOffset
+        addOffset = addOffset,
+        iterator = iterator
     }
 end
 
