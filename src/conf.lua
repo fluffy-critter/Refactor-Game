@@ -14,11 +14,11 @@ function love.conf(t)
     t.window.width = 1280
     t.window.height = 720
     -- t.window.height = 960
-    t.window.vsync = false
+    -- t.window.vsync = false
     -- t.window.fullscreen = true
 
     t.version = "0.10.2"
 
-    t.identity = "biz.beesbuzz.Refactor"
+    t.identity = "SockpuppetRefactor"
     t.window.title = "Sockpuppet - Refactor"
 end

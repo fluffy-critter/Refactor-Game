@@ -92,10 +92,10 @@ function Game:init()
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
-    local tonemapFmt = util.selectCanvasFormat("rgba32f", "rgba8")
+    local tonemapFmt = util.selectCanvasFormat("rgba8")
     if tonemapFmt then
-        self.layers.toneMap = love.graphics.newCanvas(1280, 720, pixelfmt)
-        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, pixelfmt)
+        self.layers.toneMap = love.graphics.newCanvas(1280, 720, tonemapFmt)
+        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, tonemapFmt)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end

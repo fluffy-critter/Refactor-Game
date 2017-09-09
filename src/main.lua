@@ -37,7 +37,7 @@ setmetatable(_G, {
 })
 
 local PROFILE = false
-local DEBUG = false
+local DEBUG = true
 
 local Pie
 if PROFILE then
@@ -409,6 +409,7 @@ function love.draw()
 
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
+        love.graphics.setFont(fonts.debug)
         love.graphics.printf(math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
     end
 end

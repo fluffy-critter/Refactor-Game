@@ -1576,7 +1576,7 @@ local dialog = {
             setPos = {bp_explains_so_much=100,bp_prerequisite=100},
             responses = {
                 {"What's so funny?", {}},
-                {"Please don't laugh...", {}},
+                {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
                 {nil, {}, "silence"}
             }

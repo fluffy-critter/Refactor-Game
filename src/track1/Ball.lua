@@ -135,14 +135,14 @@ function Ball:postUpdate(dt)
     end
 
     if self.minVelocity and self.ax == 0 and self.ay == 0 then
-        local vv = geom.vectorLength({self.vx, self.vy})
-        if vv < self.minVelocity then
+        local vv = self.vx*self.vx + self.vy*self.vy
+        if vv < self.minVelocity*self.minVelocity then
             -- print("kicking ball from " .. vv .. " to " .. self.minVelocity)
             local tvx, tvy
             if vv == 0 then
                 tvx, tvy = unpack(geom.randomVector(self.spawnVelocity))
             else
-                local factor = self.minVelocity/vv
+                local factor = self.minVelocity/math.sqrt(vv)
                 tvx = self.vx*factor
                 tvy = self.vy*factor
             end
