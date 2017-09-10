@@ -1,3 +1,4 @@
 #!/bin/sh
 
-echo "Someday this will build assets"
+# if we ever have automated art updates, they go here.
+

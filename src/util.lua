@@ -46,7 +46,7 @@ function util.enum(...)
     setmetatable(enum, {
         -- allows [de]serializing based on value, eg MyEnum(3)
         __call = function(_, n)
-            return enum[n]
+            return enum[vals[n]]
         end
     })
 
@@ -77,6 +77,10 @@ function util.arrayLT(a1, a2)
         end
     end
 
+    if #a1 < #a2 then
+        return true
+    end
+
     return false
 end
 
@@ -94,20 +98,22 @@ function util.arrayEQ(a1, a2)
 end
 
 -- Makes an array comparable
+local arrayComparableMeta = {
+    __lt = util.arrayLT,
+    __le = function(a1, a2)
+        return not util.arrayLT(a2, a1)
+    end,
+    __eq = util.arrayEQ
+}
 function util.comparable(ret)
-    setmetatable(ret, {
-        __lt = util.arrayLT,
-        __le = function(a1, a2)
-            return not util.arrayLT(a2, a1)
-        end,
-        __eq = util.arrayEQ
-    })
+    setmetatable(ret, arrayComparableMeta)
     return ret
 end
 
 -- Generate a weak reference to an object
+local weakRefMeta = {__mode="v"}
 function util.weakRef(data)
-    local weak = setmetatable({content=data}, {__mode="v"})
+    local weak = setmetatable({content=data}, weakRefMeta)
     return function() return weak.content end
 end
 
@@ -151,6 +157,7 @@ end
 
 -- Select the most-preferred canvas format from a list of formats
 local graphicsFormats = love.graphics.getCanvasFormats()
+-- for k,v in pairs(graphicsFormats) do print(k,v) end
 function util.selectCanvasFormat(...)
     for _,k in ipairs({...}) do
         if graphicsFormats[k] then
@@ -181,5 +188,160 @@ function util.smoothStep(x)
     return x*x*(3 - 2*x)
 end
 
+--[[ Returns a game clock
+BPM - tempo
+
+limits - the limits for each cadence; e.g. {8,4} = 8 measures per phase, 4 beats per measure.
+    Can go as deeply as desired; position array is returned as most-significant first
+
+ofs - time offset for the start of the clock
+
+Returns an object with methods:
+
+timeToPos(time) - converts a numerical position to a position array
+posToTime(pos) - converts a position array to a numerical position
+normalize(pos) - normalize an offset array with the proper modulus
+addOffset(pos, delta) - add an offset array to a position array, returning a new position array
+iterator(startTime, endTime, delta) - returns an iterator that starts at startTime, ends at endTime, incrs by delta
+]]
+function util.clock(BPM, limits, ofs)
+    ofs = ofs or 0
+
+    local timeToPos = function(time)
+        local remaining = (time - ofs)*BPM/60
+        local pos = {}
+        for idx = #limits, 1, -1 do
+            local sz = limits[idx]
+            local v = remaining % sz
+            pos[idx + 1] = v
+            remaining = (remaining - v)/sz
+        end
+        pos[1] = remaining
+        return pos
+    end
+
+    local posToTime = function(pos)
+        local beat = 0
+        for idx,sz in ipairs(limits) do
+            beat = (beat + (pos[idx] or 0))*sz
+        end
+        beat = beat + (pos[#limits + 1] or 0)
+        return beat*60/BPM + ofs
+    end
+
+    local normalize = function(pos)
+        return timeToPos(posToTime(pos))
+    end
+
+    local addOffset = function(time, delta)
+        local newPos = {}
+        for k,v in ipairs(delta) do
+            newPos[k] = v + (time[k] or 0)
+        end
+        return normalize(newPos)
+    end
+
+    local iterator = function(startTime, endTime, delta)
+        local pos = normalize(startTime)
+        endTime = normalize(endTime)
+        return function()
+            if util.arrayLT(endTime, pos) then
+                return nil
+            end
+
+            local ret = util.shallowCopy(pos)
+            pos = addOffset(pos, delta)
+            return ret
+        end
+    end
+
+    return {
+        timeToPos = timeToPos,
+        posToTime = posToTime,
+        normalize = normalize,
+        addOffset = addOffset,
+        iterator = iterator
+    }
+end
+
+-- Like ipairs(sequence) except it can take arbitrarily many tables. Returns tbl,idx,value
+function util.cpairs(...)
+    local tables = {...}
+    local wtbl = 1
+    local widx = 1
+
+    return function()
+        local tbl = tables[wtbl]
+
+        while tbl and widx > #tbl and wtbl <= #tables do
+            widx = 1
+            wtbl = wtbl + 1
+            tbl = tables[wtbl]
+        end
+        if not tbl then
+            return
+        end
+
+        local pidx = widx
+        widx = widx + 1
+        return tbl,pidx,tbl[pidx]
+    end
+end
+
+-- Like pairs(sequence) except it can take arbitrarily many tables.
+function util.mpairs(...)
+    local queue = {...}
+
+    local func, tbl, state = pairs(queue[1])
+    table.remove(queue, 1)
+
+    return function()
+        local ns, val = func(tbl, state)
+        while not ns and #queue > 0 do
+            func, tbl, state = pairs(queue[1])
+            ns, val = func(tbl, state)
+            table.remove(queue, 1)
+        end
+        state = ns
+        return ns, val
+    end, tbl, state
+end
+
+-- Shallow copy a table
+function util.shallowCopy(tbl)
+    if type(tbl) ~= "table" then
+        return tbl
+    end
+
+    local ret = {}
+    for k,v in pairs(tbl) do
+        ret[k] = v
+    end
+    return ret
+end
+
+-- Convert a list into a set
+function util.set(...)
+    local ret = {}
+    for _,v in ipairs({...}) do
+        ret[v] = true
+    end
+    return ret
+end
+
+-- Run a function on a sequence as a queue; the function takes an item, and returns whether the item has been consumed
+function util.runQueue(queue, consume)
+    local removes = {}
+    for idx,item in ipairs(queue) do
+        if consume(item) then
+            table.insert(removes, idx)
+        end
+    end
+
+    for i = #removes,1,-1 do
+        queue[removes[i]] = queue[#queue]
+        queue[#queue] = nil
+    end
+end
 
 return util

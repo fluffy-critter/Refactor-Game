@@ -6,8 +6,20 @@ Refactor
 ]]
 
 local fonts = {
+    bodoni72 = {
+        regular = love.graphics.newFont("fonts/Bodoni72Regular.fnt"),
+        bold = love.graphics.newFont("fonts/Bodoni72Bold.fnt"),
+        italic = love.graphics.newFont("fonts/Bodoni72Italic.fnt"),
+    },
+    debug = love.graphics.newFont(8),
     scoreboard = love.graphics.newFont("fonts/scoreboard.fnt"),
-    centuryGothicDigits = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789")
+    centuryGothicDigits = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789"),
+    returnOfGanon = {
+        red = love.graphics.newFont("fonts/ReturnOfGanon.fnt", "fonts/ReturnOfGanon_0-red.png"),
+        blue = love.graphics.newFont("fonts/ReturnOfGanon.fnt", "fonts/ReturnOfGanon_0-blue.png"),
+        ttf16 = love.graphics.newFont("fonts/ReturnOfGanon.ttf", 16)
+    },
+    chronoTrigger = love.graphics.newFont("fonts/ChronoTrigger.ttf", 16)
 }
 
 return fonts

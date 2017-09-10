@@ -18,12 +18,13 @@ GAME_VERSION=$(shell git rev-parse --short HEAD)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
-.PHONY: clean all
+.PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
+.PHONY: commit-check
 .PHONY: love-bundle osx win32 win64
 .PHONY: assets setup tests checks
 
-all: love-bundle osx win32 win64
+all: checks tests love-bundle osx win32 win64
 
 clean:
 	rm -rf build
@@ -31,8 +32,7 @@ clean:
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
 
-publish-precheck:
-	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
+publish-precheck: commit-check checks test-bundle
 
 publish-status:
 	butler status $(TARGET)
@@ -41,38 +41,45 @@ publish-status:
 publish-wait:
 	@ while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
 
+commit-check:
+	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
+
 setup: $(DEST)/.setup
 $(DEST)/.setup: .gitmodules
+	@which luacheck 1>/dev/null || (echo \
+		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
+		&& false )
 	mkdir -p $(DEST)
 	git submodule update --init --recursive
 	git submodule update --recursive
 	touch $(@)
-	@which luacheck 1>/dev/null || (echo \
-		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
-		&& false )
 
-assets: $(DEST)/.assets
-$(DEST)/.assets: $(shell find raw_assets -name '*.png' -or -name '*.wav')
-	mkdir -p $(DEST)
-	./update-art.sh
-	touch $(@)
+assets:
+	@ ./update-art.sh
 
-checks:
+# TODO grab the binary out of the appropriate platform version
+tests: setup
+	love $(SRC) --cute-headless
+
+test-bundle: setup $(DEST)/love/$(NAME).love
+	love $(DEST)/love/$(NAME).love --cute-headless
+
+checks: setup
 	find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
 
 run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
 # .love bundle
-love-bundle: setup $(DEST)/love/$(NAME).love
-$(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f) $(DEST)/.assets
+love-bundle: setup assets $(DEST)/love/$(NAME).love
+$(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
 	rm -f ../$(@) && \
 	zip -9r ../$(@) .
 
-publish-love: $(DEST)/.published-love
-$(DEST)/.published-love: $(DEST)/love/$(NAME).love
+publish-love: $(DEST)/.published-love-$(GAME_VERSION)
+$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love
 	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
@@ -82,10 +89,11 @@ $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/dep
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
 	cp osx/Info.plist $(@)/Contents && \
+	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love/$(NAME).love $(@)/Contents/Resources
 
-publish-osx: $(DEST)/.published-osx
-$(DEST)/.published-osx: $(DEST)/osx/$(NAME).app
+publish-osx: $(DEST)/.published-osx-$(GAME_VERSION)
+$(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app
 	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
 
 # OSX build dependencies
@@ -118,8 +126,8 @@ $(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
 
-publish-win32: $(DEST)/.published-win32
-$(DEST)/.published-win32: $(DEST)/win32/$(NAME).exe
+publish-win32: $(DEST)/.published-win32-$(GAME_VERSION)
+$(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
@@ -129,7 +137,10 @@ $(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
 
-publish-win64: $(DEST)/.published-win64
-$(DEST)/.published-win64: $(DEST)/win64/$(NAME).exe
+publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
+$(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
+
+
+#### asset rules go down here

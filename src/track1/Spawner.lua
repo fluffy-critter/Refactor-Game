@@ -9,6 +9,8 @@ retain - whether to retain spawned items (for future killing)
 
 ]]
 
+local util = require('util')
+
 local Spawner = {}
 
 function Spawner.new(game, o)
@@ -23,6 +25,9 @@ end
 
 function Spawner:onInit()
     self.time = 0
+
+    -- TODO this could probably just use EventQueue
+
     self.nextEvent = nil
     self.queue = {}
 end
@@ -59,23 +64,17 @@ function Spawner:update(dt)
         return
     end
 
-    local removes = {}
-    self.nextEvent = nil
-
-    for idx,spawn in pairs(self.queue) do
+    util.runQueue(self.queue, function(spawn)
         if spawn.when <= self.time then
             local obj = spawn.class.new(self.game, spawn.item)
             for _,tgt in pairs(spawn.targets) do
                 table.insert(tgt, obj)
             end
-            table.insert(removes, idx)
+            return true
         elseif not self.nextEvent or spawn.when < self.nextEvent then
             self.nextEvent = spawn.when
         end
-    end
-    for _,r in ipairs(removes) do
-        self.queue[r] = nil
-    end
+    end)
 end
 
 function Spawner:kill()

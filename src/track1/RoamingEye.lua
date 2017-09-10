@@ -95,6 +95,8 @@ function RoamingEye:onInit()
     self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, canvasFormat, 2)
 
     self.circle = imagepool.load('images/circlefill.png', {mipmaps = true})
+
+    self.shader = shaders.load("track1/sphereDistort.fs")
 end
 
 function RoamingEye:isAlive()
@@ -276,11 +278,12 @@ function RoamingEye:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.setColor(alpha, alpha, alpha, alpha)
-        love.graphics.setShader(shaders.sphereDistort)
-        shaders.sphereDistort:send("gamma", 0.9)
-        shaders.sphereDistort:send("env", self.game.canvas)
-        shaders.sphereDistort:send("center", {self.x/1280, self.y/720})
-        shaders.sphereDistort:send("reflectSize", {self.r/128, self.r/72})
+        local shader = self.shader
+        love.graphics.setShader(shader)
+        shader:send("gamma", 0.9)
+        shader:send("env", self.game.canvas)
+        shader:send("center", {self.x/1280, self.y/720})
+        shader:send("reflectSize", {self.r/128, self.r/72})
         love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
         love.graphics.setShader()
 

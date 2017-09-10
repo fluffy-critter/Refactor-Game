@@ -17,6 +17,7 @@ local FlappyBat = require('track1.FlappyBat')
 
 local Spawner = require('track1.Spawner')
 
+local EventQueue = require('EventQueue')
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
@@ -25,6 +26,7 @@ local fonts = require('fonts')
 
 local Game = {
     META = {
+        tracknum = 1,
         title = "little bouncing ball",
         duration = 5*60 + 26
     }
@@ -40,46 +42,37 @@ end
 
 local BPM = 132
 
+local clock = util.clock(BPM, {16, 4})
+
 -- returns music position as {phase, measure, beat}. beat will be fractional.
 function Game:musicPos()
-    local beat = self.music:tell()*BPM/60
-
-    local measure = math.floor(beat/4)
-    beat = beat - measure*4
-
-    local phase = math.floor(measure/16)
-    measure = measure - phase*16
-
-    return {phase, measure, beat}
+    return clock.timeToPos(self.music:tell())
 end
 
---[[ seeks the music to a particular spot, using the same format as musicPos(),
-with an additional timeOfs param that adjusts it by seconds
-]]
-function Game:seekMusic(phase, measure, beat, timeOfs)
-    local time = (phase or 0)
-    time = time*16 + (measure or 0)
-    time = time*4 + (beat or 0)
-    time = time*60/BPM + (timeOfs or 0)
-    self.music:seek(time)
+--[[ seeks the music to a particular spot, using the same format as musicPos(), with an additional
+timeOfs param that adjusts it by seconds ]]
+function Game:seekMusic(pos, timeOfs)
+    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
-    self.toneMap = true -- do the HDR thing
 
     self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
 
     local limits = love.graphics.getSystemLimits()
+    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     self.canvas = love.graphics.newCanvas(1280, 720)
 
     self.layers = {}
-    self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
-    self.layers.overlay = love.graphics.newCanvas(1280, 720)
+    self.layers.arena = love.graphics.newCanvas(1280, 720, pixelfmt, limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(1280, 720, pixelfmt)
+
+    self.shaders = {}
 
     local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f")
     if waterFormat then
@@ -93,12 +86,19 @@ function Game:init()
             fresnel = 0.1,
             sampleRadius = 5.5,
         }
+        self.shaders.waterRipple = shaders.load("track1/waterRipple.fs")
+        self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     else
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
-    self.layers.toneMap = love.graphics.newCanvas(1280, 720)
-    self.layers.toneMapBack = love.graphics.newCanvas(1280, 720)
+    local tonemapFmt = util.selectCanvasFormat("rgba8")
+    if tonemapFmt then
+        self.layers.toneMap = love.graphics.newCanvas(1280, 720, tonemapFmt)
+        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, tonemapFmt)
+        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
+        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
+    end
 
     self.bounds = {
         left = 32,
@@ -207,11 +207,12 @@ function Game:init()
     self.spawner = Spawner.new(self)
     self.toKill = {}
 
-    self.eventQueue = {}
-    self.nextEvent = nil
-    self:setGameEvents()
-
+    self.eventQueue = EventQueue.new()
     self.scoreFont = fonts.centuryGothicDigits
+end
+
+function Game:start()
+    self:setGameEvents()
 end
 
 function Game:defer(item)
@@ -219,10 +220,7 @@ function Game:defer(item)
 end
 
 function Game:addEvent(event)
-    table.insert(self.eventQueue, event)
-    if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-        self.nextEvent = event.when
-    end
+    self.eventQueue:addEvent(event)
 end
 
 function Game:setGameEvents()
@@ -514,7 +512,7 @@ function Game:setGameEvents()
         end
     }
 
-    self.eventQueue = {
+    self.eventQueue:addEvents({
         {
             when = {0},
             what = function()
@@ -698,9 +696,7 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.eyes.boss()
             end
         },
-    }
-
-    self.nextEvent = {0}
+    })
 end
 
 function Game:setPhase(phase)
@@ -733,28 +729,7 @@ function Game:onButtonPress(button)
     if button == 'skip' then
         print("tryin' ta skip")
         self.spawner.queue = {}
-        self:seekMusic(self.phase + 1)
-    end
-end
-
-function Game:runEvents(time)
-    if not self.nextEvent or util.arrayLT(time, self.nextEvent) then
-        return
-    end
-
-    local removes = {}
-    self.nextEvent = nil
-
-    for idx,event in pairs(self.eventQueue) do
-        if not util.arrayLT(time, event.when) then
-            event.what(unpack(event.args or {}))
-            table.insert(removes, idx)
-        elseif not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-            self.nextEvent = event.when
-        end
-    end
-    for _,r in ipairs(removes) do
-        self.eventQueue[r] = nil
+        self:seekMusic({self.phase + 1})
     end
 end
 
@@ -769,7 +744,7 @@ function Game:update(raw_dt)
             self:setPhase(phase)
         end
 
-        self:runEvents(time)
+        self.eventQueue:runEvents(time)
     end
 
     if self.phase >= 11 then
@@ -879,30 +854,18 @@ function Game:update(raw_dt)
         end
 
         local function doPostUpdates(cur)
-            local removes = {}
-            for idx,thing in pairs(cur) do
+            util.runQueue(cur, function(thing)
                 thing:postUpdate(dt, rawt)
-                if not thing:isAlive() then
-                    table.insert(removes, idx)
-                end
-            end
-            for _,r in pairs(removes) do
-                cur[r] = nil
-            end
+                return not thing:isAlive()
+            end)
         end
 
         doPostUpdates(self.balls)
         doPostUpdates(self.actors)
 
-        local removes = {}
-        for idx,particle in pairs(self.particles) do
-            if not particle:update(dt) then
-                table.insert(removes, idx)
-            end
-        end
-        for _,r in pairs(removes) do
-            self.particles[r] = nil
-        end
+        util.runQueue(self.particles, function(particle)
+            return not particle:update(dt)
+        end)
     end
 
     for _ = 1, 8 do
@@ -960,7 +923,7 @@ function Game:update(raw_dt)
 
     if self.waterParams then
         self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
-            shaders.waterRipple, {
+            self.shaders.waterRipple, {
                 psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
                 damp = self.waterParams.damp,
                 fluidity = self.waterParams.fluidity,
@@ -1015,17 +978,18 @@ function Game:draw()
 
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.clear(0,0,0,0)
+        love.graphics.clear(0,0,0,255)
         love.graphics.setColor(255, 255, 255, 255)
 
         if self.waterParams then
-            love.graphics.setShader(shaders.waterReflect)
-            shaders.waterReflect:send("psize", {1.0/1280, 1.0/720})
-            shaders.waterReflect:send("rsize", self.waterParams.rsize)
-            shaders.waterReflect:send("fresnel", self.waterParams.fresnel);
-            shaders.waterReflect:send("source", self.layers.arena)
-            shaders.waterReflect:send("bgColor", {0, 0, 0, 0})
-            shaders.waterReflect:send("waveColor", {0.1, 0, 0.5, 1})
+            local shader = self.shaders.waterReflect
+            love.graphics.setShader(shader)
+            shader:send("psize", {1.0/1280, 1.0/720})
+            shader:send("rsize", self.waterParams.rsize)
+            shader:send("fresnel", self.waterParams.fresnel);
+            shader:send("source", self.layers.arena)
+            shader:send("bgColor", {0, 0, 0, 0})
+            shader:send("waveColor", {0.1, 0, 0.5, 1})
             love.graphics.draw(self.layers.water)
             love.graphics.setShader()
         end
@@ -1039,15 +1003,15 @@ function Game:draw()
         love.graphics.print(self.score, 0, 0)
     end)
 
-    if self.toneMap then
+    if self.layers.toneMap then
         util.mapShader(self.canvas, self.layers.toneMap,
-            shaders.gaussToneMap, {
+            self.shaders.gaussToneMap, {
                 sampleRadius = {1/1280, 0},
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
         self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            shaders.gaussBlur, {
+            self.shaders.gaussBlur, {
                 sampleRadius = {0, 1/720}
             })
 

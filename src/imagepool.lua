@@ -22,7 +22,16 @@ function imagepool.load(filename, cfg)
 
     local img = imagepool.pool[key]
     if not img then
-        img = love.graphics.newImage(filename, {mipmaps = cfg.mipmaps})
+        if cfg.premultiply then
+            local data = love.image.newImageData(filename)
+            data:mapPixel(function(_,_,r,g,b,a)
+                return r*a/255, g*a/255, b*a/255, a
+            end)
+            img = love.graphics.newImage(data)
+        else
+            img = love.graphics.newImage(filename, {mipmaps = cfg.mipmaps})
+        end
+
         if cfg.mipmaps then
             img:setMipmapFilter("linear")
         end

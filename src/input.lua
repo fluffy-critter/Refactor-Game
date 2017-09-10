@@ -48,10 +48,10 @@ local keyboardMap = {
     d = 'right',
 
     p = 'start',
-    enter = 'start',
-    esc = 'back',
+    escape = 'back',
     f = 'fullscreen',
 
+    ['return'] = 'a',
     space = 'a',
     z = 'b',
     x = 'a',
@@ -67,12 +67,11 @@ local buttonMap = {
     dpright = 'right',
 
     a = 'a',
-    x = 'b',
+    b = 'b',
+    x = 'x',
+    y = 'y',
 
-    b = 'back',
     back = 'back',
-
-    y = 'start',
     start = 'start',
 
     rightshoulder = 'skip'
