@@ -8,9 +8,9 @@ Refactor
 local geom = {}
 
 geom.collision_stats = {}
-local cs = geom.collision_stats
-function geom.collision_stats:incr(key)
-    self[key] = (self[key] or 0) + 1
+
+local function cs_incr(key)
+    geom.collision_stats[key] = (geom.collision_stats[key] or 0) + 1
 end
 
 -- Check if two rectangles overlap (note: x2 must be >= x1, same for y)
@@ -63,7 +63,7 @@ end
 
 -- get the AABB of a polygon; {x0, y0, x1, y1}
 function geom.getAABB(poly)
-    cs:incr('get_aabb')
+    cs_incr('get_aabb')
 
     local aabb = {poly[1], poly[2], poly[1], poly[2]}
 
@@ -79,12 +79,12 @@ end
 
 -- check to see if a ball collides with an AABB
 function geom.pointAABBCollision(x, y, r, aabb)
-    cs:incr('point_aabb_test')
+    cs_incr('point_aabb_test')
     if x + r <= aabb[1] or y + r <= aabb[2] or x - r >= aabb[3] or y - r >= aabb[4] then
-        cs:incr('point_aabb_fail')
+        cs_incr('point_aabb_fail')
         return false
     end
-    cs:incr('point_aabb_pass')
+    cs_incr('point_aabb_pass')
     return true
 end
 
@@ -105,7 +105,7 @@ end
 displacement vector as {x,y} if it is
 ]]
 function geom.pointPolyCollision(x, y, r, poly)
-    cs:incr('point_poly_test')
+    cs_incr('point_poly_test')
 
     local npoints = #poly / 2
 
@@ -130,7 +130,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
         if dist[i] >= r then
             -- We are fully outside on this side, so we are outside
-            cs:incr('point_poly_face_inclusion_fail')
+            cs_incr('point_poly_face_inclusion_fail')
             return false
         end
 
@@ -145,7 +145,7 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     -- is our center inside the nearest segment? If so, we just use its normal
     if maxSideProj >= 0 and maxSideProj <= 1 then
-        cs:incr('point_poly_face_projection_pass')
+        cs_incr('point_poly_face_projection_pass')
         return geom.normalize(maxSideNormal, r - maxSideDist)
     end
 
@@ -166,11 +166,11 @@ function geom.pointPolyCollision(x, y, r, poly)
 
     if cornerDist2 >= r*r then
         -- oops, after all that work it turns out we're not actually intersecting
-        cs:incr('point_poly_corner_fail')
+        cs_incr('point_poly_corner_fail')
         return false
     end
 
-    cs:incr('point_poly_corner_pass')
+    cs_incr('point_poly_corner_pass')
     return geom.normalize({cornerX, cornerY}, r - math.sqrt(cornerDist2))
 end
 
