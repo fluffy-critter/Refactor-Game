@@ -718,9 +718,7 @@ function Game:setPhase(phase)
     end
 
     for k,v in pairs(geom.collision_stats) do
-        if tonumber(v) then
-            print(k,v)
-        end
+        print(k,v)
     end
     geom.collision_stats = {}
 
