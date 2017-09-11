@@ -1,6 +1,0 @@
-[submodule "thirdparty/Piefiller"]
-	path = thirdparty/Piefiller
-	url = https://github.com/Polynominal/Piefiller.git
-[submodule "thirdparty/Cute"]
-	path = thirdparty/Cute
-	url = https://github.com/fluffy-critter/Cute.git
