@@ -503,6 +503,9 @@ function Game:textFinished(textBox, node)
     if textBox.interrupted then
         print("moo")
         self.npc.interrupted = (self.npc.interrupted or 0) + 1
+    else
+        -- give it a fast cooldown
+        self.npc.interrupted = (self.npc.interrupted or 0) / 2
     end
 
     if node.setState then

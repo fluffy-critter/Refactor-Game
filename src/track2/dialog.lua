@@ -866,7 +866,7 @@ local dialog = {
             text = ".%.%.% Well, you should?",
             pose = "facing_left",
             responses = {
-                {"Why?", {}, "alienated"},
+                {"Why?", {lastnight_why_remember=100}},
                 {"I don't understand.", {}, "brain_problems"},
                 {"Yeah, I guess so.", {lastnight_joking=10}}
             }
@@ -880,6 +880,17 @@ local dialog = {
                 {"No.", {}, "alienated"},
                 {"I have no idea who you are.", {}, "brain_problems"},
                 {nil, {}, "silence"}
+            }
+        },
+
+        {
+            pos = {lastnight_why_remember=100},
+            text = "Well,% I mean,% you made kind of a big deal about it last night, so...%% I kinda figured you'd " ..
+                "want to talk about it...?",
+            responses = {
+                {"Not really...", {}, "alienated"},
+                {"What are you talking about?", {}, "brain_problems"},
+                {"I guess we should.", {}}
             }
         },
 
