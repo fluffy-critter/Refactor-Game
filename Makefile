@@ -44,14 +44,12 @@ publish-wait:
 commit-check:
 	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
-setup: $(DEST)/.setup
-$(DEST)/.setup: .gitmodules
+setup: $(DEST)/.setup-$(GAME_VERSION)
+$(DEST)/.setup-$(GAME_VERSION):
 	@which luacheck 1>/dev/null || (echo \
 		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
 		&& false )
 	mkdir -p $(DEST)
-	git submodule update --init --recursive
-	git submodule update --recursive
 	touch $(@)
 
 assets:
@@ -141,6 +139,4 @@ publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
-
-
-#### asset rules go down here
+#### asset rules go down here (someday, maybe)
