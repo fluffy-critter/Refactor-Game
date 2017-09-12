@@ -253,6 +253,10 @@ function Game:start()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
                 selections = {self.scenes.missing("vacation")}
+            elseif self.dialogState == "herpderp" then
+                selections = {
+                    self.scenes.missing("what were you expecting")
+                }
             end
 
             if selections and #selections > 1 then
@@ -353,8 +357,6 @@ function Game:update(dt)
     if time[1] > self.phase then
         print("phase = " .. self.phase)
         self.phase = time[1]
-
-        -- self:transcribe('--' .. self.phase .. '--')
     end
 
     if self.nextLyric and util.arrayLT(self.nextLyric[1], time) then
@@ -367,13 +369,17 @@ function Game:update(dt)
         end
     end
 
-    if not self.textBox and self.nextDialog and not util.arrayLT(time, self.nextDialog) then
+    if util.arrayLT(time, {12,3})
+        and not self.textBox and self.nextDialog
+        and not util.arrayLT(time, self.nextDialog)
+    then
         print("advancing dialog")
         self.nextDialog = nil
 
         if self.nextChoices then
             self.textBox = self.nextChoices
             self.nextChoices = nil
+            self.nextTimeout = self:getNextInterval(2, 4, -0.25)
         else
             self.npc.phase = time[1] + time[2]/4 + time[3]/16
 
@@ -421,17 +427,13 @@ function Game:update(dt)
                     self.kitchenScene.rose.animation = self.kitchenScene.rose.animations[node.rose]
                 end
             end
-        end
 
-        if self.textBox then
-            self.nextTimeout = self:getNextTimeout()
-        else
-            self.nextTimeout = nil
+            self.nextTimeout = self:getNextInterval(2, 1, -0.25)
         end
     end
 
     if (self.textBox and self.textBox.state < TextBox.states.ready) then
-        local extend = self:getNextTimeout(2)
+        local extend = self:getNextInterval(1.5, 1, 0)
         if util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
             print("Extending timeout from " .. table.concat(self.nextTimeout,':') .. " to " .. table.concat(extend,':'))
@@ -471,29 +473,11 @@ function Game:update(dt)
     end
 end
 
--- Get the next timeout for a textbox
-function Game:getNextTimeout(measures)
+function Game:getNextInterval(measures, beatRound, beatOfs)
     local now = self:musicPos()
-    -- go for at most two measures, minus half a beat
-    local nextTime = clock.posToTime({now[1], now[2] + (measures or 2), -0.5})
+    local nextBeat = (beatRound > 0 and math.floor(now[3]/beatRound)*beatRound) or 0
+    local nextTime = clock.posToTime({now[1], now[2] + measures, nextBeat + (beatOfs or 0)})
     local nextPos = clock.timeToPos(nextTime)
-
-    return nextPos
-end
-
--- Get the next new textbox time
-function Game:getNextDialog()
-    local now = self:musicPos()
-    -- always start at the next measure
-    local nextTime = clock.posToTime({now[1], now[2] + 1, 0})
-    local nextPos = clock.timeToPos(nextTime)
-
-    print("now=" .. table.concat(now,':') .. " nextDialog=" .. table.concat(nextPos,':'))
-
-    if not util.arrayLT(nextPos, {12,3}) then
-        -- no dialog after 12:3:0
-        return nil
-    end
 
     return nextPos
 end
@@ -548,9 +532,10 @@ function Game:textFinished(textBox, node)
         print("choices: " .. #choices)
 
         self.nextChoices = TextBox.new({choices = choices, onClose = onClose, selectSound = self.sounds.select})
+        self.nextDialog = self:getNextInterval(0.25, 1, 0)
+    else
+        self.nextDialog = self:getNextInterval(1, 2, 0)
     end
-
-    self.nextDialog = self:getNextDialog()
 end
 
 -- Called when the player makes a dialog choice (including timeout)
@@ -568,7 +553,7 @@ function Game:onChoice(response)
 
     self:transcribe("<you> " .. (response[1] or "(silence)"))
 
-    self.nextDialog = self:getNextDialog()
+    self.nextDialog = self:getNextInterval(1, 2, 0)
 end
 
 function Game:transcribe(...)
