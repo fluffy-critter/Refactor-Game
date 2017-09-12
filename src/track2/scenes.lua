@@ -401,6 +401,7 @@ function scenes.endKitchen(version)
         rose.animation = rose.animations.eyes_right
     elseif version == "herpderp" then
         -- TODO add exasperated/eyeroll fluffy sitting at the table
+        print("delicious eggs")
     else
         print(version .. ": nobody's there?")
         rose.animation = rose.animations.normal
