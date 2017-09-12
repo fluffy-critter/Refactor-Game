@@ -152,7 +152,7 @@ local dialog = {
         {
             pos = {phase=4},
             text = "Why are you looking at me like that?",
-            pose = "facing_left",
+            pose = {"right_of_rose", "facing_left"},
             rose = "eyes_right",
             responses = {
                 {"Like what?", {}, "normal"},
