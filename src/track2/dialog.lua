@@ -93,6 +93,7 @@ local dialog = {
         {
             pos = {fun=37},
             text = "Good morning... how are you feeling today?",
+            pose = {"left_of_stairs", "facing_left"},
             rose = "eyes_right",
             responses = {
                 {"I'm... fine...", {}, "normal"},
@@ -336,6 +337,7 @@ local dialog = {
             text = "M%a%y%b%e% %I% %s%h%o%u%l%d% %t%a%l%k% %%e%%x%%t%%r%a%% %%%s%%%l%%%o%%%w%%%l%%%y%%%"
                 .. " from now on.%%%.%%%.%%%.%%%.%%%",
             rose = "eyes_right",
+            setState = "herpderp",
             pose = {
                 "bottom_of_stairs", "left_of_stairs", "bottom_of_stairs", "left_of_stairs",
                 "left_of_couch",
@@ -343,6 +345,16 @@ local dialog = {
             },
             cantInterrupt=true
         },
+    },
+
+    herpderp = {
+        {
+            pos = {},
+            pose = {},
+            rose = "eyes_left",
+            text = "",
+            maxCount = 500
+        }
     },
 
     -- path where Greg thinks everything is normal
@@ -623,7 +635,7 @@ local dialog = {
             responses = {
                 {"Like what?", {}},
                 {"You're intruding!", {}, "alienated"},
-                {"Who are you?", {}, "brain_problems"}
+                {"Who are you?", {bp_dontknowwho=500}, "brain_problems"}
             }
         },
         {
@@ -635,7 +647,7 @@ local dialog = {
             responses = {
                 {"I don't know what you're talking about.", {}},
                 {"Marriage?", {wtf_marriage=100}},
-                {"Who are you?!", {}, "brain_problems"}
+                {"Who are you?!", {bp_dontknowwho=500}, "brain_problems"}
             }
         },
 
@@ -1185,7 +1197,7 @@ local dialog = {
             responses = {
                 {"But you are.", {bp_stranger=1000}},
                 {"Sorry.", {bp_stranger=1000}},
-                {"I don't know who you are.", {bp_stranger=1000}}
+                {"I don't know who you are.", {bp_stranger=1000, bp_dontknowwho=1000}}
             }
         },
         {
@@ -1197,7 +1209,7 @@ local dialog = {
             responses = {
                 {"But you are.", {bp_stranger=1000}},
                 {"Sorry.", {bp_stranger=1000}},
-                {"I don't know who you are.", {bp_stranger=1}}
+                {"I don't know who you are.", {bp_stranger=1, bp_dontknowwho=1000}}
             }
         },
         {
@@ -1207,7 +1219,7 @@ local dialog = {
             responses = {
                 {"You are to me.", {bp_stranger=1000}},
                 {"Yes?", {bp_stranger=1000}},
-                {"I don't know who you are.", {bp_stranger=1000}}
+                {"I don't know who you are.", {bp_stranger=1000, bp_dontknowwho=1000}}
             }
         },
         {
@@ -1217,7 +1229,7 @@ local dialog = {
             responses = {
                 {"You are to me.", {bp_stranger=1000}},
                 {"Sorry...", {bp_stranger=1000}},
-                {"I don't know who you are.", {bp_stranger=1000}}
+                {"I don't know who you are.", {bp_stranger=1000, bp_dontknowwho=1000}}
             }
         },
 
@@ -1523,8 +1535,30 @@ local dialog = {
         },
 
         {
-            pos = {phase=5, bp_prerequisite=0},
+            pos = {phase=5, bp_prerequisite=0, bp_dontknowwho=0},
             text = "Wait...%% Do you not...% know who I am?",
+            setPos = {bp_prerequisite=100},
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"You do seem familiar...", {}},
+                {"No, sorry...", {}},
+                {"I guess you're my husband?", {bp_guess_husband=100}}
+            }
+        },
+        {
+            pos = {phase=5, bp_prerequisite=0, bp_dontknowwho=500},
+            text = "You...%% don't know who I am?",
+            setPos = {bp_prerequisite=100},
+            pose = {"right_of_rose", "facing_left"},
+            responses = {
+                {"You do seem familiar...", {}},
+                {"No, sorry...", {}},
+                {"I guess you're my husband?", {bp_guess_husband=100}}
+            }
+        },
+        {
+            pos = {phase=5, bp_prerequisite=0, bp_dontknowwho=1000},
+            text = "You really don't know...?",
             setPos = {bp_prerequisite=100},
             pose = {"right_of_rose", "facing_left"},
             responses = {

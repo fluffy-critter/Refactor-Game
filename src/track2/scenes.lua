@@ -399,6 +399,8 @@ function scenes.endKitchen(version)
             frame = quads.greg.sitting.thinking
         }))
         rose.animation = rose.animations.eyes_right
+    elseif version == "herpderp" then
+        -- TODO add exasperated/eyeroll fluffy sitting at the table
     else
         print(version .. ": nobody's there?")
         rose.animation = rose.animations.normal
