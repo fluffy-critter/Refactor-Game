@@ -1,6 +1,6 @@
 return {
   _META = {
-    image_path = "./sprites.png",
+    image_path = "./kitchen-sprites.png",
     version = "v0.6.2",
   },
   door = {

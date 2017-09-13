@@ -12,20 +12,21 @@ local shaders = require('shaders')
 
 local Sprite = require('track2.Sprite')
 local Animator = require('Animator')
+local TextBox = require('track2.TextBox')
 
 local scenes = {}
 
 local function loadSprites(imageFile, quadFile)
-    local spriteSheet = imagepool.load(imageFile)
-    spriteSheet:setFilter('nearest')
-    local quads = quadtastic.create_quads(require(quadFile), spriteSheet:getWidth(), spriteSheet:getHeight())
+    local spriteSheet = imagepool.load(imageFile, {nearest=true})
+    local quads = quadtastic.create_quads(love.filesystem.load(quadFile)(),
+        spriteSheet:getWidth(), spriteSheet:getHeight())
     return spriteSheet, quads
 end
 
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
+    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -314,10 +315,11 @@ function scenes.missing(label)
     }
 end
 
-function scenes.endKitchen(version)
+function scenes.endKitchen(game, version)
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
+    -- TODO different outfits? are they older?
+    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -400,8 +402,8 @@ function scenes.endKitchen(version)
         }))
         rose.animation = rose.animations.eyes_right
     elseif version == "herpderp" then
-        -- TODO add exasperated/eyeroll fluffy sitting at the table
-        print("delicious eggs")
+        -- TODO replcae rose with exasperated/eyeroll fluffy sitting at the table
+        game.textBox = TextBox.new({text = "Great job breaking it, hero."})
     else
         print(version .. ": nobody's there?")
         rose.animation = rose.animations.normal
@@ -421,12 +423,24 @@ function scenes.endKitchen(version)
         draw = function(self)
             love.graphics.setColor(255,255,255)
             for _,thing in ipairs(self.layers) do
-                if thing.frame then
+                if thing.draw then
+                    thing:draw()
+                elseif thing.frame then
                     love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
                 elseif thing.image then
                     love.graphics.draw(thing.image, unpack(thing.pos or {}))
+                else
+                    for k,v in pairs(thing) do
+                        print(k,v)
+                    end
+                    error("Don't know how to draw this layer!")
+                end
+
+                if thing.state then
+                    print(thing.state)
                 end
             end
+
             return true
         end
     }

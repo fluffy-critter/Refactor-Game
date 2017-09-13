@@ -257,6 +257,10 @@ function Game:start()
                 selections = {
                     self.scenes.missing("what were you expecting")
                 }
+            else
+                selections = {
+                    self.scenes.missing("Unknown state:\n" .. self.dialogState)
+                }
             end
 
             if selections and #selections > 1 then
@@ -323,13 +327,11 @@ function Game:start()
             self.eventQueue:addEvent({
                 when = {15},
                 what = function()
-                    self.sceneStack = {self.scenes.endKitchen(self.dialogState)}
+                    self.sceneStack = {self.scenes.endKitchen(self, self.dialogState)}
                 end
             })
         end
     })
-
-
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -434,7 +436,7 @@ function Game:update(dt)
 
     if (self.textBox and self.textBox.state < TextBox.states.ready) then
         local extend = self:getNextInterval(1.5, 1, 0)
-        if util.arrayLT(self.nextTimeout, extend) then
+        if self.nextTimeout and util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
             print("Extending timeout from " .. table.concat(self.nextTimeout,':') .. " to " .. table.concat(extend,':'))
             self.nextTimeout = extend
@@ -702,15 +704,15 @@ function Game:draw()
                 love.graphics.draw(self.border)
             end
             love.graphics.setBlendMode("alpha")
-        end
 
-        if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then
-            love.graphics.setColor(unpack(self.flashColor))
-            love.graphics.rectangle("fill", 0, 0, 256, 224)
-        end
+            if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then
+                love.graphics.setColor(unpack(self.flashColor))
+                love.graphics.rectangle("fill", 0, 0, 256, 224)
+            end
 
-        if self.textBox then
-            self.textBox:draw()
+            if self.textBox then
+                self.textBox:draw()
+            end
         end
 
         if self.lyricText then
