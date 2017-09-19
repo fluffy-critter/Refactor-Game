@@ -1,3 +1,5 @@
+# ugh this is such a mess, maybe I should use cmake or scons or something
+
 # itch.io target
 TARGET="fluffy/Refactor"
 
@@ -68,8 +70,14 @@ checks: setup
 run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
+# hacky way to inject the distfiles content
+$(DEST)/.distfiles-%: $(wildcard distfiles/*)
+	mkdir -p $(DEST)/$(lastword $(subst -, ,$(@)))
+	cp distfiles/* $(DEST)/$(lastword $(subst -, ,$(@)))
+	touch $(@)
+
 # .love bundle
-love-bundle: setup assets $(DEST)/love/$(NAME).love
+love-bundle: setup assets $(DEST)/love/$(NAME).love $(DEST)/.distfiles-love
 $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
@@ -81,7 +89,7 @@ $(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love
 	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
-osx: $(DEST)/osx/$(NAME).app
+osx: $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx
 $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/deps/love.app/Contents/MacOS/love
 	mkdir -p $(DEST)/osx
 	rm -rf $(@)
@@ -118,7 +126,7 @@ $(WIN64_ROOT)/love.exe:
 	unzip love-$(LOVE_VERSION)-win64.zip
 
 # Win32 version
-win32: $(DEST)/win32/$(NAME).exe
+win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
 $(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
@@ -129,7 +137,7 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
-win64: $(DEST)/win64/$(NAME).exe
+win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
 $(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
