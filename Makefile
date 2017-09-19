@@ -76,6 +76,12 @@ $(DEST)/.distfiles-%: $(wildcard distfiles/*)
 	cp distfiles/* $(DEST)/$(lastword $(subst -, ,$(@)))
 	touch $(@)
 
+# hacky way to generate the publish rules
+publish-%: $(DEST)/.published-%-$(GAME_VERSION)
+
+$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love
+	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
+
 # .love bundle
 love-bundle: setup assets $(DEST)/love/$(NAME).love $(DEST)/.distfiles-love
 $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
@@ -83,10 +89,6 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	cd $(SRC) && \
 	rm -f ../$(@) && \
 	zip -9r ../$(@) .
-
-publish-love: $(DEST)/.published-love-$(GAME_VERSION)
-$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love
-	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
 osx: $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx
@@ -98,7 +100,6 @@ $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/dep
 	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love/$(NAME).love $(@)/Contents/Resources
 
-publish-osx: $(DEST)/.published-osx-$(GAME_VERSION)
 $(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app
 	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
 
@@ -132,7 +133,6 @@ $(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
 
-publish-win32: $(DEST)/.published-win32-$(GAME_VERSION)
 $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
@@ -143,7 +143,6 @@ $(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
 
-publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
