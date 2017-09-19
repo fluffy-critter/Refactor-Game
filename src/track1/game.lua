@@ -1027,4 +1027,15 @@ function Game:draw()
     -- return self.layers.toneMap
 end
 
+function Game:renderWater(val, f)
+    if self.layers.water then
+        self.layers.water:renderTo(function()
+            love.graphics.setColorMask(true, false, false, false)
+            love.graphics.setColor(val,255,255)
+            f()
+            love.graphics.setColorMask(true, true, true, true)
+        end)
+    end
+end
+
 return Game
