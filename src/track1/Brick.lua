@@ -41,11 +41,8 @@ function Brick:onInit()
     self.state = Brick.states.spawning
     self.stateAge = 0
 
-    self.game.layers.water:renderTo(function()
-        love.graphics.setColorMask(true, false, false, false)
-        love.graphics.setColor(255,255,255)
+    self.game:renderWater(255, function()
         love.graphics.polygon("fill", self:getPolygon())
-        love.graphics.setColorMask(true, true, true, true)
     end)
 end
 
@@ -53,11 +50,8 @@ function Brick:kill()
     if self.state < Brick.states.dying then
         self.stateAge = 0
         self.state = Brick.states.dying
-        self.game.layers.water:renderTo(function()
-            love.graphics.setColorMask(true, false, false, false)
-            love.graphics.setColor(0,255,255)
+        self.game:renderWater(0, function()
             love.graphics.polygon("fill", self:getPolygon())
-            love.graphics.setColorMask(true, true, true, true)
         end)
     end
 end

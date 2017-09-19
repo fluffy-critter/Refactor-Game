@@ -95,22 +95,16 @@ end
 function SuperBall:onHitPaddle(...)
     Ball.onHitPaddle(self, ...)
 
-    self.game.layers.water:renderTo(function()
-        love.graphics.setColorMask(true, false, false, false)
-        love.graphics.setColor(-255,255,255)
+    self.game:renderWater(-255, function()
         love.graphics.circle("fill", self.x, self.y, self.r*2)
-        love.graphics.setColorMask(true, true, true, true)
     end)
 end
 
 function SuperBall:postUpdate(dt)
     Ball.postUpdate(self, dt)
 
-    self.game.layers.water:renderTo(function()
-        love.graphics.setColorMask(true, false, false, false)
-        love.graphics.setColor(255,255,255)
+    self.game:renderWater(255, function()
         love.graphics.circle("fill", self.x, self.y, self.r/2)
-        love.graphics.setColorMask(true, true, true, true)
     end)
 end
 

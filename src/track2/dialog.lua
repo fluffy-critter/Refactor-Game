@@ -2178,12 +2178,11 @@ local dialog = {
         },
 
         {
-            pos = {phase=12,gu_prereq=500},
+            pos = {phase=11.5,gu_prereq=500},
             text = "I just can't do this anymore.",
             pose = {"below_doors", "facing_up"},
             setPos = {leaving=1000},
             cantInterrupt=true,
-            maxCount=100,
         },
 
         {
