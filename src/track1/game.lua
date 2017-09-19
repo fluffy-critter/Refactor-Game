@@ -74,7 +74,7 @@ function Game:init()
 
     self.shaders = {}
 
-    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f")
+    local waterFormat = util.selectCanvasFormat("rgba32f", "rg32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
