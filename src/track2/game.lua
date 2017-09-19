@@ -66,7 +66,7 @@ function Game:init()
     self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
     self.canvas:setFilter("nearest")
 
-    self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
+    self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8", "rgb565"))
     self.back:setFilter("nearest")
 
     self.outputScale = 3
