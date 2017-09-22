@@ -39,6 +39,11 @@ local function drawLayers(layers)
             love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
         elseif thing.image then
             love.graphics.draw(thing.image, unpack(thing.pos or {}))
+        else
+            for k,v in pairs(thing) do
+                print(k,v)
+            end
+            error("Don't know how to draw this layer!")
         end
     end
 end
