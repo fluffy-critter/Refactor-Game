@@ -7,6 +7,10 @@ return {
     closed = {x = 0, y = 144, w = 24, h = 32},
     open = {x = 32, y = 144, w = 48, h = 40},
   },
+  fluffy = {
+    blink = {x = 112, y = 144, w = 21, h = 31},
+    open = {x = 88, y = 144, w = 21, h = 31},
+  },
   greg = {
     clench = {x = 120, y = 0, w = 16, h = 40},
     down = {

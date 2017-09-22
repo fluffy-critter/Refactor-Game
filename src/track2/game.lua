@@ -236,11 +236,10 @@ function Game:start()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
                 selections = {
-                    self.scenes.missing("hospital"),
+                    self.scenes.hospital(clock.posToDelta({0,1})),
                     self.scenes.missing("doctor"),
                     self.kitchenScene,
                     self.scenes.missing("therapist"),
-                    self.kitchenScene,
                     self.scenes.missing("parkbench"),
                     self.kitchenScene,
                     self.scenes.missing("doctor"),
