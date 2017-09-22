@@ -410,7 +410,6 @@ function scenes.endKitchen(game, version)
 
     local layers = {
         {image = backgroundLayer},
-        rose
     }
 
     -- does Greg exist?
@@ -451,6 +450,7 @@ function scenes.endKitchen(game, version)
     end
 
     table.insert(layers, {image = foregroundLayer})
+    table.insert(layers, rose)
 
     return {
         layers = layers,
