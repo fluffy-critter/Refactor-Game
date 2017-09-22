@@ -352,9 +352,10 @@ local dialog = {
             pos = {},
             pose = {},
             rose = "eyes_left",
-            text = "",
-            maxCount = 500
-        }
+            text = '~%% <("<) %%^%% (>")> %%~',
+            maxCount = 500,
+            cantInterrupt = true
+        },
     },
 
     -- path where Greg thinks everything is normal

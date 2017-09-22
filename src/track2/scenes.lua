@@ -23,6 +23,26 @@ local function loadSprites(imageFile, quadFile)
     return spriteSheet, quads
 end
 
+local function updateLayers(layers, dt)
+    for _,layer in ipairs(layers) do
+        if layer.update then
+            layer:update(dt)
+        end
+    end
+end
+
+local function drawLayers(layers)
+    for _,thing in ipairs(layers) do
+        if thing.draw then
+            thing:draw()
+        elseif thing.frame then
+            love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
+        elseif thing.image then
+            love.graphics.draw(thing.image, unpack(thing.pos or {}))
+        end
+    end
+end
+
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
@@ -225,37 +245,27 @@ function scenes.kitchen()
     })
     greg.animation = nil
 
+    local layers = {
+        {image = backgroundLayer},
+        openDoor,
+        greg,
+        closedDoor,
+        {image = foregroundLayer},
+        rose,
+    }
+
     return {
         frames = quads,
         rose = rose,
         greg = greg,
 
-        layers = {
-            {image = backgroundLayer},
-            openDoor,
-            greg,
-            closedDoor,
-            {image = foregroundLayer},
-            rose,
-        },
-
-        update = function(self, dt)
-            for _,layer in ipairs(self.layers) do
-                if layer.update then
-                    layer:update(dt)
-                end
-            end
+        update = function(_, dt)
+            updateLayers(layers, dt)
         end,
 
-        draw = function(self)
+        draw = function(_)
             love.graphics.setColor(255,255,255)
-            for _,thing in ipairs(self.layers) do
-                if thing.frame then
-                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
-                elseif thing.image then
-                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
-                end
-            end
+            drawLayers(layers)
             return true
         end
     }
@@ -298,6 +308,37 @@ function scenes.phase11(duration)
                 love.graphics.draw(image, p)
                 love.graphics.setShader()
             end
+            return true
+        end
+    }
+end
+
+function scenes.hospital(duration)
+    local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
+    local bg = {{image = bgImage}}
+
+    -- TODO sprites
+    local fg = {{image = imagepool.load("track2/hospital-fg.png", {nearest=true})}}
+
+    local time = 0
+
+    return {
+        update = function(_, dt)
+            time = time + dt
+
+            updateLayers(bg)
+            updateLayers(fg)
+        end,
+        draw = function()
+            local t = math.min(time/duration,1)
+            local ofs = (224 - bgImage:getHeight())*util.smoothStep(1 - t)
+
+            love.graphics.translate(0, ofs)
+            drawLayers(bg)
+
+            love.graphics.translate(0, -ofs)
+            drawLayers(fg)
+
             return true
         end
     }
@@ -362,14 +403,13 @@ function scenes.endKitchen(game, version)
             crying = {
                 {quads.rose.kitchen.cry[1], 2/3},
                 {quads.rose.kitchen.cry[2], 2/3},
-            }
+            },
         }
     })
 
 
     local layers = {
         {image = backgroundLayer},
-        rose
     }
 
     -- does Greg exist?
@@ -402,45 +442,24 @@ function scenes.endKitchen(game, version)
         }))
         rose.animation = rose.animations.eyes_right
     elseif version == "herpderp" then
-        -- TODO replcae rose with exasperated/eyeroll fluffy sitting at the table
-        game.textBox = TextBox.new({text = "Great job breaking it, hero."})
+        rose.animation = {{quads.fluffy.open, 3}, {quads.fluffy.blink, 0.2}}
+        game.textBox = TextBox.new({text = "Nice job breaking it, hero."})
     else
         print(version .. ": nobody's there?")
         rose.animation = rose.animations.normal
     end
 
     table.insert(layers, {image = foregroundLayer})
+    table.insert(layers, rose)
 
     return {
         layers = layers,
-        update = function(self, dt)
-            for _,layer in ipairs(self.layers) do
-                if layer.update then
-                    layer:update(dt)
-                end
-            end
+        update = function(_, dt)
+            updateLayers(layers, dt)
         end,
-        draw = function(self)
+        draw = function(_)
             love.graphics.setColor(255,255,255)
-            for _,thing in ipairs(self.layers) do
-                if thing.draw then
-                    thing:draw()
-                elseif thing.frame then
-                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
-                elseif thing.image then
-                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
-                else
-                    for k,v in pairs(thing) do
-                        print(k,v)
-                    end
-                    error("Don't know how to draw this layer!")
-                end
-
-                if thing.state then
-                    print(thing.state)
-                end
-            end
-
+            drawLayers(layers)
             return true
         end
     }
