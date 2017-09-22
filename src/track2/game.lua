@@ -238,14 +238,31 @@ function Game:start()
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
+                local hospital = self.scenes.hospital(clock.posToDelta({0,1}))
+                local doctor = self.scenes.missing("doctor")
+                local therapist = self.scenes.missing("therapist")
+                local parkbench = self.scenes.missing("parkbench")
+
                 selections = {
-                    self.scenes.hospital(clock.posToDelta({0,1})),
-                    self.scenes.missing("doctor"),
+                    hospital,
+                    doctor,
                     self.kitchenScene,
-                    self.scenes.missing("therapist"),
-                    self.scenes.missing("parkbench"),
+                    parkbench,
+
+                    hospital,
                     self.kitchenScene,
-                    self.scenes.missing("doctor"),
+                    doctor,
+                    parkbench,
+
+                    therapist,
+                    self.kitchenScene,
+                    doctor,
+                    hospital,
+
+                    self.kitchenScene,
+                    self.scenes.missing("vacation"),
+                    therapist,
+                    doctor,
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then

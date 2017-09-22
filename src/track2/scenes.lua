@@ -259,11 +259,11 @@ function scenes.kitchen()
         rose = rose,
         greg = greg,
 
-        update = function(self, dt)
+        update = function(_, dt)
             updateLayers(layers, dt)
         end,
 
-        draw = function(self)
+        draw = function(_)
             love.graphics.setColor(255,255,255)
             drawLayers(layers)
             return true
@@ -457,9 +457,9 @@ function scenes.endKitchen(game, version)
         update = function(_, dt)
             updateLayers(layers, dt)
         end,
-        draw = function(self)
+        draw = function(_)
             love.graphics.setColor(255,255,255)
-            drawLayers(layers, dt)
+            drawLayers(layers)
             return true
         end
     }
