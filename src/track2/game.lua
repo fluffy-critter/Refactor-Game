@@ -66,8 +66,11 @@ function Game:init()
     self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
     self.canvas:setFilter("nearest")
 
-    self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
-    self.back:setFilter("nearest")
+    local blurFmt = util.selectCanvasFormat("rgba8", "rgb8")
+    if blurFmt then
+        self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8"))
+        self.back:setFilter("nearest")
+    end
 
     self.outputScale = 3
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
@@ -755,11 +758,13 @@ function Game:draw()
 
     end)
 
-    self.back:renderTo(function()
-        love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(255, 255, 255, 90)
-        love.graphics.draw(self.canvas)
-    end)
+    if self.back then
+        self.back:renderTo(function()
+            love.graphics.setBlendMode("alpha")
+            love.graphics.setColor(255, 255, 255, 90)
+            love.graphics.draw(self.canvas)
+        end)
+    end
 
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
@@ -767,7 +772,7 @@ function Game:draw()
         local shader = self.crtScaler
         love.graphics.setShader(shader)
         shader:send("screenSize", {256, 224})
-        love.graphics.draw(self.back, 0, 0, 0, self.outputScale, self.outputScale)
+        love.graphics.draw(self.back or self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
         love.graphics.setShader()
     end)
     return self.scaled, 4/3

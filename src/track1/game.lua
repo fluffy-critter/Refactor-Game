@@ -74,7 +74,7 @@ function Game:init()
 
     self.shaders = {}
 
-    local waterFormat = util.selectCanvasFormat("rg32f", "rgba32f")
+    local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
@@ -1025,6 +1025,17 @@ function Game:draw()
     return self.canvas
     -- return self.layers.water;
     -- return self.layers.toneMap
+end
+
+function Game:renderWater(val, f)
+    if self.layers.water then
+        self.layers.water:renderTo(function()
+            love.graphics.setColorMask(true, false, false, false)
+            love.graphics.setColor(val,255,255)
+            f()
+            love.graphics.setColorMask(true, true, true, true)
+        end)
+    end
 end
 
 return Game

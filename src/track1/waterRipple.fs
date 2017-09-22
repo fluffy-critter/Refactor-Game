@@ -34,5 +34,5 @@ vec4 effect(vec4 color, Image water, vec2 pos, vec2 screen_coords) {
     z += v*dt;
     v = v*pow(damp, dt);
 
-    return vec4(clamp(-1, 1, z), clamp(-1., 1., v), 0, 0);
+    return vec4(z,v,0,0);
 }

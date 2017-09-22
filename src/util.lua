@@ -157,13 +157,16 @@ end
 
 -- Select the most-preferred canvas format from a list of formats
 local graphicsFormats = love.graphics.getCanvasFormats()
--- for k,v in pairs(graphicsFormats) do print(k,v) end
+for k,v in pairs(graphicsFormats) do print(k,v) end
 function util.selectCanvasFormat(...)
-    for _,k in ipairs({...}) do
+    print("Requesting formats: " .. table.concat({...}, " "))
+    for i,k in ipairs({...}) do
         if graphicsFormats[k] then
+            print("  got choice " .. i .. ": " .. k)
             return k
         end
     end
+    print("  no suitable choice found")
     return nil
 end
 
