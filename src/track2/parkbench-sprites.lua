@@ -1,6 +1,12 @@
 return {
   _META = {
+    image_path = "./parkbench-sprites.png",
     version = "v0.6.2",
+  },
+  greg = {
+    {x = 44, y = 0, w = 20, h = 43},
+    {x = 68, y = 0, w = 20, h = 43},
+    {x = 92, y = 0, w = 20, h = 43},
   },
   rose = {
     _META = {

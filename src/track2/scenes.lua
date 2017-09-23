@@ -545,6 +545,31 @@ function scenes.parkBench(gregMissing)
         })
     }
 
+    if not gregMissing then
+        table.insert(bg, Sprite.new({
+            pos = {131,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.greg[1], 2},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 0.12},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 1.2},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 0.12},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+            }
+        }))
+    end
+
     local fg = {}
 
     return {
@@ -553,7 +578,7 @@ function scenes.parkBench(gregMissing)
             updateLayers(bg, dt)
             updateLayers(fg, dt)
         end,
-        draw = function(_, dt)
+        draw = function(_)
             drawLayers(sky)
             drawLayers(bg)
             drawLayers(fg)
