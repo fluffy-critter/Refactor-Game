@@ -1398,7 +1398,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=7, bp_anything=0, bp_guessed_husband=0},
+            pos = {phase=7, bp_anything=0, bp_guess_husband=0},
             text = "Can you remember anything about me? Anything at all?",
             setPos = {bp_anything=100,bp_prerequisite=100},
             pose = "facing_left",
@@ -1410,7 +1410,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, bp_anything=0, bp_prerequisite=100, bp_guessed_husband=0},
+            pos = {phase=7, bp_anything=0, bp_prerequisite=100},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
             setPos = {bp_anything=100},
@@ -1441,7 +1441,6 @@ local dialog = {
         {
             pos = {bp_guess_husband=200},
             pose = "facing_left",
-            setPos = {bp_guessed_husband=200},
             text = "Yeah, that's still true.%% But I mean, do you know anything else?",
             rose = "eyes_right"
         },
@@ -1453,7 +1452,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=8,bp_just_guessing=0},
+            pos = {phase=8,bp_just_guessing=0,bp_guess_husband=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
             pose = {"facing_left", "pause", "bottom_of_stairs", "facing_right"},
             responses = {
