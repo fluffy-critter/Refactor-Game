@@ -503,29 +503,6 @@ function scenes.parkBench(gregMissing)
     local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
     local time = 0
 
-    local birbAnims = {
-        left = {
-            {quads.birb.left.up, math.random()*3 + 0.25},
-            {quads.birb.left.peck, 0.1},
-            {quads.birb.left.up, math.random() + 0.5},
-            {quads.birb.left.peck, 0.1}
-        },
-        right = {
-            {quads.birb.right.up, math.random()*3 + 0.25},
-            {quads.birb.right.peck, 0.1},
-            {quads.birb.right.up, math.random() + 0.5},
-            {quads.birb.right.peck, 0.1}
-        },
-        flap = {
-            {quads.birb.flap[1], 0.05},
-            {quads.birb.flap[2], 0.05},
-            {quads.birb.flap[3], 0.05},
-            {quads.birb.flap[4], 0.05},
-            {quads.birb.flap[3], 0.05},
-            {quads.birb.flap[2], 0.05},
-        }
-    }
-
     local flockX, flockY = 0, 40
 
     local function birb()
@@ -535,6 +512,29 @@ function scenes.parkBench(gregMissing)
         local flappy = false
 
         local ox, oy = math.random(-20, 20), math.random(-20, 20)
+
+        local birbAnims = {
+            left = {
+                {quads.birb.left.up, math.random()*3 + 0.25},
+                {quads.birb.left.peck, 0.1},
+                {quads.birb.left.up, math.random() + 0.5},
+                {quads.birb.left.peck, 0.1}
+            },
+            right = {
+                {quads.birb.right.up, math.random()*3 + 0.25},
+                {quads.birb.right.peck, 0.1},
+                {quads.birb.right.up, math.random() + 0.5},
+                {quads.birb.right.peck, 0.1}
+            },
+            flap = {
+                {quads.birb.flap[1], 0.05},
+                {quads.birb.flap[2], 0.05},
+                {quads.birb.flap[3], 0.05},
+                {quads.birb.flap[4], 0.05},
+                {quads.birb.flap[3], 0.05},
+                {quads.birb.flap[2], 0.05},
+            }
+        }
 
         local sprite = Sprite.new({
             pos = {math.random(-16,256), math.random(160,224)},
@@ -642,6 +642,9 @@ function scenes.parkBench(gregMissing)
     for _ = 1,64 do
         table.insert(fg, birb())
     end
+    table.sort(fg, function(a,b)
+        return a.pos[2] < b.pos[2]
+    end)
 
     return {
         update = function(_, dt)
