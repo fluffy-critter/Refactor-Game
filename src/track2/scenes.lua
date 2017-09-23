@@ -503,7 +503,7 @@ function scenes.parkBench(gregMissing)
     local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
     local time = 0
 
-    local flockX, flockY = 0, 40
+    local flockX, flockY = -256, 40
 
     local function birb()
         local age = 0
@@ -537,7 +537,7 @@ function scenes.parkBench(gregMissing)
         }
 
         local sprite = Sprite.new({
-            pos = {math.random(-16,256), math.random(160,224)},
+            pos = {math.random(-16,240), math.random(160,224)},
             sheet = spriteSheet
         })
 
