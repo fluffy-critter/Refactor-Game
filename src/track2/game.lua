@@ -154,7 +154,7 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.parkBench()}
+    -- self.sceneStack = {self.scenes.doctor(self)}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -241,7 +241,7 @@ function Game:start()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
                 local hospital = self.scenes.hospital(clock.posToDelta({0,1}))
-                local doctor = self.scenes.missing("doctor")
+                local doctor = self.scenes.doctor(self)
                 local therapist = self.scenes.missing("therapist")
                 local parkbench = self.scenes.parkBench()
 
@@ -485,7 +485,7 @@ function Game:update(dt)
     end
 
     util.runQueue(self.sceneStack, function(scene)
-        scene:update(dt)
+        scene:update(dt, pos)
     end)
 
     if util.arrayLT({17,1,0}, time) then

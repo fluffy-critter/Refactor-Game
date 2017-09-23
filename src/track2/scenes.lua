@@ -503,7 +503,7 @@ function scenes.parkBench(gregMissing)
     local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
     local time = 0
 
-    local flockX, flockY = -256, 40
+    local flockX, flockY = false, 40
 
     local function birb()
         local age = 0
@@ -552,7 +552,7 @@ function scenes.parkBench(gregMissing)
             chainedUpdate(self, dt)
             age = age + dt
 
-            if not flappy and flockX >= self.pos[1] then
+            if not flappy and flockX and flockX >= self.pos[1] then
                 flappy = true
                 self.animation = birbAnims.flap
             end
@@ -603,9 +603,9 @@ function scenes.parkBench(gregMissing)
             pos = {120,112},
             sheet = spriteSheet,
             animation = {
-                {quads.rose.open, 3.75},
-                {quads.rose.blink, 0.1},
                 {quads.rose.open, 1.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.25},
                 {quads.rose.blink, 0.1},
                 {quads.rose.open, 0.75},
                 {quads.rose.blink, 0.1},
@@ -662,6 +662,60 @@ function scenes.parkBench(gregMissing)
             drawLayers(bg)
             drawLayers(fg)
 
+            return true
+        end
+    }
+end
+
+function scenes.doctor(game)
+    local spriteSheet, quads = loadSprites("track2/doctor-sprites.png", "track2/doctor-sprites.lua")
+
+    local cartpusher = Sprite.new({
+        pos = {220, 8},
+        sheet = spriteSheet,
+        frame = quads.cartpusher
+    })
+
+    local function pushCart(when)
+        if cartpusher.pos[2] < 224 then
+            game:addAnimation({
+                target = cartpusher,
+                endPos = {cartpusher.pos[1], cartpusher.pos[2] + 8},
+                easing = Animator.Easing.ease_out
+            }, {when[1], when[2], when[3] + 0.75}, {when[1], when[2], when[3] + 1.25})
+            game.eventQueue:addEvent({
+                what = pushCart,
+                when = {when[1], when[2], when[3] + 1}
+            })
+        end
+    end
+    pushCart({0,0,0})
+
+    local layers = {
+        {image = imagepool.load('track2/doctor-bg.png', {nearest=true})},
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 3.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.75},
+                {quads.rose.blink, 0.1},
+            }
+        }),
+        cartpusher
+    }
+
+    -- TODO medical staff wandering the hall, stepping on the beat
+
+    return {
+        update = function(_, dt)
+            updateLayers(layers, dt)
+        end,
+        draw = function(_)
+            drawLayers(layers)
             return true
         end
     }
