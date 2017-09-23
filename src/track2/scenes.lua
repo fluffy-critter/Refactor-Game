@@ -314,11 +314,45 @@ function scenes.phase11(duration)
 end
 
 function scenes.hospital(duration)
-    local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
-    local bg = {{image = bgImage}}
+    local spriteSheet, quads = loadSprites('track2/hospital-fg.png', 'track2/hospital-sprites.lua')
 
-    -- TODO sprites
-    local fg = {{image = imagepool.load("track2/hospital-fg.png", {nearest=true})}}
+    local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
+
+    local bg = {
+        {image = bgImage},
+        Sprite.new({
+            pos = {17, 112},
+            animation = {
+                {quads.tech[1], 2/3},
+                {quads.tech[2], 2/3}
+            },
+            sheet = spriteSheet
+        }),
+        Sprite.new({
+            pos = {120, 96},
+            sheet = spriteSheet,
+            animation = {
+                {quads.mri[1], 2/24},
+                {quads.mri[2], 2/24},
+                {quads.mri[3], 2/24},
+                {quads.mri[4], 2/24},
+                {quads.mri[5], 2/24},
+                {quads.mri[6], 2/24},
+                {quads.mri[7], 2/24},
+                {quads.mri[8], 2/24},
+                {quads.mri[9], 2/24},
+                {quads.mri[10], 2/24},
+            }
+        })
+    }
+
+    local fg = {
+        Sprite.new({
+            pos = {120, 112},
+            sheet = spriteSheet,
+            frame = quads.rose
+        }),
+    }
 
     local time = 0
 
@@ -326,11 +360,11 @@ function scenes.hospital(duration)
         update = function(_, dt)
             time = time + dt
 
-            updateLayers(bg)
-            updateLayers(fg)
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
         end,
         draw = function()
-            local t = math.min(time/duration,1)
+            local t = math.min(time/duration, 1)
             local ofs = (224 - bgImage:getHeight())*util.smoothStep(1 - t)
 
             love.graphics.translate(0, ofs)
