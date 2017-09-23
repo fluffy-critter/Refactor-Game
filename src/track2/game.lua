@@ -235,7 +235,7 @@ function Game:start()
                 selections = {
                     self.scenes.missing("therapist"),
                     self.scenes.missing("vacation"),
-                    self.scenes.missing("parkbench"),
+                    self.scenes.parkBench()
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
@@ -243,7 +243,7 @@ function Game:start()
                 local hospital = self.scenes.hospital(clock.posToDelta({0,1}))
                 local doctor = self.scenes.missing("doctor")
                 local therapist = self.scenes.missing("therapist")
-                local parkbench = self.scenes.missing("parkbench")
+                local parkbench = self.scenes.parkBench()
 
                 selections = {
                     hospital,
@@ -269,7 +269,7 @@ function Game:start()
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
                 flashOut = {0,0,255,0}
-                selections = {self.scenes.missing("parkbench", true)}
+                selections = {self.scenes.parkBench(true)}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
