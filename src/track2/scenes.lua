@@ -499,4 +499,68 @@ function scenes.endKitchen(game, version)
     }
 end
 
+function scenes.parkBench(gregMissing)
+    local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
+
+
+    local sky = {
+        {image = imagepool.load('track2/parkbench-sky.png', {nearest=true})},
+        {
+            img = imagepool.load('track2/parkbench-clouds-1.png', {nearest=true}),
+            x = math.random(0,255),
+            update = function(self, dt)
+                self.x = self.x + dt*3/2
+            end,
+            draw = function(self)
+                love.graphics.draw(self.img, self.x%256 - 256, 0)
+                love.graphics.draw(self.img, self.x%256, 0)
+            end
+        },
+        {
+            img = imagepool.load('track2/parkbench-clouds-2.png', {nearest=true}),
+            x = math.random(0,255),
+            update = function(self, dt)
+                self.x = self.x + dt*3
+            end,
+            draw = function(self)
+                love.graphics.draw(self.img, self.x%256 - 256, 0)
+                love.graphics.draw(self.img, self.x%256, 0)
+            end
+        }
+    }
+
+    local bg = {
+        {image = imagepool.load('track2/parkbench-bg.png', {nearest=true})},
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 3.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.75},
+                {quads.rose.blink, 0.1},
+            }
+        })
+    }
+
+    local fg = {}
+
+    return {
+        update = function(_, dt)
+            updateLayers(sky, dt)
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
+        end,
+        draw = function(_, dt)
+            drawLayers(sky)
+            drawLayers(bg)
+            drawLayers(fg)
+
+            return true
+        end
+    }
+end
+
 return scenes

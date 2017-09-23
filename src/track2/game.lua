@@ -154,6 +154,8 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
+    -- self.sceneStack = {self.scenes.parkBench()}
+
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
     for y = 0, 13 do
@@ -267,7 +269,7 @@ function Game:start()
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
                 flashOut = {0,0,255,0}
-                selections = {self.scenes.missing("parkbench")}
+                selections = {self.scenes.missing("parkbench", true)}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
