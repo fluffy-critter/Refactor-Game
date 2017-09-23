@@ -154,6 +154,8 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
+    -- self.sceneStack = {self.scenes.parkBench()}
+
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
     for y = 0, 13 do
