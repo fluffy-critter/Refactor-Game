@@ -501,7 +501,75 @@ end
 
 function scenes.parkBench(gregMissing)
     local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
+    local time = 0
 
+    local birbAnims = {
+        left = {
+            {quads.birb.left.up, math.random()*3 + 0.25},
+            {quads.birb.left.peck, 0.1},
+            {quads.birb.left.up, math.random() + 0.5},
+            {quads.birb.left.peck, 0.1}
+        },
+        right = {
+            {quads.birb.right.up, math.random()*3 + 0.25},
+            {quads.birb.right.peck, 0.1},
+            {quads.birb.right.up, math.random() + 0.5},
+            {quads.birb.right.peck, 0.1}
+        },
+        flap = {
+            {quads.birb.flap[1], 0.05},
+            {quads.birb.flap[2], 0.05},
+            {quads.birb.flap[3], 0.05},
+            {quads.birb.flap[4], 0.05},
+            {quads.birb.flap[3], 0.05},
+            {quads.birb.flap[2], 0.05},
+        }
+    }
+
+    local flockX, flockY = 0, 40
+
+    local function birb()
+        local age = 0
+        local dx = math.random(-10,10)/10
+        local dy = 0
+        local flappy = false
+
+        local ox, oy = math.random(-20, 20), math.random(-20, 20)
+
+        local sprite = Sprite.new({
+            pos = {math.random(-16,256), math.random(160,224)},
+            sheet = spriteSheet
+        })
+
+        if dx < 0 then
+            sprite.animation = birbAnims.left
+        else
+            sprite.animation = birbAnims.right
+        end
+
+        local chainedUpdate = sprite.update
+        sprite.update = function(self, dt)
+            chainedUpdate(self, dt)
+            age = age + dt
+
+            if not flappy and flockX >= self.pos[1] then
+                flappy = true
+                self.animation = birbAnims.flap
+            end
+
+            if flappy then
+                local ax = 2*(flockX + ox - self.pos[1] - dx*3)
+                local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                dx = dx + ax*dt
+                dy = dy + ay*dt
+            end
+
+            self.pos[1] = self.pos[1] + dt*dx
+            self.pos[2] = self.pos[2] + dt*dy
+        end
+
+        return sprite
+    end
 
     local sky = {
         {image = imagepool.load('track2/parkbench-sky.png', {nearest=true})},
@@ -571,12 +639,20 @@ function scenes.parkBench(gregMissing)
     end
 
     local fg = {}
+    for _ = 1,64 do
+        table.insert(fg, birb())
+    end
 
     return {
         update = function(_, dt)
             updateLayers(sky, dt)
             updateLayers(bg, dt)
             updateLayers(fg, dt)
+
+            time = time + dt
+            if not gregMissing then
+                flockX = (time - 1.5)*384
+            end
         end,
         draw = function(_)
             drawLayers(sky)

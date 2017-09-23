@@ -259,12 +259,12 @@ function Game:start()
                     therapist,
                     self.kitchenScene,
                     doctor,
-                    hospital,
+                    parkbench,
 
                     self.kitchenScene,
                     self.scenes.missing("vacation"),
                     therapist,
-                    doctor,
+                    parkbench,
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
