@@ -671,7 +671,7 @@ function scenes.doctor(game)
     local spriteSheet, quads = loadSprites("track2/doctor-sprites.png", "track2/doctor-sprites.lua")
 
     local cartpusher = Sprite.new({
-        pos = {220, 8},
+        pos = {220, -16},
         sheet = spriteSheet,
         frame = quads.cartpusher
     })
@@ -680,9 +680,10 @@ function scenes.doctor(game)
         if cartpusher.pos[2] < 224 then
             game:addAnimation({
                 target = cartpusher,
-                endPos = {cartpusher.pos[1], cartpusher.pos[2] + 8},
-                easing = Animator.Easing.ease_out
-            }, {when[1], when[2], when[3] + 0.75}, {when[1], when[2], when[3] + 1.25})
+                endPos = {cartpusher.pos[1], cartpusher.pos[2] + 12},
+                easing = Animator.Easing.ease_out,
+                duration = 0.25
+            }, when)
             game.eventQueue:addEvent({
                 what = pushCart,
                 when = {when[1], when[2], when[3] + 1}
