@@ -332,16 +332,16 @@ function scenes.hospital(duration)
             pos = {120, 96},
             sheet = spriteSheet,
             animation = {
-                {quads.mri[1], 2/24},
-                {quads.mri[2], 2/24},
-                {quads.mri[3], 2/24},
-                {quads.mri[4], 2/24},
-                {quads.mri[5], 2/24},
-                {quads.mri[6], 2/24},
-                {quads.mri[7], 2/24},
-                {quads.mri[8], 2/24},
-                {quads.mri[9], 2/24},
-                {quads.mri[10], 2/24},
+                {quads.mri[1], 2/30},
+                {quads.mri[2], 2/30},
+                {quads.mri[3], 2/30},
+                {quads.mri[4], 2/30},
+                {quads.mri[5], 2/30},
+                {quads.mri[6], 2/30},
+                {quads.mri[7], 2/30},
+                {quads.mri[8], 2/30},
+                {quads.mri[9], 2/30},
+                {quads.mri[10], 2/30},
             }
         })
     }
