@@ -37,7 +37,7 @@ setmetatable(_G, {
 })
 
 local PROFILE = false
-local DEBUG = true
+local DEBUG = false
 
 local Pie
 if PROFILE then
