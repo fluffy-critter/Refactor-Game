@@ -485,7 +485,7 @@ function Game:update(dt)
     end
 
     util.runQueue(self.sceneStack, function(scene)
-        scene:update(dt, pos)
+        scene:update(dt, time)
     end)
 
     if util.arrayLT({17,1,0}, time) then
