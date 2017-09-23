@@ -5,6 +5,9 @@ Refactor
 
 ]]
 
+local config = require('config')
+local util = require('util')
+
 local input = {
     -- ramp time for digital inputs, in seconds
     rampTime = 1/6,
@@ -35,8 +38,9 @@ local state = {
     padPressed = {}
 }
 
--- map keys to the input mapping (TODO configurable)
-local keyboardMap = {
+-- map keys to the input mapping
+local keyboardMap = config.keyboardMap or {}
+util.applyDefaults(keyboardMap, {
     up = 'up',
     down = 'down',
     left = 'left',
@@ -56,11 +60,12 @@ local keyboardMap = {
     z = 'b',
     x = 'a',
 
-    ['.'] = 'skip'
-}
+    ['.'] = config.debug and 'skip'
+})
 
--- map gamepad buttons to the input mapping (TODO configurable)
-local buttonMap = {
+-- map gamepad buttons to the input mapping
+local buttonMap = config.buttonmap or {}
+util.applyDefaults(buttonMap, {
     dpup = 'up',
     dpdown = 'down',
     dpleft = 'left',
@@ -74,8 +79,8 @@ local buttonMap = {
     back = 'back',
     start = 'start',
 
-    rightshoulder = 'skip'
-}
+    rightshoulder = config.debug and 'skip'
+})
 
 local function handlePress(which, map)
     local event = map[which]

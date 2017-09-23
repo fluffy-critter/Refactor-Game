@@ -36,8 +36,10 @@ setmetatable(_G, {
     end
 })
 
+local config = require('config')
+
 local PROFILE = false
-local DEBUG = false
+local DEBUG = config.debug or false
 
 local Pie
 if PROFILE then
@@ -149,7 +151,11 @@ function input.onPress(button)
         else
             screen.resumeMusic = false
         end
-        love.window.setFullscreen(not love.window.getFullscreen())
+
+        config.fullscreen = not love.window.getFullscreen()
+        love.window.setFullscreen(config.fullscreen)
+
+        config.save()
     elseif currentGame and button == 'back' then
         playing.state = PlayState.ending
     elseif currentGame and currentGame.onButtonPress then
@@ -193,6 +199,14 @@ function love.mousepressed(...)
 end
 
 function love.load(args)
+    -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
+    love.window.setMode(config.width, config.height, {
+        resizable = true,
+        fullscreen = config.fullscreen,
+        minwidth = 640,
+        minheight = 480
+    })
+
     math.randomseed(os.time())
 
     cute.go(args)
@@ -233,6 +247,14 @@ end
 local frameCount = 0
 local frameTime = 0
 local fps
+
+function love.resize(w, h)
+    if not config.fullscreen then
+        config.width = w
+        config.height = h
+        config.save()
+    end
+end
 
 function love.update(dt)
     if Pie then Pie:attach() end
