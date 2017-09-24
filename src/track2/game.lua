@@ -243,10 +243,32 @@ function Game:start()
             or self.dialogState == "alienated"
             or self.dialogState == "alien_endgame" then
                 flashOut = {127,0,255,0}
+
+                local therapist = self.scenes.missing("therapist")
+                local vacation = self.scenes.missing("vacation")
+                local parkTogether = self.scenes.parkBench()
+                local parkApart = self.scenes.parkBench(true)
+
                 selections = {
-                    self.scenes.missing("therapist"),
-                    self.scenes.missing("vacation"),
-                    self.scenes.parkBench()
+                    therapist,
+                    therapist,
+                    self.kitchenScene,
+                    parkTogether,
+
+                    therapist,
+                    self.kitchenScene,
+                    parkTogether,
+                    parkApart,
+
+                    therapist,
+                    self.kitchenScene,
+                    vacation,
+                    vacation,
+
+                    therapist,
+                    self.kitchenScene,
+                    self.dialogState == "wtf" and parkApart or parkTogether,
+                    therapist,
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
@@ -287,7 +309,7 @@ function Game:start()
                 selections = {self.scenes.missing("vacation")}
             elseif self.dialogState == "herpderp" then
                 selections = {
-                    self.scenes.missing("what were you expecting")
+                    self.kitchenScene
                 }
             else
                 selections = {
@@ -295,7 +317,7 @@ function Game:start()
                 }
             end
 
-            if selections and #selections > 1 then
+            if selections then
                 -- collate a list of greg poses
                 local gregPoses = {}
                 local rosePoses = {}
@@ -628,10 +650,18 @@ function Game:chooseDialog(dialog)
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.maxCount or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
+            local specificity = 1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
                 distance = distance + dx*dx*(self.weights[k] or 1) + (self.offsets[k] or 1)
+                if self.npc[k] then
+                    specificity = specificity + 1
+                end
             end
+
+            -- let more specific rules match first
+            distance = distance/specificity
+
             if not minDistance or distance < minDistance then
                 print("      d=" .. distance .. ": " .. node.text .. " d=" .. distance)
                 minNode = node
