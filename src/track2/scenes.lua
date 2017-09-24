@@ -271,7 +271,7 @@ function scenes.kitchen()
     }
 end
 
-function scenes.phase11(duration)
+function scenes.phase11(game, duration)
     local image = imagepool.load("track2/phase11-pan.png", {nearest=false}) -- round at blit time, let shaders interp
     local blurSize = 1
     local panSize = image:getWidth() - 256 - blurSize
@@ -308,7 +308,7 @@ function scenes.phase11(duration)
                 love.graphics.draw(image, p)
                 love.graphics.setShader()
             end
-            return true
+            return not game.npc.gone
         end
     }
 end
@@ -450,22 +450,22 @@ function scenes.endKitchen(game, version)
     if version == "wtf" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {96,113},
+            pos = {88,113},
             frame = quads.greg.down[1],
         }))
         rose.animation = rose.animations.normal
-    elseif version == "alienated" then
+    elseif version == "alienated" or version == "alien_endgame" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {104,113},
-            -- frame = quads.greg.leaning,
+            pos = {120,113},
+            frame = quads.greg.leaning,
         }))
         rose.frame = quads.rose.kitchen.blink
     elseif version == "vacation" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {104,113},
-            -- frame = quads.greg.leaning,
+            pos = {120,113},
+            frame = quads.greg.leaning,
         }))
         rose.animation = rose.animations.eyes_left
     elseif version == "brain_problems" or version == "stroke" then

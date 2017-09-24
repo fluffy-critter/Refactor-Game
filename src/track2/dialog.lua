@@ -953,7 +953,7 @@ local dialog = {
             responses = {
                 {"We're married?", {}, "brain_problems"},
                 {"Yeah, I guess so.", {lastnight_ignorance=-50}},
-                {"Who are you, again?", {}, "brain_problems"}
+                {"Who are you, again?", {}, "alienated"}
             }
         },
 
@@ -1423,7 +1423,7 @@ local dialog = {
 
         {
             pos = {bp_guess_husband=100, bp_prerequisite=100, told_was_husband=0},
-            text = "Do you actually know that, or are you really just guessing?%% Be honest.",
+            text = "Do you actually know that, or are you just guessing?%% Be honest.",
             pose = {"next_to_rose", "facing_down"},
             rose = "normal",
             responses = {
@@ -1895,7 +1895,7 @@ local dialog = {
             responses = {
                 {"I don't even know you.", {}, "wtf"},
                 {"... Never mind.", {}},
-                {"Yes.", {alien_nonanswer=100}}
+                {"Yes, that.", {alien_nonanswer=100}}
             },
         },
         {
@@ -1924,6 +1924,7 @@ local dialog = {
             pos = {phase=10},
             text = "Ha ha, okay, this is just...%% Sad. I don't want things to end this way.",
             rose = "eyes_right",
+            setState = "alien_endgame",
             responses = {
                 {"They're ending?", {}},
                 {"Wait. Don't leave.", {alien_dont_leave=100}},
@@ -1932,14 +1933,18 @@ local dialog = {
         },
         {
             pos = {phase=10.1},
-            text = "Ha ha, wow, this is just... what the hell is going on here.",
+            text = "Ha ha, wow, this is just...% what the hell is going on here.",
             pose = {"bottom_of_stairs", "facing_left"},
+            setState = "alien_endgame",
             responses = {
                 {"I don't know.", {}},
                 {"Who the hell are you?", {}, "gave_up"},
                 {"Who are you?", {}, "brain_problems"}
             }
         },
+    },
+
+    alien_endgame = {
         {
             pos = {phase=11},
             text = "When we met, you said you couldn't be in love for very long. I thought I proved you wrong. " ..
@@ -2189,7 +2194,8 @@ local dialog = {
             pos = {phase=12,gu_prereq=500,leaving=1000},
             text = "I hope you get the help you need.",
             pose = {"below_doors","leaving","pause","gone"},
-            setPos = {gone=1000}
+            setPos = {gone=1000},
+            cantInterrupt=true
         },
 
         {

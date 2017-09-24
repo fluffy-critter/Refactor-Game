@@ -95,10 +95,10 @@ function Game:init()
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
         phase = 3,
-        interrupted = 3,
+        interrupted = 100,
         fun = 0.01,
-        silence_cur = 10,
-        silence_total = 7
+        silence_cur = 100,
+        silence_total = 700
     }
 
     -- how much to bias an axis by, if it's present in the match rule
@@ -154,7 +154,7 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.doctor(self)}
+    -- self.sceneStack = {self.scenes.endKitchen(self, "gave_up")}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -187,7 +187,7 @@ function Game:start()
             -- show the photograph pan
             when = {11},
             what = function()
-                table.insert(self.sceneStack, self.scenes.phase11(16*60/BPM))
+                table.insert(self.sceneStack, self.scenes.phase11(self, 16*60/BPM))
             end
         },
         {
@@ -239,7 +239,9 @@ function Game:start()
 
             local selections
 
-            if self.dialogState == "wtf" or self.dialogState == "alienated" then
+            if self.dialogState == "wtf"
+            or self.dialogState == "alienated"
+            or self.dialogState == "alien_endgame" then
                 flashOut = {127,0,255,0}
                 selections = {
                     self.scenes.missing("therapist"),
