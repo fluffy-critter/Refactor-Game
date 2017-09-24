@@ -157,10 +157,10 @@ function scenes.kitchen()
                 pos = {182,118},
             },
             bottom_of_stairs = {
-                pos = {217,80}
+                pos = {214,80}
             },
             left_of_couch = {
-                pos = {200,128}
+                pos = {200,124}
             },
             below_doors = {
                 pos = {147,90}
@@ -185,13 +185,13 @@ function scenes.kitchen()
                 end
             },
             couch_sitting = {
-                pos = {204,124},
+                pos = {204,120},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.sitting.normal
                 end
             },
             couch_sitting_thinking = {
-                pos = {204,124},
+                pos = {204,120},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.sitting.thinking
                 end
@@ -471,7 +471,7 @@ function scenes.endKitchen(game, version)
     elseif version == "brain_problems" or version == "stroke" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {204,126},
+            pos = {204,130},
             frame = quads.greg.sitting.thinking
         }))
         rose.animation = rose.animations.eyes_right

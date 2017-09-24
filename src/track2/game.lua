@@ -180,7 +180,7 @@ function Game:start()
     self.eventQueue:addEvent({
         when = {0, 3, 2.5},
         what = function()
-            self:setPoseSequence(scene.greg, {"bottom_of_stairs", "right_of_rose", "facing_left"})
+            self:setPoseSequence(scene.greg, {"left_of_stairs", "right_of_rose", "facing_left"})
         end
     })
 
