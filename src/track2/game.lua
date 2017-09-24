@@ -184,15 +184,24 @@ function Game:start()
 
     self.eventQueue:addEvents({
         {
+            -- show the photograph pan
             when = {11},
             what = function()
                 table.insert(self.sceneStack, self.scenes.phase11(16*60/BPM))
             end
         },
         {
+            -- set the player sprite to crying for when we get back from it
             when = {11,2},
             what = function()
                 self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
+            end
+        },
+        {
+            -- make sure the last dialog box disappears before the vignettes
+            when = {12,3},
+            what = function()
+                self.nextTimeout = {12,3,3.5}
             end
         }
     })
