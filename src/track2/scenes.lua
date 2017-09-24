@@ -12,20 +12,41 @@ local shaders = require('shaders')
 
 local Sprite = require('track2.Sprite')
 local Animator = require('Animator')
+local TextBox = require('track2.TextBox')
 
 local scenes = {}
 
 local function loadSprites(imageFile, quadFile)
-    local spriteSheet = imagepool.load(imageFile)
-    spriteSheet:setFilter('nearest')
-    local quads = quadtastic.create_quads(require(quadFile), spriteSheet:getWidth(), spriteSheet:getHeight())
+    local spriteSheet = imagepool.load(imageFile, {nearest=true})
+    local quads = quadtastic.create_quads(love.filesystem.load(quadFile)(),
+        spriteSheet:getWidth(), spriteSheet:getHeight())
     return spriteSheet, quads
+end
+
+local function updateLayers(layers, dt)
+    for _,layer in ipairs(layers) do
+        if layer.update then
+            layer:update(dt)
+        end
+    end
+end
+
+local function drawLayers(layers)
+    for _,thing in ipairs(layers) do
+        if thing.draw then
+            thing:draw()
+        elseif thing.frame then
+            love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
+        elseif thing.image then
+            love.graphics.draw(thing.image, unpack(thing.pos or {}))
+        end
+    end
 end
 
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
+    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -224,43 +245,33 @@ function scenes.kitchen()
     })
     greg.animation = nil
 
+    local layers = {
+        {image = backgroundLayer},
+        openDoor,
+        greg,
+        closedDoor,
+        {image = foregroundLayer},
+        rose,
+    }
+
     return {
         frames = quads,
         rose = rose,
         greg = greg,
 
-        layers = {
-            {image = backgroundLayer},
-            openDoor,
-            greg,
-            closedDoor,
-            {image = foregroundLayer},
-            rose,
-        },
-
-        update = function(self, dt)
-            for _,layer in ipairs(self.layers) do
-                if layer.update then
-                    layer:update(dt)
-                end
-            end
+        update = function(_, dt)
+            updateLayers(layers, dt)
         end,
 
-        draw = function(self)
+        draw = function(_)
             love.graphics.setColor(255,255,255)
-            for _,thing in ipairs(self.layers) do
-                if thing.frame then
-                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
-                elseif thing.image then
-                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
-                end
-            end
+            drawLayers(layers)
             return true
         end
     }
 end
 
-function scenes.phase11(duration)
+function scenes.phase11(game, duration)
     local image = imagepool.load("track2/phase11-pan.png", {nearest=false}) -- round at blit time, let shaders interp
     local blurSize = 1
     local panSize = image:getWidth() - 256 - blurSize
@@ -297,6 +308,71 @@ function scenes.phase11(duration)
                 love.graphics.draw(image, p)
                 love.graphics.setShader()
             end
+            return not game.npc.gone
+        end
+    }
+end
+
+function scenes.hospital(duration)
+    local spriteSheet, quads = loadSprites('track2/hospital-fg.png', 'track2/hospital-sprites.lua')
+
+    local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
+
+    local bg = {
+        {image = bgImage},
+        Sprite.new({
+            pos = {17, 112},
+            animation = {
+                {quads.tech[1], 2/3},
+                {quads.tech[2], 2/3}
+            },
+            sheet = spriteSheet
+        }),
+        Sprite.new({
+            pos = {120, 96},
+            sheet = spriteSheet,
+            animation = {
+                {quads.mri[1], 2/30},
+                {quads.mri[2], 2/30},
+                {quads.mri[3], 2/30},
+                {quads.mri[4], 2/30},
+                {quads.mri[5], 2/30},
+                {quads.mri[6], 2/30},
+                {quads.mri[7], 2/30},
+                {quads.mri[8], 2/30},
+                {quads.mri[9], 2/30},
+                {quads.mri[10], 2/30},
+            }
+        })
+    }
+
+    local fg = {
+        Sprite.new({
+            pos = {120, 112},
+            sheet = spriteSheet,
+            frame = quads.rose
+        }),
+    }
+
+    local time = 0
+
+    return {
+        update = function(_, dt)
+            time = time + dt
+
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
+        end,
+        draw = function()
+            local t = math.min(time/duration, 1)
+            local ofs = (224 - bgImage:getHeight())*util.smoothStep(1 - t)
+
+            love.graphics.translate(0, ofs)
+            drawLayers(bg)
+
+            love.graphics.translate(0, -ofs)
+            drawLayers(fg)
+
             return true
         end
     }
@@ -314,10 +390,11 @@ function scenes.missing(label)
     }
 end
 
-function scenes.endKitchen(version)
+function scenes.endKitchen(game, version)
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites('track2/sprites.png', 'track2.sprites')
+    -- TODO different outfits? are they older?
+    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -360,36 +437,35 @@ function scenes.endKitchen(version)
             crying = {
                 {quads.rose.kitchen.cry[1], 2/3},
                 {quads.rose.kitchen.cry[2], 2/3},
-            }
+            },
         }
     })
 
 
     local layers = {
         {image = backgroundLayer},
-        rose
     }
 
     -- does Greg exist?
     if version == "wtf" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {96,113},
+            pos = {88,113},
             frame = quads.greg.down[1],
         }))
         rose.animation = rose.animations.normal
-    elseif version == "alienated" then
+    elseif version == "alienated" or version == "alien_endgame" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {104,113},
-            -- frame = quads.greg.leaning,
+            pos = {120,113},
+            frame = quads.greg.leaning,
         }))
         rose.frame = quads.rose.kitchen.blink
     elseif version == "vacation" then
         table.insert(layers, Sprite.new({
             sheet = spriteSheet,
-            pos = {104,113},
-            -- frame = quads.greg.leaning,
+            pos = {120,113},
+            frame = quads.greg.leaning,
         }))
         rose.animation = rose.animations.eyes_left
     elseif version == "brain_problems" or version == "stroke" then
@@ -400,33 +476,247 @@ function scenes.endKitchen(version)
         }))
         rose.animation = rose.animations.eyes_right
     elseif version == "herpderp" then
-        -- TODO add exasperated/eyeroll fluffy sitting at the table
-        print("delicious eggs")
+        rose.animation = {{quads.fluffy.open, 3}, {quads.fluffy.blink, 0.2}}
+        game.textBox = TextBox.new({text = "Nice job breaking it, hero."})
     else
         print(version .. ": nobody's there?")
         rose.animation = rose.animations.normal
     end
 
     table.insert(layers, {image = foregroundLayer})
+    table.insert(layers, rose)
 
     return {
         layers = layers,
-        update = function(self, dt)
-            for _,layer in ipairs(self.layers) do
-                if layer.update then
-                    layer:update(dt)
-                end
+        update = function(_, dt)
+            updateLayers(layers, dt)
+        end,
+        draw = function(_)
+            love.graphics.setColor(255,255,255)
+            drawLayers(layers)
+            return true
+        end
+    }
+end
+
+function scenes.parkBench(gregMissing)
+    local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
+    local time = 0
+
+    local flockX, flockY = false, 40
+
+    local function birb()
+        local age = 0
+        local dx = math.random(-10,10)/10
+        local dy = 0
+        local flappy = false
+
+        local ox, oy = math.random(-20, 20), math.random(-20, 20)
+
+        local birbAnims = {
+            left = {
+                {quads.birb.left.up, math.random()*3 + 0.25},
+                {quads.birb.left.peck, 0.1},
+                {quads.birb.left.up, math.random() + 0.5},
+                {quads.birb.left.peck, 0.1}
+            },
+            right = {
+                {quads.birb.right.up, math.random()*3 + 0.25},
+                {quads.birb.right.peck, 0.1},
+                {quads.birb.right.up, math.random() + 0.5},
+                {quads.birb.right.peck, 0.1}
+            },
+            flap = {
+                {quads.birb.flap[1], 0.05},
+                {quads.birb.flap[2], 0.05},
+                {quads.birb.flap[3], 0.05},
+                {quads.birb.flap[4], 0.05},
+                {quads.birb.flap[3], 0.05},
+                {quads.birb.flap[2], 0.05},
+            }
+        }
+
+        local sprite = Sprite.new({
+            pos = {math.random(-16,240), math.random(160,224)},
+            sheet = spriteSheet
+        })
+
+        if dx < 0 then
+            sprite.animation = birbAnims.left
+        else
+            sprite.animation = birbAnims.right
+        end
+
+        local chainedUpdate = sprite.update
+        sprite.update = function(self, dt)
+            chainedUpdate(self, dt)
+            age = age + dt
+
+            if not flappy and flockX and flockX >= self.pos[1] then
+                flappy = true
+                self.animation = birbAnims.flap
+            end
+
+            if flappy then
+                local ax = 2*(flockX + ox - self.pos[1] - dx*3)
+                local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                dx = dx + ax*dt
+                dy = dy + ay*dt
+            end
+
+            self.pos[1] = self.pos[1] + dt*dx
+            self.pos[2] = self.pos[2] + dt*dy
+        end
+
+        return sprite
+    end
+
+    local sky = {
+        {image = imagepool.load('track2/parkbench-sky.png', {nearest=true})},
+        {
+            img = imagepool.load('track2/parkbench-clouds-1.png', {nearest=true}),
+            x = math.random(0,255),
+            update = function(self, dt)
+                self.x = self.x + dt*3/2
+            end,
+            draw = function(self)
+                love.graphics.draw(self.img, self.x%256 - 256, 0)
+                love.graphics.draw(self.img, self.x%256, 0)
+            end
+        },
+        {
+            img = imagepool.load('track2/parkbench-clouds-2.png', {nearest=true}),
+            x = math.random(0,255),
+            update = function(self, dt)
+                self.x = self.x + dt*3
+            end,
+            draw = function(self)
+                love.graphics.draw(self.img, self.x%256 - 256, 0)
+                love.graphics.draw(self.img, self.x%256, 0)
+            end
+        }
+    }
+
+    local bg = {
+        {image = imagepool.load('track2/parkbench-bg.png', {nearest=true})},
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 1.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.25},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.75},
+                {quads.rose.blink, 0.1},
+            }
+        })
+    }
+
+    if not gregMissing then
+        table.insert(bg, Sprite.new({
+            pos = {131,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.greg[1], 2},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 0.12},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 1.2},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+                {quads.greg[1], 0.12},
+                {quads.greg[2], 0.07},
+                {quads.greg[3], 0.07},
+                {quads.greg[2], 0.07},
+            }
+        }))
+    end
+
+    local fg = {}
+    for _ = 1,64 do
+        table.insert(fg, birb())
+    end
+    table.sort(fg, function(a,b)
+        return a.pos[2] < b.pos[2]
+    end)
+
+    return {
+        update = function(_, dt)
+            updateLayers(sky, dt)
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
+
+            time = time + dt
+            if not gregMissing then
+                flockX = (time - 1.5)*384
             end
         end,
-        draw = function(self)
-            love.graphics.setColor(255,255,255)
-            for _,thing in ipairs(self.layers) do
-                if thing.frame then
-                    love.graphics.draw(thing.sheet, thing.frame, unpack(thing.pos or {}))
-                elseif thing.image then
-                    love.graphics.draw(thing.image, unpack(thing.pos or {}))
-                end
-            end
+        draw = function(_)
+            drawLayers(sky)
+            drawLayers(bg)
+            drawLayers(fg)
+
+            return true
+        end
+    }
+end
+
+function scenes.doctor(game)
+    local spriteSheet, quads = loadSprites("track2/doctor-sprites.png", "track2/doctor-sprites.lua")
+
+    local cartpusher = Sprite.new({
+        pos = {220, -16},
+        sheet = spriteSheet,
+        frame = quads.cartpusher
+    })
+
+    local function pushCart(when)
+        if cartpusher.pos[2] < 224 then
+            game:addAnimation({
+                target = cartpusher,
+                endPos = {cartpusher.pos[1], cartpusher.pos[2] + 12},
+                easing = Animator.Easing.ease_out,
+                duration = 0.25
+            }, when)
+            game.eventQueue:addEvent({
+                what = pushCart,
+                when = {when[1], when[2], when[3] + 1}
+            })
+        end
+    end
+    pushCart({0,0,0})
+
+    local layers = {
+        {image = imagepool.load('track2/doctor-bg.png', {nearest=true})},
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 3.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.75},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.75},
+                {quads.rose.blink, 0.1},
+            }
+        }),
+        cartpusher
+    }
+
+    -- TODO medical staff wandering the hall, stepping on the beat
+
+    return {
+        update = function(_, dt)
+            updateLayers(layers, dt)
+        end,
+        draw = function(_)
+            drawLayers(layers)
             return true
         end
     }

@@ -203,6 +203,7 @@ Returns an object with methods:
 
 timeToPos(time) - converts a numerical position to a position array
 posToTime(pos) - converts a position array to a numerical position
+posToDelta(pos) - converts a position array to a numerical delta
 normalize(pos) - normalize an offset array with the proper modulus
 addOffset(pos, delta) - add an offset array to a position array, returning a new position array
 iterator(startTime, endTime, delta) - returns an iterator that starts at startTime, ends at endTime, incrs by delta
@@ -223,13 +224,17 @@ function util.clock(BPM, limits, ofs)
         return pos
     end
 
-    local posToTime = function(pos)
+    local posToDelta = function(pos)
         local beat = 0
         for idx,sz in ipairs(limits) do
             beat = (beat + (pos[idx] or 0))*sz
         end
         beat = beat + (pos[#limits + 1] or 0)
-        return beat*60/BPM + ofs
+        return beat*60/BPM
+    end
+
+    local posToTime = function(pos)
+        return posToDelta(pos) + ofs
     end
 
     local normalize = function(pos)
@@ -258,9 +263,11 @@ function util.clock(BPM, limits, ofs)
         end
     end
 
+
     return {
         timeToPos = timeToPos,
         posToTime = posToTime,
+        posToDelta = posToDelta,
         normalize = normalize,
         addOffset = addOffset,
         iterator = iterator

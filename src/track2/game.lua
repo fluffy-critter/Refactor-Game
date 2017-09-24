@@ -5,7 +5,9 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = false
+local config = require('config')
+
+local DEBUG = config.debug
 
 local util = require('util')
 local shaders = require('shaders')
@@ -95,10 +97,10 @@ function Game:init()
     -- how much to emphasize an axis in the dialog scoring (default = 1)
     self.weights = {
         phase = 3,
-        interrupted = 3,
+        interrupted = 100,
         fun = 0.01,
-        silence_cur = 10,
-        silence_total = 7
+        silence_cur = 100,
+        silence_total = 700
     }
 
     -- how much to bias an axis by, if it's present in the match rule
@@ -154,6 +156,8 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
+    -- self.sceneStack = {self.scenes.endKitchen(self, "gave_up")}
+
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
     for y = 0, 13 do
@@ -182,15 +186,24 @@ function Game:start()
 
     self.eventQueue:addEvents({
         {
+            -- show the photograph pan
             when = {11},
             what = function()
-                table.insert(self.sceneStack, self.scenes.phase11(16*60/BPM))
+                table.insert(self.sceneStack, self.scenes.phase11(self, 16*60/BPM))
             end
         },
         {
+            -- set the player sprite to crying for when we get back from it
             when = {11,2},
             what = function()
                 self.kitchenScene.rose.animation = self.kitchenScene.rose.animations.crying
+            end
+        },
+        {
+            -- make sure the last dialog box disappears before the vignettes
+            when = {12,3},
+            what = function()
+                self.nextTimeout = {12,3,3.5}
             end
         }
     })
@@ -228,41 +241,85 @@ function Game:start()
 
             local selections
 
-            if self.dialogState == "wtf" or self.dialogState == "alienated" then
+            if self.dialogState == "wtf"
+            or self.dialogState == "alienated"
+            or self.dialogState == "alien_endgame" then
                 flashOut = {127,0,255,0}
+
+                local therapist = self.scenes.missing("therapist")
+                local vacation = self.scenes.missing("vacation")
+                local parkTogether = self.scenes.parkBench()
+                local parkApart = self.scenes.parkBench(true)
+
                 selections = {
-                    self.scenes.missing("therapist"),
-                    self.scenes.missing("vacation"),
-                    self.scenes.missing("parkbench"),
+                    therapist,
+                    therapist,
+                    self.kitchenScene,
+                    parkTogether,
+
+                    therapist,
+                    self.kitchenScene,
+                    parkTogether,
+                    parkApart,
+
+                    therapist,
+                    self.kitchenScene,
+                    vacation,
+                    vacation,
+
+                    therapist,
+                    self.kitchenScene,
+                    self.dialogState == "wtf" and parkApart or parkTogether,
+                    therapist,
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "brain_problems" or self.dialogState == "stroke" then
                 flashOut = {255,255,0,0}
+                local hospital = self.scenes.hospital(clock.posToDelta({0,1}))
+                local doctor = self.scenes.doctor(self)
+                local therapist = self.scenes.missing("therapist")
+                local parkbench = self.scenes.parkBench()
+
                 selections = {
-                    self.scenes.missing("hospital"),
-                    self.scenes.missing("doctor"),
+                    hospital,
+                    doctor,
                     self.kitchenScene,
-                    self.scenes.missing("therapist"),
+                    parkbench,
+
+                    hospital,
                     self.kitchenScene,
-                    self.scenes.missing("parkbench"),
+                    doctor,
+                    parkbench,
+
+                    therapist,
                     self.kitchenScene,
-                    self.scenes.missing("doctor"),
+                    doctor,
+                    parkbench,
+
+                    self.kitchenScene,
+                    self.scenes.missing("vacation"),
+                    therapist,
+                    parkbench,
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
                 flashOut = {0,0,255,0}
-                selections = {self.scenes.missing("parkbench")}
+                selections = {self.scenes.parkBench(true)}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
                 selections = {self.scenes.missing("vacation")}
             elseif self.dialogState == "herpderp" then
                 selections = {
-                    self.scenes.missing("what were you expecting")
+                    self.kitchenScene
+                }
+            else
+                selections = {
+                    self.scenes.missing("Unknown state:\n" .. self.dialogState)
                 }
             end
 
-            if selections and #selections > 1 then
+            if selections then
                 -- collate a list of greg poses
                 local gregPoses = {}
                 local rosePoses = {}
@@ -326,13 +383,11 @@ function Game:start()
             self.eventQueue:addEvent({
                 when = {15},
                 what = function()
-                    self.sceneStack = {self.scenes.endKitchen(self.dialogState)}
+                    self.sceneStack = {self.scenes.endKitchen(self, self.dialogState)}
                 end
             })
         end
     })
-
-
 end
 
 function Game:onButtonPress(button, code, isRepeat)
@@ -437,7 +492,7 @@ function Game:update(dt)
 
     if (self.textBox and self.textBox.state < TextBox.states.ready) then
         local extend = self:getNextInterval(1.5, 1, 0)
-        if util.arrayLT(self.nextTimeout, extend) then
+        if self.nextTimeout and util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
             print("Extending timeout from " .. table.concat(self.nextTimeout,':') .. " to " .. table.concat(extend,':'))
             self.nextTimeout = extend
@@ -465,7 +520,7 @@ function Game:update(dt)
     end
 
     util.runQueue(self.sceneStack, function(scene)
-        scene:update(dt)
+        scene:update(dt, time)
     end)
 
     if util.arrayLT({17,1,0}, time) then
@@ -597,10 +652,18 @@ function Game:chooseDialog(dialog)
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.maxCount or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
+            local specificity = 1
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
                 distance = distance + dx*dx*(self.weights[k] or 1) + (self.offsets[k] or 1)
+                if self.npc[k] then
+                    specificity = specificity + 1
+                end
             end
+
+            -- let more specific rules match first
+            distance = distance/specificity
+
             if not minDistance or distance < minDistance then
                 print("      d=" .. distance .. ": " .. node.text .. " d=" .. distance)
                 minNode = node
@@ -705,15 +768,15 @@ function Game:draw()
                 love.graphics.draw(self.border)
             end
             love.graphics.setBlendMode("alpha")
-        end
 
-        if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then
-            love.graphics.setColor(unpack(self.flashColor))
-            love.graphics.rectangle("fill", 0, 0, 256, 224)
-        end
+            if self.flashColor and self.flashColor[4] and self.flashColor[4] > 0 then
+                love.graphics.setColor(unpack(self.flashColor))
+                love.graphics.rectangle("fill", 0, 0, 256, 224)
+            end
 
-        if self.textBox then
-            self.textBox:draw()
+            if self.textBox then
+                self.textBox:draw()
+            end
         end
 
         if self.lyricText then

@@ -352,9 +352,10 @@ local dialog = {
             pos = {},
             pose = {},
             rose = "eyes_left",
-            text = "",
-            maxCount = 500
-        }
+            text = '~%% <("<) %%^%% (>")> %%~',
+            maxCount = 500,
+            cantInterrupt = true
+        },
     },
 
     -- path where Greg thinks everything is normal
@@ -801,13 +802,16 @@ local dialog = {
         {
             pos = {phase=13},
             text = "I think I know someone we can talk to.",
-            maxCount = 20,
         },
         {
             pos = {phase=13},
             text = "We just need to keep an open mind.",
-            maxCount = 20,
         },
+        {
+            pos = {phase=14},
+            text = "",
+            ended = true
+        }
 
     },
 
@@ -952,7 +956,7 @@ local dialog = {
             responses = {
                 {"We're married?", {}, "brain_problems"},
                 {"Yeah, I guess so.", {lastnight_ignorance=-50}},
-                {"Who are you, again?", {}, "brain_problems"}
+                {"Who are you, again?", {}, "alienated"}
             }
         },
 
@@ -1397,7 +1401,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=7, bp_anything=0, bp_guessed_husband=0},
+            pos = {phase=7, bp_anything=0, bp_guess_husband=0},
             text = "Can you remember anything about me? Anything at all?",
             setPos = {bp_anything=100,bp_prerequisite=100},
             pose = "facing_left",
@@ -1409,7 +1413,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, bp_anything=0, bp_prerequisite=100, bp_guessed_husband=0},
+            pos = {phase=7, bp_anything=0, bp_prerequisite=100},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
             setPos = {bp_anything=100},
@@ -1422,7 +1426,7 @@ local dialog = {
 
         {
             pos = {bp_guess_husband=100, bp_prerequisite=100, told_was_husband=0},
-            text = "Do you actually know that, or are you really just guessing?%% Be honest.",
+            text = "Do you actually know that, or are you just guessing?%% Be honest.",
             pose = {"next_to_rose", "facing_down"},
             rose = "normal",
             responses = {
@@ -1440,7 +1444,6 @@ local dialog = {
         {
             pos = {bp_guess_husband=200},
             pose = "facing_left",
-            setPos = {bp_guessed_husband=200},
             text = "Yeah, that's still true.%% But I mean, do you know anything else?",
             rose = "eyes_right"
         },
@@ -1452,7 +1455,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=8,bp_just_guessing=0},
+            pos = {phase=8,bp_just_guessing=0,bp_guess_husband=0},
             text = "Our wedding day was the happiest I'd ever seen you...",
             pose = {"facing_left", "pause", "bottom_of_stairs", "facing_right"},
             responses = {
@@ -1895,7 +1898,7 @@ local dialog = {
             responses = {
                 {"I don't even know you.", {}, "wtf"},
                 {"... Never mind.", {}},
-                {"Yes.", {alien_nonanswer=100}}
+                {"Yes, that.", {alien_nonanswer=100}}
             },
         },
         {
@@ -1924,6 +1927,7 @@ local dialog = {
             pos = {phase=10},
             text = "Ha ha, okay, this is just...%% Sad. I don't want things to end this way.",
             rose = "eyes_right",
+            setState = "alien_endgame",
             responses = {
                 {"They're ending?", {}},
                 {"Wait. Don't leave.", {alien_dont_leave=100}},
@@ -1932,14 +1936,18 @@ local dialog = {
         },
         {
             pos = {phase=10.1},
-            text = "Ha ha, wow, this is just... what the hell is going on here.",
+            text = "Ha ha, wow, this is just...% what the hell is going on here.",
             pose = {"bottom_of_stairs", "facing_left"},
+            setState = "alien_endgame",
             responses = {
                 {"I don't know.", {}},
                 {"Who the hell are you?", {}, "gave_up"},
                 {"Who are you?", {}, "brain_problems"}
             }
         },
+    },
+
+    alien_endgame = {
         {
             pos = {phase=11},
             text = "When we met, you said you couldn't be in love for very long. I thought I proved you wrong. " ..
@@ -1970,7 +1978,7 @@ local dialog = {
             setState = "gave_up",
             responses = {
                 {"Can't do what?", {}},
-                {"Please don't leave me.", {}, "alienated"},
+                {"Please don't leave me.", {alien_abort_leave=150}, "alien_endgame"},
                 {"I'm sorry.", {}},
             }
         },
@@ -1984,8 +1992,39 @@ local dialog = {
                 {"Okay...", {}},
                 {"I guess...", {}},
                 {"But who are you?", {}, "brain_problems"}
+            },
+        },
+
+        {
+            pos = {phase=12, alien_abort_leave=150},
+            text = "You're right...% Let's work on this together, okay?",
+            pose = {"right_of_rose", "facing_left"},
+        },
+
+        {
+            pos = {phase=13},
+            text = "I think I know someone we can talk to.",
+        },
+        {
+            pos = {phase=13.1},
+            text = "We just need to keep an open mind.",
+        },
+        {
+            pos = {phase=13.2},
+            text = "But%.%.%. we %really% shouldn't rush through everything,% you know?",
+            cantInterrupt = true,
+            responses = {
+                {"Yeah, I guess not.", {}},
+                {"I'm sorry...", {}},
+                {"I'll try harder.", {}}
             }
+        },
+        {
+            pos = {phase=14},
+            text = "",
+            ended = true
         }
+
     },
 
     -- path where Greg has given up on helping Rose due to brain problems
@@ -2189,7 +2228,8 @@ local dialog = {
             pos = {phase=12,gu_prereq=500,leaving=1000},
             text = "I hope you get the help you need.",
             pose = {"below_doors","leaving","pause","gone"},
-            setPos = {gone=1000}
+            setPos = {gone=1000},
+            cantInterrupt=true
         },
 
         {
