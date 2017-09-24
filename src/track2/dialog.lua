@@ -1975,7 +1975,7 @@ local dialog = {
             setState = "gave_up",
             responses = {
                 {"Can't do what?", {}},
-                {"Please don't leave me.", {}, "alienated"},
+                {"Please don't leave me.", {alien_abort_leave=150}, "alien_endgame"},
                 {"I'm sorry.", {}},
             }
         },
@@ -1990,6 +1990,12 @@ local dialog = {
                 {"I guess...", {}},
                 {"But who are you?", {}, "brain_problems"}
             }
+        },
+
+        {
+            pos = {phase=12, alien_abort_leave=150},
+            text = "You're right...% Let's work on this together, okay?",
+            pose = {"right_of_rose", "facing_left"},
         }
     },
 
