@@ -802,13 +802,16 @@ local dialog = {
         {
             pos = {phase=13},
             text = "I think I know someone we can talk to.",
-            maxCount = 20,
         },
         {
             pos = {phase=13},
             text = "We just need to keep an open mind.",
-            maxCount = 20,
         },
+        {
+            pos = {phase=14},
+            text = "",
+            ended = true
+        }
 
     },
 
@@ -1989,14 +1992,39 @@ local dialog = {
                 {"Okay...", {}},
                 {"I guess...", {}},
                 {"But who are you?", {}, "brain_problems"}
-            }
+            },
         },
 
         {
             pos = {phase=12, alien_abort_leave=150},
             text = "You're right...% Let's work on this together, okay?",
             pose = {"right_of_rose", "facing_left"},
+        },
+
+        {
+            pos = {phase=13},
+            text = "I think I know someone we can talk to.",
+        },
+        {
+            pos = {phase=13.1},
+            text = "We just need to keep an open mind.",
+        },
+        {
+            pos = {phase=13.2},
+            text = "But%.%.%. we %really% shouldn't rush through everything,% you know?",
+            cantInterrupt = true,
+            responses = {
+                {"Yeah, I guess not.", {}},
+                {"I'm sorry...", {}},
+                {"I'll try harder.", {}}
+            }
+        },
+        {
+            pos = {phase=14},
+            text = "",
+            ended = true
         }
+
     },
 
     -- path where Greg has given up on helping Rose due to brain problems

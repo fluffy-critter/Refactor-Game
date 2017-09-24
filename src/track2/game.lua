@@ -5,7 +5,9 @@ Refactor: 2 - Strangers
 
 ]]
 
-local DEBUG = false
+local config = require('config')
+
+local DEBUG = config.debug
 
 local util = require('util')
 local shaders = require('shaders')
