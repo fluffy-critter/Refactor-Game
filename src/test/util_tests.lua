@@ -173,6 +173,11 @@ notion("clock", function()
         check(clock.posToTime({0,0,-1})).is(0)
     end)
 
+    notion("posToDelta", function()
+        check(clock.posToDelta({0})).is(0)
+        check(clock.posToDelta({1})).is(32)
+    end)
+
     notion("offsets", function()
         local time = 17
         local base = clock.timeToPos(time)

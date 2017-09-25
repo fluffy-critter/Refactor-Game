@@ -52,6 +52,7 @@ end
 
 function Game:init()
     self.BPM = BPM
+    self.clock = clock
 
     self.transcript = love.filesystem.newFile("strangers-" .. os.date("%Y%m%d-%H%M%S") .. ".txt")
     self.transcript:open("w")
@@ -189,7 +190,7 @@ function Game:start()
             -- show the photograph pan
             when = {11},
             what = function()
-                table.insert(self.sceneStack, self.scenes.phase11(self, 16*60/BPM))
+                table.insert(self.sceneStack, self.scenes.phase11(self, clock.posToDelta({0,3,3})))
             end
         },
         {
