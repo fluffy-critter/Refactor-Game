@@ -157,7 +157,7 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.therapist()}
+    -- self.sceneStack = {self.scenes.parkBench()}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -826,7 +826,7 @@ function Game:draw()
     if self.back then
         self.back:renderTo(function()
             love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(255, 255, 255, 90)
+            love.graphics.setColor(255, 255, 255, 150)
             love.graphics.draw(self.canvas)
         end)
     end
