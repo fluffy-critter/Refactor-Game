@@ -34,6 +34,11 @@ function Menu:draw()
     love.graphics.setColor(255,255,255,255)
     local y = 8
     for n,item in ipairs(self.choices) do
+        if item.font then
+            font = item.font
+            love.graphics.setFont(font)
+        end
+
         if n == self.pos then
             love.graphics.setColor(255,255,255,255)
             if item.onSelect then

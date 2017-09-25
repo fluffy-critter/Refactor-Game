@@ -186,6 +186,46 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
+local function credits()
+    return {
+        draw = function()
+            love.graphics.setBlendMode("alpha")
+            love.graphics.setColor(255,255,255,255)
+            love.graphics.setFont(fonts.bodoni72.regular)
+
+            -- TODO fancier formatting
+            love.graphics.printf([[
+Refactor
+
+All music, code, and art ©2015 j. "fluffy" shagam
+http://sockpuppet.us/
+http://beesbuzz.biz/
+http://fluffy.itch.io/
+
+Acknowledgments
+
+Patreon supporters:
+Tambi Jukka Austin SallyBird Kyreeth M.Wissig
+
+Moral support:
+Emmy Nate Zeno Jakub Lito Rachel Milo
+Seattle Indies
+Double Jump
+
+Built with LÖVE
+http://love2d.org
+]],
+            8, 8,
+            love.graphics:getWidth()/3,
+            "center"
+        )
+        end,
+        onButtonPress = function()
+            menuStack[#menuStack] = nil
+        end
+    }
+end
+
 local function mainmenu()
     local choices = {}
     for _,track in ipairs(tracks) do
@@ -202,13 +242,14 @@ local function mainmenu()
     end
 
     -- TODO
-    -- table.insert(choices, {})
-    -- table.insert(choices, {
-    --     label="Credits",
-    --     onSelect=function()
-    --         table.insert(menuStack, creditsScreen())
-    --     end
-    -- })
+    table.insert(choices, {})
+    -- table.insert(choices, {label="Settings"})
+    table.insert(choices, {
+        label="Credits",
+        onSelect = function()
+            table.insert(menuStack, credits())
+        end
+    })
 
     return Menu.new({choices = choices})
 end
