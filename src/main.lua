@@ -187,39 +187,56 @@ function love.mousepressed(...)
 end
 
 local function credits()
+    local lines = {
+        {font=fonts.bodoni72.bold, text="Refactor"},
+        '',
+        'All music, code, and art ©2015 j. "fluffy" shagam',
+        {font=fonts.helveticaOutline, text=[[
+http://sockpuppet.us/
+http://beesbuzz.biz/
+http://fluffy.itch.io/]]},
+        '',
+        {font=fonts.bodoni72.bold, text="Acknowledgments"},
+        "",
+        {font=fonts.bodoni72.italic, text="Patreon supporters"},
+        "Tambi • Jukka • Austin • Sally Bird • Kyreeth • M.Wissig",
+        "",
+        {font=fonts.bodoni72.italic, text="Moral support"},
+        [[
+Emmy • Nate • Zeno • Jakub • Lito • Rachel • Milo
+Seattle Indies
+Double Jump
+
+Built with LÖVE]],
+        {font=fonts.helveticaOutline, text="http://love2d.org"}
+    }
+
+
     return {
         draw = function()
             love.graphics.setBlendMode("alpha")
             love.graphics.setColor(255,255,255,255)
-            love.graphics.setFont(fonts.bodoni72.regular)
 
-            -- TODO fancier formatting
-            love.graphics.printf([[
-Refactor
+            -- TODO better sizing
+            local width = love.graphics.getWidth()/3
+            local y = 8
 
-All music, code, and art ©2015 j. "fluffy" shagam
-http://sockpuppet.us/
-http://beesbuzz.biz/
-http://fluffy.itch.io/
+            for _,line in ipairs(lines) do
+                local text
+                if type(line) == "string" then
+                    text = line
+                else
+                    text = line.text
+                end
 
-Acknowledgments
+                local font = line.font or fonts.bodoni72.regular
 
-Patreon supporters
-Tambi * Jukka * Austin * SallyBird
-Kyreeth * M.Wissig
-
-Moral support:
-Emmy Nate Zeno Jakub Lito Rachel Milo
-Seattle Indies
-Double Jump
-
-Built with LÖVE
-http://love2d.org
-]],
-            8, 8,
-            love.graphics:getWidth()/3,
-            "center"
-        )
+                love.graphics.setFont(font)
+                local _, wrappedtext = font:getWrap(text, width)
+                love.graphics.printf(table.concat(wrappedtext, "\n"),
+                    8, y, width, "center")
+                y = y + math.max(1,#wrappedtext)*font:getHeight()
+            end
         end,
         onButtonPress = function()
             menuStack[#menuStack] = nil
