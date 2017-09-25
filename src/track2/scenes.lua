@@ -23,10 +23,10 @@ local function loadSprites(imageFile, quadFile)
     return spriteSheet, quads
 end
 
-local function updateLayers(layers, dt)
+local function updateLayers(layers, dt, time)
     for _,layer in ipairs(layers) do
         if layer.update then
-            layer:update(dt)
+            layer:update(dt, time)
         end
     end
 end
@@ -714,6 +714,67 @@ function scenes.doctor(game)
     return {
         update = function(_, dt)
             updateLayers(layers, dt)
+        end,
+        draw = function(_)
+            drawLayers(layers)
+            return true
+        end
+    }
+end
+
+function scenes.therapist()
+    local spriteSheet, quads = loadSprites("track2/therapist-sprites.png", "track2/therapist-sprites.lua")
+
+    local layers = {
+        {image = imagepool.load('track2/therapist-bg.png', {nearest=true})},
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 1.7},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.5},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 0.5},
+                {quads.rose.blink, 0.1},
+            }
+        }),
+        Sprite.new({
+            pos = {152,112},
+            sheet = spriteSheet,
+            frame = quads.greg
+        }),
+        Sprite.new({
+            pos = {216,92},
+            sheet = spriteSheet,
+            frame = quads.clock.pendulum,
+            theta = 0,
+            update = function(self, dt, time)
+                local beat = math.floor(time[3])
+                local ofs = time[3] % 1
+
+                local tgt = .35*((beat % 2)*2 - 1)
+                local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
+                self.theta = tgt*blend + -tgt*(1 - blend)
+            end,
+            draw = function(self)
+                love.graphics.draw(self.sheet, self.frame,
+                    self.pos[1], self.pos[2],
+                    self.theta,
+                    1, 1, 3, 0)
+            end
+        }),
+        Sprite.new({
+            pos = {208,80},
+            sheet = spriteSheet,
+            frame = quads.clock.face
+        }),
+        -- TODO therapist's hand
+    }
+
+    return {
+        update = function(_, dt, time)
+            updateLayers(layers, dt, time)
         end,
         draw = function(_)
             drawLayers(layers)

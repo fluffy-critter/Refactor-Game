@@ -156,7 +156,7 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.endKitchen(self, "gave_up")}
+    -- self.sceneStack = {self.scenes.therapist()}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -246,7 +246,7 @@ function Game:start()
             or self.dialogState == "alien_endgame" then
                 flashOut = {127,0,255,0}
 
-                local therapist = self.scenes.missing("therapist")
+                local therapist = self.scenes.therapist()
                 local vacation = self.scenes.missing("vacation")
                 local parkTogether = self.scenes.parkBench()
                 local parkApart = self.scenes.parkBench(true)
@@ -277,7 +277,7 @@ function Game:start()
                 flashOut = {255,255,0,0}
                 local hospital = self.scenes.hospital(clock.posToDelta({0,1}))
                 local doctor = self.scenes.doctor(self)
-                local therapist = self.scenes.missing("therapist")
+                local therapist = self.scenes.therapist()
                 local parkbench = self.scenes.parkBench()
 
                 selections = {

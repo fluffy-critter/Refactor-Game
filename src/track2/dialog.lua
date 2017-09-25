@@ -1614,7 +1614,7 @@ local dialog = {
                 {"My mom?", {}},
                 {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
-                {nil, {}, "silence"}
+                {nil, {bp_left_hanging=100}}
             }
         },
         {
@@ -1626,7 +1626,7 @@ local dialog = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
-                {nil, {}, "silence"}
+                {nil, {bp_left_hanging=100}}
             }
         },
         {
@@ -1638,7 +1638,7 @@ local dialog = {
                 {"What's so funny?", {}},
                 {"Please don't laugh...", {bp_dont_laugh=100}},
                 {"Explains what?", {}},
-                {nil, {}, "silence"}
+                {nil, {bp_left_hanging=100}}
             }
         },
 
