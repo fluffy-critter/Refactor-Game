@@ -733,7 +733,7 @@ function scenes.therapist()
             animation = {
                 {quads.rose.open, 1.7},
                 {quads.rose.blink, 0.1},
-                {quads.rose.open, 0.5},
+                {quads.rose.open, 2.3},
                 {quads.rose.blink, 0.1},
                 {quads.rose.open, 0.5},
                 {quads.rose.blink, 0.1},
@@ -742,7 +742,14 @@ function scenes.therapist()
         Sprite.new({
             pos = {152,112},
             sheet = spriteSheet,
-            frame = quads.greg
+            animation = {
+                {quads.greg.open, 0.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 1.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 2.2},
+                {quads.greg.blink, 0.1},
+            }
         }),
         Sprite.new({
             pos = {216,92},
