@@ -56,6 +56,8 @@ local input = require('input')
 local fonts = require('fonts')
 local imagepool = require('imagepool')
 
+local Menu = require('Menu')
+
 local baseTitle = "Sockpuppet - Refactor"
 
 local function blitCanvas(canvas, aspect)
@@ -116,10 +118,7 @@ local function startGame(game)
     currentGame:start()
 end
 
-local menu
-local menuPos = 1
-
-local mainmenu = {}
+local menuStack = {}
 
 local function onPause()
     if playing.state == PlayState.pausing or playing.state == PlayState.paused then
@@ -161,18 +160,7 @@ function input.onPress(button)
     elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     elseif not currentGame then
-        if button == 'up' and menuPos > 1 then
-            menuPos = menuPos - 1
-            -- TODO play sound
-        elseif button == 'down' and menuPos < #menu then
-            menuPos = menuPos + 1
-            -- TODO play sound
-        elseif button == 'a' or button == 'start' then
-            menu[menuPos].onSelect()
-        elseif button == 'back' or button == 'b' then
-            -- TODO parent menu
-            menu = mainmenu
-        end
+        menuStack[#menuStack]:onButtonPress(button)
     end
 end
 
@@ -198,6 +186,24 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
+local function mainmenu()
+    local choices = {}
+    for _,track in ipairs(tracks) do
+        table.insert(choices, {
+            label = string.format("%d. %s (%d:%d)",
+                track.META.tracknum,
+                track.META.title,
+                track.META.duration / 60,
+                track.META.duration % 60),
+            onSelect = function()
+                startGame(track)
+            end
+        })
+    end
+
+    return Menu.new({choices = choices})
+end
+
 function love.load(args)
     -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
     love.window.setMode(config.width, config.height, {
@@ -214,19 +220,7 @@ function love.load(args)
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
 
-    for n,track in ipairs(tracks) do
-        mainmenu[n] = {
-            label = string.format("%d. %s (%d:%d)",
-                track.META.tracknum,
-                track.META.title,
-                track.META.duration / 60,
-                track.META.duration % 60),
-            onSelect = function()
-                startGame(track)
-            end
-        }
-    end
-    menu = mainmenu
+    menuStack = {mainmenu()}
 
     local track
     for _,arg in ipairs(args) do
@@ -404,22 +398,7 @@ function love.draw()
         local logo = imagepool.load('mainmenu/refactor-released.png')
         love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
 
-        local font = fonts.bodoni72.regular
-        love.graphics.setBlendMode("alpha")
-        love.graphics.setFont(font)
-        love.graphics.setColor(255,255,255,255)
-        local y = 0
-        for n,item in ipairs(menu) do
-            if n == menuPos then
-                love.graphics.setColor(255,255,255,255)
-                love.graphics.print(">", 8, y + 8)
-            else
-                love.graphics.setColor(200,200,200,255)
-            end
-            love.graphics.print(item.label, 24, y + 8)
-
-            y = y + font:getHeight()
-        end
+        menuStack[#menuStack]:draw()
     end
 
     -- love.graphics.setColor(255,255,255,255)
