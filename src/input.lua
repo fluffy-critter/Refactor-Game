@@ -76,6 +76,10 @@ util.applyDefaults(buttonMap, {
     x = 'x',
     y = 'y',
 
+    leftstick = 'a',
+    rightstick = 'a',
+    leftshoulder = 'a',
+
     back = 'back',
     start = 'start',
 
@@ -155,14 +159,18 @@ function input.update(dt)
     -- handle the joysticks
     local joysticks = love.joystick.getJoysticks()
     for _,j in ipairs(joysticks) do
-        local leftx = j:getGamepadAxis("leftx")
-        if leftx and math.abs(leftx) > math.abs(analogX) then
-            analogX = leftx
+        for _,axis in ipairs({"leftx", "rightx"}) do
+            local val = j:getGamepadAxis(axis)
+            if val and math.abs(val) > math.abs(analogX) then
+                analogX = val
+            end
         end
 
-        local lefty = j:getGamepadAxis("lefty")
-        if lefty and math.abs(lefty) > math.abs(analogY) then
-            analogY = lefty
+        for _,axis in ipairs({"lefty", "righty"}) do
+            local val = j:getGamepadAxis(axis)
+            if val and math.abs(val) > math.abs(analogY) then
+                analogY = val
+            end
         end
     end
 
