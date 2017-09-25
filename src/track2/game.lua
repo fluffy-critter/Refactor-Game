@@ -303,7 +303,7 @@ function Game:start()
                 }
                 -- self.miniGame = CardGame.new()
             elseif self.dialogState == "gave_up" then
-                flashOut = {0,0,255,0}
+                flashOut = {255,0,0,0}
                 selections = {self.scenes.parkBench(true)}
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
@@ -314,6 +314,7 @@ function Game:start()
                     self.kitchenScene
                 }
             else
+                flashOut = {0,255,0,0}
                 selections = {
                     self.scenes.missing("Unknown state:\n" .. self.dialogState)
                 }
@@ -383,6 +384,7 @@ function Game:start()
             self.eventQueue:addEvent({
                 when = {15},
                 what = function()
+                    self:transcribe("[ending: " .. self.dialogState .. "]")
                     self.sceneStack = {self.scenes.endKitchen(self, self.dialogState)}
                 end
             })

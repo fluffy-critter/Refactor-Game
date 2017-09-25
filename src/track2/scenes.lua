@@ -749,12 +749,13 @@ function scenes.therapist()
             sheet = spriteSheet,
             frame = quads.clock.pendulum,
             theta = 0,
-            update = function(self, dt, time)
+            update = function(self, _, time)
                 local beat = math.floor(time[3])
                 local ofs = time[3] % 1
 
                 local tgt = .35*((beat % 2)*2 - 1)
-                local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
+                -- local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
+                local blend = util.smoothStep(math.min(1, ofs*3))
                 self.theta = tgt*blend + -tgt*(1 - blend)
             end,
             draw = function(self)
