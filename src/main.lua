@@ -186,32 +186,29 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
+local creditsLines = {
+    {font=fonts.bodoni72.bold, text="Refactor"},
+    "\n",
+    'All music, code, and art ©2015 j.\194\160"fluffy"\194\160shagam',
+    {
+        font=fonts.helveticaOutline,
+        text="http://sockpuppet.us/ · http://beesbuzz.biz/ · http://fluffy.itch.io/"
+    },
+    "\n",
+    {font=fonts.bodoni72.bold, text="Acknowledgments"},
+    "\n",
+    {font=fonts.bodoni72.italic, text="Patreon supporters"},
+    "Tambi · Jukka · Austin · Sally\194\160Bird · Kyreeth · M.Wissig",
+    "\n",
+    {font=fonts.bodoni72.italic, text="Moral support"},
+    "Emmy · Nate · Zeno · Jakub · Lito · Rachel · Milo"
+    .. " · Seattle\194\160Indies · Double\194\160Jump",
+    "\n",
+    "Built with LÖVE",
+    {font=fonts.helveticaOutline, text="http://love2d.org"}
+}
+
 local function credits()
-    local lines = {
-        {font=fonts.bodoni72.bold, text="Refactor"},
-        '',
-        'All music, code, and art ©2015 j. "fluffy" shagam',
-        {font=fonts.helveticaOutline, text=[[
-http://sockpuppet.us/
-http://beesbuzz.biz/
-http://fluffy.itch.io/]]},
-        '',
-        {font=fonts.bodoni72.bold, text="Acknowledgments"},
-        "",
-        {font=fonts.bodoni72.italic, text="Patreon supporters"},
-        "Tambi • Jukka • Austin • Sally Bird • Kyreeth • M.Wissig",
-        "",
-        {font=fonts.bodoni72.italic, text="Moral support"},
-        [[
-Emmy • Nate • Zeno • Jakub • Lito • Rachel • Milo
-Seattle Indies
-Double Jump
-
-Built with LÖVE]],
-        {font=fonts.helveticaOutline, text="http://love2d.org"}
-    }
-
-
     return {
         draw = function()
             love.graphics.setBlendMode("alpha")
@@ -221,7 +218,7 @@ Built with LÖVE]],
             local width = love.graphics.getWidth()/3
             local y = 8
 
-            for _,line in ipairs(lines) do
+            for _,line in ipairs(creditsLines) do
                 local text
                 if type(line) == "string" then
                     text = line
@@ -233,9 +230,13 @@ Built with LÖVE]],
 
                 love.graphics.setFont(font)
                 local _, wrappedtext = font:getWrap(text, width)
-                love.graphics.printf(table.concat(wrappedtext, "\n"),
-                    8, y, width, "center")
-                y = y + math.max(1,#wrappedtext)*font:getHeight()
+                for _,s in ipairs(wrappedtext) do
+                    -- trim out any separators that got orphaned
+                    s = s:gsub("^ *· ", ""):gsub(" *· *$", "")
+
+                    love.graphics.printf(s, 8, y, width, "center")
+                    y = y + font:getHeight()
+                end
             end
         end,
         onButtonPress = function()
