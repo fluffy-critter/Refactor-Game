@@ -204,8 +204,9 @@ http://fluffy.itch.io/
 
 Acknowledgments
 
-Patreon supporters:
-Tambi Jukka Austin SallyBird Kyreeth M.Wissig
+Patreon supporters
+Tambi * Jukka * Austin * SallyBird
+Kyreeth * M.Wissig
 
 Moral support:
 Emmy Nate Zeno Jakub Lito Rachel Milo
