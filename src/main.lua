@@ -201,6 +201,15 @@ local function mainmenu()
         })
     end
 
+    -- TODO
+    -- table.insert(choices, {})
+    -- table.insert(choices, {
+    --     label="Credits",
+    --     onSelect=function()
+    --         table.insert(menuStack, creditsScreen())
+    --     end
+    -- })
+
     return Menu.new({choices = choices})
 end
 
