@@ -314,7 +314,7 @@ function scenes.phase11(game, duration)
 end
 
 function scenes.hospital(duration)
-    local spriteSheet, quads = loadSprites('track2/hospital-fg.png', 'track2/hospital-sprites.lua')
+    local spriteSheet, quads = loadSprites('track2/hospital-sprites.png', 'track2/hospital-sprites.lua')
 
     local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
 
