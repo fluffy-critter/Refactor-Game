@@ -404,10 +404,6 @@ function Game:onButtonPress(button, code, isRepeat)
         return true
     end
 
-    -- if button == 'b' then
-    --     self:setPose(self.kitchenScene.greg, "couch_sitting_crying")
-    -- end
-
     if self.textBox then
         return self.textBox:onButtonPress(button, code, isRepeat)
     end
