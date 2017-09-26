@@ -34,7 +34,7 @@ function Menu:measure()
 
     for _,item in ipairs(self.choices) do
         local fontSize = font:getHeight()
-        local lw = font:getWrap(item.label or "", 65535) + fontSize*3/4
+        local lw = font:getWrap(item.label or "", 65535) + fontSize*3/4 + 8
         w = math.max(w, lw)
         h = h + fontSize
     end
@@ -81,10 +81,11 @@ function Menu:draw()
     love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.setColor(0,0,0,512)
     -- TODO maybe use gaussBlur or something? I dunno
-    love.graphics.draw(self.canvas, 7, 8)
-    love.graphics.draw(self.canvas, 9, 8)
-    love.graphics.draw(self.canvas, 8, 7)
-    love.graphics.draw(self.canvas, 8, 9)
+    for x=6,10 do
+        for y=6,10 do
+            love.graphics.draw(self.canvas, x, y)
+        end
+    end
     love.graphics.setColor(255,255,255,255)
     love.graphics.draw(self.canvas, 8, 8)
 

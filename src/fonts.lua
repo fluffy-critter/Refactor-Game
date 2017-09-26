@@ -10,7 +10,7 @@ local fonts = {
     menu = {
         regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 24),
         h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 32),
-        h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 32),
+        h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 28),
     },
     debug = love.graphics.newFont(8),
 
