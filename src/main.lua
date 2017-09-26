@@ -189,7 +189,7 @@ end
 local creditsLines = {
     {font=fonts.bodoni72.bold, text="Refactor"},
     "\n",
-    'All music, code, and art ©2015 j.\194\160"fluffy"\194\160shagam',
+    'All music, code, and art ©2015 j.\194\160"fluffy"\194\160shagam', -- TODO smartquotes
     {
         font=fonts.helveticaOutline,
         text="http://sockpuppet.us/ · http://beesbuzz.biz/ · http://fluffy.itch.io/"

@@ -157,8 +157,6 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.therapist()}
-
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
     for y = 0, 13 do
@@ -322,15 +320,17 @@ function Game:start()
             end
 
             if selections then
-                -- collate a list of greg poses
-                local gregPoses = {}
-                local rosePoses = {}
+                -- collated list of the poses we want Greg to possibly flash through
+                local gregPoses = {
+                    "right_of_rose",
+                    "below_doors",
+                    "couch_sitting",
+                    "couch_sitting_thinking",
+                    "kneeling_by_rose",
+                    "couch_sitting_crying"
+                }
 
-                -- TODO this should really just be sets of positions and frames/animations (including greg crying)
-                for v in pairs(self.kitchenScene.greg.pose) do
-                    table.insert(gregPoses, v)
-                end
-
+                local rosePoses = self.kitchenScene.rose.animations
                 for _,v in pairs(self.kitchenScene.rose.animations) do
                     table.insert(rosePoses, v)
                 end
@@ -403,6 +403,10 @@ function Game:onButtonPress(button, code, isRepeat)
         self:seekMusic({self.phase + 1})
         return true
     end
+
+    -- if button == 'b' then
+    --     self:setPose(self.kitchenScene.greg, "couch_sitting_crying")
+    -- end
 
     if self.textBox then
         return self.textBox:onButtonPress(button, code, isRepeat)

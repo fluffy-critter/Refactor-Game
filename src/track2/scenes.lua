@@ -106,7 +106,8 @@ function scenes.kitchen()
         frame = nil
     })
 
-    local greg = Sprite.new({
+    local greg
+    greg = Sprite.new({
         sheet = spriteSheet,
         pos = {217, -40},
         animations = {
@@ -138,6 +139,12 @@ function scenes.kitchen()
                 {quads.greg.right[1], .2},
                 {quads.greg.right[3], .2},
                 stop = quads.greg.right[1],
+            },
+            crying = {
+                {quads.greg.crying[1], 1/12},
+                {quads.greg.crying[2], 1/9},
+                {quads.greg.crying[3], 1/6},
+                {quads.greg.crying[2], 1/12},
             }
         },
         pose = {
@@ -188,6 +195,12 @@ function scenes.kitchen()
                 pos = {204,120},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.sitting.normal
+                end
+            },
+            couch_sitting_crying = {
+                pos = {204,120},
+                onComplete = function(sprite)
+                    sprite.animation = greg.animations.crying
                 end
             },
             couch_sitting_thinking = {
