@@ -13,6 +13,7 @@ Properties:
 
 local util = require('util')
 local fonts = require('fonts')
+local shaders = require('shaders')
 
 local Menu = {}
 
@@ -21,38 +22,73 @@ function Menu.new(o)
     setmetatable(self, {__index=Menu})
 
     util.applyDefaults(self, {
-        pos = 1
+        pos = 1,
     })
 
     return self
 end
 
-function Menu:draw()
-    local font = fonts.bodoni72.regular
-    love.graphics.setBlendMode("alpha")
-    love.graphics.setFont(font)
-    love.graphics.setColor(255,255,255,255)
-    local y = 8
-    for n,item in ipairs(self.choices) do
-        if item.font then
-            font = item.font
-            love.graphics.setFont(font)
-        end
+function Menu:measure()
+    local w, h = 0, 0
+    local font = self.font or fonts.menu.regular
 
-        if n == self.pos then
-            love.graphics.setColor(255,255,255,255)
-            if item.onSelect then
-                love.graphics.print(">", 8, y)
-            end
-        else
-            love.graphics.setColor(200,200,200,255)
-        end
-        if item.label then
-            love.graphics.print(item.label, 24, y)
-        end
-
-        y = y + font:getHeight()
+    for _,item in ipairs(self.choices) do
+        local fontSize = font:getHeight()
+        local lw = font:getWrap(item.label or "", 65535) + fontSize*3/4
+        w = math.max(w, lw)
+        h = h + fontSize
     end
+
+    return w, h
+end
+
+function Menu:draw()
+    local w, h = self:measure()
+    if not self.canvas or self.canvas:getWidth() < w or self.canvas:getHeight() < h then
+        self.canvas = love.graphics.newCanvas(w, h)
+    end
+
+    self.canvas:renderTo(function()
+        local font = self.font or fonts.menu.regular
+        love.graphics.clear(0,0,0,0)
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setFont(font)
+
+        local y = 0
+        for n,item in ipairs(self.choices) do
+            if item.font then
+                font = item.font
+                love.graphics.setFont(font)
+            end
+            local fontSize = font:getHeight()
+
+            if n == self.pos then
+                love.graphics.setColor(255,255,255,255)
+                if item.onSelect then
+                    love.graphics.print(">", 0, y)
+                end
+            else
+                love.graphics.setColor(200,200,200,255)
+            end
+            if item.label then
+                love.graphics.print(item.label, fontSize*3/4, y)
+            end
+
+            y = y + fontSize
+        end
+    end)
+
+    love.graphics.setBlendMode("alpha", "premultiplied")
+    love.graphics.setColor(0,0,0,512)
+    -- TODO maybe use gaussBlur or something? I dunno
+    love.graphics.draw(self.canvas, 7, 8)
+    love.graphics.draw(self.canvas, 9, 8)
+    love.graphics.draw(self.canvas, 8, 7)
+    love.graphics.draw(self.canvas, 8, 9)
+    love.graphics.setColor(255,255,255,255)
+    love.graphics.draw(self.canvas, 8, 8)
+
+    love.graphics.setShader()
 end
 
 function Menu:onButtonPress(button)

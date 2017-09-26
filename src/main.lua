@@ -187,25 +187,25 @@ function love.mousepressed(...)
 end
 
 local creditsLines = {
-    {font=fonts.bodoni72.bold, text="Refactor"},
+    {font=fonts.menu.h1, text="Refactor"},
     "\n",
     'All music, code, and art ©2015 j.\194\160"fluffy"\194\160shagam', -- TODO smartquotes
     {
-        font=fonts.helveticaOutline,
+        font=fonts.menu.url,
         text="http://sockpuppet.us/ · http://beesbuzz.biz/ · http://fluffy.itch.io/"
     },
     "\n",
-    {font=fonts.bodoni72.bold, text="Acknowledgments"},
+    {font=fonts.menu.h1, text="Acknowledgments"},
     "\n",
-    {font=fonts.bodoni72.italic, text="Patreon supporters"},
+    {font=fonts.menu.h2, text="Patreon supporters"},
     "Tambi · Jukka · Austin · Sally\194\160Bird · Kyreeth · M.Wissig",
     "\n",
-    {font=fonts.bodoni72.italic, text="Moral support"},
+    {font=fonts.menu.h2, text="Moral support"},
     "Emmy · Nate · Zeno · Jakub · Lito · Rachel · Milo"
     .. " · Seattle\194\160Indies · Double\194\160Jump",
     "\n",
     "Built with LÖVE",
-    {font=fonts.helveticaOutline, text="http://love2d.org"}
+    {font=fonts.menu.url, text="http://love2d.org"}
 }
 
 local function credits()
@@ -226,7 +226,7 @@ local function credits()
                     text = line.text
                 end
 
-                local font = line.font or fonts.bodoni72.regular
+                local font = line.font or fonts.menu.regular
 
                 love.graphics.setFont(font)
                 local _, wrappedtext = font:getWrap(text, width)
