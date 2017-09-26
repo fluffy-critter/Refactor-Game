@@ -323,12 +323,11 @@ function Game:start()
                 -- collated list of the poses we want Greg to possibly flash through
                 local gregPoses = {
                     "right_of_rose",
-                    "left_of_stairs",
-                    "left_of_couch",
                     "below_doors",
                     "couch_sitting",
                     "couch_sitting_thinking",
-                    "kneeling_by_rose"
+                    "kneeling_by_rose",
+                    "couch_sitting_crying"
                 }
 
                 local rosePoses = self.kitchenScene.rose.animations
@@ -404,6 +403,10 @@ function Game:onButtonPress(button, code, isRepeat)
         self:seekMusic({self.phase + 1})
         return true
     end
+
+    -- if button == 'b' then
+    --     self:setPose(self.kitchenScene.greg, "couch_sitting_crying")
+    -- end
 
     if self.textBox then
         return self.textBox:onButtonPress(button, code, isRepeat)
