@@ -777,6 +777,14 @@ function scenes.therapist()
             sheet = spriteSheet,
             frame = quads.clock.face
         }),
+        Sprite.new({
+            pos = {118,178},
+            sheet = spriteSheet,
+            animation = {
+                {quads.therapist[1], 1/3},
+                {quads.therapist[2], 1/3}
+            }
+        })
         -- TODO therapist's hand
     }
 
