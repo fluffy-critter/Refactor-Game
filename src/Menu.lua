@@ -13,7 +13,6 @@ Properties:
 
 local util = require('util')
 local fonts = require('fonts')
-local shaders = require('shaders')
 
 local Menu = {}
 
