@@ -560,9 +560,8 @@ function scenes.parkBench(gregMissing)
             sprite.animation = birbAnims.right
         end
 
-        local chainedUpdate = sprite.update
         sprite.update = function(self, dt)
-            chainedUpdate(self, dt)
+            Sprite.update(self, dt)
             age = age + dt
 
             if not flappy and flockX and flockX >= self.pos[1] then
@@ -818,6 +817,10 @@ end
 function scenes.vacation()
     local time = 0
     local beat = 0
+    local waterMask = shaders.load('track2/waterMask.fs')
+    waterMask:send('mask', imagepool.load('track2/vacation-watermask.png'))
+
+    local spriteSheet, quads = loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua')
 
     local layers = {
         {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
@@ -826,16 +829,22 @@ function scenes.vacation()
             draw = function(self)
                 local theta = math.cos(beat*math.pi/2)
                 local x = 8*math.sin(theta)
-                local y = 24*math.cos(theta) - 8
+                local t = (beat/2)%1
+                local y = 24 - 18*util.smoothStep(t)
 
-                local t = (beat*3/4)%1
-                local depth = util.smoothStep(math.sin(theta)) + 0.3
+                local depth = t < 0.5 and 1 or 1 - util.smoothStep((t - 0.5)*2)
 
-                love.graphics.setColor(255,255,255,255*depth)
+                love.graphics.setShader(waterMask)
+                love.graphics.setColor(7,131,189,255*depth)
                 love.graphics.draw(self.image, x, y)
+                love.graphics.setShader()
 
-                love.graphics.setColor(255,255,255,255)
+                love.graphics.setColor(5,81,138,255*depth)
+                love.graphics.draw(self.image, x/2, 24 - 9*util.smoothStep(t))
+
+                love.graphics.setColor(4,56,113,255)
                 love.graphics.draw(self.image, 0, 24)
+
            end
         },
     }
