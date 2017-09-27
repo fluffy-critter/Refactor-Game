@@ -73,10 +73,14 @@ notion("State value speling", function()
         interrupted = "engine",
         phase = "engine",
         fun = "engine",
+        importance = "engine", -- not actually set by engine but that's how it looks to the match rules
 
         -- attributes set by special callbacks
     }
-    local used = {}
+    local used = {
+        -- used by the engine
+        importance = "engine",
+    }
 
     local function checkPos(pos, where, status)
         if pos then

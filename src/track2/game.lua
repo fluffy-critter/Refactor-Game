@@ -390,6 +390,9 @@ function Game:start()
                 what = function()
                     self:transcribe("[ending: " .. self.dialogState .. "]")
                     self.sceneStack = {self.scenes.endKitchen(self, self.dialogState)}
+                    config.endings = config.endings or {}
+                    config.endings[self.dialogState] = (config.endings[self.dialogState] or 0) + 1
+                    config.save()
                 end
             })
         end
@@ -496,7 +499,7 @@ function Game:update(dt)
         end
     end
 
-    if (self.textBox and self.textBox.state < TextBox.states.ready) then
+    if (self.textBox and self.textBox.state < TextBox.states.ready and util.arrayLT(time,{12,2})) then
         local extend = self:getNextInterval(1.5, 1, 0)
         if self.nextTimeout and util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
@@ -658,7 +661,7 @@ function Game:chooseDialog(dialog)
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.maxCount or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
-            local specificity = 1
+            local specificity = 5
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
                 distance = distance + dx*dx*(self.weights[k] or 1) + (self.offsets[k] or 1)
@@ -666,6 +669,7 @@ function Game:chooseDialog(dialog)
                     specificity = specificity + 1
                 end
             end
+            specificity = specificity + (node.importance or 0)
 
             -- let more specific rules match first
             distance = distance/specificity
