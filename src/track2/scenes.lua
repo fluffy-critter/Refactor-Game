@@ -595,8 +595,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3/2
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 55)
+                love.graphics.draw(self.img, self.x%256, 55)
             end
         },
         {
@@ -606,8 +606,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 13)
+                love.graphics.draw(self.img, self.x%256, 13)
             end
         }
     }
