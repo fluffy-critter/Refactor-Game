@@ -849,7 +849,7 @@ function scenes.vacation()
            end
         },
         {
-            draw = function(self)
+            draw = function()
                 local t = (beat/2) % 1
 
                 -- y follows a circular arc
