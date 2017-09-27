@@ -157,6 +157,8 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
+    -- self.sceneStack = {self.scenes.vacation()}
+
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
     for y = 0, 13 do
@@ -246,7 +248,7 @@ function Game:start()
                 flashOut = {127,0,255,0}
 
                 local therapist = self.scenes.therapist()
-                local vacation = self.scenes.missing("vacation")
+                local vacation = self.scenes.vacation()
                 local parkTogether = self.scenes.parkBench()
                 local parkApart = self.scenes.parkBench(true)
 
@@ -278,6 +280,7 @@ function Game:start()
                 local doctor = self.scenes.doctor(self)
                 local therapist = self.scenes.therapist()
                 local parkbench = self.scenes.parkBench()
+                local vacation = self.scenes.vacation()
 
                 selections = {
                     hospital,
@@ -296,7 +299,7 @@ function Game:start()
                     parkbench,
 
                     self.kitchenScene,
-                    self.scenes.missing("vacation"),
+                    vacation,
                     therapist,
                     parkbench,
                 }
@@ -307,7 +310,7 @@ function Game:start()
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
-                selections = {self.scenes.missing("vacation")}
+                selections = {self.scenes.vacation()}
             elseif self.dialogState == "herpderp" then
                 selections = {
                     self.kitchenScene

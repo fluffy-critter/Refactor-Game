@@ -560,9 +560,8 @@ function scenes.parkBench(gregMissing)
             sprite.animation = birbAnims.right
         end
 
-        local chainedUpdate = sprite.update
         sprite.update = function(self, dt)
-            chainedUpdate(self, dt)
+            Sprite.update(self, dt)
             age = age + dt
 
             if not flappy and flockX and flockX >= self.pos[1] then
@@ -596,8 +595,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3/2
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 55)
+                love.graphics.draw(self.img, self.x%256, 55)
             end
         },
         {
@@ -607,8 +606,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 13)
+                love.graphics.draw(self.img, self.x%256, 13)
             end
         }
     }
@@ -778,7 +777,6 @@ function scenes.therapist()
                 local ofs = time[3] % 1
 
                 local tgt = .35*((beat % 2)*2 - 1)
-                -- local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
                 local blend = util.smoothStep(math.min(1, ofs*3))
                 self.theta = tgt*blend + -tgt*(1 - blend)
             end,
@@ -807,6 +805,91 @@ function scenes.therapist()
 
     return {
         update = function(_, dt, time)
+            updateLayers(layers, dt, time)
+        end,
+        draw = function(_)
+            drawLayers(layers)
+            return true
+        end
+    }
+end
+
+function scenes.vacation()
+    local time = 0
+    local beat = 0
+    local waterMask = shaders.load('track2/waterMask.fs')
+    waterMask:send('mask', imagepool.load('track2/vacation-watermask.png'))
+
+    local spriteSheet, quads = loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua')
+
+    local layers = {
+        {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
+        {
+            image = imagepool.load('track2/vacation-water.png', {nearest=true}),
+            draw = function(self)
+                local theta = math.cos(beat*math.pi/2)
+                local x = 8*math.sin(theta)
+                local t = (beat/2)%1
+                local y = 24 - 18*util.smoothStep(t)
+
+                local depth = t < 0.5 and 1 or 1 - util.smoothStep((t - 0.5)*2)
+
+                love.graphics.setShader(waterMask)
+                love.graphics.setColor(7,131,189,255*depth)
+                love.graphics.draw(self.image, x, y)
+                love.graphics.setShader()
+
+                love.graphics.setColor(5,81,138,255*depth)
+                love.graphics.draw(self.image, x/2, 24 - 9*util.smoothStep(t))
+
+                love.graphics.setColor(4,56,113,255)
+                love.graphics.draw(self.image, 0, 24)
+
+                love.graphics.setColor(255,255,255)
+           end
+        },
+        {
+            draw = function(self)
+                local t = (beat/2) % 1
+
+                -- y follows a circular arc
+                local yt = t*2 - 1
+                local y = 64 - 32*math.sqrt(1 - yt*yt)
+
+                -- x follows the second half of smoothstep
+                local xt = (t + 1)/2
+                local xdir = (math.floor(beat/2) % 2)*2 - 1
+                local x = 64 + xdir*(util.smoothStep(xt) - 0.75)*96
+
+                local theta = math.sin(beat*math.pi/2)*math.pi/2
+                love.graphics.draw(spriteSheet, quads.ball.base, x, y, theta, 1, 1, 8, 8)
+            end
+        },
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 1.9},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.4},
+                {quads.rose.blink, 0.1},
+            }
+        }),
+        Sprite.new({
+            pos = {157,120},
+            sheet = spriteSheet,
+            animation = {
+                {quads.greg[1], 1/3},
+                {quads.greg[2], 1/3}
+            }
+        }),
+    }
+
+    return {
+        update = function(_, dt, timePos)
+            time = time + dt
+            beat = timePos[3]
+
             updateLayers(layers, dt, time)
         end,
         draw = function(_)
