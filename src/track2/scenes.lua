@@ -800,7 +800,6 @@ function scenes.therapist()
                 {quads.therapist[2], 1/3}
             }
         })
-        -- TODO therapist's hand
     }
 
     return {
@@ -863,7 +862,7 @@ function scenes.vacation()
                 local x = 64 + xdir*(util.smoothStep(xt) - 0.75)*96
 
                 local theta = math.sin(beat*math.pi/2)*math.pi/2
-                love.graphics.draw(spriteSheet, quads.ball.base, x, y, theta, 1, 1, 8, 8)
+                love.graphics.draw(filteredSprites, quads.ball.base, x, y, theta, 1, 1, 8, 8)
             end
         },
         Sprite.new({
@@ -884,6 +883,7 @@ function scenes.vacation()
                 {quads.greg[2], 1/3}
             }
         }),
+        -- TODO kids hitting the ball
     }
 
     return {

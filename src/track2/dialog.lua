@@ -445,7 +445,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=4, normal_camehome=0, normal_tired=50},
+            pos = {phase=4, normal_camehome=0, normal_tired=50, importance=3},
             text = "When we got home last night I was worried about you.",
             setPos = {normal_camehome=100},
             responses = {
@@ -455,7 +455,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=4, normal_camehome=0, normal_tired=100},
+            pos = {phase=4, normal_camehome=0, normal_tired=100, importance=3},
             text = "When we got home last night I was afraid I'd upset you.",
             rose = "eyes_left",
             setPos = {normal_camehome=100},
@@ -527,7 +527,7 @@ local dialog = {
         },
 
         {
-            pos = {phase=6, normal_wemarried=100, normal_undercontrol=0, normal_sorry=100},
+            pos = {phase=6, normal_wemarried=100, normal_undercontrol=0, normal_sorry=100, importance=2},
             text = "I guess I'm just surprised, is all. I thought you'd gotten past your anxiety problems...",
             pose = {"below_doors", "facing_left"},
             setPos = {normal_undercontrol=100},
@@ -939,7 +939,7 @@ local dialog = {
 
         {
             pos = {lastnight_unsure_breakfast=100},
-            text = "You%.%.%. aren't sure if you've had breakfast?%% Are you feeling okay?",
+            text = "You%.%.%. aren't sure if you've had breakfast.%% Are you feeling okay?",
             pose = {"right_of_rose", "facing_left"},
             rose = "eyes_left",
             responses = {
@@ -1465,7 +1465,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=8,bp_just_guessing=100},
+            pos = {phase=8,bp_just_guessing=100,importance=3},
             text = "Yeah...%% That's what I thought...",
             pose = "bottom_of_stairs",
             rose = "closed",

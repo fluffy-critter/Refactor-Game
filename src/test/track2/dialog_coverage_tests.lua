@@ -141,7 +141,7 @@ local function generateDotFile()
         end
 
         local from = clone(here)
-        local node = (from.npc.phase < 13) and game.chooseDialog(here)
+        local node = (from.npc.phase < 13) and game.chooseDialog(here, dialog)
 
         local fromState = getPoolInfo(from.dialogState)
         for k,v in pairs(from.npc) do
