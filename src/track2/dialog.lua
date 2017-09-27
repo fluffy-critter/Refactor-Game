@@ -2353,8 +2353,28 @@ local dialog = {
 
     -- vacation time!
     vacation = {
-        { pos = {phase=11}, text = "DIALOG PATH INCOMPLETE: vacation",
-            pose="below_doors", rose="normal", maxCount=2000 }
+        {
+            pos = {phase=11},
+            text = "Yeah%.%.%. This is just what we need.",
+            pose={"next_to_rose", "facing_down"},
+            rose="eyes_right"
+        },
+        {
+            pos = {phase=12},
+            text = "I love you so much. #",
+            pose={"kneeling_by_rose"},
+            rose = "eyes_closed",
+        },
+        {
+            pos = {phase=13},
+            text = "I know just where we should go.",
+            pose={"below_doors"},
+        },
+        {
+            pos = {phase=14},
+            text = "",
+            ended = true
+        }
     }
 
  }

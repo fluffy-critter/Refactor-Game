@@ -824,6 +824,7 @@ function scenes.vacation()
 
     local layers = {
         {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
+        -- water
         {
             image = imagepool.load('track2/vacation-water.png', {nearest=false}),
             draw = function(self)
@@ -848,6 +849,7 @@ function scenes.vacation()
                 love.graphics.setColor(255,255,255)
            end
         },
+        -- beach ball
         {
             draw = function()
                 local t = (beat/2) % 1
@@ -863,8 +865,13 @@ function scenes.vacation()
 
                 local theta = math.sin(beat*math.pi/2)*math.pi/2
                 love.graphics.draw(filteredSprites, quads.ball.base, x, y, theta, 1, 1, 8, 8)
+
+                love.graphics.setColor(255,255,255,y*2)
+                love.graphics.draw(filteredSprites, quads.ball.shadow, x - 8, 91.5)
+                love.graphics.setColor(255,255,255,255)
             end
         },
+        -- rose's head
         Sprite.new({
             pos = {120,112},
             sheet = spriteSheet,
@@ -875,6 +882,7 @@ function scenes.vacation()
                 {quads.rose.blink, 0.1},
             }
         }),
+        -- greg's arm
         Sprite.new({
             pos = {157,120},
             sheet = spriteSheet,
@@ -883,7 +891,34 @@ function scenes.vacation()
                 {quads.greg[2], 1/3}
             }
         }),
-        -- TODO kids hitting the ball
+        -- left kid
+        {
+            pos = {32,64},
+            sheet = spriteSheet,
+            frame = quads.kids[1],
+            draw = function(self)
+                local t = (beat/4 + 0.5)%1
+                local y = math.min(0, (1000*t - 200)*t)
+                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
+                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
+            end
+        },
+        -- right kid
+        {
+            pos = {80,64},
+            sheet = spriteSheet,
+            frame = quads.kids[2],
+            draw = function(self)
+                local t = (beat/4)%1
+                local y = math.min(0, (1000*t - 200)*t)
+                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
+                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
+            end
+        },
     }
 
     return {
