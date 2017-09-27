@@ -190,7 +190,7 @@ local function credits()
     local creditsLines = {
         {font=fonts.menu.h1, text="Refactor"},
         "\n",
-        'All music, code, and art ©2015 j.\194\160“fluffy”\194\160shagam',
+        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam',
         {
             font=fonts.menu.url,
             text="http://sockpuppet.us/ • http://beesbuzz.biz/ • http://fluffy.itch.io/"
