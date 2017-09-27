@@ -849,8 +849,6 @@ function scenes.vacation()
            end
         },
         {
-            sheet = spriteSheet,
-            frame = quads.beachball,
             draw = function(self)
                 local t = (beat/2) % 1
 
@@ -864,7 +862,7 @@ function scenes.vacation()
                 local x = 64 + xdir*(util.smoothStep(xt) - 0.75)*96
 
                 local theta = math.sin(beat*math.pi/2)*math.pi/2
-                love.graphics.draw(self.sheet, self.frame, x, y, theta, 1, 1, 8, 8)
+                love.graphics.draw(spriteSheet, quads.ball.base, x, y, theta, 1, 1, 8, 8)
             end
         },
         Sprite.new({
@@ -876,7 +874,15 @@ function scenes.vacation()
                 {quads.rose.open, 1.4},
                 {quads.rose.blink, 0.1},
             }
-        })
+        }),
+        Sprite.new({
+            pos = {157,120},
+            sheet = spriteSheet,
+            animation = {
+                {quads.greg[1], 1/3},
+                {quads.greg[2], 1/3}
+            }
+        }),
     }
 
     return {
