@@ -754,7 +754,6 @@ function scenes.therapist()
                 local ofs = time[3] % 1
 
                 local tgt = .35*((beat % 2)*2 - 1)
-                -- local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
                 local blend = util.smoothStep(math.min(1, ofs*3))
                 self.theta = tgt*blend + -tgt*(1 - blend)
             end,
@@ -775,6 +774,45 @@ function scenes.therapist()
 
     return {
         update = function(_, dt, time)
+            updateLayers(layers, dt, time)
+        end,
+        draw = function(_)
+            drawLayers(layers)
+            return true
+        end
+    }
+end
+
+function scenes.vacation()
+    local time = 0
+    local beat = 0
+
+    local layers = {
+        {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
+        {
+            image = imagepool.load('track2/vacation-water.png', {nearest=true}),
+            draw = function(self)
+                local theta = math.cos(beat*math.pi/2)
+                local x = 8*math.sin(theta)
+                local y = 24*math.cos(theta) - 8
+
+                local t = (beat*3/4)%1
+                local depth = util.smoothStep(math.sin(theta)) + 0.3
+
+                love.graphics.setColor(255,255,255,255*depth)
+                love.graphics.draw(self.image, x, y)
+
+                love.graphics.setColor(255,255,255,255)
+                love.graphics.draw(self.image, 0, 24)
+           end
+        },
+    }
+
+    return {
+        update = function(_, dt, timePos)
+            time = time + dt
+            beat = timePos[3]
+
             updateLayers(layers, dt, time)
         end,
         draw = function(_)
