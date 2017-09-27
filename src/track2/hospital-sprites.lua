@@ -1,6 +1,6 @@
 return {
   _META = {
-    image_path = "./hospital-fg.png",
+    image_path = "./hospital-sprites.png",
     version = "v0.6.2",
   },
   mri = {
@@ -15,9 +15,9 @@ return {
     {x = 0, y = 40, w = 16, h = 4},
     {x = 0, y = 45, w = 16, h = 4},
   },
-  rose = {x = 120, y = 112, w = 16, h = 54},
+  rose = {x = 96, y = 0, w = 16, h = 54},
   tech = {
-    {x = 17, y = 112, w = 20, h = 40},
-    {x = 41, y = 112, w = 20, h = 40},
+    {x = 32, y = 0, w = 20, h = 40},
+    {x = 56, y = 0, w = 20, h = 40},
   },
 }

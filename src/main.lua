@@ -186,29 +186,31 @@ function love.mousepressed(...)
     if Pie then Pie:mousepressed(...) end
 end
 
-local creditsLines = {
-    {font=fonts.bodoni72.bold, text="Refactor"},
-    "\n",
-    'All music, code, and art ©2015 j.\194\160"fluffy"\194\160shagam',
-    {
-        font=fonts.helveticaOutline,
-        text="http://sockpuppet.us/ · http://beesbuzz.biz/ · http://fluffy.itch.io/"
-    },
-    "\n",
-    {font=fonts.bodoni72.bold, text="Acknowledgments"},
-    "\n",
-    {font=fonts.bodoni72.italic, text="Patreon supporters"},
-    "Tambi · Jukka · Austin · Sally\194\160Bird · Kyreeth · M.Wissig",
-    "\n",
-    {font=fonts.bodoni72.italic, text="Moral support"},
-    "Emmy · Nate · Zeno · Jakub · Lito · Rachel · Milo"
-    .. " · Seattle\194\160Indies · Double\194\160Jump",
-    "\n",
-    "Built with LÖVE",
-    {font=fonts.helveticaOutline, text="http://love2d.org"}
-}
-
 local function credits()
+    local creditsLines = {
+        {font=fonts.menu.h1, text="Refactor"},
+        "\n",
+        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam',
+        {
+            font=fonts.menu.url,
+            text="http://sockpuppet.us/ • http://beesbuzz.biz/ • http://fluffy.itch.io/"
+        },
+        "\n",
+        {font=fonts.menu.h1, text="Acknowledgments"},
+        "\n",
+        {font=fonts.menu.h2, text="Patreon supporters"},
+        "Tambi • Jukka • Austin • Sally\194\160Bird • Kyreeth • M.Wissig",
+        "\n",
+        {font=fonts.menu.h2, text="Moral support"},
+        "Emmy • Nate • Zeno • Jakub • Lito • Rachel • Patrick • Milo"
+        .. " • Seattle\194\160Indies • Double\194\160Jump",
+        "\n",
+        "Built with LÖVE",
+        {font=fonts.menu.url, text="http://love2d.org"}
+    }
+
+    local canvas
+
     return {
         draw = function()
             love.graphics.setBlendMode("alpha")
@@ -216,28 +218,48 @@ local function credits()
 
             -- TODO better sizing
             local width = love.graphics.getWidth()/3
-            local y = 8
 
-            for _,line in ipairs(creditsLines) do
-                local text
-                if type(line) == "string" then
-                    text = line
-                else
-                    text = line.text
+            -- TODO proper measurement (really I should just do a friggin' text canvas object, huh?)
+            if not canvas or canvas:getWidth() < width then
+                canvas = love.graphics.newCanvas(width, love.graphics.getHeight())
+            end
+
+            canvas:renderTo(function()
+                love.graphics.setBlendMode("alpha")
+                love.graphics.setColor(255,255,255,255)
+                love.graphics.clear(0,0,0,0)
+                local y = 0
+                for _,line in ipairs(creditsLines) do
+                    local text
+                    if type(line) == "string" then
+                        text = line
+                    else
+                        text = line.text
+                    end
+
+                    local font = line.font or fonts.menu.regular
+
+                    love.graphics.setFont(font)
+                    local _, wrappedtext = font:getWrap(text, width)
+                    for _,s in ipairs(wrappedtext) do
+                        -- trim out any separators that got orphaned
+                        s = s:gsub("^ *• ", ""):gsub(" *• *$", "")
+
+                        love.graphics.printf(s, 0, y, width, "center")
+                        y = y + font:getHeight()
+                    end
                 end
+            end)
 
-                local font = line.font or fonts.bodoni72.regular
-
-                love.graphics.setFont(font)
-                local _, wrappedtext = font:getWrap(text, width)
-                for _,s in ipairs(wrappedtext) do
-                    -- trim out any separators that got orphaned
-                    s = s:gsub("^ *· ", ""):gsub(" *· *$", "")
-
-                    love.graphics.printf(s, 8, y, width, "center")
-                    y = y + font:getHeight()
+            love.graphics.setBlendMode("alpha","premultiplied")
+            love.graphics.setColor(0,0,0,512)
+            for x=-2,2 do
+                for y=-2,2 do
+                    love.graphics.draw(canvas, x+8, y+8)
                 end
             end
+            love.graphics.setColor(255,255,255,255)
+            love.graphics.draw(canvas,8,8)
         end,
         onButtonPress = function()
             menuStack[#menuStack] = nil

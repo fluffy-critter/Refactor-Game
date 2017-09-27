@@ -106,7 +106,8 @@ function scenes.kitchen()
         frame = nil
     })
 
-    local greg = Sprite.new({
+    local greg
+    greg = Sprite.new({
         sheet = spriteSheet,
         pos = {217, -40},
         animations = {
@@ -138,6 +139,12 @@ function scenes.kitchen()
                 {quads.greg.right[1], .2},
                 {quads.greg.right[3], .2},
                 stop = quads.greg.right[1],
+            },
+            crying = {
+                {quads.greg.crying[1], 1/12},
+                {quads.greg.crying[2], 1/9},
+                {quads.greg.crying[3], 1/6},
+                {quads.greg.crying[2], 1/12},
             }
         },
         pose = {
@@ -188,6 +195,12 @@ function scenes.kitchen()
                 pos = {204,120},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.sitting.normal
+                end
+            },
+            couch_sitting_crying = {
+                pos = {204,120},
+                onComplete = function(sprite)
+                    sprite.animation = greg.animations.crying
                 end
             },
             couch_sitting_thinking = {
@@ -314,7 +327,7 @@ function scenes.phase11(game, duration)
 end
 
 function scenes.hospital(duration)
-    local spriteSheet, quads = loadSprites('track2/hospital-fg.png', 'track2/hospital-sprites.lua')
+    local spriteSheet, quads = loadSprites('track2/hospital-sprites.png', 'track2/hospital-sprites.lua')
 
     local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
 
@@ -558,10 +571,13 @@ function scenes.parkBench(gregMissing)
             end
 
             if flappy then
-                local ax = 2*(flockX + ox - self.pos[1] - dx*3)
-                local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                -- local ax = 2*(flockX + ox - self.pos[1] - dx*3)
+                -- local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                local ax = (flockX + ox - self.pos[1])/2
+                local ay = (flockY + oy - self.pos[2])/3
                 dx = dx + ax*dt
                 dy = dy + ay*dt
+                self.animSpeed = 0.2 + ax/30
             end
 
             self.pos[1] = self.pos[1] + dt*dx
@@ -648,14 +664,15 @@ function scenes.parkBench(gregMissing)
 
     return {
         update = function(_, dt)
-            updateLayers(sky, dt)
-            updateLayers(bg, dt)
-            updateLayers(fg, dt)
-
             time = time + dt
             if not gregMissing then
                 flockX = (time - 1.5)*384
+                flockY = 40 - 80*util.clamp(flockX/200,0,2)
             end
+
+            updateLayers(sky, dt)
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
         end,
         draw = function(_)
             drawLayers(sky)
@@ -733,7 +750,7 @@ function scenes.therapist()
             animation = {
                 {quads.rose.open, 1.7},
                 {quads.rose.blink, 0.1},
-                {quads.rose.open, 0.5},
+                {quads.rose.open, 2.3},
                 {quads.rose.blink, 0.1},
                 {quads.rose.open, 0.5},
                 {quads.rose.blink, 0.1},
@@ -742,7 +759,14 @@ function scenes.therapist()
         Sprite.new({
             pos = {152,112},
             sheet = spriteSheet,
-            frame = quads.greg
+            animation = {
+                {quads.greg.open, 0.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 1.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 2.2},
+                {quads.greg.blink, 0.1},
+            }
         }),
         Sprite.new({
             pos = {216,92},
@@ -769,6 +793,14 @@ function scenes.therapist()
             sheet = spriteSheet,
             frame = quads.clock.face
         }),
+        Sprite.new({
+            pos = {118,178},
+            sheet = spriteSheet,
+            animation = {
+                {quads.therapist[1], 1/3},
+                {quads.therapist[2], 1/3}
+            }
+        })
         -- TODO therapist's hand
     }
 
