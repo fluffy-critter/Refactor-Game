@@ -821,11 +821,12 @@ function scenes.vacation()
     waterMask:send('mask', imagepool.load('track2/vacation-watermask.png'))
 
     local spriteSheet, quads = loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua')
+    local filteredSprites = imagepool.load('track2/vacation-sprites.png') -- let this one be filtered
 
     local layers = {
         {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
         {
-            image = imagepool.load('track2/vacation-water.png', {nearest=true}),
+            image = imagepool.load('track2/vacation-water.png', {nearest=false}),
             draw = function(self)
                 local theta = math.cos(beat*math.pi/2)
                 local x = 8*math.sin(theta)
@@ -849,7 +850,7 @@ function scenes.vacation()
            end
         },
         {
-            draw = function(self)
+            draw = function()
                 local t = (beat/2) % 1
 
                 -- y follows a circular arc
