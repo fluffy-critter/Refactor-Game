@@ -1,7 +1,9 @@
 return {
   _META = {
+    image_path = "./vacation-sprites.png",
     version = "v0.6.2",
   },
+  beachball = {x = 96, y = 0, w = 16, h = 16},
   rose = {
     _META = {
       image_path = "/Users/fluffy/projects/Refactor-Game/src/track2/vacation-sprites.png",

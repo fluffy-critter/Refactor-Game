@@ -845,8 +845,38 @@ function scenes.vacation()
                 love.graphics.setColor(4,56,113,255)
                 love.graphics.draw(self.image, 0, 24)
 
+                love.graphics.setColor(255,255,255)
            end
         },
+        {
+            sheet = spriteSheet,
+            frame = quads.beachball,
+            draw = function(self)
+                local t = (beat/2) % 1
+
+                -- y follows a circular arc
+                local yt = t*2 - 1
+                local y = 64 - 32*math.sqrt(1 - yt*yt)
+
+                -- x follows the second half of smoothstep
+                local xt = (t + 1)/2
+                local xdir = (math.floor(beat/2) % 2)*2 - 1
+                local x = 64 + xdir*(util.smoothStep(xt) - 0.75)*96
+
+                local theta = math.sin(beat*math.pi/2)*math.pi/2
+                love.graphics.draw(self.sheet, self.frame, x, y, theta, 1, 1, 8, 8)
+            end
+        },
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 1.9},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.4},
+                {quads.rose.blink, 0.1},
+            }
+        })
     }
 
     return {
