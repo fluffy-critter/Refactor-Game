@@ -106,7 +106,8 @@ function scenes.kitchen()
         frame = nil
     })
 
-    local greg = Sprite.new({
+    local greg
+    greg = Sprite.new({
         sheet = spriteSheet,
         pos = {217, -40},
         animations = {
@@ -138,6 +139,12 @@ function scenes.kitchen()
                 {quads.greg.right[1], .2},
                 {quads.greg.right[3], .2},
                 stop = quads.greg.right[1],
+            },
+            crying = {
+                {quads.greg.crying[1], 1/12},
+                {quads.greg.crying[2], 1/9},
+                {quads.greg.crying[3], 1/6},
+                {quads.greg.crying[2], 1/12},
             }
         },
         pose = {
@@ -188,6 +195,12 @@ function scenes.kitchen()
                 pos = {204,120},
                 onComplete = function(sprite)
                     sprite.frame = quads.greg.sitting.normal
+                end
+            },
+            couch_sitting_crying = {
+                pos = {204,120},
+                onComplete = function(sprite)
+                    sprite.animation = greg.animations.crying
                 end
             },
             couch_sitting_thinking = {
@@ -314,7 +327,7 @@ function scenes.phase11(game, duration)
 end
 
 function scenes.hospital(duration)
-    local spriteSheet, quads = loadSprites('track2/hospital-fg.png', 'track2/hospital-sprites.lua')
+    local spriteSheet, quads = loadSprites('track2/hospital-sprites.png', 'track2/hospital-sprites.lua')
 
     local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
 
@@ -547,9 +560,8 @@ function scenes.parkBench(gregMissing)
             sprite.animation = birbAnims.right
         end
 
-        local chainedUpdate = sprite.update
         sprite.update = function(self, dt)
-            chainedUpdate(self, dt)
+            Sprite.update(self, dt)
             age = age + dt
 
             if not flappy and flockX and flockX >= self.pos[1] then
@@ -558,10 +570,13 @@ function scenes.parkBench(gregMissing)
             end
 
             if flappy then
-                local ax = 2*(flockX + ox - self.pos[1] - dx*3)
-                local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                -- local ax = 2*(flockX + ox - self.pos[1] - dx*3)
+                -- local ay = 2*(flockY + oy - self.pos[2] - dy*3)
+                local ax = (flockX + ox - self.pos[1])/2
+                local ay = (flockY + oy - self.pos[2])/3
                 dx = dx + ax*dt
                 dy = dy + ay*dt
+                self.animSpeed = 0.2 + ax/30
             end
 
             self.pos[1] = self.pos[1] + dt*dx
@@ -580,8 +595,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3/2
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 55)
+                love.graphics.draw(self.img, self.x%256, 55)
             end
         },
         {
@@ -591,8 +606,8 @@ function scenes.parkBench(gregMissing)
                 self.x = self.x + dt*3
             end,
             draw = function(self)
-                love.graphics.draw(self.img, self.x%256 - 256, 0)
-                love.graphics.draw(self.img, self.x%256, 0)
+                love.graphics.draw(self.img, self.x%256 - 256, 13)
+                love.graphics.draw(self.img, self.x%256, 13)
             end
         }
     }
@@ -648,14 +663,15 @@ function scenes.parkBench(gregMissing)
 
     return {
         update = function(_, dt)
-            updateLayers(sky, dt)
-            updateLayers(bg, dt)
-            updateLayers(fg, dt)
-
             time = time + dt
             if not gregMissing then
                 flockX = (time - 1.5)*384
+                flockY = 40 - 80*util.clamp(flockX/200,0,2)
             end
+
+            updateLayers(sky, dt)
+            updateLayers(bg, dt)
+            updateLayers(fg, dt)
         end,
         draw = function(_)
             drawLayers(sky)
@@ -733,7 +749,7 @@ function scenes.therapist()
             animation = {
                 {quads.rose.open, 1.7},
                 {quads.rose.blink, 0.1},
-                {quads.rose.open, 0.5},
+                {quads.rose.open, 2.3},
                 {quads.rose.blink, 0.1},
                 {quads.rose.open, 0.5},
                 {quads.rose.blink, 0.1},
@@ -742,7 +758,14 @@ function scenes.therapist()
         Sprite.new({
             pos = {152,112},
             sheet = spriteSheet,
-            frame = quads.greg
+            animation = {
+                {quads.greg.open, 0.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 1.5},
+                {quads.greg.blink, 0.1},
+                {quads.greg.open, 2.2},
+                {quads.greg.blink, 0.1},
+            }
         }),
         Sprite.new({
             pos = {216,92},
@@ -754,7 +777,6 @@ function scenes.therapist()
                 local ofs = time[3] % 1
 
                 local tgt = .35*((beat % 2)*2 - 1)
-                -- local blend = util.smoothStep(math.max(0, (ofs - 2/3)*3))
                 local blend = util.smoothStep(math.min(1, ofs*3))
                 self.theta = tgt*blend + -tgt*(1 - blend)
             end,
@@ -770,11 +792,140 @@ function scenes.therapist()
             sheet = spriteSheet,
             frame = quads.clock.face
         }),
-        -- TODO therapist's hand
+        Sprite.new({
+            pos = {118,178},
+            sheet = spriteSheet,
+            animation = {
+                {quads.therapist[1], 1/3},
+                {quads.therapist[2], 1/3}
+            }
+        })
     }
 
     return {
         update = function(_, dt, time)
+            updateLayers(layers, dt, time)
+        end,
+        draw = function(_)
+            drawLayers(layers)
+            return true
+        end
+    }
+end
+
+function scenes.vacation()
+    local time = 0
+    local beat = 0
+    local waterMask = shaders.load('track2/waterMask.fs')
+    waterMask:send('mask', imagepool.load('track2/vacation-watermask.png'))
+
+    local spriteSheet, quads = loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua')
+    local filteredSprites = imagepool.load('track2/vacation-sprites.png') -- let this one be filtered
+
+    local layers = {
+        {image = imagepool.load('track2/vacation-bg.png', {nearest=true})},
+        -- water
+        {
+            image = imagepool.load('track2/vacation-water.png', {nearest=false}),
+            draw = function(self)
+                local theta = math.cos(beat*math.pi/2)
+                local x = 8*math.sin(theta)
+                local t = (beat/2)%1
+                local y = 24 - 18*util.smoothStep(t)
+
+                local depth = t < 0.5 and 1 or 1 - util.smoothStep((t - 0.5)*2)
+
+                love.graphics.setShader(waterMask)
+                love.graphics.setColor(7,131,189,255*depth)
+                love.graphics.draw(self.image, x, y)
+                love.graphics.setShader()
+
+                love.graphics.setColor(5,81,138,255*depth)
+                love.graphics.draw(self.image, x/2, 24 - 9*util.smoothStep(t))
+
+                love.graphics.setColor(4,56,113,255)
+                love.graphics.draw(self.image, 0, 24)
+
+                love.graphics.setColor(255,255,255)
+           end
+        },
+        -- beach ball
+        {
+            draw = function()
+                local t = (beat/2) % 1
+
+                -- y follows a circular arc
+                local yt = t*2 - 1
+                local y = 64 - 32*math.sqrt(1 - yt*yt)
+
+                -- x follows the second half of smoothstep
+                local xt = (t + 1)/2
+                local xdir = (math.floor(beat/2) % 2)*2 - 1
+                local x = 64 + xdir*(util.smoothStep(xt) - 0.75)*96
+
+                local theta = math.sin(beat*math.pi/2)*math.pi/2
+                love.graphics.draw(filteredSprites, quads.ball.base, x, y, theta, 1, 1, 8, 8)
+
+                love.graphics.setColor(255,255,255,y*2)
+                love.graphics.draw(filteredSprites, quads.ball.shadow, x - 8, 91.5)
+                love.graphics.setColor(255,255,255,255)
+            end
+        },
+        -- rose's head
+        Sprite.new({
+            pos = {120,112},
+            sheet = spriteSheet,
+            animation = {
+                {quads.rose.open, 1.9},
+                {quads.rose.blink, 0.1},
+                {quads.rose.open, 1.4},
+                {quads.rose.blink, 0.1},
+            }
+        }),
+        -- greg's arm
+        Sprite.new({
+            pos = {157,120},
+            sheet = spriteSheet,
+            animation = {
+                {quads.greg[1], 1/3},
+                {quads.greg[2], 1/3}
+            }
+        }),
+        -- left kid
+        {
+            pos = {32,64},
+            sheet = spriteSheet,
+            frame = quads.kids[1],
+            draw = function(self)
+                local t = (beat/4 + 0.5)%1
+                local y = math.min(0, (1000*t - 200)*t)
+                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
+                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
+            end
+        },
+        -- right kid
+        {
+            pos = {80,64},
+            sheet = spriteSheet,
+            frame = quads.kids[2],
+            draw = function(self)
+                local t = (beat/4)%1
+                local y = math.min(0, (1000*t - 200)*t)
+                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
+                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
+            end
+        },
+    }
+
+    return {
+        update = function(_, dt, timePos)
+            time = time + dt
+            beat = timePos[3]
+
             updateLayers(layers, dt, time)
         end,
         draw = function(_)

@@ -157,7 +157,7 @@ function Game:start()
     self.kitchenScene = self.scenes.kitchen()
     self.sceneStack = {self.kitchenScene}
 
-    -- self.sceneStack = {self.scenes.therapist()}
+    -- self.sceneStack = {self.scenes.vacation()}
 
     -- animation: Greg walking down the stairs
     local scene = self.kitchenScene
@@ -248,7 +248,7 @@ function Game:start()
                 flashOut = {127,0,255,0}
 
                 local therapist = self.scenes.therapist()
-                local vacation = self.scenes.missing("vacation")
+                local vacation = self.scenes.vacation()
                 local parkTogether = self.scenes.parkBench()
                 local parkApart = self.scenes.parkBench(true)
 
@@ -280,6 +280,7 @@ function Game:start()
                 local doctor = self.scenes.doctor(self)
                 local therapist = self.scenes.therapist()
                 local parkbench = self.scenes.parkBench()
+                local vacation = self.scenes.vacation()
 
                 selections = {
                     hospital,
@@ -298,7 +299,7 @@ function Game:start()
                     parkbench,
 
                     self.kitchenScene,
-                    self.scenes.missing("vacation"),
+                    vacation,
                     therapist,
                     parkbench,
                 }
@@ -309,7 +310,7 @@ function Game:start()
                 -- self.miniGame = PigeonGame.new()
             elseif self.dialogState == "vacation" then
                 flashOut = {255,0,255,0}
-                selections = {self.scenes.missing("vacation")}
+                selections = {self.scenes.vacation()}
             elseif self.dialogState == "herpderp" then
                 selections = {
                     self.kitchenScene
@@ -322,15 +323,17 @@ function Game:start()
             end
 
             if selections then
-                -- collate a list of greg poses
-                local gregPoses = {}
-                local rosePoses = {}
+                -- collated list of the poses we want Greg to possibly flash through
+                local gregPoses = {
+                    "right_of_rose",
+                    "below_doors",
+                    "couch_sitting",
+                    "couch_sitting_thinking",
+                    "kneeling_by_rose",
+                    "couch_sitting_crying"
+                }
 
-                -- TODO this should really just be sets of positions and frames/animations (including greg crying)
-                for v in pairs(self.kitchenScene.greg.pose) do
-                    table.insert(gregPoses, v)
-                end
-
+                local rosePoses = self.kitchenScene.rose.animations
                 for _,v in pairs(self.kitchenScene.rose.animations) do
                     table.insert(rosePoses, v)
                 end
@@ -387,6 +390,9 @@ function Game:start()
                 what = function()
                     self:transcribe("[ending: " .. self.dialogState .. "]")
                     self.sceneStack = {self.scenes.endKitchen(self, self.dialogState)}
+                    config.endings = config.endings or {}
+                    config.endings[self.dialogState] = (config.endings[self.dialogState] or 0) + 1
+                    config.save()
                 end
             })
         end
@@ -493,7 +499,7 @@ function Game:update(dt)
         end
     end
 
-    if (self.textBox and self.textBox.state < TextBox.states.ready) then
+    if (self.textBox and self.textBox.state < TextBox.states.ready and util.arrayLT(time,{12,2})) then
         local extend = self:getNextInterval(1.5, 1, 0)
         if self.nextTimeout and util.arrayLT(self.nextTimeout, extend) then
             -- we're a chatosaurus, extend the timeout a little
@@ -655,7 +661,7 @@ function Game:chooseDialog(dialog)
     for _,_,node in util.cpairs(dialog[self.dialogState], dialog.always) do
         if not self.dialogCounts[node] or self.dialogCounts[node] < (node.maxCount or 1) then
             local distance = (self.dialogCounts[node] or 0) + math.random()*0.1
-            local specificity = 1
+            local specificity = 5
             for k,v in pairs(node.pos or {}) do
                 local dx = v - (self.npc[k] or 0)
                 distance = distance + dx*dx*(self.weights[k] or 1) + (self.offsets[k] or 1)
@@ -663,6 +669,7 @@ function Game:chooseDialog(dialog)
                     specificity = specificity + 1
                 end
             end
+            specificity = specificity + (node.importance or 0)
 
             -- let more specific rules match first
             distance = distance/specificity
@@ -826,7 +833,7 @@ function Game:draw()
     if self.back then
         self.back:renderTo(function()
             love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(255, 255, 255, 90)
+            love.graphics.setColor(255, 255, 255, 150)
             love.graphics.draw(self.canvas)
         end)
     end

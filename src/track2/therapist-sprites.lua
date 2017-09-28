@@ -4,12 +4,19 @@ return {
     version = "v0.6.2",
   },
   clock = {
-    face = {x = 80, y = 0, w = 16, h = 16},
-    pendulum = {x = 99, y = 0, w = 6, h = 18},
+    face = {x = 0, y = 48, w = 16, h = 16},
+    pendulum = {x = 19, y = 48, w = 6, h = 18},
   },
-  greg = {x = 48, y = 0, w = 16, h = 43},
+  greg = {
+    blink = {x = 72, y = 0, w = 16, h = 43},
+    open = {x = 48, y = 0, w = 16, h = 43},
+  },
   rose = {
     blink = {x = 24, y = 0, w = 16, h = 44},
     open = {x = 0, y = 0, w = 16, h = 44},
+  },
+  therapist = {
+    {x = 27, y = 48, w = 4, h = 7},
+    {x = 35, y = 48, w = 4, h = 7},
   },
 }
