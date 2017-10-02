@@ -173,9 +173,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=6, angry=0},
+            pos = {phase=6, angry=0, silence_likeyou=0},
             text = "This isn't like you.",
             pose = "facing_left",
+            setPos = {silence_likeyou=1000},
             responses = {
                 {"Like who?", {}, "normal"},
                 {"Who ARE you?", {}, "brain_problems"},
@@ -183,9 +184,10 @@ local dialog = {
             }
         },
         {
-            pos = {phase=6, angry=1},
+            pos = {phase=6, angry=1, silence_likeyou=0},
             text = "This is just like you.",
             pose = {"below_doors", "facing_right"},
+            setPos = {silence_likeyou=1000},
             responses = {
                 {"What is?", {}, "normal"},
                 {"Sorry, do I know you?", {}, "brain_problems"},
@@ -194,10 +196,11 @@ local dialog = {
         },
 
         {
-            pos = {phase=7},
+            pos = {phase=7, silence_whatisaid=0},
             text = "Is this about what I said last night? It was only a joke.",
             pose = {"below_doors", "facing_right"},
             rose = "eyes_right",
+            setPos = {silence_whatisaid=1000},
             responses = {
                 {"And I'm sure it was funny.", {}, "brain_problems"},
                 {"Well it wasn't very funny.", {}, "last_night"},
@@ -205,10 +208,11 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7},
+            pos = {phase=7, silence_whatisaid=0},
             text = "Is this about what I said last night? I'm sorry, it was out of line.",
             pose = {"below_doors", "facing_left"},
             rose = "normal",
+            setPos = {silence_whatisaid=1000},
             responses = {
                 {"...What did you say?", {}, "brain_problems"},
                 {"Yes, it was.", {}, "normal"},
@@ -216,10 +220,11 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7},
+            pos = {phase=7, silence_whatisaid=0},
             text = "If this is about what I said last night, well%.%.%.%% you deserved it.",
             pose = {"below_doors", "facing_right"},
             rose = "eyes_left",
+            setPos = {silence_whatisaid=1000},
             responses = {
                 {"...What did you say?", {}, "brain_problems"},
                 {"I doubt it.", {}, "normal"},
@@ -228,9 +233,10 @@ local dialog = {
         },
 
         {
-            pos = {phase=8},
+            pos = {phase=8, silence_silenttreatment=0},
             text = "I'm just not sure why you're giving me the silent treatment, here...",
             pose = {"below_doors", "facing_up"},
+            setPos = {silence_silenttreatment=1000},
             rose = "eyes_left",
             responses = {
                 {"I feel... numb...", {}, "stroke"},
@@ -239,10 +245,11 @@ local dialog = {
             }
         },
         {
-            pos = {phase=8},
+            pos = {phase=8, silence_silenttreatment=0},
             text = "So you can cut it out with the silent treatment.",
             pose = {"below_doors", "facing_right"},
             rose = "normal",
+            setPos = {silence_silenttreatment=1000},
             responses = {
                 {"Who are you?", {}, "brain_problems"},
                 {"Why are you even here?", {}, "last_night"},
