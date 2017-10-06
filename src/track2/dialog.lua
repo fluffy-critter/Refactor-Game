@@ -1059,7 +1059,7 @@ local dialog = {
             pos = {phase=10, fun=50, lastnight_samething=0},
             text = "Ha ha, what? Are we even talking about the same thing?",
             responses = {
-                {"What are we talking about?", {lastnight_what_talking=200}},
+                {"What are we talking about?", {lastnight_what_talking=1000}},
                 {"I think so...?", {lastnight_samething=1000}},
                 {"Probably not.", {}, "wtf"},
                 {nil, {}, "silence"}
@@ -1069,6 +1069,7 @@ local dialog = {
             pos = {phase=10.5, lastnight_samething=1000},
             text = "I'm just not sure what's going on here.",
             pose = "on_phone",
+            setPos = {lastnight_samething=0},
             responses = {
                 {"I'm sorry... I'm just in a strange mood.", {}},
                 {"Neither do I.", {}, "brain_problems"},
@@ -1089,9 +1090,10 @@ local dialog = {
         },
 
         {
-            pos = {lastnight_what_talking=200},
+            pos = {lastnight_what_talking=1000},
             text = "I'm not even sure now. I thought about our fight last night...?",
             setState = "brain_problems",
+            setPos = {lastnight_what_talking=0},
             responses = {
                 {"What fight?", {}},
                 {"I'm talking about a stranger in my home.", {}},
