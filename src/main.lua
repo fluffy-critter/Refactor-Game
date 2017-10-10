@@ -300,6 +300,7 @@ function love.load(args)
     love.window.setMode(config.width, config.height, {
         resizable = true,
         fullscreen = config.fullscreen,
+        vsync = config.vsync,
         minwidth = 640,
         minheight = 480
     })
