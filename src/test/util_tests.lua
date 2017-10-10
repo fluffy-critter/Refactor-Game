@@ -62,6 +62,14 @@ notion("Enums compare correctly", function()
     check(myEnum.second ~= myEnum.third).is(true)
 end)
 
+notion("Enums don't compare across types", function()
+    local e1 = util.enum("a")
+    local e2 = util.enum("a")
+
+    check(e1.a == e2.a).is(false)
+    check(e1.a ~= e2.a).is(true)
+end)
+
 notion("applyDefaults works right", function()
     local defaults = { foo = 1, bar = 2 }
     local applyTo = { bar = 3, baz = 5 }

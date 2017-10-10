@@ -12,23 +12,15 @@ local util = {}
 -- Create an enum
 function util.enum(...)
     local enum = {}
-    local function checktype(o)
-        if o.enum ~= enum then
-            error("attempted to compare incompatible enum types")
-        end
-    end
 
     local meta = {
         __eq = function(o1, o2)
-            checktype(o2)
             return o1.val == o2.val
         end,
         __lt = function(o1, o2)
-            checktype(o2)
             return o1.val < o2.val
         end,
         __le = function(o1, o2)
-            checktype(o2)
             return o1.val <= o2.val
         end,
         __tostring = function(o)
