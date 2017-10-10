@@ -227,14 +227,12 @@ notion("Poses getting set enough", function()
     local count = {}
 
     checkAllDialogs(dialog, function(state, item)
-        if not item.pos.phase or item.pos.phase < 11 then
-            count[state] = (count[state] or 0) + 1
-            if item.pose then
-                posesSet[state] = (posesSet[state] or 0) + 1
-            end
-            if item.rose then
-                rosesSet[state] = (rosesSet[state] or 0) + 1
-            end
+        count[state] = (count[state] or 0) + 1
+        if item.pose then
+            posesSet[state] = (posesSet[state] or 0) + 1
+        end
+        if item.rose then
+            rosesSet[state] = (rosesSet[state] or 0) + 1
         end
     end)
 

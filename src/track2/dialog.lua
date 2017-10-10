@@ -1412,7 +1412,7 @@ local dialog = {
         {
             pos = {phase=7, bp_anything=0, bp_guess_husband=0},
             text = "Can you remember anything about me? Anything at all?",
-            setPos = {bp_anything=100,bp_prerequisite=100},
+            setPos = {bp_anything=100},
             pose = "facing_left",
             rose = "normal",
             responses = {
@@ -1422,7 +1422,7 @@ local dialog = {
             }
         },
         {
-            pos = {phase=7, bp_anything=0, bp_prerequisite=100},
+            pos = {phase=7, bp_anything=0},
             text = "Surely you must remember SOMETHING about me...",
             pose = "left_of_couch",
             setPos = {bp_anything=100},
@@ -1973,6 +1973,7 @@ local dialog = {
             pos = {phase=11.5},
             text = "I worry about you. But... is the feeling even mutual?",
             pose = "facing_left",
+            rose = "eyes_left",
             responses = {
                 {"How can I?", {}},
                 {"I'm sorry.", {alien_dont_leave=100}},
@@ -1984,6 +1985,7 @@ local dialog = {
             pos = {phase=12, alien_dont_leave=0},
             text = "I'm sorry, but I just can't do this anymore.",
             pose = "below_doors",
+            rose = "eyes_right",
             setState = "gave_up",
             responses = {
                 {"Can't do what?", {}},
@@ -1997,6 +1999,7 @@ local dialog = {
             text = "Look, I% kinda% want to leave you, but that's not the adult thing to do.%% " ..
                 " Let's work on this,% together,% okay?",
             pose = {"right_of_rose", "facing_left"},
+            rose = "eyes_right",
             responses = {
                 {"Okay...", {}},
                 {"I guess...", {}},
@@ -2007,12 +2010,14 @@ local dialog = {
         {
             pos = {phase=12, alien_abort_leave=150},
             text = "You're right...% Let's work on this together, okay?",
+            rose = "closed",
             pose = {"right_of_rose", "facing_left"},
         },
 
         {
             pos = {phase=13},
             text = "I think I know someone we can talk to.",
+            rose = "closed",
         },
         {
             pos = {phase=13.1},
@@ -2022,6 +2027,7 @@ local dialog = {
             pos = {phase=13.2},
             text = "But%.%.%. we %really% shouldn't rush through everything,% you know?",
             cantInterrupt = true,
+            rose = "closed",
             responses = {
                 {"Yeah, I guess not.", {}},
                 {"I'm sorry...", {}},
@@ -2365,25 +2371,66 @@ local dialog = {
         {
             pos = {phase=11},
             text = "Yeah%.%.%. This is just what we need.",
-            pose={"next_to_rose", "facing_down"},
-            rose="eyes_right"
+            pose = {"next_to_rose", "facing_down"},
+            rose = "eyes_right",
         },
         {
             pos = {phase=12},
             text = "I love you so much. #",
-            pose={"kneeling_by_rose"},
+            pose = "kneeling_by_rose",
             rose = "eyes_closed",
         },
         {
             pos = {phase=13},
             text = "I know just where we should go.",
-            pose={"below_doors"},
+            pose = "below_doors",
+            rose ="eyes_left",
+            responses = {
+                {"Where?", {vac_where=1000}},
+                {"When?", {vac_when=1000}},
+                {"Why?", {vac_why=1000}},
+            }
+        },
+        {
+            pos = {phase=13.1},
+            text = "Yeah, it'll be nice and relaxing...",
+            pose = "below_doors",
+            rose = "eyes_right",
+        },
+        {
+            pos = {phase=13.2},
+            text = "We'll have so much fun...",
+            pose = "below_doors",
+        },
+        {
+            pos = {phase=13.3},
+            text = "Something we'll remember...%% for%ev%er.%.%.",
+            pose = "below_doors",
+            rose = "eyes_closed",
         },
         {
             pos = {phase=14},
+            pose = "below_doors",
+            rose = "crying",
             text = "",
             ended = true
-        }
+        },
+
+        {
+            pos = {vac_where=1000},
+            text = "You'll see.%% I know you'll enjoy it.",
+            pose = {"right_of_rose", "facing_left"},
+        },
+        {
+            pos = {vac_when=1000},
+            text = "Let's go as soon as we can.%% We can take the train there.%% Pack light.",
+            pose = {"right_of_rose", "facing_up"},
+        },
+        {
+            pos = {vac_why=1000},
+            text = "It's been way too long since we've gotten out of the city.%% We could use some...% fresh air.",
+            pose = {"right_of_rose", "facing_right"},
+        },
     }
 
  }
