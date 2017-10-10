@@ -142,7 +142,7 @@ notion("mpairs", function()
     local result = {}
     local count = 0
 
-    for k,v in util.mpairs(t1, t2, t3) do
+    for _,k,v in util.mpairs(t1, t2, t3) do
         count = count + 1
         result[k] = v
     end

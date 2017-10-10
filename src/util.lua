@@ -277,44 +277,27 @@ end
 -- Like ipairs(sequence) except it can take arbitrarily many tables. Returns tbl,idx,value
 function util.cpairs(...)
     local tables = {...}
-    local wtbl = 1
-    local widx = 1
 
-    return function()
-        local tbl = tables[wtbl]
-
-        while tbl and widx > #tbl and wtbl <= #tables do
-            widx = 1
-            wtbl = wtbl + 1
-            tbl = tables[wtbl]
+    return coroutine.wrap(function()
+        for _,tbl in ipairs(tables) do
+            for idx,val in ipairs(tbl) do
+                coroutine.yield(tbl,idx,val)
+            end
         end
-        if not tbl then
-            return
-        end
-
-        local pidx = widx
-        widx = widx + 1
-        return tbl,pidx,tbl[pidx]
-    end
+    end)
 end
 
--- Like pairs(sequence) except it can take arbitrarily many tables.
+-- Like pairs(sequence) except it can take arbitrarily many tables. Returns tbl,key,val
 function util.mpairs(...)
-    local queue = {...}
+    local tables = {...}
 
-    local func, tbl, state = pairs(queue[1])
-    table.remove(queue, 1)
-
-    return function()
-        local ns, val = func(tbl, state)
-        while not ns and #queue > 0 do
-            func, tbl, state = pairs(queue[1])
-            ns, val = func(tbl, state)
-            table.remove(queue, 1)
+    return coroutine.wrap(function()
+        for _,tbl in ipairs(tables) do
+            for key,val in pairs(tbl) do
+                coroutine.yield(tbl,key,val)
+            end
         end
-        state = ns
-        return ns, val
-    end, tbl, state
+    end)
 end
 
 -- Shallow copy a table
