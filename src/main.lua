@@ -80,8 +80,8 @@ local function blitCanvas(canvas, aspect)
 end
 
 local tracks = {
-    require('track1.game'),
-    require('track2.game')
+    require('track1'),
+    require('track2')
 }
 local currentGame
 
