@@ -62,7 +62,7 @@ function Actor:checkHitBalls(balls)
             return false
         end
 
-        return geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
+        return geom.pointPolyCollision(ball.x, ball.y, ball.r, poly, ball.vx, ball.vy)
     end
 
     for _,ball in pairs(balls) do
