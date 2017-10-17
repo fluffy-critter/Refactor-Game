@@ -317,7 +317,7 @@ function love.load(args)
     local track
     for _,arg in ipairs(args) do
         if arg:sub(1, 5) == "track" then
-            track = require(arg .. ".game")
+            track = require(arg)
             startGame(track)
         end
     end

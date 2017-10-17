@@ -838,7 +838,7 @@ function Game:update(raw_dt)
 
             -- test against paddle (if we're within range)
             if math.abs(ball.x - p.x) < p.w and math.abs(ball.y - p.y) < p.w then
-                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon())
+                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon(), ball.vx, ball.vy)
                 if c then
                     ball:onHitPaddle(c, self.paddle)
                 end

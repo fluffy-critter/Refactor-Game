@@ -52,9 +52,7 @@ end
 
 -- Normalize a vector to a particular length
 function geom.normalize(nrm, len)
-    if len == nil then
-        len = 1
-    end
+    len = len or 1
 
     local x, y = unpack(nrm)
     local d = math.sqrt(x*x + y*y)
@@ -103,8 +101,11 @@ end
 
 --[[ check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided,
 displacement vector as {x,y} if it is
+
+vx and vy are the velocity vector of the point, and are optional. If specified, we only consider collisions
+with front-facing edges.
 ]]
-function geom.pointPolyCollision(x, y, r, poly)
+function geom.pointPolyCollision(x, y, r, poly, vx, vy)
     cs_incr('point_poly_test')
 
     local npoints = #poly / 2
@@ -112,8 +113,6 @@ function geom.pointPolyCollision(x, y, r, poly)
     local x1, y1, x2, y2
     x2 = poly[npoints*2 - 1]
     y2 = poly[npoints*2]
-
-    local dist = {}
 
     local maxSide
     local maxSideDist
@@ -126,19 +125,22 @@ function geom.pointPolyCollision(x, y, r, poly)
         x2 = poly[i*2 - 1]
         y2 = poly[i*2]
 
-        dist[i] = geom.linePointDistance(x, y, x1, y1, x2, y2)
+        local dist = geom.linePointDistance(x, y, x1, y1, x2, y2)
 
-        if dist[i] >= r then
+        if dist >= r then
             -- We are fully outside on this side, so we are outside
             cs_incr('point_poly_face_inclusion_fail')
             return false
         end
 
+        local nrm = geom.getNormal(x1, y1, x2, y2)
+        local visible = not vx or not vy or (vx*nrm[1] + vy*nrm[2] <= 0)
+
         -- find the closest side
-        if maxSide == nil or dist[i] > maxSideDist then
+        if visible and (not maxSide or dist > maxSideDist) then
             maxSide = i
-            maxSideDist = dist[i]
-            maxSideNormal = geom.getNormal(x1, y1, x2, y2)
+            maxSideDist = dist
+            maxSideNormal = nrm
             maxSideProj = geom.projectPointToLine(x, y, x1, y1, x2, y2)
         end
     end
@@ -157,7 +159,7 @@ function geom.pointPolyCollision(x, y, r, poly)
         local cx = x - poly[i*2 - 1]
         local cy = y - poly[i*2]
         local cd = cx*cx + cy*cy
-        if cornerDist2 == nil or cd < cornerDist2 then
+        if not cornerDist2 or cd < cornerDist2 then
             cornerDist2 = cd
             cornerX = cx
             cornerY = cy
