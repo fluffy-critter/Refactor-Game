@@ -844,8 +844,7 @@ function Game:update(raw_dt)
             if geom.pointAABBCollision(ball.x, ball.y, ball.r, paddleAABB)
             and geom.pointPointCollision(ball.x, ball.y, ball.r, p.x, p.y, paddleR)
             then
-                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly,
-                    ball.vx, ball.vy)
+                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly)
                 if c then
                     ball:onHitPaddle(c, self.paddle)
                 end

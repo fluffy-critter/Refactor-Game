@@ -101,11 +101,8 @@ end
 
 --[[ check to see if a ball collides with a polygon (clockwise winding); returns false if it's not collided,
 displacement vector as {x,y} if it is
-
-vx and vy are the velocity vector of the point, and are optional. If specified, we only consider collisions
-with front-facing edges.
 ]]
-function geom.pointPolyCollision(x, y, r, poly, vx, vy)
+function geom.pointPolyCollision(x, y, r, poly)
     cs_incr('point_poly_test')
 
     local npoints = #poly / 2
@@ -133,14 +130,11 @@ function geom.pointPolyCollision(x, y, r, poly, vx, vy)
             return false
         end
 
-        local nrm = geom.getNormal(x1, y1, x2, y2)
-        local visible = not vx or not vy or (vx*nrm[1] + vy*nrm[2] <= 0)
-
         -- find the closest side
-        if visible and (not maxSide or dist > maxSideDist) then
+        if not maxSide or dist > maxSideDist then
             maxSide = i
             maxSideDist = dist
-            maxSideNormal = nrm
+            maxSideNormal = geom.getNormal(x1, y1, x2, y2)
             maxSideProj = geom.projectPointToLine(x, y, x1, y1, x2, y2)
         end
     end
