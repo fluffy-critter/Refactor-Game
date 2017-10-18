@@ -815,6 +815,10 @@ function Game:update(raw_dt)
             dt = self.timeMapper(time)*dt
         end
 
+        local paddlePoly = p:getPolygon()
+        local paddleR = math.sqrt(p.w*p.w + p.h*p.h)
+        local paddleAABB = geom.getAABB(paddlePoly)
+
         for _,ball in pairs(self.balls) do
 
             ball:preUpdate(dt, rawt)
@@ -836,10 +840,12 @@ function Game:update(raw_dt)
                 end
             end
 
-            -- test against paddle (if we're within range of a very rough bounding rect)
-            local maxBound = math.max(p.w, p.h) + ball.r
-            if math.abs(ball.x - p.x) < maxBound and math.abs(ball.y - p.y) < maxBound then
-                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, p:getPolygon(), ball.vx, ball.vy)
+            -- test against paddle
+            if geom.pointAABBCollision(ball.x, ball.y, ball.r, paddleAABB)
+            and geom.pointPointCollision(ball.x, ball.y, ball.r, p.x, p.y, paddleR)
+            then
+                local c = geom.pointPolyCollision(ball.x, ball.y, ball.r, paddlePoly,
+                    ball.vx, ball.vy)
                 if c then
                     ball:onHitPaddle(c, self.paddle)
                 end
