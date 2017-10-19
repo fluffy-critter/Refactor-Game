@@ -13,7 +13,7 @@ local input = {
     rampTime = 1/6,
 
     -- dead zone for analog sticks
-    deadZone = 0.1,
+    deadZone = 0.25,
 
     -- current joystick position
     x = 0,
@@ -197,25 +197,25 @@ function input.update(dt)
         padY = 0
     end
 
-    padX = math.max(-1, math.min(padX, 1))
-    padY = math.max(-1, math.min(padY, 1))
+    padX = util.clamp(padX, -1, 1)
+    padY = util.clamp(padY, -1, 1)
 
     -- generate pressed events based on stick position
     local function hysteresis(dir, val)
-        if val and not state.analogPressed[dir] and val > 0.4 then
+        if val and not state.analogPressed[dir] and val > 0.6 then
             state.analogPressed[dir] = true
             if not input.pressed[dir] then
                 print("stick pressed: " .. dir)
+                input.pressed[dir] = true
                 input.onPress(dir)
             end
-            input.pressed[dir] = true
-        elseif val and state.analogPressed[dir] and val < 0.3 then
+        elseif val and state.analogPressed[dir] and val < 0.4 then
             state.analogPressed[dir] = false
             if input.pressed[dir] then
                 print("stick released: " .. dir)
+                input.pressed[dir] = false
                 input.onRelease(dir)
             end
-            input.pressed[dir] = false
         end
     end
 
@@ -225,14 +225,18 @@ function input.update(dt)
     hysteresis('down', analogY)
 
     -- set our stick position as appropriate
-    if analogX and math.abs(analogX) > input.deadZone then
-        input.x = analogX
+    if analogX > input.deadZone then
+        input.x = (analogX - input.deadZone)/(1 - input.deadZone)
+    elseif analogX < -input.deadZone then
+        input.x = (analogX + input.deadZone)/(1 - input.deadZone)
     else
         input.x = padX
     end
 
-    if analogY and math.abs(analogY) > input.deadZone then
-        input.y = analogY
+    if analogY > input.deadZone then
+        input.y = (analogY - input.deadZone)/(1 - input.deadZone)
+    elseif analogY < -input.deadZone then
+        input.y = (analogY + input.deadZone)/(1 - input.deadZone)
     else
         input.y = padY
     end
