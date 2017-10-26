@@ -284,13 +284,23 @@ local function mainmenu()
 
     -- TODO
     table.insert(choices, {})
-    -- table.insert(choices, {label="Settings"})
     table.insert(choices, {
         label="Credits",
         onSelect = function()
             table.insert(menuStack, credits())
         end
     })
+
+    if not config.kiosk then
+        table.insert(choices, {})
+        -- table.insert(choices, {label="Settings"})
+        table.insert(choices, {
+            label="Exit",
+            onSelect = function()
+                os.exit(0)
+            end
+        })
+    end
 
     return Menu.new({choices = choices})
 end
