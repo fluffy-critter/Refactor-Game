@@ -115,11 +115,13 @@ $(DEST)/deps/love.app/Contents/MacOS/love:
 # Windows build dependencies
 WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
+PECOFF_ROOT=$(DEST)/deps/pecoff4j-0.0.1
 
 $(WIN32_ROOT)/love.exe:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
 	wget https://bitbucket.org/rude/love/downloads/love-$(LOVE_VERSION)-win32.zip && \
+	mkdir
 	unzip love-$(LOVE_VERSION)-win32.zip
 
 $(WIN64_ROOT)/love.exe:
@@ -127,6 +129,12 @@ $(WIN64_ROOT)/love.exe:
 	cd $(DEST)/deps && \
 	wget https://bitbucket.org/rude/love/downloads/love-$(LOVE_VERSION)-win64.zip && \
 	unzip love-$(LOVE_VERSION)-win64.zip
+
+$(PECOFF_ROOT)/pecoff4j-0.0.1.jar:
+	mkdir -p $(PECOFF_ROOT) && \
+	cd $(DEST)/deps && \
+	wget https://downloads.sourceforge.net/project/pecoff4j/pecoff4j/v0.0.1/pecoff4j-0.0.1.zip && \
+	unzip pecoff4j-0.0.1.zip -d pecoff4j-0.0.1
 
 # Win32 version
 # TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
