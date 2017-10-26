@@ -137,13 +137,14 @@ $(PECOFF_JAR):
 	wget https://downloads.sourceforge.net/project/pecoff4j/pecoff4j/v0.0.1/pecoff4j-0.0.1.zip && \
 	unzip pecoff4j-0.0.1.zip -d pecoff4j-0.0.1
 
-$(WINRES): $(PECOFF_JAR)
+$(WINRES):
 	mkdir -p $(WINRES)
+$(WINRES)/winres.class: $(WINRES) windows/winres.java $(PECOFF_JAR)
 	javac -cp $(PECOFF_JAR) windows/winres.java -d $(WINRES)
 
 # Win32 version
 win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
-$(DEST)/win32/$(NAME).exe: $(WINRES) $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win32/$(NAME).exe: $(WINRES)/winres.class $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cp $(WIN32_ROOT)/love.exe $(@)
@@ -156,7 +157,7 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 
 # Win64 version
 win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
-$(DEST)/win64/$(NAME).exe: $(WINRES) $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win64/$(NAME).exe: $(WINRES)/winres.class $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cp $(WIN64_ROOT)/love.exe $(@)
