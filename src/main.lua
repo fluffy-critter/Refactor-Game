@@ -284,7 +284,6 @@ local function mainmenu()
 
     -- TODO
     table.insert(choices, {})
-    -- table.insert(choices, {label="Settings"})
     table.insert(choices, {
         label="Credits",
         onSelect = function()
@@ -292,10 +291,23 @@ local function mainmenu()
         end
     })
 
+    if not config.kiosk then
+        table.insert(choices, {})
+        -- table.insert(choices, {label="Settings"})
+        table.insert(choices, {
+            label="Exit",
+            onSelect = function()
+                os.exit(0)
+            end
+        })
+    end
+
     return Menu.new({choices = choices})
 end
 
 function love.load(args)
+    cute.go(args)
+
     -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
     love.window.setMode(config.width, config.height, {
         resizable = true,
@@ -307,7 +319,6 @@ function love.load(args)
 
     math.randomseed(os.time())
 
-    cute.go(args)
 
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
