@@ -296,6 +296,8 @@ local function mainmenu()
 end
 
 function love.load(args)
+    cute.go(args)
+
     -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
     love.window.setMode(config.width, config.height, {
         resizable = true,
@@ -307,7 +309,6 @@ function love.load(args)
 
     math.randomseed(os.time())
 
-    cute.go(args)
 
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
