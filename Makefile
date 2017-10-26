@@ -15,7 +15,7 @@ NAME=Refactor
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
 
-# Version of the game
+# Version of the game (TODO add actual versioning)
 GAME_VERSION=$(shell git rev-parse --short HEAD)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
@@ -129,8 +129,9 @@ $(WIN64_ROOT)/love.exe:
 	unzip love-$(LOVE_VERSION)-win64.zip
 
 # Win32 version
+# TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
 win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
-$(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
@@ -140,8 +141,9 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
+# TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
 win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
-$(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
