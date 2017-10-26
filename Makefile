@@ -117,13 +117,12 @@ WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 PECOFF_ROOT=$(DEST)/deps/pecoff4j-0.0.1
 PECOFF_JAR=$(PECOFF_ROOT)/pecoff4j-0.0.1.jar
-WINRES=$(DEST)/winres.class
+WINRES=$(DEST)/winres
 
 $(WIN32_ROOT)/love.exe:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
 	wget https://bitbucket.org/rude/love/downloads/love-$(LOVE_VERSION)-win32.zip && \
-	mkdir
 	unzip love-$(LOVE_VERSION)-win32.zip
 
 $(WIN64_ROOT)/love.exe:
@@ -139,35 +138,30 @@ $(PECOFF_JAR):
 	unzip pecoff4j-0.0.1.zip -d pecoff4j-0.0.1
 
 $(WINRES): $(PECOFF_JAR)
-	mkdir -p $(DEST)
-	javac -cp $(PECOFF_JAR) windows/winres.java -d $(DEST)
+	mkdir -p $(WINRES)
+	javac -cp $(PECOFF_JAR) windows/winres.java -d $(WINRES)
 
 # Win32 version
-win32: $(WINRES) $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
-$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
+win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
+$(DEST)/win32/$(NAME).exe: $(WINRES) $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cp $(WIN32_ROOT)/love.exe $(@)
-	java -cp $(DEST):$(PECOFF_JAR) winres $(@) windows/icon.ico
+	java -cp $(WINRES):$(PECOFF_JAR) winres $(@) windows/icon.ico
 	cat $(DEST)/love/$(NAME).love >> $(@)
-	# TODO: remove this, and move the $(WINRES) dep into this target instead of the metatarget
-	cat $(^) > $(@)
 
 publish-win32: $(DEST)/.published-win32-$(GAME_VERSION)
 $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
-# TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
-win64: $(WINRES) $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
-$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
+win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
+$(DEST)/win64/$(NAME).exe: $(WINRES) $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
-	cp $(WIN32_ROOT)/love.exe $(@)
-	java -cp $(DEST):$(PECOFF_JAR) winres $(@) windows/icon.ico
+	cp $(WIN64_ROOT)/love.exe $(@)
+	java -cp $(WINRES):$(PECOFF_JAR) winres $(@) windows/icon.ico
 	cat $(DEST)/love/$(NAME).love >> $(@)
-	# TODO: remove this, and move the $(WINRES) dep into this target instead of the metatarget
-	cat $(^) > $(@)
 
 publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
