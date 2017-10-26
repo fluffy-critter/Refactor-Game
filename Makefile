@@ -116,6 +116,9 @@ $(DEST)/deps/love.app/Contents/MacOS/love:
 WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 
+# These are temporary; remove them after the windowsIcon stuff gets merged in
+setup: $(WIN32_ROOT)/love.exe $(WIN64_ROOT)/love.exe
+
 $(WIN32_ROOT)/love.exe:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
@@ -129,7 +132,6 @@ $(WIN64_ROOT)/love.exe:
 	unzip love-$(LOVE_VERSION)-win64.zip
 
 # Win32 version
-# TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
 win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
 $(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
@@ -141,7 +143,6 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
-# TODO we should be able to manipualte these files/resources from the Mac CLI somehow, right?
 win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
 $(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
