@@ -15,8 +15,10 @@ NAME=Refactor
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
 
-# Version of the game (TODO add actual versioning)
-GAME_VERSION=$(shell git rev-parse --short HEAD)
+# Version of the game
+COMMITHASH=$(shell git rev-parse --short HEAD)
+COMMITTIME=$(shell expr `git show -s --format=format:%at` - 1499042500)
+GAME_VERSION=0.2.$(COMMITTIME)-$(COMMITHASH)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
