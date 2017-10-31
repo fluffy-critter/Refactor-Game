@@ -25,10 +25,10 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: commit-check
-.PHONY: love-bundle osx win32 win64
+.PHONY: love-bundle osx win32 win64 bundle-win32
 .PHONY: assets setup tests checks version
 
-all: checks tests love-bundle osx win32 win64
+all: checks tests love-bundle osx win32 win64 bundle-win32
 
 clean:
 	rm -rf build
@@ -154,5 +154,11 @@ $(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
 publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
+
+WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
+bundle-win32: $(DEST)/$(WIN32_BUNDLE_FILENAME)
+$(DEST)/$(WIN32_BUNDLE_FILENAME): win32
+	cd $(DEST)/win32 && zip -9r ../$(WIN32_BUNDLE_FILENAME) *
+
 
 #### asset rules go down here (someday, maybe)
