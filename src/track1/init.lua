@@ -1033,13 +1033,13 @@ function Game:draw()
     if self.layers.toneMap then
         util.mapShader(self.canvas, self.layers.toneMap,
             self.shaders.gaussToneMap, {
-                sampleRadius = {self.scale/1280, 0},
+                sampleRadius = {1/1280, 0},
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
         self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
             self.shaders.gaussBlur, {
-                sampleRadius = {0, self.scale/720}
+                sampleRadius = {0, 1/720}
             })
 
         self.canvas:renderTo(function()
