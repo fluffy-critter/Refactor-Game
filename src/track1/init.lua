@@ -55,6 +55,29 @@ function Game:seekMusic(pos, timeOfs)
     self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
+function Game:resize(w, h)
+    self.scale = math.min(w/1280, h/720)
+
+    local w = self.scale*1280
+    local h = self.scale*720
+
+    self.canvas = love.graphics.newCanvas(w, h)
+
+    local limits = love.graphics.getSystemLimits()
+    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+
+    self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
+
+    local tonemapFmt = util.selectCanvasFormat("rgba8")
+    if tonemapFmt then
+        self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
+        self.layers.toneMapBack = love.graphics.newCanvas(w, h, tonemapFmt)
+        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
+        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
+    end
+end
+
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
@@ -63,17 +86,13 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    local limits = love.graphics.getSystemLimits()
-    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
-
-    self.canvas = love.graphics.newCanvas(1280, 720)
 
     self.layers = {}
-    self.layers.arena = love.graphics.newCanvas(1280, 720, pixelfmt, limits.canvasmsaa)
-    self.layers.overlay = love.graphics.newCanvas(1280, 720, pixelfmt)
-
     self.shaders = {}
 
+    self:resize(love.graphics.getWidth(), love.graphics.getHeight())
+
+    -- water always renders at 720p
     local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
@@ -90,14 +109,6 @@ function Game:init()
         self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     else
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
-    end
-
-    local tonemapFmt = util.selectCanvasFormat("rgba8")
-    if tonemapFmt then
-        self.layers.toneMap = love.graphics.newCanvas(1280, 720, tonemapFmt)
-        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, tonemapFmt)
-        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
-        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
 
     self.bounds = {
@@ -943,6 +954,8 @@ function Game:draw()
         love.graphics.clear(0,0,0,0)
     end)
 
+    love.graphics.scale(self.scale, self.scale)
+
     self.layers.arena:renderTo(function()
         love.graphics.clear(0, 0, 0, 0)
 
@@ -982,6 +995,8 @@ function Game:draw()
         end
     end)
 
+    love.graphics.origin()
+
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.clear(0,0,0,255)
@@ -996,7 +1011,7 @@ function Game:draw()
             shader:send("source", self.layers.arena)
             shader:send("bgColor", {0, 0, 0, 0})
             shader:send("waveColor", {0.1, 0, 0.5, 1})
-            love.graphics.draw(self.layers.water)
+            love.graphics.draw(self.layers.water, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end
 
@@ -1012,13 +1027,13 @@ function Game:draw()
     if self.layers.toneMap then
         util.mapShader(self.canvas, self.layers.toneMap,
             self.shaders.gaussToneMap, {
-                sampleRadius = {1/1280, 0},
+                sampleRadius = {self.scale/1280, 0},
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
         self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
             self.shaders.gaussBlur, {
-                sampleRadius = {0, 1/720}
+                sampleRadius = {0, self.scale/720}
             })
 
         self.canvas:renderTo(function()
