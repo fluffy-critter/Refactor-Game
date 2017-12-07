@@ -24,7 +24,8 @@ local Game = {
     META = {
         tracknum = 2,
         title = "strangers",
-        duration = 3*60 + 11
+        duration = 3*60 + 11,
+        description = "weird little story"
     }
 }
 

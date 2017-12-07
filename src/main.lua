@@ -340,6 +340,10 @@ function love.resize(w, h)
         config.height = h
         config.save()
     end
+
+    if currentGame and currentGame.resize then
+        currentGame:resize(w, h)
+    end
 end
 
 function love.update(dt)
