@@ -56,7 +56,12 @@ function Game:seekMusic(pos, timeOfs)
 end
 
 function Game:resize(w, h)
-    self.scale = math.min(w/1280, h/720)
+    self:setScale(math.min(w/1280, h/720))
+end
+
+function Game:setScale(scale)
+    -- limit the resolution to 1080p (TODO: adapt based on framerate)
+    self.scale = math.min(1080/720, scale)
 
     local w = self.scale*1280
     local h = self.scale*720
