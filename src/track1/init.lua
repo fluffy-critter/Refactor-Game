@@ -60,11 +60,12 @@ function Game:resize(w, h)
 end
 
 function Game:setScale(scale)
-    -- limit the resolution to 1080p (TODO: adapt based on framerate)
-    self.scale = math.min(1080/720, scale)
+    -- limit the resolution to 1440p (TODO: adapt based on framerate)
+    self.scale = math.min(2, scale)
 
-    local w = self.scale*1280
-    local h = self.scale*720
+    local w = math.floor(self.scale*1280 + 0.5)
+    local h = math.floor(w*720/1280)
+    print("Now rendering at " .. w .. "x" .. h)
 
     self.canvas = love.graphics.newCanvas(w, h)
 
