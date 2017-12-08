@@ -245,6 +245,8 @@ function RoamingEye:draw()
         chargeColor = {self.chargeColor[1], self.chargeColor[2], self.chargeColor[3], self.chargeColor[4]*chargeAmount}
     end
 
+    love.graphics.push()
+    love.graphics.origin()
     self.canvas:renderTo(function()
         love.graphics.clear(0,0,0,0)
 
@@ -264,6 +266,7 @@ function RoamingEye:draw()
         end
 
     end)
+    love.graphics.pop()
 
     self.game.layers.overlay:renderTo(function()
         local alpha = 255
