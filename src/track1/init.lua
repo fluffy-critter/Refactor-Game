@@ -56,12 +56,17 @@ function Game:seekMusic(pos, timeOfs)
 end
 
 function Game:resize(w, h)
-    self:setScale(math.min(w/1280, h/720))
+    -- set the maximum scale factor for the display
+    self.maxScale = math.min(w/1280, h/720)
 end
 
 function Game:setScale(scale)
-    -- limit the resolution to 1440p (TODO: adapt based on framerate)
-    self.scale = math.min(2, scale)
+    -- don't change if we're within 10% of the previous scale factor
+    if self.scale and scale < self.scale*1.05 and scale > self.scale*0.95 then
+        return
+    end
+
+    self.scale = math.min(scale, self.maxScale)
 
     local w = math.floor(self.scale*1280 + 0.5)
     local h = math.floor(w*720/1280)
@@ -84,6 +89,16 @@ function Game:setScale(scale)
     end
 end
 
+function Game:onFps(fps)
+    if fps < 45 then
+        -- aggressively drop the quality proportionally to the choppiness
+        self:setScale(math.max(0.5, self.scale*fps/60))
+    elseif fps > 55 then
+        -- slowly ramp up
+        self:setScale(self.scale * 1.1)
+    end
+end
+
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
@@ -97,6 +112,7 @@ function Game:init()
     self.shaders = {}
 
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
+    self:setScale(self.maxScale)
 
     -- water always renders at 720p
     local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
@@ -960,7 +976,7 @@ function Game:draw()
         love.graphics.clear(0,0,0,0)
     end)
 
-    love.graphics.scale(self.scale, self.scale)
+    love.graphics.scale(self.scale)
 
     self.layers.arena:renderTo(function()
         love.graphics.clear(0, 0, 0, 0)
@@ -1027,7 +1043,9 @@ function Game:draw()
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(255,255,255,255)
         love.graphics.setFont(self.scoreFont)
+        love.graphics.scale(self.scale)
         love.graphics.print(self.score, 0, 0)
+        love.graphics.origin()
     end)
 
     if self.layers.toneMap then

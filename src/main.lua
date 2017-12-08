@@ -442,6 +442,10 @@ function love.update(dt)
         fps = frameCount/frameTime
         frameTime = 0
         frameCount = 0
+
+        if currentGame and currentGame.onFps then
+            currentGame:onFps(fps)
+        end
     end
 end
 
