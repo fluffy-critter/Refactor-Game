@@ -58,19 +58,29 @@ end
 function Game:resize(w, h)
     -- set the maximum scale factor for the display
     self.maxScale = math.min(w/1280, h/720)
+    if not self.scale or self.scale > self.maxScale then
+        self:setScale(self.maxScale)
+    end
 end
 
 function Game:setScale(scale)
-    -- don't change if we're within 10% of the previous scale factor
-    if self.scale and scale < self.scale*1.05 and scale > self.scale*0.95 then
-        return
+    scale = math.min(scale, self.maxScale)
+    local w = math.floor(scale*1280 + 0.5)
+    local h = math.floor(w*720/1280)
+
+    -- don't change if we're not adjusting by at least 10 pixels
+    if self.scale then
+        local oldW = self.scale*1280
+        local oldH = self.scale*720
+
+        if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
+            return
+        end
     end
 
-    self.scale = math.min(scale, self.maxScale)
+    self.scale = scale
 
-    local w = math.floor(self.scale*1280 + 0.5)
-    local h = math.floor(w*720/1280)
-    print("Now rendering at " .. w .. "x" .. h)
+    print("Now rendering at " .. self.scale .. " -> " .. w .. "x" .. h)
 
     self.canvas = love.graphics.newCanvas(w, h)
 
@@ -92,7 +102,7 @@ end
 function Game:onFps(fps)
     if fps < 45 then
         -- aggressively drop the quality proportionally to the choppiness
-        self:setScale(math.max(0.5, self.scale*fps/60))
+        self:setScale((self.scale + math.max(0.5, self.scale*fps/60))/2)
     elseif fps > 55 then
         -- slowly ramp up
         self:setScale(self.scale * 1.1)
@@ -112,7 +122,6 @@ function Game:init()
     self.shaders = {}
 
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
-    self:setScale(self.maxScale)
 
     -- water always renders at 720p
     local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
