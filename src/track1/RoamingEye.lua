@@ -10,6 +10,7 @@ local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
 local gfx = require('gfx')
+local config = require('config')
 
 local Actor = require('track1.Actor')
 local StunBullet = require('track1.StunBullet')
@@ -311,12 +312,14 @@ function RoamingEye:drawPost()
             gfx.circle(true, self.x, self.y, self.r)
         end
 
-        --[[
-        love.graphics.setColor(128,0,0,128)
-        self:drawCircle(self.posX, self.posY, 10)
-        love.graphics.setColor(0,0,128,128)
-        self:drawCircle(self.tgtX, self.tgtY, 10)
-        ]]
+        if config.debug then
+            love.graphics.setColor(0,0,255,alpha)
+            love.graphics.line(self.posX, self.posY, self.tgtX, self.tgtY)
+            love.graphics.setColor(255,0,0,alpha)
+            gfx.circle(false, self.posX, self.posY, 10)
+            love.graphics.setColor(0,255,0,alpha)
+            gfx.circle(false, self.tgtX, self.tgtY, 10)
+        end
     end)
 end
 

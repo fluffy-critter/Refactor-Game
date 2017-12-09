@@ -1024,12 +1024,12 @@ function Game:draw()
         for _,particle in pairs(self.particles) do
             particle:draw()
         end
-    end)
 
-    -- draw post-effects
-    for _,actor in pairs(self.actors) do
-        actor:drawPost()
-    end
+        -- draw post-effects
+        for _,actor in pairs(self.actors) do
+            actor:drawPost()
+        end
+    end)
 
     love.graphics.origin()
 
