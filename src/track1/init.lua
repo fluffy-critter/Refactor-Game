@@ -100,7 +100,8 @@ function Game:setScale(scale)
 end
 
 function Game:onFps(fps)
-    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side to push things a bit higher
+    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side
+    -- to push things a bit higher
     if fps >= 55 and config.vsync then
         fps = 65
     end
