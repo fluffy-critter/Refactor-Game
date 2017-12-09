@@ -231,7 +231,7 @@ function RoamingEye:onHitBall(nrm, ball)
     end
 end
 
-function RoamingEye:draw()
+function RoamingEye:drawPost()
     local px, py = unpack(geom.normalize({self.lookX, self.lookY}))
     local irisR = self.r - self.irisSize
     local chargeTime = self.time - (self.nextShot - self.shootChargeTime)

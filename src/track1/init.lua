@@ -94,7 +94,6 @@ function Game:setScale(scale)
     local tonemapFmt = util.selectCanvasFormat("rgba8")
     if tonemapFmt then
         self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
-        self.layers.toneMapBack = love.graphics.newCanvas(w, h, tonemapFmt)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
@@ -1026,6 +1025,11 @@ function Game:draw()
         end
     end)
 
+    -- draw post-effects
+    for _,actor in pairs(self.actors) do
+        actor:drawPost()
+    end
+
     love.graphics.origin()
 
     self.canvas:renderTo(function()
@@ -1070,15 +1074,13 @@ function Game:draw()
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
-        self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            self.shaders.gaussBlur, {
-                sampleRadius = {0, 1/720}
-            })
-
         self.canvas:renderTo(function()
             love.graphics.setBlendMode("add", "premultiplied")
             love.graphics.setColor(192, 192, 192, 192)
+            love.graphics.setShader(self.shaders.gaussBlur)
+            self.shaders.gaussBlur:send("sampleRadius", {0, 1/720})
             love.graphics.draw(self.layers.toneMap)
+            love.graphics.setShader()
         end)
     end
 

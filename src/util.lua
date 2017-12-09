@@ -117,13 +117,16 @@ end
 -- render a shader from a source buffer to a destination buffer with a shader and args; return the buffers swapped
 function util.mapShader(source, dest, shader, args)
     dest:renderTo(function()
+        love.graphics.push("all")
+
         love.graphics.setBlendMode("replace", "premultiplied")
         love.graphics.setShader(shader)
         for k,v in pairs(args) do
             shader:send(k,v)
         end
         love.graphics.draw(source)
-        love.graphics.setShader()
+
+        love.graphics.pop()
     end)
     return dest, source
 end
