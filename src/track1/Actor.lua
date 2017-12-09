@@ -105,4 +105,8 @@ function Actor:draw()
     -- no default
 end
 
+function Actor:drawPost()
+    -- no default
+end
+
 return Actor
