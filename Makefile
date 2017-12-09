@@ -15,10 +15,12 @@ NAME=Refactor
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
 
-# Version of the game
+# Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
+BASEVERSION=0.2.1
+
+# Determine the full version string based on the tag
 COMMITHASH=$(shell git rev-parse --short HEAD)
-BASEVERSION=v0.2.1
-COMMITTIME=$(shell expr `git show -s --format=format:%at` - `git show -s --format=format:%at $(BASEVERSION)`)
+COMMITTIME=$(shell expr `git show -s --format=format:%at` - `git show -s --format=format:%at v$(BASEVERSION)`)
 GAME_VERSION=$(BASEVERSION).$(COMMITTIME)-$(COMMITHASH)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
