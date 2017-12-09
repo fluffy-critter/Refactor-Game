@@ -96,6 +96,8 @@ local playing = {
 
 local menuVolume = 0
 
+local highdpi = false
+
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
     love.audio.newSource('mainmenu/loop2.mp3'),
@@ -282,7 +284,6 @@ local function mainmenu()
         })
     end
 
-    -- TODO
     table.insert(choices, {})
     table.insert(choices, {
         label="Credits",
@@ -293,6 +294,7 @@ local function mainmenu()
 
     if not config.kiosk then
         table.insert(choices, {})
+        -- TODO
         -- table.insert(choices, {label="Settings"})
         table.insert(choices, {
             label="Exit",
@@ -314,11 +316,19 @@ function love.load(args)
         fullscreen = config.fullscreen,
         vsync = config.vsync,
         minwidth = 640,
-        minheight = 480
+        minheight = 480,
+        highdpi = config.highdpi
     })
 
-    math.randomseed(os.time())
+    local _, _, flags = love.window.getMode()
+    highdpi = flags.highdpi
 
+    -- terrible, ghastly hack
+    if highdpi then
+        fonts.menu = fonts.menu_hidpi
+    end
+
+    math.randomseed(os.time())
 
     love.mouse.setVisible(false)
     love.keyboard.setKeyRepeat(true)
@@ -464,6 +474,9 @@ function love.draw()
     if currentGame then
         love.graphics.clear(32, 32, 32)
 
+        love.graphics.push()
+        love.graphics.origin()
+
         local canvas, aspect = currentGame:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
@@ -483,22 +496,29 @@ function love.draw()
                 saturation * math.sin(shift)
             })
         end
+
+        love.graphics.pop()
+
         blitCanvas(canvas, aspect)
         love.graphics.setShader()
     else
+        local scale = highdpi and 2 or 1
+        love.graphics.push()
+        love.graphics.scale(scale)
+
         love.graphics.clear(0,0,0)
         love.graphics.setBlendMode("alpha")
 
         -- draw menu
-        local w = love.graphics:getWidth()
-        local h = love.graphics:getHeight()
+        local w = love.graphics:getWidth()/scale
+        local h = love.graphics:getHeight()/scale
 
         love.graphics.setColor(44,48,0)
         love.graphics.rectangle("fill", 0, 0, w, 300)
         love.graphics.setColor(255,255,255,255)
 
         local ground = imagepool.load('mainmenu/ground.png')
-        for x = 0, love.graphics:getWidth(), 702 do
+        for x = 0, w, 702 do
             love.graphics.draw(ground, x, 0)
         end
 
@@ -509,6 +529,7 @@ function love.draw()
         local logo = imagepool.load('mainmenu/refactor-released.png')
         love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
 
+        love.graphics.pop()
         menuStack[#menuStack]:draw()
     end
 

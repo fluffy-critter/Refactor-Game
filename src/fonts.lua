@@ -5,8 +5,13 @@ Refactor
 
 ]]
 
--- TODO replace this with an asset pool, ugh
+-- TODO replace this with an asset pool (that is also scaling-aware), ugh
 local fonts = {
+    menu_hidpi = {
+        regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 48),
+        h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 64),
+        h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 56),
+    },
     menu = {
         regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 24),
         h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 32),
