@@ -357,8 +357,7 @@ local fps
 
 function love.resize(w, h)
     if not config.fullscreen then
-        config.width = w
-        config.height = h
+        config.width, config.height = love.window.getMode()
         config.save()
     end
 
