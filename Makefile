@@ -17,8 +17,9 @@ LOVE_VERSION=0.10.2
 
 # Version of the game
 COMMITHASH=$(shell git rev-parse --short HEAD)
-COMMITTIME=$(shell expr `git show -s --format=format:%at` - 1499042500)
-GAME_VERSION=0.2.$(COMMITTIME)-$(COMMITHASH)
+BASEVERSION=v0.2.1
+COMMITTIME=$(shell expr `git show -s --format=format:%at` - `git show -s --format=format:%at $(BASEVERSION)`)
+GAME_VERSION=$(BASEVERSION).$(COMMITTIME)-$(COMMITHASH)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
