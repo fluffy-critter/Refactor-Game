@@ -46,7 +46,7 @@ function SparkParticle:draw()
     local size = util.clamp(1 - self.time/self.lifetime, 0, 1)
     love.graphics.setColor(self.color[1], self.color[2], self.color[3],
         (self.color[4] or 255)*math.pow(size, self.gamma))
-    gfx.circle(true, self.x, self.y, self.r)
+    gfx.circle(true, self.x, self.y, self.r*size)
 end
 
 return SparkParticle
