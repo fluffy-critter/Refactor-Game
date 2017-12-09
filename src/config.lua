@@ -12,7 +12,7 @@ local config = {
     height = 720,
     vsync = true,
     kiosk = false,
-    highdpi = true
+    highdpi = false
 }
 
 local filePath = 'userconf.lua'
