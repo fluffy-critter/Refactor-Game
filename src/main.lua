@@ -81,7 +81,8 @@ end
 
 local tracks = {
     require('track1'),
-    require('track2')
+    require('track2'),
+    require('track7'),
 }
 local currentGame
 
