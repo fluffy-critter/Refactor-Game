@@ -23,6 +23,7 @@ local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
 local fonts = require('fonts')
+local config = require('config')
 
 local Game = {
     META = {
@@ -100,13 +101,12 @@ function Game:setScale(scale)
 end
 
 function Game:onFps(fps)
-    if fps < 45 then
-        -- aggressively drop the quality proportionally to the choppiness
-        self:setScale((self.scale + math.max(0.5, self.scale*fps/60))/2)
-    elseif fps > 55 then
-        -- slowly ramp up
-        self:setScale(self.scale * 1.1)
+    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side to push things a bit higher
+    if fps >= 55 and config.vsync then
+        fps = 65
     end
+
+    self:setScale((self.scale*3 + math.max(0.5, self.scale*fps/60))/4)
 end
 
 function Game:init()
@@ -1054,6 +1054,12 @@ function Game:draw()
         love.graphics.setFont(self.scoreFont)
         love.graphics.scale(self.scale)
         love.graphics.print(self.score, 0, 0)
+
+        if config.debug then
+            love.graphics.setFont(fonts.debug)
+            love.graphics.print(self.scale, 512, 0)
+        end
+
         love.graphics.origin()
     end)
 
