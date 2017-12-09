@@ -502,16 +502,16 @@ function love.draw()
         blitCanvas(canvas, aspect)
         love.graphics.setShader()
     else
-        local scale = highdpi and 2 or 1
         love.graphics.push()
-        love.graphics.scale(scale)
+        local res = highdpi and 2 or 1
+        love.graphics.scale(res)
 
         love.graphics.clear(0,0,0)
         love.graphics.setBlendMode("alpha")
 
         -- draw menu
-        local w = love.graphics:getWidth()/scale
-        local h = love.graphics:getHeight()/scale
+        local w = love.graphics:getWidth()/res
+        local h = love.graphics:getHeight()/res
 
         love.graphics.setColor(44,48,0)
         love.graphics.rectangle("fill", 0, 0, w, 300)

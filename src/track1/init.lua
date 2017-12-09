@@ -101,7 +101,8 @@ function Game:setScale(scale)
 end
 
 function Game:onFps(fps)
-    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side to push things a bit higher
+    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side
+    -- to push things a bit higher
     if fps >= 55 and config.vsync then
         fps = 65
     end
@@ -1024,12 +1025,12 @@ function Game:draw()
         for _,particle in pairs(self.particles) do
             particle:draw()
         end
-    end)
 
-    -- draw post-effects
-    for _,actor in pairs(self.actors) do
-        actor:drawPost()
-    end
+        -- draw post-effects
+        for _,actor in pairs(self.actors) do
+            actor:drawPost()
+        end
+    end)
 
     love.graphics.origin()
 
