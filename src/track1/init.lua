@@ -23,6 +23,7 @@ local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
 local fonts = require('fonts')
+local config = require('config')
 
 local Game = {
     META = {
@@ -56,6 +57,58 @@ function Game:seekMusic(pos, timeOfs)
     self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
+function Game:resize(w, h)
+    -- set the maximum scale factor for the display
+    self.maxScale = math.min(w/1280, h/720)
+    if not self.scale or self.scale > self.maxScale then
+        self:setScale(self.maxScale)
+    end
+end
+
+function Game:setScale(scale)
+    scale = math.min(scale, self.maxScale)
+    local w = math.floor(scale*1280 + 0.5)
+    local h = math.floor(w*720/1280)
+
+    -- don't change if we're not adjusting by at least 10 pixels
+    if self.scale then
+        local oldW = self.scale*1280
+        local oldH = self.scale*720
+
+        if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
+            return
+        end
+    end
+
+    self.scale = scale
+
+    print("Now rendering at " .. self.scale .. " -> " .. w .. "x" .. h)
+
+    self.canvas = love.graphics.newCanvas(w, h)
+
+    local limits = love.graphics.getSystemLimits()
+    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+
+    self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, limits.canvasmsaa)
+    self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
+
+    local tonemapFmt = util.selectCanvasFormat("rgba8")
+    if tonemapFmt then
+        self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
+        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
+        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
+    end
+end
+
+function Game:onFps(fps)
+    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side to push things a bit higher
+    if fps >= 55 and config.vsync then
+        fps = 65
+    end
+
+    self:setScale((self.scale*3 + math.max(0.5, self.scale*fps/60))/4)
+end
+
 function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
@@ -64,17 +117,13 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    local limits = love.graphics.getSystemLimits()
-    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
-
-    self.canvas = love.graphics.newCanvas(1280, 720)
 
     self.layers = {}
-    self.layers.arena = love.graphics.newCanvas(1280, 720, pixelfmt, limits.canvasmsaa)
-    self.layers.overlay = love.graphics.newCanvas(1280, 720, pixelfmt)
-
     self.shaders = {}
 
+    self:resize(love.graphics.getWidth(), love.graphics.getHeight())
+
+    -- water always renders at 720p
     local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
@@ -91,14 +140,6 @@ function Game:init()
         self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     else
         self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
-    end
-
-    local tonemapFmt = util.selectCanvasFormat("rgba8")
-    if tonemapFmt then
-        self.layers.toneMap = love.graphics.newCanvas(1280, 720, tonemapFmt)
-        self.layers.toneMapBack = love.graphics.newCanvas(1280, 720, tonemapFmt)
-        self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
-        self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
 
     self.bounds = {
@@ -944,6 +985,8 @@ function Game:draw()
         love.graphics.clear(0,0,0,0)
     end)
 
+    love.graphics.scale(self.scale)
+
     self.layers.arena:renderTo(function()
         love.graphics.clear(0, 0, 0, 0)
 
@@ -983,6 +1026,13 @@ function Game:draw()
         end
     end)
 
+    -- draw post-effects
+    for _,actor in pairs(self.actors) do
+        actor:drawPost()
+    end
+
+    love.graphics.origin()
+
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
         love.graphics.clear(0,0,0,255)
@@ -997,7 +1047,7 @@ function Game:draw()
             shader:send("source", self.layers.arena)
             shader:send("bgColor", {0, 0, 0, 0})
             shader:send("waveColor", {0.1, 0, 0.5, 1})
-            love.graphics.draw(self.layers.water)
+            love.graphics.draw(self.layers.water, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end
 
@@ -1007,7 +1057,15 @@ function Game:draw()
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(255,255,255,255)
         love.graphics.setFont(self.scoreFont)
+        love.graphics.scale(self.scale)
         love.graphics.print(self.score, 0, 0)
+
+        if config.debug then
+            love.graphics.setFont(fonts.debug)
+            love.graphics.print(self.scale, 512, 0)
+        end
+
+        love.graphics.origin()
     end)
 
     if self.layers.toneMap then
@@ -1017,15 +1075,13 @@ function Game:draw()
                 lowCut = {0.7,0.7,0.7,0.7},
                 gamma = 4
             })
-        self.layers.toneMap, self.layers.toneMapBack = util.mapShader(self.layers.toneMap, self.layers.toneMapBack,
-            self.shaders.gaussBlur, {
-                sampleRadius = {0, 1/720}
-            })
-
         self.canvas:renderTo(function()
             love.graphics.setBlendMode("add", "premultiplied")
             love.graphics.setColor(192, 192, 192, 192)
+            love.graphics.setShader(self.shaders.gaussBlur)
+            self.shaders.gaussBlur:send("sampleRadius", {0, 1/720})
             love.graphics.draw(self.layers.toneMap)
+            love.graphics.setShader()
         end)
     end
 

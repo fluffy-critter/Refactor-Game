@@ -10,7 +10,9 @@ config.lua - default user configuration/persistent settings
 local config = {
     width = 1280,
     height = 720,
-    vsync = true
+    vsync = true,
+    kiosk = false,
+    highdpi = false
 }
 
 local filePath = 'userconf.lua'

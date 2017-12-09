@@ -15,18 +15,23 @@ NAME=Refactor
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
 
-# Version of the game
-GAME_VERSION=$(shell git rev-parse --short HEAD)
+# Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
+BASEVERSION=0.2.1
+
+# Determine the full version string based on the tag
+COMMITHASH=$(shell git rev-parse --short HEAD)
+COMMITTIME=$(shell expr `git show -s --format=format:%at` - `git show -s --format=format:%at v$(BASEVERSION)`)
+GAME_VERSION=$(BASEVERSION).$(COMMITTIME)-$(COMMITHASH)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: commit-check
-.PHONY: love-bundle osx win32 win64
+.PHONY: love-bundle osx win32 win64 bundle-win32
 .PHONY: assets setup tests checks version
 
-all: checks tests love-bundle osx win32 win64
+all: checks tests love-bundle osx win32 win64 bundle-win32
 
 clean:
 	rm -rf build
@@ -116,6 +121,9 @@ $(DEST)/deps/love.app/Contents/MacOS/love:
 WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 
+# These are temporary; remove them after the windowsIcon stuff gets merged in
+setup: $(WIN32_ROOT)/love.exe $(WIN64_ROOT)/love.exe
+
 $(WIN32_ROOT)/love.exe:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
@@ -130,7 +138,7 @@ $(WIN64_ROOT)/love.exe:
 
 # Win32 version
 win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
-$(DEST)/win32/$(NAME).exe: $(WIN32_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
@@ -141,7 +149,7 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 
 # Win64 version
 win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
-$(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
+$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
@@ -149,5 +157,11 @@ $(DEST)/win64/$(NAME).exe: $(WIN64_ROOT)/love.exe $(DEST)/love/$(NAME).love
 publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
 $(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
+
+WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
+bundle-win32: $(DEST)/$(WIN32_BUNDLE_FILENAME)
+$(DEST)/$(WIN32_BUNDLE_FILENAME): win32
+	cd $(DEST)/win32 && zip -9r ../$(WIN32_BUNDLE_FILENAME) *
+
 
 #### asset rules go down here (someday, maybe)
