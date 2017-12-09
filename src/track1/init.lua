@@ -24,6 +24,8 @@ local shaders = require('shaders')
 local input = require('input')
 local fonts = require('fonts')
 
+local gfx = require('gfx')
+
 local Game = {
     META = {
         tracknum = 1,

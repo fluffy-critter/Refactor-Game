@@ -63,7 +63,7 @@ Methods:
 local HitParticle = require('track1.HitParticle')
 local util = require('util')
 local geom = require('geom')
-local imagepool = require('imagepool')
+local gfx = require('gfx')
 
 local Ball = {}
 
@@ -101,9 +101,6 @@ function Ball:onInit()
 
     self.paddleScoreVal = self.paddleScore
     self.timeSinceLastHit = 0
-
-    self.fillImage = imagepool.load('images/circlefill.png', {mipmaps = true})
-    self.ringImage = imagepool.load('images/circlehollow.png', {mipmaps = true})
 end
 
 function Ball:onStart()
@@ -247,10 +244,10 @@ end
 function Ball:draw()
     love.graphics.setBlendMode(self.blendMode)
     love.graphics.setColor(unpack(self.color))
-    love.graphics.draw(self.fillImage, self.x, self.y, 0, self.r/64, self.r/64, 64, 64)
+    gfx.circle(true, self.x, self.y, self.r)
 
     if self.isBullet then
-        love.graphics.draw(self.ringImage, self.x, self.y, 0, (self.r + 3)/64, (self.r + 3)/64, 64, 64)
+        gfx.circle(false, self.x, self.y, self.r + 3)
     end
 end
 

@@ -9,7 +9,7 @@ RoamingEye - it looks at you piercingly
 local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
-local imagepool = require('imagepool')
+local gfx = require('gfx')
 
 local Actor = require('track1.Actor')
 local StunBullet = require('track1.StunBullet')
@@ -91,10 +91,11 @@ function RoamingEye:onInit()
     self.lookX = 0
     self.lookY = 0
 
-    local canvasFormat = util.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
-    self.canvas = love.graphics.newCanvas(self.r*2, self.r*2, canvasFormat, 2)
+    local size = math.ceil(2*self.game.scale*self.r)
+    self.scale = size/self.r/2
 
-    self.circle = imagepool.load('images/circlefill.png', {mipmaps = true})
+    local canvasFormat = util.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
+    self.canvas = love.graphics.newCanvas(size, size, canvasFormat, 2)
 
     self.shader = shaders.load("track1/sphereDistort.fs")
 end
@@ -230,10 +231,6 @@ function RoamingEye:onHitBall(nrm, ball)
     end
 end
 
-function RoamingEye:drawCircle(x, y, r)
-    love.graphics.draw(self.circle, x, y, 0, r/64, r/64, 64, 64)
-end
-
 function RoamingEye:draw()
     local px, py = unpack(geom.normalize({self.lookX, self.lookY}))
     local irisR = self.r - self.irisSize
@@ -245,28 +242,30 @@ function RoamingEye:draw()
         chargeColor = {self.chargeColor[1], self.chargeColor[2], self.chargeColor[3], self.chargeColor[4]*chargeAmount}
     end
 
-    love.graphics.push()
-    love.graphics.origin()
     self.canvas:renderTo(function()
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.scale(self.scale)
+
         love.graphics.clear(0,0,0,0)
 
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(unpack(self.ballColor))
 
-        self:drawCircle(self.r, self.r, self.r)
+        gfx.circle(true, self.r, self.r, self.r)
 
         love.graphics.setColor(unpack(self.irisColor))
-        self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.irisSize)
+        gfx.circle(true, self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.irisSize)
         love.graphics.setColor(unpack(self.pupilColor))
-        self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize)
+        gfx.circle(true, self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize)
 
         if chargeAmount then
             love.graphics.setColor(unpack(chargeColor))
-            self:drawCircle(self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize*math.sqrt(chargeAmount))
+            gfx.circle(true, self.r + px*0.9*irisR, self.r + py*0.9*irisR, self.pupilSize*math.sqrt(chargeAmount))
         end
 
+        love.graphics.pop()
     end)
-    love.graphics.pop()
 
     self.game.layers.overlay:renderTo(function()
         local alpha = 255
@@ -287,7 +286,9 @@ function RoamingEye:draw()
         shader:send("env", self.game.canvas)
         shader:send("center", {self.x/1280, self.y/720})
         shader:send("reflectSize", {self.r/128, self.r/72})
-        love.graphics.draw(self.canvas, self.x - self.r, self.y - self.r)
+        love.graphics.draw(self.canvas, self.x, self.y, 0,
+            1/self.scale, 1/self.scale,
+            self.r*self.scale, self.r*self.scale)
         love.graphics.setShader()
 
         if self.state == RoamingEye.states.alive and chargeAmount then
@@ -307,7 +308,7 @@ function RoamingEye:draw()
         love.graphics.setBlendMode("alpha", "alphamultiply")
         if self.state == RoamingEye.states.spawning or self.state == RoamingEye.states.dying then
             love.graphics.setColor(255, 255, 255, alpha)
-            self:drawCircle(self.x, self.y, self.r)
+            gfx.circle(true, self.x, self.y, self.r)
         end
 
         --[[
