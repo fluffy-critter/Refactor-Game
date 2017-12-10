@@ -284,7 +284,7 @@ function RoamingEye:drawPost()
         local shader = self.shader
         love.graphics.setShader(shader)
         shader:send("gamma", 0.9)
-        shader:send("env", self.game.canvas)
+        shader:send("env", self.game.layers.arena)
         shader:send("center", {self.x/1280, self.y/720})
         shader:send("reflectSize", {self.r/128, self.r/72})
         love.graphics.draw(self.canvas, self.x, self.y, 0,
