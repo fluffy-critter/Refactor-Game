@@ -98,6 +98,11 @@ local menuVolume = 0
 
 local highdpi = false
 
+local frameCount = 0
+local frameTime = 0
+local renderScale = 2
+local fps
+
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
     love.audio.newSource('mainmenu/loop2.mp3'),
@@ -116,6 +121,9 @@ local function startGame(game)
     playing.state = PlayState.starting
     playing.speed = 1.0
     playing.fade = 0
+
+    frameTime = 0
+    frameCount = 0
 
     currentGame:start()
 end
@@ -351,10 +359,6 @@ function love.load(args)
     end
 end
 
-local frameCount = 0
-local frameTime = 0
-local fps
-
 function love.resize(w, h)
     if not config.fullscreen then
         config.width, config.height = love.window.getMode()
@@ -449,12 +453,21 @@ function love.update(dt)
     frameCount = frameCount + 1
     if frameTime >= 0.25 then
         fps = frameCount/frameTime
-        frameTime = 0
-        frameCount = 0
-
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
         end
+
+        if currentGame and currentGame.setScale then
+            -- TODO account for the difference between render and total time, but ignore vsync time
+            local avgTime = frameTime/frameCount
+            local targetTime = config.vsync and 1/55 or 1/60
+
+            renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
+            currentGame:setScale(renderScale)
+        end
+
+        frameTime = 0
+        frameCount = 0
     end
 end
 
