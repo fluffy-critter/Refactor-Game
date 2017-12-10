@@ -60,7 +60,7 @@ function Game:resize(w, h)
     -- set the maximum scale factor for the display
     self.maxScale = math.min(w/1280, h/720)
     if not self.scale or self.scale > self.maxScale then
-        self:setScale(self.maxScale)
+        self:setScale(1)
     end
 end
 

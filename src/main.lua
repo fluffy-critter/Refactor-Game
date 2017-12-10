@@ -100,7 +100,7 @@ local highdpi = false
 
 local frameCount = 0
 local frameTime = 0
-local renderScale = 2
+local renderScale = config.scaleFactor
 local fps
 
 local bgLoops = {
@@ -125,6 +125,7 @@ local function startGame(game)
     frameTime = 0
     frameCount = 0
 
+    currentGame:setScale(renderScale)
     currentGame:start()
 end
 
@@ -331,6 +332,8 @@ function love.load(args)
     local _, _, flags = love.window.getMode()
     highdpi = flags.highdpi
 
+    renderScale = config.scaleFactor
+
     -- terrible, ghastly hack
     if highdpi then
         fonts.menu = fonts.menu_hidpi
@@ -451,20 +454,22 @@ function love.update(dt)
 
     frameTime = frameTime + dt
     frameCount = frameCount + 1
-    if frameTime >= 0.25 then
+    if frameTime >= 0.5 then
         fps = frameCount/frameTime
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
         end
 
-        if currentGame and currentGame.setScale then
+        if config.adaptive and currentGame and currentGame.setScale then
             -- TODO account for the difference between render and total time, but ignore vsync time
             local avgTime = frameTime/frameCount
             local targetTime = config.vsync and 1/55 or 1/60
 
             renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
-            currentGame:setScale(renderScale)
+        else
+            renderScale = config.scaleFactor
         end
+        currentGame:setScale(renderScale)
 
         frameTime = 0
         frameCount = 0
