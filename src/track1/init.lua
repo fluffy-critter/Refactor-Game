@@ -61,7 +61,7 @@ function Game:resize(w, h)
     -- set the maximum scale factor for the display
     self.maxScale = math.min(w/1280, h/720)
     if not self.scale or self.scale > self.maxScale then
-        self:setScale(self.maxScale)
+        self:setScale(1)
     end
 end
 
@@ -89,7 +89,8 @@ function Game:setScale(scale)
     local limits = love.graphics.getSystemLimits()
     local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
-    self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, limits.canvasmsaa)
+    local msaa = math.min(config.msaa or limits.canvasmsaa, limits.canvasmsaa)
+    self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, msaa)
     self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
 
     local tonemapFmt = util.selectCanvasFormat("rgba8")
@@ -98,16 +99,6 @@ function Game:setScale(scale)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
-end
-
-function Game:onFps(fps)
-    -- if we're running near 60FPS and vsync is enabled, pretend we're running on the faster side
-    -- to push things a bit higher
-    if fps >= 55 and config.vsync then
-        fps = 65
-    end
-
-    self:setScale((self.scale*3 + math.max(0.5, self.scale*fps/60))/4)
 end
 
 function Game:init()
@@ -1063,7 +1054,7 @@ function Game:draw()
 
         if config.debug then
             love.graphics.setFont(fonts.debug)
-            love.graphics.print(self.scale, 512, 0)
+            love.graphics.print(self.canvas:getWidth() .. ' ' .. self.canvas:getHeight(), 512, 0)
         end
 
         love.graphics.origin()

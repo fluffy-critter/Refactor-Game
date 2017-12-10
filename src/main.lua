@@ -99,6 +99,11 @@ local menuVolume = 0
 
 local highdpi = false
 
+local frameCount = 0
+local frameTime = 0
+local renderScale = config.scaleFactor
+local fps
+
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
     love.audio.newSource('mainmenu/loop2.mp3'),
@@ -118,6 +123,10 @@ local function startGame(game)
     playing.speed = 1.0
     playing.fade = 0
 
+    frameTime = 0
+    frameCount = 0
+
+    currentGame:setScale(renderScale)
     currentGame:start()
 end
 
@@ -324,6 +333,8 @@ function love.load(args)
     local _, _, flags = love.window.getMode()
     highdpi = flags.highdpi
 
+    renderScale = config.scaleFactor
+
     -- terrible, ghastly hack
     if highdpi then
         fonts.menu = fonts.menu_hidpi
@@ -351,10 +362,6 @@ function love.load(args)
         loop:seek(math.random()*loop:getDuration())
     end
 end
-
-local frameCount = 0
-local frameTime = 0
-local fps
 
 function love.resize(w, h)
     if not config.fullscreen then
@@ -448,14 +455,25 @@ function love.update(dt)
 
     frameTime = frameTime + dt
     frameCount = frameCount + 1
-    if frameTime >= 0.25 then
+    if frameTime >= 0.5 then
         fps = frameCount/frameTime
-        frameTime = 0
-        frameCount = 0
-
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
         end
+
+        if config.adaptive and currentGame and currentGame.setScale then
+            -- TODO account for the difference between render and total time, but ignore vsync time
+            local avgTime = frameTime/frameCount
+            local targetTime = config.vsync and 1/55 or 1/60
+
+            renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
+        else
+            renderScale = config.scaleFactor
+        end
+        currentGame:setScale(renderScale)
+
+        frameTime = 0
+        frameCount = 0
     end
 end
 

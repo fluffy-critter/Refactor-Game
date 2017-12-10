@@ -54,6 +54,18 @@ function util.applyDefaults(dest, defaults)
     end
 end
 
+-- Overwrite table values
+function util.applyValues(dest, values)
+    for k,v in pairs(values) do
+        if type(v) == "table" then
+            dest[k] = dest[k] or {}
+            util.applyDefaults(dest[k], v)
+        else
+            dest[k] = v
+        end
+    end
+end
+
 -- Clamps n between low and high
 function util.clamp(n, low, high)
     return math.max(low, math.min(n, high))

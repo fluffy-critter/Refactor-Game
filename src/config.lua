@@ -7,12 +7,16 @@ config.lua - default user configuration/persistent settings
 
 ]]
 
+local util = require('util')
+
 local config = {
     width = 1280,
     height = 720,
     vsync = true,
     kiosk = false,
-    highdpi = false
+    highdpi = false,
+    adaptive = true,
+    scaleFactor = 1
 }
 
 local filePath = 'userconf.lua'
@@ -55,10 +59,7 @@ function config.load()
     end)
 
     if ok and vals then
-        for k,v in pairs(vals) do
-            print(k .. " = " .. tostring(v))
-            config[k] = v
-        end
+        util.applyValues(config, vals)
     end
 end
 
