@@ -64,6 +64,7 @@ function Game:start()
 end
 
 function Game:update(dt)
+    print(dt)
 end
 
 function Game:draw()

@@ -79,9 +79,9 @@ run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
 # hacky way to inject the distfiles content
-$(DEST)/.distfiles-%: $(wildcard distfiles/*)
+$(DEST)/.distfiles-%: LICENSE $(wildcard distfiles/*)
 	mkdir -p $(DEST)/$(lastword $(subst -, ,$(@)))
-	cp distfiles/* $(DEST)/$(lastword $(subst -, ,$(@)))
+	cp LICENSE distfiles/* $(DEST)/$(lastword $(subst -, ,$(@)))
 	touch $(@)
 
 publish-love: $(DEST)/.published-love-$(GAME_VERSION)
