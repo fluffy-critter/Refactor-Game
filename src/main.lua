@@ -470,7 +470,9 @@ function love.update(dt)
         else
             renderScale = config.scaleFactor
         end
-        currentGame:setScale(renderScale)
+        if currentGame then
+           currentGame:setScale(renderScale)
+        end
 
         frameTime = 0
         frameCount = 0
