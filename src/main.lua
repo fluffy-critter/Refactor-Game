@@ -126,7 +126,9 @@ local function startGame(game)
     frameTime = 0
     frameCount = 0
 
-    currentGame:setScale(renderScale)
+    if currentGame.setScale then
+        currentGame:setScale(renderScale)
+    end
     currentGame:start()
 end
 
@@ -467,10 +469,6 @@ function love.update(dt)
             local targetTime = config.vsync and 1/55 or 1/60
 
             renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
-        else
-            renderScale = config.scaleFactor
-        end
-        if currentGame then
            currentGame:setScale(renderScale)
         end
 
