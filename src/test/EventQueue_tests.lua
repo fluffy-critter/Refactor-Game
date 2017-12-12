@@ -26,7 +26,6 @@ notion("the queue functions", function()
     eq:insert({when = {}, what = cb})
     eq:insert({when = {1}, what = cb})
 
-    check(#eq.queue).is(2)
     check(eq:next()).shallowMatches({})
 
     eq:insert(
@@ -34,20 +33,16 @@ notion("the queue functions", function()
         {when = {2}, what = cb}
     )
 
-    check(#eq.queue).is(4)
     check(eq:next()).shallowMatches({})
 
     eq:run({0})
-    check(#eq.queue).is(3)
     check(count).is(1)
     check(lastRan).shallowMatches({0})
     check(eq:next()).shallowMatches({1})
 
     eq:run({0})
-    check(count).is(1)
 
     eq:run({1})
-    check(#eq.queue).is(2)
     check(count).is(2)
     check(lastRan).shallowMatches({1})
 
@@ -55,13 +50,12 @@ notion("the queue functions", function()
     eq:run({10})
 
     check(count).is(4)
-    check(#eq.queue).is(1)
     check(lastRan).shallowMatches({10})
     check(eq:next()).shallowMatches({11})
 
     eq:run({11})
     check(count).is(5)
-    check(#eq.queue).is(0)
+    check(eq.queue:empty()).is(true)
     check(lastRan).shallowMatches({11})
     check(eq:next()).is(nil)
 end)

@@ -8,6 +8,7 @@ Event queue runner
 ]]
 
 local util = require('util')
+local heap = require('thirdparty.binary_heap')
 
 local EventQueue = {}
 
@@ -15,44 +16,34 @@ function EventQueue.new(obj)
     local self = obj or {}
     setmetatable(self, {__index=EventQueue})
 
-    self.queue = {}
+    self.queue = heap:new(util.arrayLT)
 
     return self
 end
 
 -- Return the timestamp of the next event
 function EventQueue:next()
-    return self.nextEvent
+    if self.queue:empty() then
+        return nil
+    end
+    return self.queue:next_key()
 end
 
 function EventQueue:insert(...)
     for _,event in ipairs({...}) do
-        assert(event.when)
-        assert(event.what)
+        assert(event.when, "missing event.when")
+        assert(event.what and type(event.what) == "function", "event.what must be a function")
 
-        table.insert(self.queue, event)
-        if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-            self.nextEvent = event.when
-        end
+        self.queue:insert(event.when, event.what)
     end
 end
 
 -- Run all the events up to and including the current time. Events get the time in their callback
 function EventQueue:run(time)
-    if not self.nextEvent or util.arrayLT(time, self.nextEvent) then
-        return
+    while not self.queue:empty() and not util.arrayLT(time, self.queue:next_key()) do
+        local _,event = self.queue:pop()
+        event(time)
     end
-
-    self.nextEvent = nil
-
-    util.runQueue(self.queue, function(event)
-        if not util.arrayLT(time, event.when) then
-            event.what(time)
-            return true
-        elseif not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-            self.nextEvent = event.when
-        end
-    end)
 end
 
 return EventQueue
