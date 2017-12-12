@@ -254,7 +254,7 @@ function Game:defer(item)
 end
 
 function Game:addEvent(event)
-    self.eventQueue:addEvent(event)
+    self.eventQueue:insert(event)
 end
 
 function Game:setGameEvents()
@@ -546,7 +546,7 @@ function Game:setGameEvents()
         end
     }
 
-    self.eventQueue:addEvents({
+    self.eventQueue:insert(
         {
             when = {0},
             what = function()
@@ -729,8 +729,8 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.eyes.minions(3)
                 spawnFuncs.mobs.eyes.boss()
             end
-        },
-    })
+        }
+    )
 end
 
 function Game:setPhase(phase)
@@ -778,7 +778,7 @@ function Game:update(raw_dt)
             self:setPhase(phase)
         end
 
-        self.eventQueue:runEvents(time)
+        self.eventQueue:run(time)
     end
 
     if self.phase >= 11 then

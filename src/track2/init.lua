@@ -139,7 +139,7 @@ end
     endTime - when to end the animation (default: anim.duration)
 ]]
 function Game:addAnimation(anim, startTime, endTime)
-    self.eventQueue:addEvent({
+    self.eventQueue:insert({
         when = startTime or {},
         what = function(now)
             if endTime then
@@ -179,14 +179,14 @@ function Game:start()
             {0, math.floor(y/4), y%4},
             {0, math.floor(y/4), y%4 + 0.5})
     end
-    self.eventQueue:addEvent({
+    self.eventQueue:insert({
         when = {0, 3, 2.5},
         what = function()
             self:setPoseSequence(scene.greg, {"left_of_stairs", "right_of_rose", "facing_left"})
         end
     })
 
-    self.eventQueue:addEvents({
+    self.eventQueue:insert(
         {
             -- show the photograph pan
             when = {11},
@@ -208,7 +208,7 @@ function Game:start()
                 self.nextTimeout = {12,3,3.5}
             end
         }
-    })
+    )
 
     -- at {12,3,0.5} fade to white until {13}
     self:addAnimation({
@@ -234,7 +234,7 @@ function Game:start()
     others - ???
     ]]
 
-    self.eventQueue:addEvent({
+    self.eventQueue:insert({
         when = {13},
         what = function()
             -- choose a set of scenes based on dialog state
@@ -344,7 +344,7 @@ function Game:start()
                 for when in clock.iterator({13}, {15,0,-1}, {0,0,2}) do
                     print(idx)
                     local which = selections[idx]
-                    self.eventQueue:addEvent({
+                    self.eventQueue:insert({
                         when = when, what = function()
                             print(which)
                             self.sceneStack = {which}
@@ -386,7 +386,7 @@ function Game:start()
                 endPos = {0,0,0,0},
                 easing = Animator.Easing.ease_out,
             }, {15,0,0}, {15,1,0})
-            self.eventQueue:addEvent({
+            self.eventQueue:insert({
                 when = {15},
                 what = function()
                     self:transcribe("[ending: " .. self.dialogState .. "]")
@@ -419,7 +419,7 @@ end
 function Game:update(dt)
     local time = self:musicPos()
 
-    self.eventQueue:runEvents(time)
+    self.eventQueue:run(time)
     self.animator:update(dt)
 
     if time[1] > self.phase then

@@ -29,12 +29,15 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: commit-check
 .PHONY: love-bundle osx win32 win64 bundle-win32
-.PHONY: assets setup tests checks version
+.PHONY: submodules assets setup tests checks version
 
-all: checks tests love-bundle osx win32 win64 bundle-win32
+all: submodules checks tests love-bundle osx win32 win64 bundle-win32
 
 clean:
 	rm -rf build
+
+submodules:
+	git submodule update --init --recursive
 
 version:
 	@echo "$(GAME_VERSION)"

@@ -20,27 +20,25 @@ function EventQueue.new(obj)
     return self
 end
 
-function EventQueue:addEvent(event)
-    -- TODO normalize timepos to actual timecode
-
-    assert(event.when)
-    assert(event.what)
-
-    table.insert(self.queue, event)
-    if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
-        self.nextEvent = event.when
-    end
+-- Return the timestamp of the next event
+function EventQueue:next()
+    return self.nextEvent
 end
 
--- Copy in a bunch of events at once
-function EventQueue:addEvents(tbl)
-    for _,event in ipairs(tbl) do
-        self:addEvent(event)
+function EventQueue:insert(...)
+    for _,event in ipairs({...}) do
+        assert(event.when)
+        assert(event.what)
+
+        table.insert(self.queue, event)
+        if not self.nextEvent or util.arrayLT(event.when, self.nextEvent) then
+            self.nextEvent = event.when
+        end
     end
 end
 
 -- Run all the events up to and including the current time. Events get the time in their callback
-function EventQueue:runEvents(time)
+function EventQueue:run(time)
     if not self.nextEvent or util.arrayLT(time, self.nextEvent) then
         return
     end
