@@ -8,8 +8,8 @@ local util = require('util')
 
 local Game = {
     META = {
-        tracknum = 1,
-        title = "little bouncing ball",
+        tracknum = 7,
+        title = "flight",
         duration = 5*60 + 26,
         description = "falling monk",
     }
