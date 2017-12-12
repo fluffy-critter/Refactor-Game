@@ -10,7 +10,7 @@ local Game = {
     META = {
         tracknum = 7,
         title = "flight",
-        duration = 5*60 + 26,
+        duration = 2*60 + 20,
         description = "falling monk",
     }
 }
