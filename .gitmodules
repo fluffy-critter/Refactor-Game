@@ -1,0 +1,3 @@
+[submodule "thirdparty/lua-heaps"]
+	path = thirdparty/lua-heaps
+	url = https://github.com/geoffleyland/lua-heaps
