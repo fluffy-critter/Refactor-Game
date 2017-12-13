@@ -76,7 +76,7 @@ function Game:setScale(scale)
         local oldH = self.scale*720
 
         if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
-            return
+            return self.scale
         end
     end
 
@@ -99,6 +99,8 @@ function Game:setScale(scale)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
+
+    return self.scale
 end
 
 function Game:init()
@@ -112,8 +114,6 @@ function Game:init()
 
     self.layers = {}
     self.shaders = {}
-
-    self:resize(love.graphics.getWidth(), love.graphics.getHeight())
 
     -- water always renders at 720p
     local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
@@ -242,7 +242,8 @@ function Game:init()
     self.toKill = {}
 
     self.eventQueue = EventQueue.new()
-    self.scoreFont = fonts.centuryGothicDigits
+    self.scoreFont = love.graphics.newImageFont("fonts/centurygothic-digits.png", "0123456789")
+    self.debugFont = love.graphics.newFont(12)
 end
 
 function Game:start()
@@ -1053,7 +1054,7 @@ function Game:draw()
         love.graphics.print(self.score, 0, 0)
 
         if config.debug then
-            love.graphics.setFont(fonts.debug)
+            love.graphics.setFont(self.debugFont)
             love.graphics.print(self.canvas:getWidth() .. ' ' .. self.canvas:getHeight(), 512, 0)
         end
 

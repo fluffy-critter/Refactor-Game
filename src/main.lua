@@ -93,7 +93,8 @@ local highdpi = false
 
 local frameCount = 0
 local frameTime = 0
-local renderScale = config.scaleFactor
+local frameTarget
+local renderScale
 local fps
 
 local bgLoops = {
@@ -117,9 +118,13 @@ local function startGame(game)
 
     frameTime = 0
     frameCount = 0
+    renderScale = config.scaleFactor
 
+    if currentGame.resize then
+        currentGame:resize(love.graphics.getWidth(), love.graphics.getHeight())
+    end
     if currentGame.setScale then
-        currentGame:setScale(renderScale)
+        renderScale = currentGame:setScale(renderScale)
     end
     currentGame:start()
 end
@@ -306,9 +311,7 @@ local function mainmenu()
     return Menu.new({choices = choices})
 end
 
-function love.load(args)
-    cute.go(args)
-
+local function applyGraphicsConfig()
     -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
     love.window.setMode(config.width, config.height, {
         resizable = true,
@@ -322,12 +325,21 @@ function love.load(args)
     local _, _, flags = love.window.getMode()
     highdpi = flags.highdpi
 
+    local refresh = config.targetFPS or flags.refreshrate
+    if not refresh or refresh == 0 then
+        refresh = 60 -- default that makes most sense
+    end
+    frameTarget = 1/refresh
+
     renderScale = config.scaleFactor
 
-    -- terrible, ghastly hack
-    if highdpi then
-        fonts.menu = fonts.menu_hidpi
-    end
+    fonts.hidpi = highdpi
+end
+
+function love.load(args)
+    cute.go(args)
+
+    applyGraphicsConfig()
 
     math.randomseed(os.time())
 
@@ -449,10 +461,14 @@ function love.update(dt)
         if config.adaptive and currentGame and currentGame.setScale then
             -- TODO account for the difference between render and total time, but ignore vsync time
             local avgTime = frameTime/frameCount
-            local targetTime = config.vsync and 1/55 or 1/60
 
-            renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
-           currentGame:setScale(renderScale)
+            -- TODO vsync should use the standard deviation as well
+            if config.vsync and avgTime < frameTarget*0.95 then
+                renderScale = renderScale*1.25
+            else
+                renderScale = math.max((renderScale*3 + renderScale*frameTarget/avgTime)/4, 0.5)
+            end
+            renderScale = currentGame:setScale(renderScale)
         end
 
         frameTime = 0
@@ -538,7 +554,7 @@ function love.draw()
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.debug)
-        love.graphics.printf(math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
+        love.graphics.printf(renderScale .. "  " .. math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
     end
 end
 

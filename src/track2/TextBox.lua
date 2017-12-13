@@ -7,7 +7,7 @@ Refactor: 2 - Strangers
 
 local util = require('util')
 local imagepool = require('imagepool')
-local fonts = require('fonts')
+local fonts = require('track2.fonts')
 
 local TextBox = {
     states = util.enum("opening", "writing", "ready", "closing", "closed")
