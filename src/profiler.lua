@@ -13,7 +13,6 @@ local profiler = {}
 
 local font = love.graphics.newFont(16)
 
-local frameTime
 local context
 local stats = {
     counts = {},
@@ -41,7 +40,7 @@ function profiler.detach()
 end
 
 function profiler.draw()
-    if total == 0 then
+    if stats.total == 0 then
         return
     end
 
