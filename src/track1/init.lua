@@ -22,7 +22,6 @@ local geom = require('geom')
 local util = require('util')
 local shaders = require('shaders')
 local input = require('input')
-local fonts = require('fonts')
 local config = require('config')
 
 local Game = {
@@ -76,7 +75,7 @@ function Game:setScale(scale)
         local oldH = self.scale*720
 
         if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
-            return self.scale
+            return scale
         end
     end
 

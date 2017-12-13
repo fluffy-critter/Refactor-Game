@@ -63,7 +63,7 @@ end
 function Game:setScale(scale)
     self.outputScale = math.floor(math.min(self.maxScale, scale*4))
     self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
-    return self.outputScale/4
+    return math.min(scale, self.maxScale/4)
 end
 
 function Game:init()
