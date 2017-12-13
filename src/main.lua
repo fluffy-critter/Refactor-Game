@@ -490,7 +490,8 @@ function love.update(dt)
             if config.vsync and avgTime + varTime < frameTarget*0.9 then
                 renderScale = renderScale*1.25
             else
-                renderScale = math.max((renderScale*3 + renderScale*frameTarget/avgTime)/4, 0.5)
+                local targetTime = config.vsync and frameTarget*1.05 or frameTarget
+                renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
             end
             renderScale = currentGame:setScale(renderScale)
         end
