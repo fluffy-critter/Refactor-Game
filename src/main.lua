@@ -100,6 +100,7 @@ local highdpi = false
 
 local frameCount = 0
 local frameTime = 0
+local frameTimeSqr = 0
 local frameTarget
 local renderScale
 local fps
@@ -472,6 +473,7 @@ function love.update(dt)
     if Pie then Pie:detach() end
 
     frameTime = frameTime + dt
+    frameTimeSqr = frameTimeSqr + dt*dt
     frameCount = frameCount + 1
     if frameTime >= 0.5 then
         fps = frameCount/frameTime
@@ -482,9 +484,10 @@ function love.update(dt)
         if config.adaptive and currentGame and currentGame.setScale then
             -- TODO account for the difference between render and total time, but ignore vsync time
             local avgTime = frameTime/frameCount
+            local varTime = frameTimeSqr/frameCount - avgTime*avgTime
 
             -- TODO vsync should use the standard deviation as well
-            if config.vsync and avgTime < frameTarget*0.95 then
+            if config.vsync and avgTime + varTime < frameTarget*0.9 then
                 renderScale = renderScale*1.25
             else
                 renderScale = math.max((renderScale*3 + renderScale*frameTarget/avgTime)/4, 0.5)
@@ -493,6 +496,7 @@ function love.update(dt)
         end
 
         frameTime = 0
+        frameTimeSqr = 0
         frameCount = 0
     end
 end

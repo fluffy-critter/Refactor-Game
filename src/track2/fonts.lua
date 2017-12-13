@@ -15,7 +15,7 @@ local fonts = {
     },
     chronoTrigger = love.graphics.newFont("fonts/ChronoTrigger.ttf", 16),
 
-    debug = love.graphics.newFont(16),
+    debug = love.graphics.newFont(8),
 }
 
 return fonts
