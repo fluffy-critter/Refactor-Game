@@ -462,7 +462,7 @@ function love.update(dt)
     frameTime = frameTime + dt
     frameTimeSqr = frameTimeSqr + dt*dt
     frameCount = frameCount + 1
-    if frameTime >= 0.5 then
+    if frameTime > 0.25 then
         fps = frameCount/frameTime
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
@@ -473,13 +473,14 @@ function love.update(dt)
             local avgTime = frameTime/frameCount
             local varTime = frameTimeSqr/frameCount - avgTime*avgTime
 
-            -- TODO vsync should use the standard deviation as well
-            if config.vsync and avgTime + varTime < frameTarget*0.9 then
-                renderScale = renderScale*1.25
-            else
-                local targetTime = config.vsync and frameTarget*1.05 or frameTarget
-                renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
+            if config.vsync and varTime < avgTime/20 then
+                -- frame time variance is < 5% so let's assume we're halfway between vsync increments
+                avgTime = avgTime*3/4
             end
+
+            local targetTime = frameTarget
+            -- scale up based on worst-case time per standard deviation
+            renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.5)
             renderScale = currentGame:setScale(renderScale)
         end
 

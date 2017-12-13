@@ -20,24 +20,19 @@ local stats = {
     total = 0
 }
 
-local lastTime
-
 local function hook()
     local info = debug.getinfo(2)
     if info then
         local where = context .. ':' .. tostring(info.name) .. info.source .. ':' .. info.linedefined
-        local now = love.timer.getTime()
-        stats.counts[where] = (stats.counts[where] or 0) + now - lastTime
-        stats.total = stats.total + now - lastTime
-        lastTime = now
+        stats.counts[where] = (stats.counts[where] or 0) + 1
+        stats.total = stats.total + 1
     end
 end
 
 function profiler.attach(name)
     context = name
 
-    lastTime = love.timer.getTime()
-    debug.sethook(hook, "", 73)
+    debug.sethook(hook, "", 25)
 end
 
 function profiler.detach()
