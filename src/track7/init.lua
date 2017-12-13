@@ -36,11 +36,24 @@ function Game:seekMusic(pos, timeOfs)
 end
 
 function Game:resize(w, h)
-    self.screen = {w = w, h = h}
+    self.screenSize = {w = w, h = h}
+    self.scale = nil
+end
 
-    if not self.canvas or self.canvas:getWidth() ~= w or self.canvas:getHeight() ~= h then
-        self.canvas = love.graphics.newCanvas(w, h)
+function Game:setScale(scale)
+    scale = math.min(scale, 1)
+
+    -- Only adjust if we've changed by more than 5% ish
+    if self.scale and scale < self.scale*1.05 and scale > self.scale*0.95 then
+        return scale
     end
+
+    -- Set the canvas to the screen resolution directly
+    self.scale = scale
+    self.canvas = love.graphics.newCanvas(math.floor(scale*self.screenSize.w),
+        math.floor(scale*self.screenSize.h))
+
+    return scale
 end
 
 function Game:init()
@@ -64,7 +77,7 @@ function Game:start()
 end
 
 function Game:update(dt)
-    print(dt)
+    -- print(dt)
 end
 
 function Game:draw()
@@ -73,12 +86,22 @@ function Game:draw()
 
         love.graphics.push()
 
-        local scale = math.min(self.screen.w/1280, self.screen.h/720)
-        love.graphics.translate((self.screen.w - 1280*scale)/2, (self.screen.h - 720*scale)/2)
-        love.graphics.scale(scale, scale)
+        local ww = self.canvas:getWidth()
+        local hh = self.canvas:getHeight()
+
+        -- center the coordinate system such that 0,0 is the center of the screen
+        love.graphics.translate(ww/2, hh/2)
+
+        -- fit a 1000x1000 coordinate square inset into the canvas
+        local scale = math.min(ww, hh)/1000
+        love.graphics.scale(scale)
 
         love.graphics.setColor(255,255,255)
-        love.graphics.rectangle("fill", 0, 0, 1280, 720)
+        love.graphics.circle("line", -100, 0, 100)
+        love.graphics.circle("line", 0, 0, 100)
+        love.graphics.circle("line", 100, 0, 100)
+
+        love.graphics.rectangle("line", -500, -500, 1000, 1000)
 
         love.graphics.pop()
     end)

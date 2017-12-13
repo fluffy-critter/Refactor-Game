@@ -366,18 +366,19 @@ function love.load(args)
 end
 
 function love.resize(w, h)
+    print("resize " .. w .. ' ' .. h)
     if not config.fullscreen then
         config.width, config.height = love.window.getMode()
         config.save()
     end
 
+    if currentGame and currentGame.resize then
+        currentGame:resize(w, h)
+    end
+
     renderScale = config.scaleFactor
     if currentGame and currentGame.setScale then
         currentGame:setScale(renderScale)
-    end
-
-    if currentGame and currentGame.resize then
-        currentGame:resize(w, h)
     end
 end
 
@@ -491,6 +492,7 @@ function love.draw()
 
     if screen.state == ScreenState.configwait then
         screen.state = ScreenState.ready
+        love.resize(love.graphics.getWidth(), love.graphics.getHeight())
         if screen.resumeMusic then
             currentGame.music:resume()
         end
