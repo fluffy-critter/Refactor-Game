@@ -38,16 +38,9 @@ setmetatable(_G, {
 
 local config = require('config')
 
-local PROFILE = false
 local DEBUG = config.debug or false
 
-local Pie
-if PROFILE then
-    local piefiller = require('thirdparty.piefiller')
-    Pie = piefiller:new()
-    Pie:setKey("save_to_file","w")
-end
-
+local profiler = config.profiler and require('profiler')
 local cute = require('thirdparty.cute')
 
 local shaders = require('shaders')
@@ -81,7 +74,7 @@ end
 
 local tracks = {
     require('track1'),
-    require('track2')
+    require('track2'),
 }
 local currentGame
 
@@ -191,7 +184,6 @@ end
 
 local chainKeypressed = love.keypressed
 function love.keypressed(...)
-    if Pie then Pie:keypressed(...) end
     cute.keypressed(...)
 
     if chainKeypressed then
@@ -199,17 +191,11 @@ function love.keypressed(...)
     end
 end
 
-function love.mousepressed(...)
-    -- local x, y, button, istouch = ...
-
-    if Pie then Pie:mousepressed(...) end
-end
-
 local function credits()
     local creditsLines = {
         {font=fonts.menu.h1, text="Refactor"},
         "\n",
-        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam',
+        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam unless otherwise specified',
         {
             font=fonts.menu.url,
             text="http://sockpuppet.us/ • http://beesbuzz.biz/ • http://fluffy.itch.io/"
@@ -225,7 +211,9 @@ local function credits()
         .. " • Seattle\194\160Indies • Double\194\160Jump",
         "\n",
         "Built with LÖVE",
-        {font=fonts.menu.url, text="http://love2d.org"}
+        {font=fonts.menu.url, text="http://love2d.org"},
+        "\n",
+        "See the LICENSE file for additional credits"
     }
 
     local canvas
@@ -378,23 +366,24 @@ function love.load(args)
 end
 
 function love.resize(w, h)
+    print("resize " .. w .. ' ' .. h)
     if not config.fullscreen then
         config.width, config.height = love.window.getMode()
         config.save()
+    end
+
+    if currentGame and currentGame.resize then
+        currentGame:resize(w, h)
     end
 
     renderScale = config.scaleFactor
     if currentGame and currentGame.setScale then
         currentGame:setScale(renderScale)
     end
-
-    if currentGame and currentGame.resize then
-        currentGame:resize(w, h)
-    end
 end
 
 function love.update(dt)
-    if Pie then Pie:attach() end
+    if profiler then profiler.attach("update") end
 
     if screen.state == ScreenState.configwait then
         return
@@ -470,8 +459,6 @@ function love.update(dt)
         currentGame:update(dt*mul)
     end
 
-    if Pie then Pie:detach() end
-
     frameTime = frameTime + dt
     frameTimeSqr = frameTimeSqr + dt*dt
     frameCount = frameCount + 1
@@ -500,19 +487,22 @@ function love.update(dt)
         frameTimeSqr = 0
         frameCount = 0
     end
+
+    if profiler then profiler.detach() end
 end
 
 function love.draw()
     cute.draw()
 
-    if Pie then Pie:attach() end
-
     if screen.state == ScreenState.configwait then
         screen.state = ScreenState.ready
+        love.resize(love.graphics.getWidth(), love.graphics.getHeight())
         if screen.resumeMusic then
             currentGame.music:resume()
         end
     end
+
+    if profiler then profiler.attach("draw") end
 
     if currentGame then
         love.graphics.clear(32, 32, 32)
@@ -579,9 +569,11 @@ function love.draw()
     -- love.graphics.setColor(255,255,255,255)
     -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
 
-    if Pie then Pie:detach() end
+    if profiler then
+        profiler.detach()
+        profiler.draw()
+    end
 
-    if Pie then Pie:draw() end
 
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
