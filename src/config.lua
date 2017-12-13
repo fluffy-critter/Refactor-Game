@@ -17,7 +17,7 @@ local config = {
     highdpi = false,
     adaptive = true,
     scaleFactor = 1,
-    targetFPS = 30
+    targetFPS = nil
 }
 
 local filePath = 'userconf.lua'

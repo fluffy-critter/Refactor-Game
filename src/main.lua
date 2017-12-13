@@ -329,9 +329,9 @@ local function applyGraphicsConfig()
         resizable = true,
         fullscreen = config.fullscreen,
         vsync = config.vsync,
-        minwidth = 640,
-        minheight = 480,
-        highdpi = config.highdpi
+        highdpi = config.highdpi,
+        minwidth = 480,
+        minheight = 480
     })
 
     local _, _, flags = love.window.getMode()
@@ -380,6 +380,11 @@ function love.resize(w, h)
     if not config.fullscreen then
         config.width, config.height = love.window.getMode()
         config.save()
+    end
+
+    renderScale = config.scaleFactor
+    if currentGame and currentGame.setScale then
+        currentGame:setScale(renderScale)
     end
 
     if currentGame and currentGame.resize then
@@ -576,7 +581,8 @@ function love.draw()
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.debug)
-        love.graphics.printf(renderScale .. "  " .. math.floor(fps*100 + 0.5)/100, 0, 0, love.graphics.getWidth(), "right")
+        love.graphics.printf(renderScale .. "  " .. math.floor(fps*100 + 0.5)/100,
+            0, 0, love.graphics.getWidth(), "right")
     end
 end
 
