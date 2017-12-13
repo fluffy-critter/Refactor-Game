@@ -16,7 +16,8 @@ local config = {
     kiosk = false,
     highdpi = false,
     adaptive = true,
-    scaleFactor = 1
+    scaleFactor = 1,
+    targetFPS = 30
 }
 
 local filePath = 'userconf.lua'

@@ -12,7 +12,8 @@ local DEBUG = config.debug
 local util = require('util')
 local shaders = require('shaders')
 local imagepool = require('imagepool')
-local fonts = require('fonts')
+
+local fonts = require('track2.fonts')
 
 local TextBox = require('track2.TextBox')
 
@@ -50,6 +51,20 @@ function Game:seekMusic(pos, timeOfs)
     self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
 end
 
+function Game:resize(w, h)
+    -- set the maximum scale factor for the display
+    self.maxScale = math.min(w/256, h/224)
+    if not self.scale or self.scale > self.maxScale then
+        self:setScale(1)
+    end
+end
+
+function Game:setScale(scale)
+    self.outputScale = math.floor(math.min(self.maxScale, scale*4))
+    self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
+    return self.outputScale/4
+end
+
 function Game:init()
     self.BPM = BPM
     self.clock = clock
@@ -74,9 +89,6 @@ function Game:init()
         self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8"))
         self.back:setFilter("nearest")
     end
-
-    self.outputScale = 3
-    self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
 
     self.border = imagepool.load('track2/border.png', {premultiply=true})
 
