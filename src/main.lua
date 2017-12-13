@@ -40,6 +40,7 @@ local config = require('config')
 
 local DEBUG = config.debug or false
 
+local profiler = config.profiler and require('profiler')
 local cute = require('thirdparty.cute')
 
 local shaders = require('shaders')
@@ -383,6 +384,8 @@ function love.resize(w, h)
 end
 
 function love.update(dt)
+    if profiler then profiler.attach("update", dt) end
+
     if screen.state == ScreenState.configwait then
         return
     end
@@ -460,7 +463,7 @@ function love.update(dt)
     frameTime = frameTime + dt
     frameTimeSqr = frameTimeSqr + dt*dt
     frameCount = frameCount + 1
-    if frameTime >= 0.5 then
+    if frameTime > 0.25 then
         fps = frameCount/frameTime
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
@@ -471,13 +474,14 @@ function love.update(dt)
             local avgTime = frameTime/frameCount
             local varTime = frameTimeSqr/frameCount - avgTime*avgTime
 
-            -- TODO vsync should use the standard deviation as well
-            if config.vsync and avgTime + varTime < frameTarget*0.9 then
-                renderScale = renderScale*1.25
-            else
-                local targetTime = config.vsync and frameTarget*1.05 or frameTarget
-                renderScale = math.max((renderScale*3 + renderScale*targetTime/avgTime)/4, 0.5)
+            if config.vsync and varTime < avgTime/20 then
+                -- frame time variance is < 5% so let's assume we're halfway between vsync increments
+                avgTime = avgTime*3/4
             end
+
+            local targetTime = frameTarget
+            -- scale up based on worst-case time per standard deviation
+            renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.5)
             renderScale = currentGame:setScale(renderScale)
         end
 
@@ -485,6 +489,8 @@ function love.update(dt)
         frameTimeSqr = 0
         frameCount = 0
     end
+
+    if profiler then profiler.detach() end
 end
 
 function love.draw()
@@ -497,6 +503,8 @@ function love.draw()
             currentGame.music:resume()
         end
     end
+
+    if profiler then profiler.attach("draw") end
 
     if currentGame then
         love.graphics.clear(32, 32, 32)
@@ -562,6 +570,12 @@ function love.draw()
 
     -- love.graphics.setColor(255,255,255,255)
     -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
+
+    if profiler then
+        profiler.detach()
+        profiler.draw()
+    end
+
 
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
