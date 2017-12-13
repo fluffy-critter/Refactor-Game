@@ -10,6 +10,7 @@ local config = require('config')
 local DEBUG = config.debug
 
 local util = require('util')
+local gfx = require('gfx')
 local shaders = require('shaders')
 local imagepool = require('imagepool')
 
@@ -82,12 +83,12 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgb565", "rgba8"))
+    self.canvas = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgb565", "rgba8"))
     self.canvas:setFilter("nearest")
 
-    local blurFmt = util.selectCanvasFormat("rgba8", "rgb8")
+    local blurFmt = gfx.selectCanvasFormat("rgba8", "rgb8")
     if blurFmt then
-        self.back = love.graphics.newCanvas(256, 224, util.selectCanvasFormat("rgba8"))
+        self.back = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgba8"))
         self.back:setFilter("nearest")
     end
 

@@ -20,6 +20,7 @@ local Spawner = require('track1.Spawner')
 local EventQueue = require('EventQueue')
 local geom = require('geom')
 local util = require('util')
+local gfx = require('gfx')
 local shaders = require('shaders')
 local input = require('input')
 local config = require('config')
@@ -86,13 +87,13 @@ function Game:setScale(scale)
     self.canvas = love.graphics.newCanvas(w, h)
 
     local limits = love.graphics.getSystemLimits()
-    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+    local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     local msaa = math.min(config.msaa or limits.canvasmsaa, limits.canvasmsaa)
     self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, msaa)
     self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
 
-    local tonemapFmt = util.selectCanvasFormat("rgba8")
+    local tonemapFmt = gfx.selectCanvasFormat("rgba8")
     if tonemapFmt then
         self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
@@ -115,7 +116,7 @@ function Game:init()
     self.shaders = {}
 
     -- water always renders at 720p
-    local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
+    local waterFormat = gfx.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)

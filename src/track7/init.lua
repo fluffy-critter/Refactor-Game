@@ -5,6 +5,7 @@ Refactor: 7 - flight
 ]]
 
 local util = require('util')
+local gfx = require('gfx')
 
 local Game = {
     META = {
@@ -48,14 +49,14 @@ function Game:setScale(scale)
         return scale
     end
 
-    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+    local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     -- Set the canvas to the screen resolution directly
     self.scale = scale
     self.canvas = love.graphics.newCanvas(
         math.floor(scale*self.screenSize.w),
         math.floor(scale*self.screenSize.h),
-        pxielfmt)
+        pixelfmt)
 
     return scale
 end

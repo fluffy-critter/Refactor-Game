@@ -162,20 +162,6 @@ function util.solveQuadratic(a, b, c)
     return (-b - det)/2/a, (-b + det)/2/a
 end
 
--- Select the most-preferred canvas format from a list of formats
-local graphicsFormats = love.graphics.getCanvasFormats()
-print("Available graphics formats:")
-for k in pairs(graphicsFormats) do print('\t' .. k) end
-
-function util.selectCanvasFormat(...)
-    for _,k in ipairs({...}) do
-        if graphicsFormats[k] then
-            return k
-        end
-    end
-    return nil
-end
-
 -- shuffle a list the right way
 function util.shuffle(list)
     local indices = {}
