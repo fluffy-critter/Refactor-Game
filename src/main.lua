@@ -383,7 +383,7 @@ function love.resize(w, h)
 end
 
 function love.update(dt)
-    if profiler then profiler.attach("update") end
+    if profiler then profiler.attach("update", dt) end
 
     if screen.state == ScreenState.configwait then
         return
