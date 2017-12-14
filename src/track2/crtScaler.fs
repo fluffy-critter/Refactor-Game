@@ -10,7 +10,7 @@ uniform vec2 outputSize;
 
 float xbrt(float x0, float x1) {
     // integral of .05sin(x) + .95 = (19x-cos(x))/20
-    return (19*x1 - cos(x1) + cos(x0) - 19*x0)/20;
+    return (8*x1 - cos(x1) + cos(x0) - 8*x0)/9;
 }
 
 float ybrt(float y0, float y1) {
@@ -24,7 +24,7 @@ float ybrt(float y0, float y1) {
 vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
     // bunch because that means it's very subtle even at 4K
-    const float hPitch = 1152.0/4.0;
+    const float hPitch = 1152.0/3.0;
 
     float dot = tc.x*hPitch;
 
@@ -45,7 +45,7 @@ vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // CRT scanlines
     float rowT = tc.y*screenSize.y;
     float rowB = (tc.y + 1.0/outputSize.y)*screenSize.y;
-    float beamColor = ybrt(rowT*2*3.14159, rowB*2*3.14159)/(rowB - rowT)/6;
+    float beamColor = ybrt(rowT*2*3.14159, rowB*2*3.14159)/(rowB - rowT);
 
     // simulate a little horizontal smearing
     vec2 ofs = vec2(0.25/screenSize.x, 0.0);
