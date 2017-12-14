@@ -53,7 +53,7 @@ end
 
 function Game:resize(w, h)
     -- set the maximum scale factor for the display
-    self.maxScale = math.min(w/256, h/224)
+    self.maxScale = math.min(w/512, h/384)
     if not self.scale or self.scale > self.maxScale then
         self:setScale(1)
     end
@@ -61,7 +61,7 @@ end
 
 function Game:setScale(scale)
     self.outputScale = math.floor(math.min(self.maxScale, scale*4))
-    self.scaled = love.graphics.newCanvas(256*self.outputScale, 224*self.outputScale)
+    self.scaled = love.graphics.newCanvas(512*self.outputScale, 384*self.outputScale)
     return math.min(scale, self.maxScale/4)
 end
 
@@ -856,7 +856,8 @@ function Game:draw()
         local shader = self.crtScaler
         love.graphics.setShader(shader)
         shader:send("screenSize", {256, 224})
-        love.graphics.draw(self.back or self.canvas, 0, 0, 0, self.outputScale, self.outputScale)
+        shader:send("outputSize", {self.scaled:getDimensions()})
+        love.graphics.draw(self.back or self.canvas, 0, 0, 0, self.scaled:getWidth()/256, self.scaled:getHeight()/224)
         love.graphics.setShader()
     end)
     return self.scaled, 4/3
