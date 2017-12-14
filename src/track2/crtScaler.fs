@@ -8,13 +8,13 @@ uniform vec2 outputSize;
 
 float brt(float phaseL, float phaseR) {
     // integral of .05sin(x) + .95 = (19x-cos(x))/20
-    return (19*phaseR - cos(phaseR) + cos(phaseL) - 19*phaseL)/20;
+    return (8*phaseR - cos(phaseR) + cos(phaseL) - 8*phaseL)/9;
 }
 
 vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
     // bunch because that means it's very subtle even at 4K
-    const float hPitch = 1152.0/4.0;
+    const float hPitch = 1152.0/3.0;
 
     float dot = tc.x*hPitch;
 
@@ -30,7 +30,7 @@ vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // typical dot mask had a typical aperture aspect of 9:7, meaning 1152*3/4*7/9 = 672 dots tall
     // vertical 'duty cycle' is about 85%, with an offset every other column
 
-    // CRT scanlines
+    // CRT scanlines (TODO use an integral to cut down on aliasing effects)
     float row = tc.y*screenSize.y;
     float yRowPos = fract(row) - 0.5;
     float yBrt = sqrt(1.0 - yRowPos*yRowPos*2.0);
