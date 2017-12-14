@@ -480,7 +480,7 @@ function love.update(dt)
 
             local targetTime = frameTarget
             -- scale up based on worst-case time per standard deviation
-            renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.5)
+            renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.005)
             renderScale = currentGame:setScale(renderScale)
         end
 

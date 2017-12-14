@@ -53,16 +53,23 @@ end
 
 function Game:resize(w, h)
     -- set the maximum scale factor for the display
-    self.maxScale = math.min(w/512, h/384)
-    if not self.scale or self.scale > self.maxScale then
-        self:setScale(1)
-    end
+    self.maxScale = math.min(w/1920, h/1440)
+    self:setScale(self.scale or 1)
 end
 
 function Game:setScale(scale)
-    self.outputScale = math.floor(math.min(self.maxScale, scale*4))
-    self.scaled = love.graphics.newCanvas(512*self.outputScale, 384*self.outputScale)
-    return math.min(scale, self.maxScale/4)
+    scale = math.max(math.min(scale, self.maxScale), 256/1920)
+
+    --  TODO try to fit the scale to a nice even interval
+    local newScale = scale
+    if newScale == self.scale then
+        return scale
+    end
+
+    self.scaled = love.graphics.newCanvas(1920*newScale, 1440*newScale)
+    self.scale = newScale
+    print("Now rendering at", self.scaled:getDimensions())
+    return scale
 end
 
 function Game:init()
