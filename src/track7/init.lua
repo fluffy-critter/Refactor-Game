@@ -94,11 +94,12 @@ function Game:draw()
         local ww = self.canvas:getWidth()
         local hh = self.canvas:getHeight()
 
-        -- center the coordinate system such that 0,0 is the center of the screen
-        love.graphics.translate(ww/2, hh/2)
+        -- make a 1920x1080 box fit on the screen
+        local scale = math.min(ww/1920, hh/1080)
 
-        -- fit a 1000x1000 coordinate square inset into the canvas
-        local scale = math.min(ww, hh)/1000
+        -- center the coordinate system such that x=0 is the center of the screen and y=540 is the bottom edge
+        -- 540*scale + ty = hh
+        love.graphics.translate(ww/2, hh - 540*scale)
         love.graphics.scale(scale)
 
         love.graphics.setColor(255,255,255)
@@ -106,7 +107,7 @@ function Game:draw()
         love.graphics.circle("line", 0, 0, 100)
         love.graphics.circle("line", 100, 0, 100)
 
-        love.graphics.rectangle("line", -500, -500, 1000, 1000)
+        love.graphics.rectangle("line", -1920/2, -1080/2, 1920, 1080)
 
         love.graphics.pop()
     end)
