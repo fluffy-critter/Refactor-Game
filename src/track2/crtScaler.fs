@@ -8,23 +8,24 @@ Integrals computed using https://www.integral-calculator.com
 uniform vec2 screenSize;
 uniform vec2 outputSize;
 
+// TODO - sin(x1)-sin(x0) probably has a simpler form when x1-x0 is constant
+// TODO - this could also be approximated with a polynomial form of e.g. fract(2*pi*x) although I suspect most modern GPUs do that already
+
 float xbrt(float x0, float x1) {
-    // integral of .05sin(x) + .95 = (19x-cos(x))/20
-    return (8*x1 - cos(x1) + cos(x0) - 8*x0)/9/(x1 - x0);
+    // integral of .05*sin(x) + .95 = (19x-cos(x))/20
+    return sqrt(4.0/5.0 + (cos(x0) - cos(x1))/5.0/(x1 - x0));
 }
 
-float ybrt(float y0, float y1) {
-    // integral of 1 - pow(cos(y)*.5 + .5, 3) =
-    // -(9sin(2x) - 4sin(x)^3 + 48sin(x) - 66x)/96
-    float p0 = 9.*sin(2.*y0) - 4.*pow(sin(y0), 3.) + 48.*sin(y0) - 66.*y0;
-    float p1 = 9.*sin(2.*y1) - 4.*pow(sin(y1), 3.) + 48.*sin(y1) - 66.*y1;
-    return (p0 - p1)/96./(y1 - y0);
+float ybrt(float x0, float x1) {
+    // integral of (1-cos(x))/2 = (x-sin(x))/2
+    return sqrt(0.5 + (sin(x0) - sin(x1))/2.0/(x1 - x0));
 }
 
 vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
     // bunch because that means it's very subtle even at 4K
-    const float hPitch = 1152.0/3.0;
+    const float hPitch = 1152.0/2.0;
+    // const float hPitch = 5;
 
     float dot = tc.x*hPitch;
 
@@ -48,10 +49,11 @@ vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     float beamColor = ybrt(rowT*2*3.14159, rowB*2*3.14159)*.5 + .75;
 
     // simulate a little horizontal smearing
-    vec2 ofs = vec2(0.33/screenSize.x, 0.0);
-    vec4 pixelColor = 0.5*Texel(txt, tc)
-        + 0.25*Texel(txt, tc + ofs)
-        + 0.25*Texel(txt, tc - ofs);
+    vec2 pixelSoft = vec2(tc.x, (floor(rowT) + 0.5)/screenSize.y);
+    vec2 pixelHard = vec2((floor(tc.x*screenSize.x) + 0.5)/screenSize.x, pixelSoft.y);
+    float xofs = fract(tc.x*screenSize.x);
+    float blend = 4.0*xofs*(1.0 - xofs);
+    vec4 pixelColor = blend*Texel(txt, pixelHard) + (1.0 - blend)*Texel(txt, pixelSoft);
 
     return color * vec4(pixelColor.rgb * maskColor * beamColor, 1.0);
 }

@@ -91,12 +91,10 @@ function Game:init()
     self.score = 0
 
     self.canvas = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgb565", "rgba8"))
-    self.canvas:setFilter("nearest")
 
     local blurFmt = gfx.selectCanvasFormat("rgba8", "rgb8")
     if blurFmt then
         self.back = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgba8"))
-        self.back:setFilter("nearest")
     end
 
     self.border = imagepool.load('track2/border.png', {premultiply=true})

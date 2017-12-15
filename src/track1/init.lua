@@ -84,7 +84,16 @@ function Game:setScale(scale)
 
     print("Now rendering at " .. self.scale .. " -> " .. w .. "x" .. h)
 
+    local prevCanvas = self.canvas
     self.canvas = love.graphics.newCanvas(w, h)
+    if prevCanvas then
+        -- rescale the old canvas so we can preserve the realtime-ish reflections
+        self.canvas:renderTo(function()
+            love.graphics.setBlendMode("replace")
+            love.graphics.setColor(255,255,255,255)
+            love.graphics.draw(prevCanvas, 0, 0, 0, w/prevCanvas:getWidth(), h/prevCanvas:getHeight())
+        end)
+    end
 
     local limits = love.graphics.getSystemLimits()
     local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
