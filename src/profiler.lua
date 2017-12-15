@@ -21,12 +21,13 @@ local stats = {
 }
 
 local totalTime = 0
+local targetTime = 0
 
 local contextTimes = {}
 
 local contextColors = {
-    update = {255,0,0},
-    draw = {0,255,0}
+    update = {255,0,0,127},
+    draw = {0,255,0,127}
 }
 
 local colors = {}
@@ -92,7 +93,7 @@ function profiler.draw()
         local h = dy * count
 
         love.graphics.setColor(unpack(colors[k].context))
-        love.graphics.rectangle("fill", 0, y, 5, h)
+        love.graphics.rectangle("fill", 0, y, 15, h)
 
         if h > 8 then
             love.graphics.setFont(font)
@@ -113,18 +114,22 @@ function profiler.draw()
 
     totalTime = totalTime*.9 + love.timer.getDelta()
     y = 0
-    local x = love.graphics.getWidth() - 4
+    local x = love.graphics.getWidth() - 15
     dy = love.graphics.getHeight()/totalTime
     for k,v in pairs(contextTimes) do
         love.graphics.setColor(unpack(contextColors[k]))
         local h = dy*v.total
-        love.graphics.rectangle("fill", x, y, 4, h)
+        love.graphics.rectangle("fill", x, y, 15, h)
         y = y + h
     end
     for k,v in pairs(contextTimes) do
         contextTimes[k].total = v.total*.9
     end
 
+    targetTime = targetTime*.9 + 1/60
+    love.graphics.setColor(255,255,0,127)
+    local y = love.graphics.getHeight()*targetTime/totalTime
+    love.graphics.line(x - 32, y, x, y)
 
     love.graphics.pop()
 end

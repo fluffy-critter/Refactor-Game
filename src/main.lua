@@ -99,6 +99,8 @@ local frameTarget
 local renderScale
 local fps
 
+local updateTime = 0
+
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
     love.audio.newSource('mainmenu/loop2.mp3'),
@@ -390,6 +392,8 @@ function love.update(dt)
         return
     end
 
+    local updateStart = love.timer.getTime()
+
     if playing.state == PlayState.menu then
         if menuVolume == 0 then
             for _,loop in ipairs(bgLoops) do
@@ -479,7 +483,10 @@ function love.update(dt)
                 avgTime = avgTime*3/4
             end
 
-            local targetTime = frameTarget
+            -- if the update is longer than the frame time there's no way a graphics sacrifice will help,
+            -- so let's target the next interval down
+            local targetTime = math.ceil(updateTime/frameTarget)*frameTarget
+
             -- scale up based on worst-case time per standard deviation
             renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.005)
             renderScale = currentGame:setScale(renderScale)
@@ -489,6 +496,9 @@ function love.update(dt)
         frameTimeSqr = 0
         frameCount = 0
     end
+
+    local delta = love.timer.getTime() - updateStart
+    updateTime = delta*.5 + updateTime*.5
 
     if profiler then profiler.detach() end
 end
