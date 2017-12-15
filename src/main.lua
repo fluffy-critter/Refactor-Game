@@ -91,6 +91,7 @@ local playing = {
 local menuVolume = 0
 
 local highdpi = false
+local vsync
 
 local frameCount = 0
 local frameTime = 0
@@ -328,6 +329,7 @@ local function applyGraphicsConfig()
 
     local _, _, flags = love.window.getMode()
     highdpi = flags.highdpi
+    vsync = flags.vsync
 
     local refresh = config.targetFPS or flags.refreshrate
     if not refresh or refresh == 0 then
@@ -478,7 +480,7 @@ function love.update(dt)
             local avgTime = frameTime/frameCount
             local varTime = frameTimeSqr/frameCount - avgTime*avgTime
 
-            if config.vsync and varTime < avgTime/20 then
+            if vsync and varTime < avgTime/20 then
                 -- frame time variance is < 5% so let's assume we're halfway between vsync increments
                 avgTime = avgTime*3/4
             end
