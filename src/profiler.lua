@@ -87,6 +87,7 @@ function profiler.draw()
     love.graphics.origin()
     love.graphics.setBlendMode("alpha")
 
+    -- draw the function timings
     local y = 0
     local dy = love.graphics.getHeight()/totalTime
     for k,count in util.spairs(stats.counts, function(t,a,b) return t[b] < t[a] end) do
@@ -107,11 +108,13 @@ function profiler.draw()
         y = y + h
     end
 
+    -- smoothing
     for k,v in pairs(stats.counts) do
         stats.counts[k] = v*.9
     end
     stats.total = stats.total*.9
 
+    -- draw the context timings
     totalTime = totalTime*.9 + love.timer.getDelta()
     y = 0
     local x = love.graphics.getWidth() - 15
@@ -122,14 +125,17 @@ function profiler.draw()
         love.graphics.rectangle("fill", x, y, 15, h)
         y = y + h
     end
+
+    -- smoothing
     for k,v in pairs(contextTimes) do
         contextTimes[k].total = v.total*.9
     end
 
-    targetTime = targetTime*.9 + 1/60
+    -- draw the 60FPS boundary line
     love.graphics.setColor(255,255,0,127)
     local y = love.graphics.getHeight()*targetTime/totalTime
-    love.graphics.line(x - 32, y, x, y)
+    love.graphics.line(x - 32, y, x + 15, y)
+    targetTime = targetTime*.9 + 1/60
 
     love.graphics.pop()
 end
