@@ -76,12 +76,14 @@ function profiler.draw()
 
         love.graphics.setColor(unpack(colors[k].context))
         love.graphics.rectangle("fill", 0, y, 5, h)
-        love.graphics.setColor(unpack(colors[k].id))
-        love.graphics.rectangle("fill", 5, y, 5, h)
 
         if h > 8 then
             love.graphics.setFont(font)
+            love.graphics.setColor(0,0,0)
+            love.graphics.print(k, 16, y+1)
             love.graphics.setColor(255,255,255)
+            love.graphics.print(k, 14, y-1)
+            love.graphics.setColor(unpack(colors[k].id))
             love.graphics.print(k, 15, y)
         end
         y = y + h
