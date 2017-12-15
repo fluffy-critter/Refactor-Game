@@ -8,6 +8,7 @@ Profiler thingus. Inspired by classic 'CRT-scanline' profiling techniques.
 ]]
 
 local util = require('util')
+local bit = require('bit')
 
 local profiler = {}
 
@@ -19,10 +20,30 @@ local stats = {
     total = 0
 }
 
+local contextColors = {
+    update = {255,0,0},
+    draw = {0,255,0}
+}
+
+local colors = {}
+local function colorHash(str)
+    local h = 0xdeadbeef
+    for i = 1, #str do
+        h = bit.bxor(bit.ror(h, 3), str:byte(i)*131071)
+    end
+    return {h % 256, math.floor(h/256) % 256, math.floor(h/65536) % 256}
+end
+
 local function hook()
     local info = debug.getinfo(2)
     if info then
         local where = context .. ':' .. tostring(info.name) .. info.source .. ':' .. info.linedefined
+        if not colors[where] then
+            colors[where] = {
+                context = contextColors[context],
+                id = colorHash(where)
+            }
+        end
         stats.counts[where] = (stats.counts[where] or 0) + 1
         stats.total = stats.total + 1
     end
@@ -52,7 +73,12 @@ function profiler.draw()
     local dy = love.graphics.getHeight()/stats.total
     for k,count in util.spairs(stats.counts, function(t,a,b) return t[b] < t[a] end) do
         local h = dy * count
-        love.graphics.rectangle("line", 0, y, 10, h)
+
+        love.graphics.setColor(unpack(colors[k].context))
+        love.graphics.rectangle("fill", 0, y, 5, h)
+        love.graphics.setColor(unpack(colors[k].id))
+        love.graphics.rectangle("fill", 5, y, 5, h)
+
         if h > 8 then
             love.graphics.setFont(font)
             love.graphics.setColor(255,255,255)
