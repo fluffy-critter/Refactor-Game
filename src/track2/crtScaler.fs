@@ -12,8 +12,8 @@ uniform vec2 outputSize;
 // TODO - this could also be approximated with a polynomial form of e.g. fract(2*pi*x) although I suspect most modern GPUs do that already
 
 float xbrt(float x0, float x1) {
-    // integral of .05sin(x) + .95 = (19x-cos(x))/20
-    return sqrt(8.0/9.0 + (cos(x0) - cos(x1))/9.0/(x1 - x0));
+    // integral of .05*sin(x) + .95 = (19x-cos(x))/20
+    return sqrt(4.0/5.0 + (cos(x0) - cos(x1))/5.0/(x1 - x0));
 }
 
 float ybrt(float x0, float x1) {
@@ -24,7 +24,8 @@ float ybrt(float x0, float x1) {
 vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
     // bunch because that means it's very subtle even at 4K
-    const float hPitch = 1152.0/3.0;
+    const float hPitch = 1152.0/2.0;
+    // const float hPitch = 5;
 
     float dot = tc.x*hPitch;
 
