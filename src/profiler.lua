@@ -20,6 +20,10 @@ local stats = {
     total = 0
 }
 
+local totalTime = 0
+
+local contextTimes = {}
+
 local contextColors = {
     update = {255,0,0},
     draw = {0,255,0}
@@ -34,6 +38,8 @@ local function colorHash(str)
     return {h % 256, math.floor(h/256) % 256, math.floor(h/65536) % 256}
 end
 
+local lastTime
+
 local function hook()
     local info = debug.getinfo(2)
     if info then
@@ -44,20 +50,31 @@ local function hook()
                 id = colorHash(where)
             }
         end
-        stats.counts[where] = (stats.counts[where] or 0) + 1
-        stats.total = stats.total + 1
+        local now = love.timer.getTime()
+        local delta = now - lastTime
+        lastTime = now
+        stats.counts[where] = (stats.counts[where] or 0) + delta
+        stats.total = stats.total + delta
     end
 end
 
 function profiler.attach(name)
     context = name
+    lastTime = love.timer.getTime()
+
+    contextTimes[name] = contextTimes[name] or {}
+    contextTimes[name].start = lastTime
 
     debug.sethook(hook, "", 25)
 end
 
 function profiler.detach()
     debug.sethook()
+
+    contextTimes[context].total = (contextTimes[context].total or 0) + love.timer.getTime() - contextTimes[context].start
+
     context = nil
+    lastTime = nil
 end
 
 function profiler.draw()
@@ -70,7 +87,7 @@ function profiler.draw()
     love.graphics.setBlendMode("alpha")
 
     local y = 0
-    local dy = love.graphics.getHeight()/stats.total
+    local dy = love.graphics.getHeight()/totalTime
     for k,count in util.spairs(stats.counts, function(t,a,b) return t[b] < t[a] end) do
         local h = dy * count
 
@@ -93,6 +110,21 @@ function profiler.draw()
         stats.counts[k] = v*.9
     end
     stats.total = stats.total*.9
+
+    totalTime = totalTime*.9 + love.timer.getDelta()
+    y = 0
+    local x = love.graphics.getWidth() - 4
+    dy = love.graphics.getHeight()/totalTime
+    for k,v in pairs(contextTimes) do
+        love.graphics.setColor(unpack(contextColors[k]))
+        local h = dy*v.total
+        love.graphics.rectangle("fill", x, y, 4, h)
+        y = y + h
+    end
+    for k,v in pairs(contextTimes) do
+        contextTimes[k].total = v.total*.9
+    end
+
 
     love.graphics.pop()
 end
