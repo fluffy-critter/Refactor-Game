@@ -899,6 +899,8 @@ function Game:update(raw_dt)
             actor:preUpdate(dt, rawt)
         end
 
+        -- TODO bucket the actors and only check actors that are in threatened buckets
+        -- because, seriously, this function takes like 90% of CPU time pretty often
         for _,actor in pairs(self.actors) do
             actor:checkHitBalls(self.balls)
         end
