@@ -21,7 +21,12 @@ float ybrt(float x0, float x1) {
     return sqrt(0.5 + (sin(x0) - sin(x1))/2.0/(x1 - x0));
 }
 
-vec4 effect(vec4 color, Image txt, vec2 tc, vec2 screen_coords) {
+vec4 effect(vec4 color, Image txt, vec2 itc, vec2 screen_coords) {
+    // little bit of CRT bulge
+    vec2 tc = vec2((itc.x - 0.5)*(itc.y*(itc.y - 1)*0.02 + 1.0) + 0.5,
+                   (itc.y - 0.5)*(itc.x*(itc.x - 1)*0.05 + 1.0) + 0.5);
+
+
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
     // bunch because that means it's very subtle even at 4K
     const float hPitch = 1152.0/2.0;
