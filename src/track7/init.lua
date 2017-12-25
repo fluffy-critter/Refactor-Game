@@ -6,6 +6,7 @@ Refactor: 7 - flight
 
 local util = require('util')
 local gfx = require('gfx')
+local heap = require('thirdparty.binary_heap')
 
 local Game = {
     META = {
@@ -24,16 +25,9 @@ function Game.new()
     return o
 end
 
-local BPM = 120
-local clock = util.clock(BPM, {4})
-
--- returns music position as {measure, beat}. beat will be fractional.
+-- returns music position in terms of MIDI clocks
 function Game:musicPos()
-    return clock.timeToPos(self.music:tell())
-end
-
-function Game:seekMusic(pos, timeOfs)
-    self.music:seek(clock.posToTime(pos) + (timeOfs or 0))
+    return self.music:tell()*960
 end
 
 function Game:resize(w, h)
@@ -62,8 +56,6 @@ function Game:setScale(scale)
 end
 
 function Game:init()
-    self.BPM = BPM
-
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
 
     self.monk = {
@@ -75,6 +67,18 @@ function Game:init()
     }
 
     self.music = love.audio.newSource('track7/07-flight.mp3')
+
+    local eventlist = love.filesystem.load('track7/events.lua')()
+    self.events = heap:new()
+    for _,data in ipairs(eventlist) do
+        self.events:insert(data[1], {
+            track = data[2],
+            note = data[3],
+            velocity = data[4]
+        })
+    end
+
+    self.actors = {}
 end
 
 function Game:start()
@@ -82,7 +86,15 @@ function Game:start()
 end
 
 function Game:update(dt)
-    -- print(dt)
+    local now = self:musicPos()
+    while not self.events:empty() and self.events:next_key() <= now do
+        local _,event = self.events:pop()
+        print(event.track, event.note, event.velocity)
+    end
+
+    util.runQueue(self.actors, function(actor)
+        return actor:update(dt)
+    end)
 end
 
 function Game:draw()
@@ -118,6 +130,10 @@ function Game:draw()
         love.graphics.circle("line", 100, 0, 100)
 
         love.graphics.rectangle("line", -1920/2, -1080/2, 1920, 1080)
+
+        for _,actor in pairs(self.actors) do
+            actor:draw()
+        end
 
         love.graphics.pop()
     end)
