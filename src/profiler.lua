@@ -27,7 +27,8 @@ local contextTimes = {}
 
 local contextColors = {
     update = {255,0,0,127},
-    draw = {0,255,0,127}
+    draw = {0,255,0,127},
+    after = {0,0,255}
 }
 
 local colors = {}
@@ -60,6 +61,10 @@ local function hook()
 end
 
 function profiler.attach(name)
+    if context then
+        profiler.detach()
+    end
+
     context = name
     lastTime = love.timer.getTime()
 
@@ -72,7 +77,9 @@ end
 function profiler.detach()
     debug.sethook()
 
-    contextTimes[context].total = (contextTimes[context].total or 0) + love.timer.getTime() - contextTimes[context].start
+    if context then
+        contextTimes[context].total = (contextTimes[context].total or 0) + love.timer.getTime() - contextTimes[context].start
+    end
 
     context = nil
     lastTime = nil

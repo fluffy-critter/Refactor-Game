@@ -99,8 +99,18 @@ function Game:draw()
 
         -- center the coordinate system such that x=0 is the center of the screen and y=540 is the bottom edge
         -- 540*scale + ty = hh
-        love.graphics.translate(ww/2, hh - 540*scale)
+        local tx = ww/2
+        local ty = hh - 540*scale
+        love.graphics.translate(tx, ty)
         love.graphics.scale(scale)
+
+        -- compute the extents of the playfield, given that x*scale + tx = ox, i.e. x = (ox - tx)/scale
+        local minX = (0 - tx)/scale
+        local maxX = (ww - tx)/scale
+        local minY = (0 - ty)/scale
+        local maxY = (hh - ty)/scale
+        love.graphics.print("0,0", 0, 0)
+        love.graphics.print("0," .. minY, 0, minY)
 
         love.graphics.setColor(255,255,255)
         love.graphics.circle("line", -100, 0, 100)

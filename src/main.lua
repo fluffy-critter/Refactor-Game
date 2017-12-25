@@ -588,12 +588,13 @@ function love.draw()
         profiler.draw()
     end
 
-
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.debug)
         love.graphics.printf(renderScale .. "  " .. math.floor(fps*100 + 0.5)/100,
             0, 0, love.graphics.getWidth(), "right")
     end
+
+    if profiler then profiler.attach("after") end
 end
 
