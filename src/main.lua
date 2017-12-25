@@ -312,6 +312,8 @@ local function mainmenu()
     return Menu.new({choices = choices})
 end
 
+local canvasTarget, entropyFront, entropyBack;
+
 local function applyGraphicsConfig()
     -- apply the configuration stuff (can't do this in conf.lua because of chicken-and-egg with application directory)
     love.window.setMode(config.width, config.height, {
@@ -323,7 +325,8 @@ local function applyGraphicsConfig()
         minheight = 480
     })
 
-    local _, _, flags = love.window.getMode()
+    local w, h, flags = love.window.getMode()
+    love.resize(w, h)
     highdpi = flags.highdpi
 
     local refresh = config.targetFPS or flags.refreshrate
@@ -380,6 +383,13 @@ function love.resize(w, h)
     if currentGame and currentGame.setScale then
         currentGame:setScale(renderScale)
     end
+
+    print("creating canvas")
+    w = love.graphics.getWidth()
+    h = love.graphics.getHeight()
+    canvasTarget = love.graphics.newCanvas(w, h)
+    entropyFront = love.graphics.newCanvas(w, h)
+    entropyBack = love.graphics.newCanvas(w, h)
 end
 
 function love.update(dt)
@@ -505,67 +515,92 @@ function love.draw()
 
     if profiler then profiler.attach("draw") end
 
-    if currentGame then
-        love.graphics.clear(32, 32, 32)
+    canvasTarget:renderTo(function()
 
-        love.graphics.push()
-        love.graphics.origin()
+        if currentGame then
+            love.graphics.clear(32, 32, 32)
 
-        local canvas, aspect = currentGame:draw()
+            love.graphics.push()
+            love.graphics.origin()
 
-        love.graphics.setBlendMode("alpha", "premultiplied")
-        local brt = 255*util.smoothStep(playing.fade)
-        love.graphics.setColor(brt, brt, brt)
+            local canvas, aspect = currentGame:draw()
 
-        if playing.state ~= PlayState.playing then
-            local shader = shaders.load("shaders/hueshift.fs")
-            love.graphics.setShader(shader)
-            local saturation = playing.speed*.85 + .15
-            local shift = (1 - playing.speed)*math.pi
-            if playing.state == PlayState.resuming then
-                shift = -shift
+            love.graphics.setBlendMode("alpha", "premultiplied")
+            local brt = 255*util.smoothStep(playing.fade)
+            love.graphics.setColor(brt, brt, brt)
+
+            if playing.state ~= PlayState.playing then
+                local shader = shaders.load("shaders/hueshift.fs")
+                love.graphics.setShader(shader)
+                local saturation = playing.speed*.85 + .15
+                local shift = (1 - playing.speed)*math.pi
+                if playing.state == PlayState.resuming then
+                    shift = -shift
+                end
+                shader:send("basis", {
+                    saturation * math.cos(shift),
+                    saturation * math.sin(shift)
+                })
             end
-            shader:send("basis", {
-                saturation * math.cos(shift),
-                saturation * math.sin(shift)
-            })
+
+            love.graphics.pop()
+            blitCanvas(canvas, aspect)
+            love.graphics.setShader()
+        else
+            love.graphics.push()
+            local res = highdpi and 2 or 1
+            love.graphics.scale(res)
+
+            love.graphics.clear(0,0,0)
+            love.graphics.setBlendMode("alpha")
+
+            -- draw menu
+            local w = love.graphics:getWidth()/res
+            local h = love.graphics:getHeight()/res
+
+            love.graphics.setColor(44,48,0)
+            love.graphics.rectangle("fill", 0, 0, w, 300)
+            love.graphics.setColor(255,255,255,255)
+
+            local ground = imagepool.load('mainmenu/ground.png')
+            for x = 0, w, 702 do
+                love.graphics.draw(ground, x, 0)
+            end
+
+            local bg = imagepool.load('mainmenu/forest-stuff.png')
+            local scale = math.min(w/bg:getWidth(), h*1.2/bg:getHeight())
+            love.graphics.draw(bg, (w - bg:getWidth()*scale)/2, 0, 0, scale, scale)
+
+            local logo = imagepool.load('mainmenu/refactor-released.png')
+            love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
+
+            love.graphics.pop()
+            menuStack[#menuStack]:draw()
         end
 
-        love.graphics.pop()
+    end)
 
-        blitCanvas(canvas, aspect)
-        love.graphics.setShader()
-    else
-        love.graphics.push()
-        local res = highdpi and 2 or 1
-        love.graphics.scale(res)
+    local dither = shaders.load("shaders/ditherTarget.fs")
+    love.graphics.setShader(dither)
+    dither:send("error", entropyBack)
+    dither:send("levels", 8)
+    love.graphics.setBlendMode("replace")
 
-        love.graphics.clear(0,0,0)
-        love.graphics.setBlendMode("alpha")
+    dither:send("getValue", 8/7)
+    dither:send("getError", 0)
+    love.graphics.draw(canvasTarget)
 
-        -- draw menu
-        local w = love.graphics:getWidth()/res
-        local h = love.graphics:getHeight()/res
+    dither:send("getValue", 0)
+    dither:send("getError", 1)
+    entropyFront:renderTo(function()
+        love.graphics.draw(canvasTarget)
+    end)
 
-        love.graphics.setColor(44,48,0)
-        love.graphics.rectangle("fill", 0, 0, w, 300)
-        love.graphics.setColor(255,255,255,255)
+    love.graphics.setShader()
 
-        local ground = imagepool.load('mainmenu/ground.png')
-        for x = 0, w, 702 do
-            love.graphics.draw(ground, x, 0)
-        end
+    -- love.graphics.draw(entropyFront)
 
-        local bg = imagepool.load('mainmenu/forest-stuff.png')
-        local scale = math.min(w/bg:getWidth(), h*1.2/bg:getHeight())
-        love.graphics.draw(bg, (w - bg:getWidth()*scale)/2, 0, 0, scale, scale)
-
-        local logo = imagepool.load('mainmenu/refactor-released.png')
-        love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
-
-        love.graphics.pop()
-        menuStack[#menuStack]:draw()
-    end
+    entropyBack, entropyFront = entropyFront, entropyBack
 
     -- love.graphics.setColor(255,255,255,255)
     -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
