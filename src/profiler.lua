@@ -35,7 +35,7 @@ local colors = {}
 local function colorHash(str)
     local h = 0xdeadbeef
     for i = 1, #str do
-        h = bit.bxor(bit.ror(h, 3), str:byte(i)*131071)
+        h = bit.bxor(bit.ror(h, 3), str:byte(i)*32452867)
     end
     return {h % 256, math.floor(h/256) % 256, math.floor(h/65536) % 256}
 end

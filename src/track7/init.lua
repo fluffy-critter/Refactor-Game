@@ -5,8 +5,14 @@ Refactor: 7 - flight
 ]]
 
 local util = require('util')
+local input = require('input')
 local gfx = require('gfx')
 local heap = require('thirdparty.binary_heap')
+
+local quadtastic = require('thirdparty.libquadtastic')
+local imagepool = require('imagepool')
+
+local Coin = require('track7.Coin')
 
 local Game = {
     META = {
@@ -58,10 +64,14 @@ end
 function Game:init()
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
 
+    self.camera = {
+        y = 0,
+        vy = 0
+    }
+
     self.monk = {
         x = 0,
         y = 0,
-        t = 0,
         vx = 0,
         vy = 0
     }
@@ -79,6 +89,22 @@ function Game:init()
     end
 
     self.actors = {}
+
+    self.sprites = imagepool.load('track7/sprites.png', {mipmaps=true})
+    local atlas = love.filesystem.load('track7/sprites.lua')()
+    self.quads = quadtastic.create_quads(atlas, self.sprites:getWidth(), self.sprites:getHeight())
+
+    self.monk.cx = atlas.monk.w/2
+    self.monk.cy = atlas.monk.h/2
+
+    for i=1,100 do
+        table.insert(self.actors, Coin.new({
+            sprite = self.sprites,
+            quad = self.quads.coin,
+            x = math.random(-500,500),
+            y = i*100
+        }))
+    end
 end
 
 function Game:start()
@@ -86,6 +112,29 @@ function Game:start()
 end
 
 function Game:update(dt)
+    local ax = input.x*1000
+    local ay = 100
+
+    self.monk.x = self.monk.x + (self.monk.vx + 0.5*ax*dt)*dt
+    self.monk.y = self.monk.y + (self.monk.vy + 0.5*ay*dt)*dt
+
+    self.monk.vx = self.monk.vx + ax*dt
+    self.monk.vy = self.monk.vy + ay*dt
+
+    do
+        local c = self.camera
+        local lag = 1 -- how far the camera lags behind the player
+
+        -- where the player will be in (lag) seconds
+        local targetY = self.monk.y + (self.monk.vy + .5*ay*lag)*lag
+
+        -- targetY = cameraY + t*cameraVY + t*t*cameraAY/2, solve for cameraAY
+        local cameraAY = 2*(targetY - c.y - lag*c.vy)/lag/lag
+
+        c.y = c.y + (c.vy + 0.5*cameraAY*dt)*dt
+        c.vy = c.vy + cameraAY*dt
+    end
+
     local now = self:musicPos()
     while not self.events:empty() and self.events:next_key() <= now do
         local _,event = self.events:pop()
@@ -99,7 +148,7 @@ end
 
 function Game:draw()
     self.canvas:renderTo(function()
-        love.graphics.clear(0,0,0,255)
+        love.graphics.clear(0,0,127,255)
 
         love.graphics.push()
 
@@ -121,15 +170,11 @@ function Game:draw()
         local maxX = (ww - tx)/scale
         local minY = (0 - ty)/scale
         local maxY = (hh - ty)/scale
-        love.graphics.print("0,0", 0, 0)
-        love.graphics.print("0," .. minY, 0, minY)
 
-        love.graphics.setColor(255,255,255)
-        love.graphics.circle("line", -100, 0, 100)
-        love.graphics.circle("line", 0, 0, 100)
-        love.graphics.circle("line", 100, 0, 100)
+        love.graphics.translate(0, -self.camera.y)
 
-        love.graphics.rectangle("line", -1920/2, -1080/2, 1920, 1080)
+        -- draw the monk
+        love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, 0, 0.25, 0.25, self.monk.cx, self.monk.cy)
 
         for _,actor in pairs(self.actors) do
             actor:draw()
