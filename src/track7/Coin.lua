@@ -20,7 +20,6 @@ function Coin:update()
 end
 
 function Coin:draw()
-    print(self.x, self.y)
     love.graphics.draw(self.sprite, self.quad, self.x, self.y)
 end
 

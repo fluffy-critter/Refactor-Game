@@ -13,6 +13,7 @@ local quadtastic = require('thirdparty.libquadtastic')
 local imagepool = require('imagepool')
 
 local Coin = require('track7.Coin')
+local Channel = require('track7.Channel')
 
 local Game = {
     META = {
@@ -76,6 +77,9 @@ function Game:init()
         vy = 0
     }
 
+    self.bounds = {center = 0, width = 1000}
+    self.channel = Channel.new()
+
     self.music = love.audio.newSource('track7/07-flight.mp3')
 
     local eventlist = love.filesystem.load('track7/events.lua')()
@@ -135,6 +139,13 @@ function Game:update(dt)
         c.vy = c.vy + cameraAY*dt
     end
 
+    self.channel:update(self.camera.y + 600, function()
+        local b = self.bounds
+        b.width = util.clamp(b.width + math.random(-10, 10), 200, 600)
+        b.center = util.clamp(b.center + math.random(-100, 100), -900 + b.width, 900 - b.width)
+        return {b.center - b.width, b.center + b.width}
+    end)
+
     local now = self:musicPos()
     while not self.events:empty() and self.events:next_key() <= now do
         local _,event = self.events:pop()
@@ -172,6 +183,9 @@ function Game:draw()
         local maxY = (hh - ty)/scale
 
         love.graphics.translate(0, -self.camera.y)
+
+        -- draw the mountain
+        self.channel:draw(minY + self.camera.y, maxY + self.camera.y)
 
         -- draw the monk
         love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, 0, 0.25, 0.25, self.monk.cx, self.monk.cy)
