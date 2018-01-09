@@ -51,7 +51,7 @@ end
 
 function Coin:draw()
     love.graphics.circle("line", self.x, self.y, self.r)
-    love.graphics.draw(self.sprite, self.quad, self.x, self.y)
+    -- love.graphics.draw(self.sprite, self.quad, self.x, self.y)
 end
 
 return Coin

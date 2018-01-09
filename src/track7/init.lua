@@ -8,6 +8,7 @@ local util = require('util')
 local geom = require('geom')
 local input = require('input')
 local gfx = require('gfx')
+local config = require('config')
 local heap = require('thirdparty.binary_heap')
 
 local quadtastic = require('thirdparty.libquadtastic')
@@ -121,10 +122,24 @@ function Game:init()
 end
 
 function Game:start()
-    self.music:play()
+end
+
+function Game:onButtonPress(button)
+    if button == 'skip' then
+        self.music:seek(self:musicPos() + 10)
+    end
 end
 
 function Game:update(dt)
+    if not self.endingTime and self:musicPos() > 130 then
+        self.endingTime = 0
+    elseif self.endingTime then
+        self.endingTime = self.endingTime + dt
+        if self.endingTime > 3 then
+            self.gameOver = true
+        end
+    end
+
     self.monk.tiltX = math.pow(0.1, dt)*(self.monk.tiltX + input.x*dt)
 
     local monkUp = geom.normalize({self.monk.tiltX, -0.5})
@@ -141,6 +156,11 @@ function Game:update(dt)
 
     self.monk.x = self.monk.x + (self.monk.vx + 0.5*ax*dt)*dt
     self.monk.y = self.monk.y + (self.monk.vy + 0.5*ay*dt)*dt
+
+    if not self.started and self.monk.y > 100 then
+        self.started = true
+        self.music:play()
+    end
 
     self.monk.vx = self.monk.vx + ax*dt
     self.monk.vy = self.monk.vy + ay*dt
@@ -161,6 +181,7 @@ function Game:update(dt)
 
     self.channel:update(self.camera.y + 600, function()
         local b = self.bounds
+
         b.width = util.clamp(b.width + math.random(-10, 10), 100, 600)
         b.center = util.clamp(b.center + math.random(-100, 100), -900 + b.width, 900 - b.width)
         return {b.center - b.width, b.center + b.width}
@@ -245,6 +266,17 @@ function Game:draw()
         end
 
         love.graphics.pop()
+
+        if self.endingTime then
+            -- fade to white
+            local alpha = math.min(255, self.endingTime*255/3)
+            love.graphics.setColor(255, 255, 255, alpha)
+            love.graphics.rectangle("fill", 0, 0, ww, hh)
+        end
+
+        if config.debug then
+            love.graphics.print(self:musicPos() .. ' ' .. tostring(self.endingTime), 0, 0)
+        end
     end)
     return self.canvas
 end
