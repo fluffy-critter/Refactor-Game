@@ -17,7 +17,7 @@ function Channel.new(o)
     util.applyDefaults(self, {
         interval = 100,
         edges = {},
-        bottom = 0
+        bottom = 0,
     })
 
     setmetatable(self, {__index = Channel})
@@ -25,9 +25,9 @@ function Channel.new(o)
 end
 
 -- given a Y position and a height, return the minimal extents for safe passage as left,right
-function Channel:getExtents(y, height)
+function Channel:getExtents(y0, y1)
     local maxL, minR
-    for i = math.floor((y - height)/interval), math.ceil((y + height)/interval) do
+    for i = math.floor(y0/self.interval), math.ceil(y1/self.interval) do
         local cur = self.edges[i]
         if cur then
             maxL = math.max(maxL or cur[1], cur[1])
@@ -62,8 +62,17 @@ function Channel:draw(startY, endY)
         local edges = self.edges[i]
         if edges then
             local left,right = unpack(edges)
-            love.graphics.rectangle("fill", -1000, y0, left + 1000, self.interval)
-            love.graphics.rectangle("fill", right, y0, 1000, self.interval)
+            love.graphics.setColor(0,0,0)
+            love.graphics.rectangle("fill", -1000, y0, left + 800, self.interval)
+            love.graphics.rectangle("fill", right + 200, y0, 1000, self.interval)
+
+            love.graphics.setColor(255,255,255)
+            if self.leftQuad and self.spriteSheet then
+                love.graphics.draw(self.spriteSheet, self.leftQuad, left - 430, y0 - 10)
+            end
+            if self.rightQuad and self.spriteSheet then
+                love.graphics.draw(self.spriteSheet, self.rightQuad, right, y0 - 10)
+            end
         end
     end
 end
