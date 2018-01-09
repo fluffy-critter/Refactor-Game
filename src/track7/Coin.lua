@@ -8,6 +8,7 @@ a coin
 ]]
 
 local util = require('util')
+local geom = require('geom')
 
 local Coin = {}
 
@@ -20,6 +21,7 @@ function Coin.new(o)
         vx = 0,
         x = 0,
         y = 0,
+        r = 30
     })
 
     setmetatable(self, {__index = Coin})
@@ -27,9 +29,20 @@ function Coin.new(o)
 end
 
 function Coin:update(dt, maxY)
+    if self.channel then
+        local nrm = self.channel:checkCollision(self.x, self.y, self.r)
+        if nrm then
+            self.x = self.x + nrm[1]
+            self.y = self.y + nrm[2]
+            self.vx, self.vy = geom.reflectVector(nrm, self.vx, self.vy)
+        end
+    end
+
     self.x = self.x + dt*self.vx
     self.y = self.y + dt*(self.vy + 0.5*dt*self.ay)
     self.vy = self.vy + dt*self.ay
+
+
 
     -- despawn if the coin has been collected or if it's fallen off the bottom of the screen forever
     -- TODO make the despawn logic based on a bit more useful stuff
@@ -37,6 +50,7 @@ function Coin:update(dt, maxY)
 end
 
 function Coin:draw()
+    love.graphics.circle("line", self.x, self.y, self.r)
     love.graphics.draw(self.sprite, self.quad, self.x, self.y)
 end
 

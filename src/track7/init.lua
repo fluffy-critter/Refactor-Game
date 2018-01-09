@@ -189,10 +189,12 @@ function Game:update(dt)
         table.insert(self.actors, Coin.new({
             y = self.camera.y + 540,
             x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
+            vx = math.random(-event.velocity, event.velocity),
             vy = self.monk.vy - jump/t,
             ay = ay + jump*2/t,
             sprite = self.sprites,
-            quad = self.quads.coin
+            quad = self.quads.coin,
+            channel = self.channel
         }))
     end
 
