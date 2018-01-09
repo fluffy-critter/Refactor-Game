@@ -211,7 +211,7 @@ local function credits()
         "Tambi • Jukka • Austin • Sally\194\160Bird • Kyreeth • M.Wissig",
         "\n",
         {font=fonts.menu.h2, text="Moral support"},
-        "Emmy • Nate • Zeno • Jakub • Lito • Rachel • Patrick • Milo"
+        "Emmy • Nate • Zeno • Jakub • Lito • Rachel • Patrick • Milo • Packbat"
         .. " • Seattle\194\160Indies • Double\194\160Jump",
         "\n",
         "Built with LÖVE",

@@ -183,12 +183,15 @@ function Game:update(dt)
         print(event.track, event.note, event.velocity)
 
         -- TODO differentiate different coin types
+        -- packbat worked out the equations to solve this, TODO add notes and process :)
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
+        local t = 1
+        local jump = 1.25
         table.insert(self.actors, Coin.new({
             y = self.camera.y + 540,
-            x = self.bounds.center + self.bounds.width*(xpos*2 - 1),
-            vy = -event.velocity*2,
-            ay = self.monk.vy,
+            x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
+            vy = self.monk.vy - 540*4*jump/t,
+            ay = ay + 540*8*jump/t,
             sprite = self.sprites,
             quad = self.quads.coin
         }))
