@@ -33,9 +33,9 @@ function Game.new()
     return o
 end
 
--- returns music position in terms of MIDI clocks
+-- returns music position in terms of seconds
 function Game:musicPos()
-    return self.music:tell()*960
+    return self.music:tell()
 end
 
 function Game:resize(w, h)
@@ -82,7 +82,8 @@ function Game:init()
         vx = 0,
         vy = 0,
         tiltX = 0,
-        theta = 0
+        theta = 0,
+        r = 100
     }
 
     -- set the arena boundaries
@@ -102,7 +103,7 @@ function Game:init()
     local eventlist = love.filesystem.load('track7/events.lua')()
     self.events = heap:new()
     for _,data in ipairs(eventlist) do
-        self.events:insert(data[1], {
+        self.events:insert(data[1]/960, {
             track = data[2],
             note = data[3],
             velocity = data[4]
@@ -165,16 +166,14 @@ function Game:update(dt)
         return {b.center - b.width, b.center + b.width}
     end)
 
-    local wallL, wallR = self.channel:getExtents(self.monk.y, self.monk.y + 100)
-    if wallL and self.monk.x < wallL then
-        self.monk.vy = -.25*self.monk.vy
-        self.monk.vx = math.abs(self.monk.vx) + wallL - self.monk.x
-        self.monk.tiltX = math.abs(self.monk.tiltX)
-    end
-    if wallR and self.monk.x > wallR then
-        self.monk.vy = -.25*self.monk.vy
-        self.monk.vx = -math.abs(self.monk.vx) + wallR - self.monk.x
-        self.monk.tiltX = -math.abs(self.monk.tiltX)
+    local nrm = self.channel:checkCollision(self.monk.x, self.monk.y, self.monk.r)
+    if nrm then
+        self.monk.x = self.monk.x + nrm[1]
+        self.monk.y = self.monk.y + nrm[2]
+
+        self.monk.vx, self.monk.vy = geom.reflectVector(nrm, self.monk.vx, self.monk.vy)
+
+        self.monk.tiltX = math.abs(self.monk.tiltX)*(nrm[1] < 0 and -1 or 1)
     end
 
     local now = self:musicPos()
@@ -185,13 +184,13 @@ function Game:update(dt)
         -- TODO differentiate different coin types
         -- packbat worked out the equations to solve this, TODO add notes and process :)
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
-        local t = 1
-        local jump = 1.25
+        local t = 2
+        local jump = 540*1.5*4*t
         table.insert(self.actors, Coin.new({
             y = self.camera.y + 540,
             x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
-            vy = self.monk.vy - 540*4*jump/t,
-            ay = ay + 540*8*jump/t,
+            vy = self.monk.vy - jump/t,
+            ay = ay + jump*2/t,
             sprite = self.sprites,
             quad = self.quads.coin
         }))
@@ -203,6 +202,8 @@ function Game:update(dt)
 end
 
 function Game:draw()
+    love.graphics.setBlendMode("alpha", "alphamultiply")
+
     self.canvas:renderTo(function()
         love.graphics.clear(0,0,127,255)
 
@@ -233,6 +234,7 @@ function Game:draw()
         self.channel:draw(minY + self.camera.y, maxY + self.camera.y)
 
         -- draw the monk
+        love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
         love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta, 0.5, 0.5, self.monk.cx, self.monk.cy)
         love.graphics.line(self.monk.x, self.monk.y, self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
 
