@@ -21,6 +21,9 @@ function Channel.new(o)
         bottom = 0,
     })
 
+    -- ugly hack that should be fixed
+    self.edges[0] = {-1000, 1000}
+
     setmetatable(self, {__index = Channel})
     return self
 end
@@ -138,18 +141,33 @@ function Channel:draw(startY, endY)
     local y0 = startIdx*self.interval
     local y1 = y0 + self.interval
 
-    love.graphics.setColor(255,255,255)
+    love.graphics.setColor(34,24,1)
     for i = startIdx, endIdx - 1 do
         local top = self.edges[i]
         local bottom = self.edges[i + 1]
 
         if top and bottom then
-            love.graphics.line(top[1], y0, bottom[1], y1)
-            love.graphics.line(top[2], y0, bottom[2], y1)
+            love.graphics.polygon("fill", top[1], y0, bottom[1], y1, -1000, y1, -1000, y0)
+            love.graphics.polygon("fill", top[2], y0, bottom[2], y1, 1000, y1, 1000, y0)
         end
 
         y0 = y0 + self.interval
         y1 = y1 + self.interval
+    end
+
+    y0 = (startIdx - 2)*self.interval
+    for i = startIdx - 2, endIdx + 2 do
+        local top = self.edges[i]
+        if top then
+            local theta = i*i -- TODO better randomness
+            local scale = math.sin(i*(i+27))*0.25 + 0.75
+
+            love.graphics.draw(self.spriteSheet, self.wallQuad,
+                top[1] - 371*scale/2, y0, theta + top[2], scale, scale, 371/2, 311/2)
+            love.graphics.draw(self.spriteSheet, self.wallQuad,
+                top[2] + 371*scale/2, y0, theta + top[1], scale, scale, 371/2, 311/2)
+        end
+        y0 = y0 + self.interval
     end
 end
 

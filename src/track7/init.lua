@@ -100,8 +100,7 @@ function Game:init()
     -- configure the mountain channel
     self.channel = Channel.new({
         spriteSheet = self.sprites,
-        leftQuad = self.quads.walls.left,
-        rightQuad = self.quads.walls.right
+        wallQuad = self.quads.wall,
     })
 
     self.music = love.audio.newSource('track7/07-flight.mp3')
@@ -127,7 +126,7 @@ function Game:init()
     self.monk.cx = atlas.monk.w/2
     self.monk.cy = atlas.monk.h/2
 
-    self.scoreFont = love.graphics.newFont(16)
+    self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
 end
 
@@ -167,7 +166,7 @@ function Game:update(dt)
     self.monk.x = self.monk.x + (self.monk.vx + 0.5*ax*dt)*dt
     self.monk.y = self.monk.y + (self.monk.vy + 0.5*ay*dt)*dt
 
-    if not self.started and self.monk.y > 100 then
+    if not self.started and self.monk.y > 500 then
         self.started = true
         self.music:play()
     end
@@ -177,7 +176,7 @@ function Game:update(dt)
 
     do
         local c = self.camera
-        local lag = 1 -- how far the camera lags behind the player
+        local lag = 0.5 -- how far the camera lags behind the player
 
         -- where the player will be in (lag) seconds
         local targetY = self.monk.y + (self.monk.vy + .5*ay*lag)*lag
@@ -203,13 +202,14 @@ function Game:update(dt)
         local coins = math.min(30, math.floor(self.score/4))
         self.score = self.score - coins
         for _=1,coins do
+            local vs = math.random()*2 + 3
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
                 r = 10,
-                vx = self.monk.vx + math.random(-100,100),
-                vy = self.monk.vy + math.random(-100,100),
-                ay = 200,
+                vx = self.monk.vx*vs + math.random(-100,100),
+                vy = self.monk.vy*vs + math.random(-100,100),
+                ay = 250,
                 channel = self.channel
             }))
         end
@@ -268,8 +268,6 @@ function Game:draw()
     self.canvas:renderTo(function()
         love.graphics.clear(0,0,127,255)
 
-        love.graphics.push()
-
         local ww = self.canvas:getWidth()
         local hh = self.canvas:getHeight()
 
@@ -280,14 +278,17 @@ function Game:draw()
         -- 540*scale + ty = hh
         local tx = ww/2
         local ty = hh - 540*scale
-        love.graphics.translate(tx, ty)
-        love.graphics.scale(scale)
 
         -- compute the extents of the playfield, given that x*scale + tx = ox, i.e. x = (ox - tx)/scale
-        -- local minX = (0 - tx)/scale
+        local minX = (0 - tx)/scale
         -- local maxX = (ww - tx)/scale
         local minY = (0 - ty)/scale
         local maxY = (hh - ty)/scale
+
+        -- draw the scene
+        love.graphics.push()
+        love.graphics.translate(tx, ty)
+        love.graphics.scale(scale)
 
         love.graphics.translate(0, -self.camera.y)
 
@@ -295,6 +296,7 @@ function Game:draw()
         self.channel:draw(minY + self.camera.y, maxY + self.camera.y)
 
         -- draw the monk
+        love.graphics.setColor(255,255,255)
         love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
         love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta,
             0.5, 0.5, self.monk.cx, self.monk.cy)
@@ -306,6 +308,16 @@ function Game:draw()
 
         love.graphics.pop()
 
+        -- draw the scoreboard
+        love.graphics.push()
+        love.graphics.setColor(255,255,255)
+        love.graphics.scale(scale/2)
+        love.graphics.rectangle("fill", 0, 0, 16*2 + 300, 16*2 + 88)
+        love.graphics.setColor(0,0,0)
+        love.graphics.setFont(self.scoreFont)
+        love.graphics.print(self.score, 16, 16)
+        love.graphics.pop()
+
         if self.endingTime then
             -- fade to white
             local alpha = math.min(255, self.endingTime*255/self.ending.duration)
@@ -313,9 +325,6 @@ function Game:draw()
             love.graphics.rectangle("fill", 0, 0, ww, hh)
         end
 
-        love.graphics.setFont(self.scoreFont)
-        love.graphics.scale(3)
-        love.graphics.print(self.score, 0, 0)
     end)
     return self.canvas
 end
