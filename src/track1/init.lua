@@ -116,7 +116,7 @@ function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
 
-    self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
+    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
 
