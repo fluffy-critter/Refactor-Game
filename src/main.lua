@@ -345,10 +345,8 @@ function love.load(args)
     -- TODO is there a way to scan the actual bundle directly? I'm not finding it...
     -- TODO maybe we could only actually load the game when we need it?
     for i=1,13 do
-        local chunk, err = love.filesystem.load("track" .. i .. "/init.lua")
-        if not chunk then
-            print(i, err)
-        else
+        local chunk = love.filesystem.load("track" .. i .. "/init.lua")
+        if chunk then
             table.insert(tracks, chunk())
         end
     end
