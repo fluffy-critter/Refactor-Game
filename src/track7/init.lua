@@ -27,7 +27,12 @@ local Game = {
 }
 
 function Game.new()
-    local o = {}
+    local o = {
+        ending = {
+            start = 121315/960, -- last note
+            duration = (123840-121315)*2/960, -- halfway point is where wind sound starts
+        }
+    }
     setmetatable(o, {__index=Game})
 
     o:init()
@@ -65,6 +70,7 @@ function Game:setScale(scale)
 end
 
 function Game:init()
+
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
 
     self.sprites = imagepool.load('track7/sprites.png', {mipmaps=true})
@@ -131,11 +137,11 @@ function Game:onButtonPress(button)
 end
 
 function Game:update(dt)
-    if not self.endingTime and self:musicPos() > 130 then
+    if not self.endingTime and self:musicPos() > self.ending.start then
         self.endingTime = 0
     elseif self.endingTime then
         self.endingTime = self.endingTime + dt
-        if self.endingTime > 3 then
+        if self.endingTime > self.ending.duration then
             self.gameOver = true
         end
     end
@@ -269,7 +275,7 @@ function Game:draw()
 
         if self.endingTime then
             -- fade to white
-            local alpha = math.min(255, self.endingTime*255/3)
+            local alpha = math.min(255, self.endingTime*255/self.ending.duration)
             love.graphics.setColor(255, 255, 255, alpha)
             love.graphics.rectangle("fill", 0, 0, ww, hh)
         end
