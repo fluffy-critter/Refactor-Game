@@ -75,6 +75,7 @@ end
 local tracks = {
     require('track1'),
     require('track2'),
+    require('track7'),
 }
 local currentGame
 
@@ -90,6 +91,7 @@ local playing = {
 local menuVolume = 0
 
 local highdpi = false
+local vsync
 
 local frameCount = 0
 local frameTime = 0
@@ -97,6 +99,8 @@ local frameTimeSqr = 0
 local frameTarget
 local renderScale
 local fps
+
+local updateTime = 0
 
 local bgLoops = {
     love.audio.newSource('mainmenu/loop1.mp3'),
@@ -207,7 +211,7 @@ local function credits()
         "Tambi • Jukka • Austin • Sally\194\160Bird • Kyreeth • M.Wissig",
         "\n",
         {font=fonts.menu.h2, text="Moral support"},
-        "Emmy • Nate • Zeno • Jakub • Lito • Rachel • Patrick • Milo"
+        "Emmy • Nate • Zeno • Jakub • Lito • Rachel • Patrick • Milo • Packbat"
         .. " • Seattle\194\160Indies • Double\194\160Jump",
         "\n",
         "Built with LÖVE",
@@ -325,6 +329,7 @@ local function applyGraphicsConfig()
 
     local _, _, flags = love.window.getMode()
     highdpi = flags.highdpi
+    vsync = flags.vsync
 
     local refresh = config.targetFPS or flags.refreshrate
     if not refresh or refresh == 0 then
@@ -388,6 +393,8 @@ function love.update(dt)
     if screen.state == ScreenState.configwait then
         return
     end
+
+    local updateStart = love.timer.getTime()
 
     if playing.state == PlayState.menu then
         if menuVolume == 0 then
@@ -473,12 +480,15 @@ function love.update(dt)
             local avgTime = frameTime/frameCount
             local varTime = frameTimeSqr/frameCount - avgTime*avgTime
 
-            if config.vsync and varTime < avgTime/20 then
+            if vsync and varTime < avgTime/20 then
                 -- frame time variance is < 5% so let's assume we're halfway between vsync increments
                 avgTime = avgTime*3/4
             end
 
-            local targetTime = frameTarget
+            -- if the update is longer than the frame time there's no way a graphics sacrifice will help,
+            -- so let's target the next interval down
+            local targetTime = math.ceil(updateTime/frameTarget)*frameTarget
+
             -- scale up based on worst-case time per standard deviation
             renderScale = math.max((renderScale*3 + renderScale*targetTime/(avgTime + varTime))/4, 0.005)
             renderScale = currentGame:setScale(renderScale)
@@ -488,6 +498,9 @@ function love.update(dt)
         frameTimeSqr = 0
         frameCount = 0
     end
+
+    local delta = love.timer.getTime() - updateStart
+    updateTime = delta*.5 + updateTime*.5
 
     if profiler then profiler.detach() end
 end
@@ -575,12 +588,13 @@ function love.draw()
         profiler.draw()
     end
 
-
     if DEBUG and fps then
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.debug)
         love.graphics.printf(renderScale .. "  " .. math.floor(fps*100 + 0.5)/100,
             0, 0, love.graphics.getWidth(), "right")
     end
+
+    if profiler then profiler.attach("after") end
 end
 
