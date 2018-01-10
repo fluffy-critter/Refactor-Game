@@ -70,8 +70,9 @@ function Game:setScale(scale)
 end
 
 function Game:init()
-
     self:resize(love.graphics.getWidth(), love.graphics.getHeight())
+
+    self.score = 0
 
     self.sprites = imagepool.load('track7/sprites.png', {mipmaps=true})
     local atlas = love.filesystem.load('track7/sprites.lua')()
@@ -125,6 +126,9 @@ function Game:init()
 
     self.monk.cx = atlas.monk.w/2
     self.monk.cy = atlas.monk.h/2
+
+    self.scoreFont = love.graphics.newFont(16)
+    self.debugFont = love.graphics.newFont(12)
 end
 
 function Game:start()
@@ -201,6 +205,8 @@ function Game:update(dt)
         self.monk.vx, self.monk.vy = geom.reflectVector(nrm, self.monk.vx, self.monk.vy)
 
         self.monk.tiltX = math.abs(self.monk.tiltX)*(nrm[1] < 0 and -1 or 1)
+
+        -- TODO spawn small uncollectable coins and decrease score
     end
 
     local now = self:musicPos()
@@ -221,12 +227,23 @@ function Game:update(dt)
             ay = ay + jump*2/t,
             sprite = self.sprites,
             quad = self.quads.coin,
-            channel = self.channel
+            channel = self.channel,
+            onCollect = function(coin)
+                self.score = self.score + 1
+                return true -- TODO fade out instead
+            end
         }))
     end
 
     util.runQueue(self.actors, function(actor)
-        return actor:update(dt, self.camera.y + 540)
+        if actor:update(dt, self.camera.y + 540) then
+            return true
+        end
+
+        if actor.onCollect and geom.pointPointCollision(actor.x, actor.y, actor.r,
+            self.monk.x, self.monk.y, self.monk.r) then
+            return actor:onCollect()
+        end
     end)
 end
 
@@ -280,9 +297,9 @@ function Game:draw()
             love.graphics.rectangle("fill", 0, 0, ww, hh)
         end
 
-        if config.debug then
-            love.graphics.print(self:musicPos() .. ' ' .. tostring(self.endingTime), 0, 0)
-        end
+        love.graphics.setFont(self.scoreFont)
+        love.graphics.scale(3)
+        love.graphics.print(self.score, 0, 0)
     end)
     return self.canvas
 end
