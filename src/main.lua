@@ -602,18 +602,18 @@ function love.draw()
     local dither = shaders.load("shaders/ditherTarget.fs")
     love.graphics.setShader(dither)
     dither:send("error", entropyBack)
-    dither:send("levels", 8)
+    dither:send("levels", 2)
     love.graphics.setBlendMode("replace")
 
-    dither:send("getValue", 8/7)
-    dither:send("getError", 0)
-    love.graphics.draw(canvasTarget)
-
-    dither:send("getValue", 0)
+    dither:send("getValue", 1/128)
     dither:send("getError", 1)
     entropyFront:renderTo(function()
         love.graphics.draw(canvasTarget)
     end)
+
+    dither:send("getValue", 1)
+    dither:send("getError", 0)
+    love.graphics.draw(canvasTarget)
 
     love.graphics.setShader()
 
