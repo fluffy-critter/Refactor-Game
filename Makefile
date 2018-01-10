@@ -29,9 +29,10 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 JAM_TRACK=track7
 
 .PHONY: clean all run
-.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
+.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-jam
+.PHONY: publish-status publish-wait
 .PHONY: commit-check
-.PHONY: love-bundle osx win32 win64 bundle-win32
+.PHONY: love-bundle osx win32 win64 jam bundle-win32
 .PHONY: submodules assets setup tests checks version
 
 all: submodules checks tests love-bundle osx win32 win64 bundle-win32
@@ -100,17 +101,20 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
 	rm -f ../$(@) && \
-	zip -9r ../$(@) . -x 'test/**'
+	zip -9r ../$(@) . -x 'test'
 
 # .love bundle, jam-specific
-jam-bundle: setup assets $(DEST)/jam-bundle/$(NAME)-jam.love $(DEST)/.distfiles-jam
-$(DEST)/jam-bundle/$(NAME)-jam.love: $(shell find $(SRC) -type f)
-	mkdir -p $(DEST)/jam-bundle && \
+jam: setup assets $(DEST)/jam/$(NAME)-jam.love $(DEST)/.distfiles-jam
+$(DEST)/jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
+	mkdir -p $(DEST)/jam && \
 	cd $(SRC) && \
 	rm -f ../$(@) && \
-	zip -9r ../$(@) . -x 'track*/**' 'test/**' && \
+	zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
 	zip -9r ../$(@) $(JAM_TRACK)
 
+publish-jam: publish-precheck $(DEST)/.published-jam-$(GAME_VERSION)
+$(DEST)/.published-jam-$(GAME_VERSION): $(DEST)/jam/$(NAME)-jam.love
+	butler push $(DEST)/jam $(TARGET):jam-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
 osx: $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx
@@ -137,9 +141,6 @@ $(DEST)/deps/love.app/Contents/MacOS/love:
 WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 
-# These are temporary; remove them after the windowsIcon stuff gets merged in
-setup: $(WIN32_ROOT)/love.exe $(WIN64_ROOT)/love.exe
-
 $(WIN32_ROOT)/love.exe:
 	mkdir -p $(DEST)/deps/ && \
 	cd $(DEST)/deps && \
@@ -154,7 +155,7 @@ $(WIN64_ROOT)/love.exe:
 
 # Win32 version
 win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
-$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
+$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love $(WIN32_ROOT)/love.exe
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
@@ -165,7 +166,7 @@ $(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
 
 # Win64 version
 win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
-$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
+$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love $(WIN64_ROOT)/love.exe
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
