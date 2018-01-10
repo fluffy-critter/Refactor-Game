@@ -199,14 +199,29 @@ function Game:update(dt)
 
     local nrm = self.channel:checkCollision(self.monk.x, self.monk.y, self.monk.r)
     if nrm then
+        -- spawn small uncollectable coins and decrease score
+        local coins = math.min(30, math.floor(self.score/4))
+        self.score = self.score - coins
+        for _=1,coins do
+            table.insert(self.actors, Coin.new({
+                x = self.monk.x,
+                y = self.monk.y,
+                r = 10,
+                vx = self.monk.vx + math.random(-100,100),
+                vy = self.monk.vy + math.random(-100,100),
+                ay = 200,
+                channel = self.channel
+            }))
+        end
+
+        -- offset to stop penetration
         self.monk.x = self.monk.x + nrm[1]
         self.monk.y = self.monk.y + nrm[2]
 
+        -- reflect velocity vector
         self.monk.vx, self.monk.vy = geom.reflectVector(nrm, self.monk.vx, self.monk.vy)
-
         self.monk.tiltX = math.abs(self.monk.tiltX)*(nrm[1] < 0 and -1 or 1)
 
-        -- TODO spawn small uncollectable coins and decrease score
     end
 
     local now = self:musicPos()

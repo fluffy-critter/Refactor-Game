@@ -16,12 +16,12 @@ function Coin.new(o)
     local self = o or {}
 
     util.applyDefaults(self, {
-        ay = 100,
         vy = 0,
         vx = 0,
         x = 0,
         y = 0,
-        r = 30
+        r = 30,
+        elastic = 0.3
     })
 
     setmetatable(self, {__index = Coin})
@@ -34,7 +34,7 @@ function Coin:update(dt, maxY)
         if nrm then
             self.x = self.x + nrm[1]
             self.y = self.y + nrm[2]
-            self.vx, self.vy = geom.reflectVector(nrm, self.vx, self.vy)
+            self.vx, self.vy = geom.reflectVector(nrm, self.vx*self.elastic, self.vy*self.elastic)
         end
     end
 
