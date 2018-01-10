@@ -92,11 +92,11 @@ $(DEST)/.distfiles-%: LICENSE $(wildcard distfiles/*)
 	touch $(@)
 
 publish-love: $(DEST)/.published-love-$(GAME_VERSION)
-$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love
+$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love $(DEST)/.distfiles-love
 	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # .love bundle
-love-bundle: setup assets $(DEST)/love/$(NAME).love $(DEST)/.distfiles-love
+love-bundle: setup assets $(DEST)/love/$(NAME).love
 $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
@@ -104,7 +104,7 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) . -x 'test'
 
 # .love bundle, jam-specific
-jam: setup assets $(DEST)/jam/$(NAME)-jam.love $(DEST)/.distfiles-jam
+jam: setup assets $(DEST)/jam/$(NAME)-jam.love
 $(DEST)/jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/jam && \
 	cd $(SRC) && \
@@ -113,11 +113,11 @@ $(DEST)/jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) $(JAM_TRACK)
 
 publish-jam: publish-precheck $(DEST)/.published-jam-$(GAME_VERSION)
-$(DEST)/.published-jam-$(GAME_VERSION): $(DEST)/jam/$(NAME)-jam.love
+$(DEST)/.published-jam-$(GAME_VERSION): $(DEST)/jam/$(NAME)-jam.love $(DEST)/.distfiles-jam
 	butler push $(DEST)/jam $(TARGET):jam-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # macOS version
-osx: $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx
+osx: $(DEST)/osx/$(NAME).app
 $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/deps/love.app/Contents/MacOS/love
 	mkdir -p $(DEST)/osx
 	rm -rf $(@)
@@ -127,7 +127,7 @@ $(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/dep
 	cp $(DEST)/love/$(NAME).love $(@)/Contents/Resources
 
 publish-osx: $(DEST)/.published-osx-$(GAME_VERSION)
-$(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app
+$(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx
 	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
 
 # OSX build dependencies
@@ -154,30 +154,30 @@ $(WIN64_ROOT)/love.exe:
 	unzip love-$(LOVE_VERSION)-win64.zip
 
 # Win32 version
-win32: $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
+win32: $(DEST)/win32/$(NAME).exe
 $(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love $(WIN32_ROOT)/love.exe
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
 	cat $(^) > $(@)
 
 publish-win32: $(DEST)/.published-win32-$(GAME_VERSION)
-$(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe
+$(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
 	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
-win64: $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
+win64: $(DEST)/win64/$(NAME).exe
 $(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love $(WIN64_ROOT)/love.exe
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
 	cat $(^) > $(@)
 
 publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
-$(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe
+$(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe $(DEST)/.distfiles-win64
 	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
 
 WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
 bundle-win32: $(DEST)/$(WIN32_BUNDLE_FILENAME)
-$(DEST)/$(WIN32_BUNDLE_FILENAME): win32
+$(DEST)/$(WIN32_BUNDLE_FILENAME): $(DEST)/win32/$(NAME).exe $(DEST)/.distfiles-win32
 	cd $(DEST)/win32 && zip -9r ../$(WIN32_BUNDLE_FILENAME) *
 
 
