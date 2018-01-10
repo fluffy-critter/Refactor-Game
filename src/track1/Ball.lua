@@ -215,7 +215,7 @@ function Ball:applyReflection(nrm, vx, vy, immediate)
 
     local px, py = geom.reflectVector(nrm, rvx, rvy)
 
-    self:applyImpulse(nx, ny, (1 + self.elasticity)*px, (1 + self.elasticity)*py, immediate)
+    self:applyImpulse(nrm[1], nrm[2], (1 + self.elasticity)*px, (1 + self.elasticity)*py, immediate)
 end
 
 function Ball:applyImpulse(dx, dy, dvx, dvy, immediate)

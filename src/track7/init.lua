@@ -8,7 +8,7 @@ local util = require('util')
 local geom = require('geom')
 local input = require('input')
 local gfx = require('gfx')
-local config = require('config')
+-- local config = require('config')
 local heap = require('thirdparty.binary_heap')
 
 local quadtastic = require('thirdparty.libquadtastic')
@@ -228,7 +228,7 @@ function Game:update(dt)
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
-            onCollect = function(coin)
+            onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead
             end
@@ -269,8 +269,8 @@ function Game:draw()
         love.graphics.scale(scale)
 
         -- compute the extents of the playfield, given that x*scale + tx = ox, i.e. x = (ox - tx)/scale
-        local minX = (0 - tx)/scale
-        local maxX = (ww - tx)/scale
+        -- local minX = (0 - tx)/scale
+        -- local maxX = (ww - tx)/scale
         local minY = (0 - ty)/scale
         local maxY = (hh - ty)/scale
 
@@ -281,7 +281,8 @@ function Game:draw()
 
         -- draw the monk
         love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
-        love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta, 0.5, 0.5, self.monk.cx, self.monk.cy)
+        love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta,
+            0.5, 0.5, self.monk.cx, self.monk.cy)
         love.graphics.line(self.monk.x, self.monk.y, self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
 
         for _,actor in pairs(self.actors) do

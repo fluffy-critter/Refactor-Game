@@ -78,7 +78,8 @@ function profiler.detach()
     debug.sethook()
 
     if context then
-        contextTimes[context].total = (contextTimes[context].total or 0) + love.timer.getTime() - contextTimes[context].start
+        contextTimes[context].total =
+            (contextTimes[context].total or 0) + love.timer.getTime() - contextTimes[context].start
     end
 
     context = nil
@@ -140,7 +141,7 @@ function profiler.draw()
 
     -- draw the 60FPS boundary line
     love.graphics.setColor(255,255,0,127)
-    local y = love.graphics.getHeight()*targetTime/totalTime
+    y = love.graphics.getHeight()*targetTime/totalTime
     love.graphics.line(x - 32, y, x + 15, y)
     targetTime = targetTime*.9 + 1/60
 
