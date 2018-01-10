@@ -95,7 +95,7 @@ function RoamingEye:onInit()
     local size = math.ceil(2*self.game.scale*self.r)
     self.scale = size/self.r/2
 
-    local canvasFormat = util.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
+    local canvasFormat = gfx.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
     self.canvas = love.graphics.newCanvas(size, size, canvasFormat, 2)
 
     self.shader = shaders.load("track1/sphereDistort.fs")

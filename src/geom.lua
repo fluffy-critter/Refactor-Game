@@ -182,4 +182,18 @@ function geom.vectorLength(vector)
     return math.sqrt(vx*vx + vy*vy)
 end
 
+-- Reflect a vector (vx,vy) per a surface normal
+function geom.reflectVector(nrm, vx, vy)
+    local nx, ny = unpack(nrm)
+
+    -- calculate the perpendicular projection of our reversed velocity vector onto the reflection normal
+    local mag2 = nx*nx + ny*ny
+    local dot = nx*vx + ny*vy
+    local px = -nx*dot/mag2
+    local py = -ny*dot/mag2
+
+    return px, py
+end
+
+
 return geom

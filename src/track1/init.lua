@@ -20,6 +20,7 @@ local Spawner = require('track1.Spawner')
 local EventQueue = require('EventQueue')
 local geom = require('geom')
 local util = require('util')
+local gfx = require('gfx')
 local shaders = require('shaders')
 local input = require('input')
 local config = require('config')
@@ -28,7 +29,8 @@ local Game = {
     META = {
         tracknum = 1,
         title = "little bouncing ball",
-        duration = 5*60 + 26
+        duration = 5*60 + 26,
+        description = "bouncing balls",
     }
 }
 
@@ -68,12 +70,12 @@ function Game:setScale(scale)
     local w = math.floor(scale*1280 + 0.5)
     local h = math.floor(w*720/1280)
 
-    -- don't change if we're not adjusting by at least 10 pixels
+    -- don't change if we're not adjusting by at least 50 pixels
     if self.scale then
         local oldW = self.scale*1280
         local oldH = self.scale*720
 
-        if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
+        if math.abs(oldW - w) < 50 and math.abs(oldH - h) < 50 then
             return scale
         end
     end
@@ -94,13 +96,13 @@ function Game:setScale(scale)
     end
 
     local limits = love.graphics.getSystemLimits()
-    local pixelfmt = util.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+    local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     local msaa = math.min(config.msaa or limits.canvasmsaa, limits.canvasmsaa)
     self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, msaa)
     self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
 
-    local tonemapFmt = util.selectCanvasFormat("rgba8")
+    local tonemapFmt = gfx.selectCanvasFormat("rgba8")
     if tonemapFmt then
         self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
@@ -114,7 +116,7 @@ function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
 
-    self.music = love.audio.newSource('music/01-little-bouncing-ball.mp3')
+    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3')
     self.phase = -1
     self.score = 0
 
@@ -123,7 +125,7 @@ function Game:init()
     self.shaders = {}
 
     -- water always renders at 720p
-    local waterFormat = util.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
+    local waterFormat = gfx.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
         self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
         self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
@@ -262,7 +264,7 @@ function Game:defer(item)
 end
 
 function Game:addEvent(event)
-    self.eventQueue:addEvent(event)
+    self.eventQueue:insert(event)
 end
 
 function Game:setGameEvents()
@@ -554,7 +556,7 @@ function Game:setGameEvents()
         end
     }
 
-    self.eventQueue:addEvents({
+    self.eventQueue:insert(
         {
             when = {0},
             what = function()
@@ -737,8 +739,8 @@ function Game:setGameEvents()
                 spawnFuncs.mobs.eyes.minions(3)
                 spawnFuncs.mobs.eyes.boss()
             end
-        },
-    })
+        }
+    )
 end
 
 function Game:setPhase(phase)
@@ -786,7 +788,7 @@ function Game:update(raw_dt)
             self:setPhase(phase)
         end
 
-        self.eventQueue:runEvents(time)
+        self.eventQueue:run(time)
     end
 
     if self.phase >= 11 then
@@ -897,6 +899,8 @@ function Game:update(raw_dt)
             actor:preUpdate(dt, rawt)
         end
 
+        -- TODO bucket the actors and only check actors that are in threatened buckets
+        -- because, seriously, this function takes like 90% of CPU time pretty often
         for _,actor in pairs(self.actors) do
             actor:checkHitBalls(self.balls)
         end

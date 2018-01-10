@@ -14,6 +14,20 @@ local imagepool = require('imagepool')
 local filledCircle = imagepool.load('images/circlefill.png', {mipmaps=true})
 local hollowCircle = imagepool.load('images/circlehollow.png', {mipmaps=true})
 
+-- Select the most-preferred canvas format from a list of formats
+local graphicsFormats = love.graphics.getCanvasFormats()
+print("Available graphics formats:")
+for k in pairs(graphicsFormats) do print('\t' .. k) end
+
+function gfx.selectCanvasFormat(...)
+    for _,k in ipairs({...}) do
+        if graphicsFormats[k] then
+            return k
+        end
+    end
+    return nil
+end
+
 function gfx.circle(fill, x, y, r)
     love.graphics.push()
     love.graphics.setBlendMode("alpha", "alphamultiply")

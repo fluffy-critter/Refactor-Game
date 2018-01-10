@@ -17,8 +17,11 @@ function imagepool.load(filename, cfg)
 
     local key = filename
 
-    if cfg.mipmaps then key = key .. "|mipmap" end
-    if cfg.nearest then key = key .. "|nearest" end
+    for k,v in pairs(cfg) do
+        if v then
+            key = key .. '|' .. k .. '=' .. tostring(v)
+        end
+    end
 
     local img = imagepool.pool[key]
     if not img then

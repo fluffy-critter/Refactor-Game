@@ -700,7 +700,7 @@ function scenes.doctor(game)
                 easing = Animator.Easing.ease_out,
                 duration = 0.25
             }, when)
-            game.eventQueue:addEvent({
+            game.eventQueue:insert({
                 what = pushCart,
                 when = {when[1], when[2], when[3] + 1}
             })

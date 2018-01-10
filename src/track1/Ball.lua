@@ -213,15 +213,9 @@ function Ball:applyReflection(nrm, vx, vy, immediate)
     local rvx = self.vx - vx
     local rvy = self.vy - vy
 
-    local nx, ny = unpack(nrm)
+    local px, py = geom.reflectVector(nrm, rvx, rvy)
 
-    -- calculate the perpendicular projection of our reversed velocity vector onto the reflection normal
-    local mag2 = nx*nx + ny*ny
-    local dot = nx*rvx + ny*rvy
-    local px = -nx*dot/mag2
-    local py = -ny*dot/mag2
-
-    self:applyImpulse(nx, ny, (1 + self.elasticity)*px, (1 + self.elasticity)*py, immediate)
+    self:applyImpulse(nrm[1], nrm[2], (1 + self.elasticity)*px, (1 + self.elasticity)*py, immediate)
 end
 
 function Ball:applyImpulse(dx, dy, dvx, dvy, immediate)
