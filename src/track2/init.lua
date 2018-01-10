@@ -83,7 +83,7 @@ function Game:init()
 
     self.sounds = {}
     self.music = SoundGroup.new({
-        bgm = love.audio.newSource('music/02-strangers.mp3'),
+        bgm = love.audio.newSource('track2/02-strangers.mp3'),
         sounds = self.sounds
     })
 
