@@ -70,12 +70,12 @@ function Game:setScale(scale)
     local w = math.floor(scale*1280 + 0.5)
     local h = math.floor(w*720/1280)
 
-    -- don't change if we're not adjusting by at least 10 pixels
+    -- don't change if we're not adjusting by at least 50 pixels
     if self.scale then
         local oldW = self.scale*1280
         local oldH = self.scale*720
 
-        if math.abs(oldW - w) < 10 and math.abs(oldH - h) < 10 then
+        if math.abs(oldW - w) < 50 and math.abs(oldH - h) < 50 then
             return scale
         end
     end

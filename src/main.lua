@@ -469,7 +469,7 @@ function love.update(dt)
     frameTime = frameTime + dt
     frameTimeSqr = frameTimeSqr + dt*dt
     frameCount = frameCount + 1
-    if frameTime > 0.25 then
+    if frameTime > 0.5 then
         fps = frameCount/frameTime
         if currentGame and currentGame.onFps then
             currentGame:onFps(fps)
