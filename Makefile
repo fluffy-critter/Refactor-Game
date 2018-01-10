@@ -25,6 +25,9 @@ GAME_VERSION=$(BASEVERSION).$(COMMITTIME)-$(COMMITHASH)
 
 GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "clean")
 
+# Which track to include in the current jam build
+JAM_TRACK=track7
+
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status publish-wait
 .PHONY: commit-check
@@ -97,7 +100,17 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
 	rm -f ../$(@) && \
-	zip -9r ../$(@) .
+	zip -9r ../$(@) . -x 'test/**'
+
+# .love bundle, jam-specific
+jam-bundle: setup assets $(DEST)/jam-bundle/$(NAME)-jam.love $(DEST)/.distfiles-jam
+$(DEST)/jam-bundle/$(NAME)-jam.love: $(shell find $(SRC) -type f)
+	mkdir -p $(DEST)/jam-bundle && \
+	cd $(SRC) && \
+	rm -f ../$(@) && \
+	zip -9r ../$(@) . -x 'track*/**' 'test/**' && \
+	zip -9r ../$(@) $(JAM_TRACK)
+
 
 # macOS version
 osx: $(DEST)/osx/$(NAME).app $(DEST)/.distfiles-osx

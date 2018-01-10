@@ -72,11 +72,7 @@ local function blitCanvas(canvas, aspect)
         blitSize[1]*sx/canvasWidth, blitSize[2]/canvasHeight)
 end
 
-local tracks = {
-    require('track1'),
-    require('track2'),
-    require('track7'),
-}
+local tracks = {}
 local currentGame
 
 local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending", "menu")
@@ -344,6 +340,18 @@ end
 
 function love.load(args)
     cute.go(args)
+
+    -- scan for all of the existing tracks and add them to the track list
+    -- TODO is there a way to scan the actual bundle directly? I'm not finding it...
+    -- TODO maybe we could only actually load the game when we need it?
+    for i=1,13 do
+        local chunk, err = love.filesystem.load("track" .. i .. "/init.lua")
+        if not chunk then
+            print(i, err)
+        else
+            table.insert(tracks, chunk())
+        end
+    end
 
     applyGraphicsConfig()
 
