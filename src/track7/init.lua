@@ -282,7 +282,7 @@ function Game:draw()
         local ty = hh - 540*scale
 
         -- compute the extents of the playfield, given that x*scale + tx = ox, i.e. x = (ox - tx)/scale
-        local minX = (0 - tx)/scale
+        -- local minX = (0 - tx)/scale
         -- local maxX = (ww - tx)/scale
         local minY = (0 - ty)/scale
         local maxY = (hh - ty)/scale
