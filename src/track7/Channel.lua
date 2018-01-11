@@ -186,7 +186,7 @@ function Channel:draw(startY, endY)
         y1 = y1 + self.interval
     end
 
-    love.graphics.setColor(34, 24, 7, 192)
+    love.graphics.setColor(34, 24, 7)
     y0 = (startIdx - 2)*self.interval
     for i = startIdx - 2, endIdx + 2 do
         local top = self.edges[i]
@@ -195,9 +195,9 @@ function Channel:draw(startY, endY)
             local scale = math.sin(i*(i+27))*0.25 + 0.75
 
             love.graphics.draw(self.spriteSheet, self.wallQuad,
-                top[1] - 371*scale/2, y0, theta + top[2], scale, scale, 371/2, 311/2)
+                top[1] - 80*scale, y0, theta + top[2], scale, scale, 100, 100)
             love.graphics.draw(self.spriteSheet, self.wallQuad,
-                top[2] + 371*scale/2, y0, theta + top[1], scale, scale, 371/2, 311/2)
+                top[2] + 80*scale, y0, theta + top[1], scale, scale, 100, 100)
         end
         y0 = y0 + self.interval
     end

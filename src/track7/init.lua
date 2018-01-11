@@ -203,13 +203,14 @@ function Game:update(dt)
         local coins = math.min(30, math.floor(self.score/4))
         self.score = self.score - coins
         for _=1,coins do
-            local vs = math.random()*2 + 3
+            local vs = math.random() + 1
+            local theta = math.random()*2*math.pi
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
                 r = 10,
-                vx = self.monk.vx*vs + math.random(-100,100),
-                vy = self.monk.vy*vs + math.random(-100,100),
+                vx = (self.monk.vx + 100*math.sin(theta))*vs,
+                vy = (self.monk.vy + 100*math.cos(theta))*vs,
                 ay = 250,
                 channel = self.channel
             }))
