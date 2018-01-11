@@ -214,7 +214,6 @@ function Channel:draw(startY, endY)
             love.graphics.draw(self.spriteSheet, self.wallQuad,
                 top[2] + 80*scale, y0, theta + top[1], scale, scale, 100, 100)
         end
-        y0 = y0 + self.interval
     end
 end
 
