@@ -256,7 +256,7 @@ function Game:update(dt)
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
-            color = (event.track == 3) and {255,128,128} or {255,255,255},
+            color = (event.track == 3) and {255,128,128} or {math.random(224,255),255,math.random(192,255)},
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
