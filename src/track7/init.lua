@@ -128,6 +128,7 @@ function Game:init()
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
+    self.scoreBg = imagepool.load('track7/papertexture.png')
 end
 
 function Game:start()
@@ -312,7 +313,7 @@ function Game:draw()
         love.graphics.push()
         love.graphics.setColor(255,255,255)
         love.graphics.scale(scale/2)
-        love.graphics.rectangle("fill", 0, 0, 16*2 + 300, 16*2 + 88)
+        love.graphics.draw(self.scoreBg, 0, 0)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, 16, 16)

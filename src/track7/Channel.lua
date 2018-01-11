@@ -141,20 +141,52 @@ function Channel:draw(startY, endY)
     local y0 = startIdx*self.interval
     local y1 = y0 + self.interval
 
-    love.graphics.setColor(34,24,1)
     for i = startIdx, endIdx - 1 do
         local top = self.edges[i]
         local bottom = self.edges[i + 1]
 
         if top and bottom then
-            love.graphics.polygon("fill", top[1], y0, bottom[1], y1, -1000, y1, -1000, y0)
-            love.graphics.polygon("fill", top[2], y0, bottom[2], y1, 1000, y1, 1000, y0)
+            local nrm = geom.normalize({bottom[1] - top[1], self.interval})
+            local lgt = nrm[1]
+
+            love.graphics.setColor(34 + 8*lgt, 24 + 5*lgt, 7 + 15*lgt)
+            love.graphics.polygon("fill",
+                top[1], y0,
+                bottom[1], y1,
+                bottom[1] - self.interval, y1,
+                top[1] - self.interval, y0)
+
+            nrm = geom.normalize({top[2] - bottom[2], self.interval})
+            lgt = nrm[1]
+
+            love.graphics.setColor(34 + 8*lgt, 24 + 5*lgt, 7 + 15*lgt)
+            love.graphics.polygon("fill",
+                top[2], y0,
+                bottom[2], y1,
+                bottom[2] + self.interval, y1,
+                top[2] + self.interval, y0)
+
+            love.graphics.setColor(20,16,0)
+
+            love.graphics.polygon("fill",
+                -1000, y0,
+                -1000, y1,
+                bottom[1] - self.interval + 1, y1,
+                top[1] - self.interval + 1, y0)
+
+            love.graphics.polygon("fill",
+                1000, y0,
+                1000, y1,
+                bottom[2] + self.interval - 1, y1,
+                top[2] + self.interval - 1, y0)
+
         end
 
         y0 = y0 + self.interval
         y1 = y1 + self.interval
     end
 
+    love.graphics.setColor(34, 24, 7, 192)
     y0 = (startIdx - 2)*self.interval
     for i = startIdx - 2, endIdx + 2 do
         local top = self.edges[i]
