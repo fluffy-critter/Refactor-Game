@@ -112,7 +112,7 @@ $(DEST)/jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
 	zip -9r ../$(@) $(JAM_TRACK)
 
-publish-jam: publish-precheck $(DEST)/.published-jam-$(GAME_VERSION)
+publish-jam: publish $(DEST)/.published-jam-$(GAME_VERSION)
 $(DEST)/.published-jam-$(GAME_VERSION): $(DEST)/jam/$(NAME)-jam.love $(DEST)/.distfiles-jam
 	butler push $(DEST)/jam $(TARGET):jam-bundle --userversion $(GAME_VERSION) && touch $(@)
 

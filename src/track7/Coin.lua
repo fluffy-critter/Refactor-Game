@@ -48,7 +48,8 @@ function Coin:update(dt, maxY)
 end
 
 function Coin:draw()
-    love.graphics.circle("line", self.x, self.y, self.r)
+    love.graphics.setColor(255,255,0)
+    love.graphics.circle("fill", self.x, self.y, self.r)
     -- love.graphics.draw(self.sprite, self.quad, self.x, self.y)
 end
 
