@@ -8,7 +8,7 @@ local util = require('util')
 local geom = require('geom')
 local input = require('input')
 local gfx = require('gfx')
--- local config = require('config')
+local config = require('config')
 local heap = require('thirdparty.binary_heap')
 
 local quadtastic = require('thirdparty.libquadtastic')
@@ -219,8 +219,12 @@ function Game:update(dt)
                 r = 10,
                 vx = self.monk.vx*(1 + 0.5*math.sin(theta)),
                 vy = self.monk.vy*(1 + 0.5*math.cos(theta)),
-                ay = 250,
-                channel = self.channel
+                ay = ay + 540,
+                channel = self.channel,
+                spriteSheet = self.sprites,
+                quads = self.quads.coin,
+                frameSpeed = 20 + math.random(0, 20),
+                age = math.random()*1000
             }))
         end
 
@@ -242,21 +246,24 @@ function Game:update(dt)
         -- TODO differentiate different coin types
         -- packbat worked out the equations to solve this, TODO add notes and process :)
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
-        local t = 2
-        local jump = 540*1.5*4*t
+        local jump = 540*1.5*4
         table.insert(self.actors, Coin.new({
             y = self.camera.y + 540,
             x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
             vx = math.random(-event.velocity, event.velocity),
-            vy = self.monk.vy - jump/t,
-            ay = ay + jump*2/t,
+            vy = self.monk.vy - jump,
+            ay = ay + jump*2,
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
+            color = (event.track == 3) and {255,128,128} or {255,255,255},
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
-            end
+            end,
+            spriteSheet = self.sprites,
+            quads = self.quads.coin,
+            frameSpeed = 12 + event.velocity/25
         }))
     end
 
@@ -315,10 +322,15 @@ function Game:draw()
 
         -- draw the monk
         love.graphics.setColor(255,255,255)
-        love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
-        love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta,
+        love.graphics.draw(self.sprites, self.quads.monk,
+            self.monk.x, self.monk.y, self.monk.theta,
             0.5, 0.5, self.monk.cx, self.monk.cy)
-        love.graphics.line(self.monk.x, self.monk.y, self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
+
+        if config.debug then
+            love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
+            love.graphics.line(self.monk.x, self.monk.y,
+                self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
+        end
 
         for _,actor in pairs(self.actors) do
             actor:draw()
