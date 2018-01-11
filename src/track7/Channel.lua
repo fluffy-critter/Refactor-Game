@@ -138,10 +138,27 @@ function Channel:draw(startY, endY)
     local startIdx = math.floor(startY/self.interval)
     local endIdx = math.ceil(endY/self.interval)
 
-    local y0 = startIdx*self.interval
-    local y1 = y0 + self.interval
+    -- background edges
+    love.graphics.setColor(0, 0, 0, 128)
+    for i = startIdx - 2, endIdx + 2 do
+        local y0 = i*self.interval
+        local top = self.edges[i]
+        if top then
+            local theta = i*(i + 17) -- TODO better randomness
+            local scale = math.sin(i*(i+96))*0.25 + 0.75
 
+            love.graphics.draw(self.spriteSheet, self.wallQuad,
+                top[1] - 70*scale, y0, theta + top[2], scale, scale, 100, 100)
+            love.graphics.draw(self.spriteSheet, self.wallQuad,
+                top[2] + 70*scale, y0, theta + top[1], scale, scale, 100, 100)
+        end
+    end
+
+    -- gross contour
     for i = startIdx, endIdx - 1 do
+        local y0 = i*self.interval
+        local y1 = y0 + self.interval
+
         local top = self.edges[i]
         local bottom = self.edges[i + 1]
 
@@ -181,14 +198,12 @@ function Channel:draw(startY, endY)
                 top[2] + self.interval - 1, y0)
 
         end
-
-        y0 = y0 + self.interval
-        y1 = y1 + self.interval
     end
 
+    -- foreground edges
     love.graphics.setColor(34, 24, 7)
-    y0 = (startIdx - 2)*self.interval
     for i = startIdx - 2, endIdx + 2 do
+        local y0 = i*self.interval
         local top = self.edges[i]
         if top then
             local theta = i*i -- TODO better randomness

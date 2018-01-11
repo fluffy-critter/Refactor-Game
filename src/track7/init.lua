@@ -95,7 +95,7 @@ function Game:init()
     }
 
     -- set the arena boundaries
-    self.bounds = {center = 0, width = 1000}
+    self.bounds = {center = 0, width = 1100}
 
     -- configure the mountain channel
     self.channel = Channel.new({
@@ -129,6 +129,7 @@ function Game:init()
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
     self.scoreBg = imagepool.load('track7/papertexture.png')
+    self.background = imagepool.load('track7/background.jpg')
 end
 
 function Game:start()
@@ -192,8 +193,16 @@ function Game:update(dt)
     self.channel:update(self.camera.y + 600, function()
         local b = self.bounds
 
-        b.width = util.clamp(b.width + math.random(-10, 10), 100, 600)
-        b.center = util.clamp(b.center + math.random(-100, 100), -900 + b.width, 900 - b.width)
+        local curLeft = b.center - b.width
+        local curRight = b.center + b.width
+
+        -- if the maxima are already outside bounds, allow it; otherwise don't let it drift further
+        local maxLeft = math.min(curLeft, -900)
+        local maxRight = math.max(curRight, 900)
+
+        b.width = util.clamp(b.width + math.random(-10, 10), 250, math.max(b.width, 600))
+        b.center = util.clamp(b.center + math.random(-100, 100), maxLeft + b.width, maxRight - b.width)
+
         return {b.center - b.width, b.center + b.width}
     end)
 
@@ -203,14 +212,13 @@ function Game:update(dt)
         local coins = math.min(30, math.floor(self.score/4))
         self.score = self.score - coins
         for _=1,coins do
-            local vs = math.random() + 1
             local theta = math.random()*2*math.pi
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
                 r = 10,
-                vx = (self.monk.vx + 100*math.sin(theta))*vs,
-                vy = (self.monk.vy + 100*math.cos(theta))*vs,
+                vx = self.monk.vx*(1 + 0.5*math.sin(theta)),
+                vy = self.monk.vy*(1 + 0.5*math.cos(theta)),
                 ay = 250,
                 channel = self.channel
             }))
@@ -247,7 +255,7 @@ function Game:update(dt)
             channel = self.channel,
             onCollect = function()
                 self.score = self.score + 1
-                return true -- TODO fade out instead
+                return true -- TODO fade out instead?
             end
         }))
     end
@@ -268,7 +276,7 @@ function Game:draw()
     love.graphics.setBlendMode("alpha", "alphamultiply")
 
     self.canvas:renderTo(function()
-        love.graphics.clear(0,0,127,255)
+        love.graphics.clear(71, 143, 229, 255)
 
         local ww = self.canvas:getWidth()
         local hh = self.canvas:getHeight()
@@ -282,8 +290,8 @@ function Game:draw()
         local ty = hh - 540*scale
 
         -- compute the extents of the playfield, given that x*scale + tx = ox, i.e. x = (ox - tx)/scale
-        -- local minX = (0 - tx)/scale
-        -- local maxX = (ww - tx)/scale
+        local minX = (0 - tx)/scale
+        local maxX = (ww - tx)/scale
         local minY = (0 - ty)/scale
         local maxY = (hh - ty)/scale
 
@@ -291,6 +299,14 @@ function Game:draw()
         love.graphics.push()
         love.graphics.translate(tx, ty)
         love.graphics.scale(scale)
+
+        love.graphics.setColor(255,255,255,255)
+        local bgScale = (maxX - minX)/self.background:getWidth()
+        local bgPad = maxY - self.background:getHeight()*bgScale
+        -- maximum velocity is around 1700, so maximum Y offset is about 1700*140 = 238000
+        love.graphics.draw(self.background, minX,
+            bgPad*(math.min(1, self.camera.y/200000) + 1)/2,
+            0, bgScale)
 
         love.graphics.translate(0, -self.camera.y)
 
