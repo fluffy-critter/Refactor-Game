@@ -192,7 +192,7 @@ function Channel:draw(startY, endY)
         local top = self.edges[i]
         if top then
             local theta = i*i -- TODO better randomness
-            local scale = math.sin(i*(i+27))*0.25 + 0.75
+            local scale = math.sin(i*(i+27))*0.25 + 0.65
 
             love.graphics.draw(self.spriteSheet, self.wallQuad,
                 top[1] - 80*scale, y0, theta + top[2], scale, scale, 100, 100)
