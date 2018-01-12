@@ -213,12 +213,13 @@ function Game:update(dt)
         self.score = self.score - coins
         for _=1,coins do
             local theta = math.random()*2*math.pi
+            local mag = geom.vectorLength({self.monk.vx, self.monk.vy})
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
                 r = 10,
-                vx = self.monk.vx*(1 + 0.5*math.sin(theta)),
-                vy = self.monk.vy*(1 + 0.5*math.cos(theta)),
+                vx = self.monk.vx + mag*math.sin(theta),
+                vy = self.monk.vy + mag*math.cos(theta),
                 ay = ay + 540,
                 channel = self.channel,
                 spriteSheet = self.sprites,
