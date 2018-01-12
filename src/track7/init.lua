@@ -241,10 +241,11 @@ function Game:update(dt)
     local now = self:musicPos()
     while not self.events:empty() and self.events:next_key() <= now do
         local _,event = self.events:pop()
-        print(event.track, event.note, event.velocity)
+        if config.debug then
+            print(event.track, event.note, event.velocity)
+        end
 
         -- TODO differentiate different coin types
-        -- packbat worked out the equations to solve this, TODO add notes and process :)
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
         local jump = 540*1.5*4
         table.insert(self.actors, Coin.new({

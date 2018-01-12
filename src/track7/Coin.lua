@@ -61,10 +61,8 @@ function Coin:draw()
 
     if self.spriteSheet and self.quads then
         local frame = math.floor(self.age*self.frameSpeed) % #self.quads + 1
-        print("frame",frame,#self.quads)
         local quad = self.quads[frame]
         local _,_,w,h = quad:getViewport()
-        print(w,h)
         love.graphics.draw(self.spriteSheet, quad, self.x, self.y, 0,
             self.r*2/w, self.r*2/h, w/2, h/2)
     end
