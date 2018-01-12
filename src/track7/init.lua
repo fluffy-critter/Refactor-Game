@@ -224,7 +224,7 @@ function Game:update(dt)
                 spriteSheet = self.sprites,
                 quads = self.quads.coin,
                 frameSpeed = 20 + math.random(0, 20),
-                age = math.random()*1000
+                frameTime = math.random()*1000
             }))
         end
 
@@ -248,7 +248,8 @@ function Game:update(dt)
         -- TODO differentiate different coin types
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
         local jump = 540*1.5*4
-        table.insert(self.actors, Coin.new({
+
+        local spawn = {
             y = self.camera.y + 540,
             x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
             vx = math.random(-event.velocity, event.velocity),
@@ -257,15 +258,24 @@ function Game:update(dt)
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
-            color = (event.track == 3) and {255,128,128} or {255,math.random(224,255),math.random(192,255)},
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
             end,
             spriteSheet = self.sprites,
             quads = self.quads.coin,
-            frameSpeed = 12 + event.velocity/25
-        }))
+            frameSpeed = (12 + event.velocity/25) * (math.random(0,1)*2 - 1),
+            frameTime = math.random()*1000
+        }
+
+        if event.track == 3 then
+            spawn.quads = self.quads.gem
+            spawn.frameSpeed = spawn.frameSpeed*2
+            -- TODO onCollect
+            -- TODO maybe gems should get their own draw() which uses actual rotation and lighting?
+        end
+
+        table.insert(self.actors, Coin.new(spawn))
     end
 
     util.runQueue(self.actors, function(actor)
