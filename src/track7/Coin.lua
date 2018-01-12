@@ -25,7 +25,8 @@ function Coin.new(o)
         elastic = 0.3,
         color = {255,255,255},
         age = 0,
-        frameSpeed = 12
+        frameSpeed = 12,
+        baseSize = 125
     })
 
     setmetatable(self, {__index = Coin})
@@ -64,7 +65,7 @@ function Coin:draw()
         local quad = self.quads[frame]
         local _,_,w,h = quad:getViewport()
         love.graphics.draw(self.spriteSheet, quad, self.x, self.y, 0,
-            self.r*2/w, self.r*2/h, w/2, h/2)
+            self.r*2/self.baseSize, self.r*2/self.baseSize, w/2, h/2)
     end
 end
 

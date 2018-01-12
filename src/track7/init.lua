@@ -128,7 +128,6 @@ function Game:init()
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
-    self.scoreBg = imagepool.load('track7/papertexture.png')
     self.background = imagepool.load('track7/background.jpg')
 end
 
@@ -258,7 +257,7 @@ function Game:update(dt)
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
-            color = (event.track == 3) and {255,128,128} or {math.random(224,255),255,math.random(192,255)},
+            color = (event.track == 3) and {255,128,128} or {255,math.random(224,255),math.random(192,255)},
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
@@ -343,8 +342,7 @@ function Game:draw()
         -- draw the scoreboard
         love.graphics.push()
         love.graphics.setColor(255,255,255)
-        love.graphics.scale(scale/2)
-        love.graphics.draw(self.scoreBg, -100, 0)
+        love.graphics.draw(self.sprites, self.quads.paper, -100, 0, 0, 0.5, 0.5)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, 16, 16)
