@@ -11,7 +11,6 @@ local gfx = require('gfx')
 local config = require('config')
 local heap = require('thirdparty.binary_heap')
 
-local quadtastic = require('thirdparty.libquadtastic')
 local imagepool = require('imagepool')
 
 local Coin = require('track7.Coin')
@@ -74,9 +73,8 @@ function Game:init()
 
     self.score = 0
 
-    self.sprites = imagepool.load('track7/sprites.png', {mipmaps=true})
-    local atlas = love.filesystem.load('track7/sprites.lua')()
-    self.quads = quadtastic.create_quads(atlas, self.sprites:getWidth(), self.sprites:getHeight())
+    self.itemSprites, self.itemQuads = gfx.loadSprites('track7/sprites.png', 'track7/sprites.lua', {mipmaps=true})
+    self.monkSprites, self.monkQuads = gfx.loadSprites('track7/monk.png', 'track7/monk.lua', {mipmaps=true})
 
     self.camera = {
         y = 0,
@@ -99,8 +97,8 @@ function Game:init()
 
     -- configure the mountain channel
     self.channel = Channel.new({
-        spriteSheet = self.sprites,
-        wallQuad = self.quads.wall,
+        spriteSheet = self.itemSprites,
+        wallQuad = self.itemQuads.wall,
     })
 
     self.music = love.audio.newSource('track7/07-flight.mp3')
@@ -123,8 +121,8 @@ function Game:init()
 
     self.actors = {}
 
-    self.monk.cx = atlas.monk.w/2
-    self.monk.cy = atlas.monk.h/2
+    self.monk.cx = 255 - 16
+    self.monk.cy = 686 - 67
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
@@ -221,8 +219,8 @@ function Game:update(dt)
                 vy = self.monk.vy + mag*math.cos(theta),
                 ay = ay + 540,
                 channel = self.channel,
-                spriteSheet = self.sprites,
-                quads = self.quads.coin,
+                spriteSheet = self.itemSprites,
+                quads = self.itemQuads.coin,
                 frameSpeed = 20 + math.random(0, 20),
                 frameTime = math.random()*1000
             }))
@@ -255,21 +253,21 @@ function Game:update(dt)
             vx = math.random(-event.velocity, event.velocity),
             vy = self.monk.vy - jump,
             ay = ay + jump*2,
-            sprite = self.sprites,
-            quad = self.quads.coin,
+            sprite = self.itemSprites,
+            quad = self.itemQuads.coin,
             channel = self.channel,
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
             end,
-            spriteSheet = self.sprites,
-            quads = self.quads.coin,
+            spriteSheet = self.itemSprites,
+            quads = self.itemQuads.coin,
             frameSpeed = (12 + event.velocity/25) * (math.random(0,1)*2 - 1),
             frameTime = math.random()*1000
         }
 
         if event.track == 3 then
-            spawn.quads = self.quads.gem
+            spawn.quads = self.itemQuads.gem
             spawn.frameSpeed = spawn.frameSpeed*2
             -- TODO onCollect
             -- TODO maybe gems should get their own draw() which uses actual rotation and lighting?
@@ -333,9 +331,9 @@ function Game:draw()
 
         -- draw the monk
         love.graphics.setColor(255,255,255)
-        love.graphics.draw(self.sprites, self.quads.monk,
+        love.graphics.draw(self.monkSprites, self.monkQuads.monk,
             self.monk.x, self.monk.y, self.monk.theta,
-            0.5, 0.5, self.monk.cx, self.monk.cy)
+            0.4, 0.4, self.monk.cx, self.monk.cy)
 
         if config.debug then
             love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
@@ -352,7 +350,7 @@ function Game:draw()
         -- draw the scoreboard
         love.graphics.push()
         love.graphics.setColor(255,255,255)
-        love.graphics.draw(self.sprites, self.quads.paper, -100, 0, 0, 0.5, 0.5)
+        love.graphics.draw(self.itemSprites, self.itemQuads.paper, -100, 0, 0, 0.5, 0.5)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, 16, 16)
