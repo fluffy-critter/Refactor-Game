@@ -6,22 +6,15 @@ Refactor: 2 - Strangers
 ]]
 
 local imagepool = require('imagepool')
-local quadtastic = require('thirdparty.libquadtastic')
 local util = require('util')
 local shaders = require('shaders')
+local gfx = require('gfx')
 
 local Sprite = require('track2.Sprite')
 local Animator = require('Animator')
 local TextBox = require('track2.TextBox')
 
 local scenes = {}
-
-local function loadSprites(imageFile, quadFile)
-    local spriteSheet = imagepool.load(imageFile, {nearest=true})
-    local quads = quadtastic.create_quads(love.filesystem.load(quadFile)(),
-        spriteSheet:getWidth(), spriteSheet:getHeight())
-    return spriteSheet, quads
-end
 
 local function updateLayers(layers, dt, time)
     for _,layer in ipairs(layers) do
@@ -46,7 +39,8 @@ end
 function scenes.kitchen()
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
-    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
+    local spriteSheet, quads = gfx.loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua',
+        {nearest=true})
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -327,7 +321,8 @@ function scenes.phase11(game, duration)
 end
 
 function scenes.hospital(duration)
-    local spriteSheet, quads = loadSprites('track2/hospital-sprites.png', 'track2/hospital-sprites.lua')
+    local spriteSheet, quads = gfx.loadSprites('track2/hospital-sprites.png', 'track2/hospital-sprites.lua',
+        {nearest=true})
 
     local bgImage = imagepool.load("track2/hospital-bg.png", {nearest=true})
 
@@ -407,7 +402,8 @@ function scenes.endKitchen(game, version)
     local backgroundLayer = imagepool.load('track2/kitchen.png')
     local foregroundLayer = imagepool.load('track2/kitchen-fg.png')
     -- TODO different outfits? are they older?
-    local spriteSheet, quads = loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua')
+    local spriteSheet, quads = gfx.loadSprites('track2/kitchen-sprites.png', 'track2/kitchen-sprites.lua',
+        {nearest=true})
 
     local rose = Sprite.new({
         sheet = spriteSheet,
@@ -513,7 +509,8 @@ function scenes.endKitchen(game, version)
 end
 
 function scenes.parkBench(gregMissing)
-    local spriteSheet, quads = loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua")
+    local spriteSheet, quads = gfx.loadSprites("track2/parkbench-sprites.png", "track2/parkbench-sprites.lua",
+        {nearest=true})
     local time = 0
 
     local flockX, flockY = false, 40
@@ -684,7 +681,8 @@ function scenes.parkBench(gregMissing)
 end
 
 function scenes.doctor(game)
-    local spriteSheet, quads = loadSprites("track2/doctor-sprites.png", "track2/doctor-sprites.lua")
+    local spriteSheet, quads = gfx.loadSprites("track2/doctor-sprites.png", "track2/doctor-sprites.lua",
+        {nearest=true})
 
     local cartpusher = Sprite.new({
         pos = {220, -16},
@@ -739,7 +737,8 @@ function scenes.doctor(game)
 end
 
 function scenes.therapist()
-    local spriteSheet, quads = loadSprites("track2/therapist-sprites.png", "track2/therapist-sprites.lua")
+    local spriteSheet, quads = gfx.loadSprites("track2/therapist-sprites.png", "track2/therapist-sprites.lua",
+        {nearest=true})
 
     local layers = {
         {image = imagepool.load('track2/therapist-bg.png', {nearest=true})},
@@ -819,7 +818,8 @@ function scenes.vacation()
     local waterMask = shaders.load('track2/waterMask.fs')
     waterMask:send('mask', imagepool.load('track2/vacation-watermask.png'))
 
-    local spriteSheet, quads = loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua')
+    local spriteSheet, quads = gfx.loadSprites('track2/vacation-sprites.png', 'track2/vacation-sprites.lua',
+        {nearest=true})
     local filteredSprites = imagepool.load('track2/vacation-sprites.png') -- let this one be filtered
 
     local layers = {

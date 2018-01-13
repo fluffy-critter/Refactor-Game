@@ -21,9 +21,6 @@ function Channel.new(o)
         bottom = 0,
     })
 
-    -- ugly hack that should be fixed
-    self.edges[0] = {-1000, 1000}
-
     setmetatable(self, {__index = Channel})
     return self
 end
@@ -134,15 +131,17 @@ function Channel:checkCollision(x, y, r)
     return nrm
 end
 
-function Channel:draw(startY, endY)
+function Channel:draw(startY, endY, minX, maxX)
     local startIdx = math.floor(startY/self.interval)
     local endIdx = math.ceil(endY/self.interval)
+
+    local dflEdge = {minX - 200, maxX + 200}
 
     -- background edges
     love.graphics.setColor(0, 0, 0, 128)
     for i = startIdx - 2, endIdx + 2 do
         local y0 = i*self.interval
-        local top = self.edges[i]
+        local top = self.edges[i] or dflEdge
         if top then
             local theta = i*(i + 17) -- TODO better randomness
             local scale = math.sin(i*(i+96))*0.25 + 0.75
@@ -159,8 +158,8 @@ function Channel:draw(startY, endY)
         local y0 = i*self.interval
         local y1 = y0 + self.interval
 
-        local top = self.edges[i]
-        local bottom = self.edges[i + 1]
+        local top = self.edges[i] or dflEdge
+        local bottom = self.edges[i + 1] or dflEdge
 
         if top and bottom then
             local nrm = geom.normalize({bottom[1] - top[1], self.interval})
@@ -186,14 +185,14 @@ function Channel:draw(startY, endY)
             love.graphics.setColor(20,16,0)
 
             love.graphics.polygon("fill",
-                -1000, y0,
-                -1000, y1,
+                minX, y0,
+                minX, y1,
                 bottom[1] - self.interval + 1, y1,
                 top[1] - self.interval + 1, y0)
 
             love.graphics.polygon("fill",
-                1000, y0,
-                1000, y1,
+                maxX, y0,
+                maxX, y1,
                 bottom[2] + self.interval - 1, y1,
                 top[2] + self.interval - 1, y0)
 
@@ -204,7 +203,7 @@ function Channel:draw(startY, endY)
     love.graphics.setColor(34, 24, 7)
     for i = startIdx - 2, endIdx + 2 do
         local y0 = i*self.interval
-        local top = self.edges[i]
+        local top = self.edges[i] or dflEdge
         if top then
             local theta = i*i -- TODO better randomness
             local scale = math.sin(i*(i+27))*0.25 + 0.65

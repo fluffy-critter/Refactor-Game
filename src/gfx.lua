@@ -10,6 +10,7 @@ Useful graphics functions
 local gfx = {}
 
 local imagepool = require('imagepool')
+local quadtastic = require('thirdparty.libquadtastic')
 
 local filledCircle = imagepool.load('images/circlefill.png', {mipmaps=true})
 local hollowCircle = imagepool.load('images/circlehollow.png', {mipmaps=true})
@@ -34,6 +35,13 @@ function gfx.circle(fill, x, y, r)
     local cc = fill and filledCircle or hollowCircle
     love.graphics.draw(cc, x, y, 0, r/256, r/256, 256, 256)
     love.graphics.pop()
+end
+
+function gfx.loadSprites(imageFile, quadFile, cfg)
+    local spriteSheet = imagepool.load(imageFile, cfg)
+    local quads = quadtastic.create_quads(love.filesystem.load(quadFile)(),
+        spriteSheet:getWidth(), spriteSheet:getHeight())
+    return spriteSheet, quads
 end
 
 return gfx
