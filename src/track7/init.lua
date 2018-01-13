@@ -122,8 +122,8 @@ function Game:init()
 
     self.actors = {}
 
-    self.monk.cx = 255 - 16
-    self.monk.cy = 686 - 48
+    self.monk.cx = 256/2 - 4
+    self.monk.cy = 686/2 - 24
     self.monkShader = shaders.load('track7/windDistort.fs')
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
@@ -335,7 +335,7 @@ function Game:draw()
         love.graphics.setColor(255,255,255)
 
         love.graphics.setShader(self.monkShader)
-        local windSpeed = 0.015*math.min(1, self.monk.vy/2000)
+        local windSpeed = 0.015*math.min(1, self.monk.vy/3000)
         self.monkShader:send("windAmount", {
             math.sin(self.monk.theta)*windSpeed,
             math.cos(self.monk.theta)*windSpeed
@@ -343,7 +343,7 @@ function Game:draw()
         self.monkShader:send("phase", self.monk.y/1000)
         love.graphics.draw(self.monkSprites, self.monkQuads.monk,
             self.monk.x, self.monk.y, self.monk.theta,
-            0.4, 0.4, self.monk.cx, self.monk.cy)
+            0.8, 0.8, self.monk.cx, self.monk.cy)
         love.graphics.setShader()
 
         if config.debug then
