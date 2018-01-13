@@ -82,6 +82,7 @@ function Channel:checkCollision(x, y, r)
         local top = self.edges[i]
         local bottom = self.edges[i + 1]
 
+        local ln
         if top and bottom then
             if x - r < math.max(top[1], bottom[1]) then
                 -- adjust the left polygon for here
@@ -97,7 +98,7 @@ function Channel:checkCollision(x, y, r)
                 -- lpoly[7] = -10000
                 lpoly[8] = y1
 
-                local ln = geom.pointPolyCollision(x, y, r, lpoly)
+                ln = geom.pointPolyCollision(x, y, r, lpoly)
                 if ln then
                     nrm = nrm and {nrm[1] + ln[1], nrm[2] + ln[2]} or ln
                 end
@@ -117,10 +118,22 @@ function Channel:checkCollision(x, y, r)
                 rpoly[7] = bottom[2]
                 rpoly[8] = y1
 
-                local rn = geom.pointPolyCollision(x, y, r, rpoly)
-                if rn then
-                    nrm = nrm and {nrm[1] + rn[1], nrm[2] + rn[2]} or rn
+                ln = geom.pointPolyCollision(x, y, r, rpoly)
+                if ln then
+                    nrm = nrm and {nrm[1] + ln[1], nrm[2] + ln[2]} or ln
                 end
+            end
+
+            if x + r < math.min(top[1], bottom[1]) then
+                -- we're so deep inside that we're stuck between slices
+                ln = {math.min(top[1], bottom[1]) - x - r, 0}
+                nrm = nrm and {nrm[1] + ln[1], nrm[2]} or ln
+            end
+
+            if x - r > math.max(top[2], bottom[2]) then
+                -- we're so deep inside that we're stuck between slices
+                ln = {x - r - math.min(top[2], bottom[2]), 0}
+                nrm = nrm and {nrm[1] + ln[1], nrm[2]} or ln
             end
         end
 
