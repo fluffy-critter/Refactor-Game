@@ -329,7 +329,7 @@ function Game:draw()
         love.graphics.translate(0, -self.camera.y)
 
         -- draw the mountain
-        self.channel:draw(minY + self.camera.y, maxY + self.camera.y)
+        self.channel:draw(minY + self.camera.y, maxY + self.camera.y, minX, maxX)
 
         -- draw the monk
         love.graphics.setColor(255,255,255)
@@ -360,11 +360,14 @@ function Game:draw()
 
         -- draw the scoreboard
         love.graphics.push()
+        love.graphics.translate(tx, ty)
+        love.graphics.scale(scale)
+
         love.graphics.setColor(255,255,255)
-        love.graphics.draw(self.itemSprites, self.itemQuads.paper, -100, 0, 0, 0.5, 0.5)
+        love.graphics.draw(self.itemSprites, self.itemQuads.paper, minX - 100, minY, 0, 0.5, 0.5)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
-        love.graphics.print(self.score, 16, 16)
+        love.graphics.print(self.score, minX + 16, minY + 16)
         love.graphics.pop()
 
         if self.endingTime then
