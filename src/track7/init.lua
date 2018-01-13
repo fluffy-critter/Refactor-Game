@@ -10,6 +10,7 @@ local input = require('input')
 local gfx = require('gfx')
 local config = require('config')
 local heap = require('thirdparty.binary_heap')
+local shaders = require('shaders')
 
 local imagepool = require('imagepool')
 
@@ -122,7 +123,8 @@ function Game:init()
     self.actors = {}
 
     self.monk.cx = 255 - 16
-    self.monk.cy = 686 - 67
+    self.monk.cy = 686 - 48
+    self.monkShader = shaders.load('track7/windDistort.fs')
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
@@ -331,9 +333,18 @@ function Game:draw()
 
         -- draw the monk
         love.graphics.setColor(255,255,255)
+
+        love.graphics.setShader(self.monkShader)
+        local windSpeed = 0.015*math.min(1, self.monk.vy/2000)
+        self.monkShader:send("windAmount", {
+            math.sin(self.monk.theta)*windSpeed,
+            math.cos(self.monk.theta)*windSpeed
+        })
+        self.monkShader:send("phase", self.monk.y/1000)
         love.graphics.draw(self.monkSprites, self.monkQuads.monk,
             self.monk.x, self.monk.y, self.monk.theta,
             0.4, 0.4, self.monk.cx, self.monk.cy)
+        love.graphics.setShader()
 
         if config.debug then
             love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
