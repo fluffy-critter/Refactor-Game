@@ -205,14 +205,14 @@ function input.update(dt)
         if val and not state.analogPressed[dir] and val > 0.6 then
             state.analogPressed[dir] = true
             if not input.pressed[dir] then
-                print("stick pressed: " .. dir)
+                -- print("stick pressed: " .. dir)
                 input.pressed[dir] = true
                 input.onPress(dir)
             end
         elseif val and state.analogPressed[dir] and val < 0.4 then
             state.analogPressed[dir] = false
             if input.pressed[dir] then
-                print("stick released: " .. dir)
+                -- print("stick released: " .. dir)
                 input.pressed[dir] = false
                 input.onRelease(dir)
             end

@@ -8,7 +8,7 @@ local util = require('util')
 local geom = require('geom')
 local input = require('input')
 local gfx = require('gfx')
--- local config = require('config')
+local config = require('config')
 local heap = require('thirdparty.binary_heap')
 
 local quadtastic = require('thirdparty.libquadtastic')
@@ -128,7 +128,6 @@ function Game:init()
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
-    self.scoreBg = imagepool.load('track7/papertexture.png')
     self.background = imagepool.load('track7/background.jpg')
 end
 
@@ -213,14 +212,19 @@ function Game:update(dt)
         self.score = self.score - coins
         for _=1,coins do
             local theta = math.random()*2*math.pi
+            local mag = geom.vectorLength({self.monk.vx, self.monk.vy})
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
                 r = 10,
-                vx = self.monk.vx*(1 + 0.5*math.sin(theta)),
-                vy = self.monk.vy*(1 + 0.5*math.cos(theta)),
-                ay = 250,
-                channel = self.channel
+                vx = self.monk.vx + mag*math.sin(theta),
+                vy = self.monk.vy + mag*math.cos(theta),
+                ay = ay + 540,
+                channel = self.channel,
+                spriteSheet = self.sprites,
+                quads = self.quads.coin,
+                frameSpeed = 20 + math.random(0, 20),
+                frameTime = math.random()*1000
             }))
         end
 
@@ -237,27 +241,41 @@ function Game:update(dt)
     local now = self:musicPos()
     while not self.events:empty() and self.events:next_key() <= now do
         local _,event = self.events:pop()
-        print(event.track, event.note, event.velocity)
+        if config.debug then
+            print(event.track, event.note, event.velocity)
+        end
 
         -- TODO differentiate different coin types
-        -- packbat worked out the equations to solve this, TODO add notes and process :)
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
-        local t = 2
-        local jump = 540*1.5*4*t
-        table.insert(self.actors, Coin.new({
+        local jump = 540*1.5*4
+
+        local spawn = {
             y = self.camera.y + 540,
             x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
             vx = math.random(-event.velocity, event.velocity),
-            vy = self.monk.vy - jump/t,
-            ay = ay + jump*2/t,
+            vy = self.monk.vy - jump,
+            ay = ay + jump*2,
             sprite = self.sprites,
             quad = self.quads.coin,
             channel = self.channel,
             onCollect = function()
                 self.score = self.score + 1
                 return true -- TODO fade out instead?
-            end
-        }))
+            end,
+            spriteSheet = self.sprites,
+            quads = self.quads.coin,
+            frameSpeed = (12 + event.velocity/25) * (math.random(0,1)*2 - 1),
+            frameTime = math.random()*1000
+        }
+
+        if event.track == 3 then
+            spawn.quads = self.quads.gem
+            spawn.frameSpeed = spawn.frameSpeed*2
+            -- TODO onCollect
+            -- TODO maybe gems should get their own draw() which uses actual rotation and lighting?
+        end
+
+        table.insert(self.actors, Coin.new(spawn))
     end
 
     util.runQueue(self.actors, function(actor)
@@ -315,10 +333,15 @@ function Game:draw()
 
         -- draw the monk
         love.graphics.setColor(255,255,255)
-        love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
-        love.graphics.draw(self.sprites, self.quads.monk, self.monk.x, self.monk.y, self.monk.theta,
+        love.graphics.draw(self.sprites, self.quads.monk,
+            self.monk.x, self.monk.y, self.monk.theta,
             0.5, 0.5, self.monk.cx, self.monk.cy)
-        love.graphics.line(self.monk.x, self.monk.y, self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
+
+        if config.debug then
+            love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
+            love.graphics.line(self.monk.x, self.monk.y,
+                self.monk.x + self.monk.vx/10, self.monk.y + self.monk.vy/10)
+        end
 
         for _,actor in pairs(self.actors) do
             actor:draw()
@@ -329,8 +352,7 @@ function Game:draw()
         -- draw the scoreboard
         love.graphics.push()
         love.graphics.setColor(255,255,255)
-        love.graphics.scale(scale/2)
-        love.graphics.draw(self.scoreBg, -100, 0)
+        love.graphics.draw(self.sprites, self.quads.paper, -100, 0, 0, 0.5, 0.5)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, 16, 16)
