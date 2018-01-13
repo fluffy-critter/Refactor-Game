@@ -9,6 +9,7 @@ a coin
 
 local util = require('util')
 local geom = require('geom')
+local config = require('config')
 
 local Coin = {}
 
@@ -21,7 +22,11 @@ function Coin.new(o)
         x = 0,
         y = 0,
         r = 30,
-        elastic = 0.3
+        elastic = 0.3,
+        color = {255,255,255},
+        age = 0,
+        frameSpeed = 12,
+        baseSize = 125
     })
 
     setmetatable(self, {__index = Coin})
@@ -29,6 +34,8 @@ function Coin.new(o)
 end
 
 function Coin:update(dt, maxY)
+    self.age = self.age + dt
+
     if self.channel then
         local nrm = self.channel:checkCollision(self.x, self.y, self.r)
         if nrm then
@@ -48,9 +55,18 @@ function Coin:update(dt, maxY)
 end
 
 function Coin:draw()
-    love.graphics.setColor(255,255,0)
-    love.graphics.circle("fill", self.x, self.y, self.r)
-    -- love.graphics.draw(self.sprite, self.quad, self.x, self.y)
+    love.graphics.setColor(unpack(self.color))
+    if config.debug then
+        love.graphics.circle("line", self.x, self.y, self.r)
+    end
+
+    if self.spriteSheet and self.quads then
+        local frame = math.floor(self.age*self.frameSpeed) % #self.quads + 1
+        local quad = self.quads[frame]
+        local _,_,w,h = quad:getViewport()
+        love.graphics.draw(self.spriteSheet, quad, self.x, self.y, 0,
+            self.r*2/self.baseSize, self.r*2/self.baseSize, w/2, h/2)
+    end
 end
 
 return Coin
