@@ -105,7 +105,6 @@ Other suggestions (and times suggested)
    1 leopard gecko
    1 lionfish
    1 lizard
-   1 long-beaked evhidna
    1 long-nosed chimaera (ghost shark)
    1 lynx
    1 macropinna microstoma
@@ -192,7 +191,6 @@ Other suggestions (and times suggested)
    2 cuttlefish
    2 dingo
    2 dugong
-   2 echidna
    2 komodo dragon
    2 marmoset
    2 opossum
@@ -203,4 +201,5 @@ Other suggestions (and times suggested)
    2 sugar glider
    2 whale
    3 axolotl
+   3 echidna
    3 lemur
