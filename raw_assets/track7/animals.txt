@@ -7,7 +7,6 @@ Kudu (@rejemy)
 
 Other suggestions (and times suggested)
 
-   1 Portuguese man-o-war
    1 aardvark
    1 african clawed frog
    1 alligator
@@ -22,7 +21,6 @@ Other suggestions (and times suggested)
    1 argonaut
    1 armadillo
    1 auroch
-   3 axolotl
    1 aye-aye
    1 bandicoot
    1 basking shark
@@ -32,21 +30,17 @@ Other suggestions (and times suggested)
    1 bison
    1 blobfish
    1 blue-ringed octopus
-   2 bonobo
    1 budgerigar
    1 bullfrog
    1 bush baby
    1 camel
-   2 capybara
    1 cardinal
    1 caribou
-   2 cassowary
    1 catshark
    1 chambered nautilus
    1 cheetah
    1 chevrotain
    1 chicken
-   2 coconut crab
    1 conch
    1 condor
    1 coot
@@ -54,15 +48,11 @@ Other suggestions (and times suggested)
    1 crab
    1 crocodile monitor
    1 crow
-   2 cuttlefish
    1 dik dik
    1 dikdik
-   2 dingo
    1 dolphin
    1 dormouse
-   2 dugong
    1 dung beetle
-   2 echidna
    1 eyelash mite
    1 fennec
    1 ferret
@@ -108,12 +98,10 @@ Other suggestions (and times suggested)
    1 king snake
    1 kingfisher
    1 kiwi
-   2 komodo dragon
    1 kookaburra
    1 leaf-cutter ant
    1 leafy-sea dragon
    1 least weasel
-   2 lemur
    1 leopard gecko
    1 lionfish
    1 lizard
@@ -126,7 +114,6 @@ Other suggestions (and times suggested)
    1 mantis
    1 mantis shrimp
    1 marabou stork
-   2 marmoset
    1 meerkat
    1 mole
    1 mongoose
@@ -142,29 +129,24 @@ Other suggestions (and times suggested)
    1 oarfish
    1 okapi
    1 olm
-   2 opossum
    1 oryx
    1 ostrich
-   2 pangolin
    1 parrot
    1 penguin
    1 pika
    1 pink anemone fish
-   2 platypus
    1 porcupine
+   1 Portuguese man-o-war
    1 ptarmigan
    1 pudu
    1 pygmy seahorse
    1 pygmy shrew
    1 quail
    1 quokka
-   2 quoll
-   2 raccoon
    1 rattlesnake
    1 red panda
    1 red-eyed crocodile skink
    1 reeve’s muntjac
-   1 ring-tailed lemur
    1 rubber boa
    1 saiga
    1 salamander
@@ -186,7 +168,6 @@ Other suggestions (and times suggested)
    1 stargazer
    1 stick insect
    1 stingray
-   2 sugar glider
    1 tanuki
    1 tardigrade
    1 tarsier
@@ -199,9 +180,27 @@ Other suggestions (and times suggested)
    1 wallaby
    1 water deer
    1 weasel
-   2 whale
    1 whelk
    1 wolverine
    1 wombat
    1 yak
    1 yeti crab
+   2 bonobo
+   2 capybara
+   2 cassowary
+   2 coconut crab
+   2 cuttlefish
+   2 dingo
+   2 dugong
+   2 echidna
+   2 komodo dragon
+   2 marmoset
+   2 opossum
+   2 pangolin
+   2 platypus
+   2 quoll
+   2 raccoon
+   2 sugar glider
+   2 whale
+   3 axolotl
+   3 lemur
