@@ -3,6 +3,7 @@ Animals in spritesheet order:
 Basset hound
 Cat
 Kudu (@rejemy)
+Axolotl (a bunch of people)
 
 
 Other suggestions (and times suggested)
@@ -199,6 +200,5 @@ Other suggestions (and times suggested)
    2 raccoon
    2 sugar glider
    2 whale
-   3 axolotl
    3 echidna
    3 lemur
