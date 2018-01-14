@@ -138,8 +138,6 @@ function Game:init()
 
     self.faces = {}
 
-    local images = {}
-
     for n = 1,3 do
         local x = (n - 1) % 5
         local y = math.floor((n - 1)/5) % 5
