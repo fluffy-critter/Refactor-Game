@@ -48,8 +48,6 @@ Other suggestions (and times suggested)
    1 crab
    1 crocodile monitor
    1 crow
-   1 dik dik
-   1 dikdik
    1 dolphin
    1 dormouse
    1 dung beetle
@@ -189,6 +187,7 @@ Other suggestions (and times suggested)
    2 cassowary
    2 coconut crab
    2 cuttlefish
+   2 dik dik
    2 dingo
    2 dugong
    2 komodo dragon
