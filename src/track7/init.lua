@@ -90,7 +90,15 @@ function Game:init()
         vy = 0,
         tiltX = 0,
         theta = 0,
-        r = 100
+        r = 100,
+
+        -- based on the spritesheet quad
+        cx = 256/2 - 4,
+        cy = 686/2 - 24,
+
+        -- face center x/y
+        fx = 1024/5/2,
+        fy = 1024/5 + 160/2
     }
 
     -- set the arena boundaries
@@ -129,6 +137,25 @@ function Game:init()
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
     self.background = imagepool.load('track7/background.jpg')
+
+    self.faces = {}
+
+    local images = {}
+
+    for n = 1,2 do
+        local x = (n - 1) % 5
+        local y = math.floor((n - 1)/5) % 5
+        local page = math.floor((n - 1)/25) + 1
+
+        local sheet = imagepool.load('track7/faces-' .. page .. '.png', {mipmaps=true})
+        self.faces[n] = {
+            sheet = sheet,
+            quad = love.graphics.newQuad(x*1024/5, y*1024/5, 1024/5, 1024/5, 1024, 1024)
+        }
+    end
+
+    -- temporary for testing
+    self.monk.face = self.faces[2]
 end
 
 function Game:start()
@@ -148,6 +175,10 @@ function Game:update(dt)
         if self.endingTime > self.ending.duration then
             self.gameOver = true
         end
+    end
+
+    if self.faceTime then
+        self.faceTime = self.faceTime + dt
     end
 
     self.monk.tiltX = math.pow(0.1, dt)*(self.monk.tiltX + input.x*dt)
@@ -271,8 +302,23 @@ function Game:update(dt)
         if event.track == 3 then
             spawn.quads = self.itemQuads.gem
             spawn.frameSpeed = spawn.frameSpeed*2
-            -- TODO onCollect
-            -- TODO maybe gems should get their own draw() which uses actual rotation and lighting?
+
+            spawn.onCollect = function()
+                self.score = self.score + 100
+
+                if #self.faces > 0 then
+                    -- grab a random face, remove from queue
+                    local idx = math.random(1,#self.faces)
+                    self.monk.face = self.faces[idx]
+                    self.faces[idx] = self.faces[#self.faces]
+                    table.remove(self.faces, #self.faces)
+
+                    self.faceTime = 0
+                end
+
+                return true
+            end
+
         end
 
         table.insert(self.actors, Coin.new(spawn))
@@ -345,6 +391,24 @@ function Game:draw()
             self.monk.x, self.monk.y, self.monk.theta,
             0.8, 0.8, self.monk.cx, self.monk.cy)
         love.graphics.setShader()
+
+        if self.monk.face then
+            local alpha
+            if self.faceTime then
+                alpha = 255*(1 - util.smoothStep(math.min(1, self.faceTime)))
+            else
+                alpha = 255
+            end
+
+            if alpha > 0 then
+                love.graphics.setColor(255, 255, 255, alpha)
+                love.graphics.draw(self.monk.face.sheet, self.monk.face.quad,
+                    self.monk.x, self.monk.y, self.monk.theta,
+                    0.8, 0.8, self.monk.fx, self.monk.fy)
+            else
+                self.monk.face = nil
+            end
+        end
 
         if config.debug then
             love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
