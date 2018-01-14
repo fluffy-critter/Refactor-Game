@@ -1,0 +1,207 @@
+Animals in spritesheet order:
+
+Basset hound
+Cat
+Kudu (@rejemy)
+
+
+Other suggestions (and times suggested)
+
+   1 Portuguese man-o-war
+   1 aardvark
+   1 african clawed frog
+   1 alligator
+   1 anaconda
+   1 anchovy
+   1 anemone
+   1 angler fish
+   1 anglerfish
+   1 ant
+   1 antelope
+   1 arctic fox
+   1 argonaut
+   1 armadillo
+   1 auroch
+   3 axolotl
+   1 aye-aye
+   1 bandicoot
+   1 basking shark
+   1 bat
+   1 bathynomus giganteus
+   1 beaver
+   1 bison
+   1 blobfish
+   1 blue-ringed octopus
+   2 bonobo
+   1 budgerigar
+   1 bullfrog
+   1 bush baby
+   1 camel
+   2 capybara
+   1 cardinal
+   1 caribou
+   2 cassowary
+   1 catshark
+   1 chambered nautilus
+   1 cheetah
+   1 chevrotain
+   1 chicken
+   2 coconut crab
+   1 conch
+   1 condor
+   1 coot
+   1 corgi
+   1 crab
+   1 crocodile monitor
+   1 crow
+   2 cuttlefish
+   1 dik dik
+   1 dikdik
+   2 dingo
+   1 dolphin
+   1 dormouse
+   2 dugong
+   1 dung beetle
+   2 echidna
+   1 eyelash mite
+   1 fennec
+   1 ferret
+   1 flamingo
+   1 flying fox
+   1 fossa
+   1 fox
+   1 frilled shark
+   1 furry lobster
+   1 gazelle
+   1 gecko
+   1 geoduck
+   1 gharial
+   1 giant anteater
+   1 giant pacific octopus
+   1 giant shipworm
+   1 gila monster
+   1 giraffe
+   1 gnu
+   1 goblin shark
+   1 greenland shark
+   1 hagfish
+   1 harbor seal
+   1 harlequin shrimp
+   1 hedgehog
+   1 heron
+   1 hoarmy marmot
+   1 honduran white bat
+   1 honey badger
+   1 horse
+   1 horseshoe crab
+   1 hydra
+   1 hyena
+   1 hyrax
+   1 ibex
+   1 iguana
+   1 impala
+   1 jerboa
+   1 jumping spiders
+   1 junco
+   1 kakapo
+   1 kea
+   1 king snake
+   1 kingfisher
+   1 kiwi
+   2 komodo dragon
+   1 kookaburra
+   1 leaf-cutter ant
+   1 leafy-sea dragon
+   1 least weasel
+   2 lemur
+   1 leopard gecko
+   1 lionfish
+   1 lizard
+   1 long-beaked evhidna
+   1 long-nosed chimaera (ghost shark)
+   1 lynx
+   1 macropinna microstoma
+   1 magpie
+   1 manatee
+   1 mantis
+   1 mantis shrimp
+   1 marabou stork
+   2 marmoset
+   1 meerkat
+   1 mole
+   1 mongoose
+   1 moon snail
+   1 mountain goat
+   1 mountain lion
+   1 mudskipper
+   1 muskrat
+   1 naked mole rat
+   1 narwhal
+   1 numbat
+   1 nutria
+   1 oarfish
+   1 okapi
+   1 olm
+   2 opossum
+   1 oryx
+   1 ostrich
+   2 pangolin
+   1 parrot
+   1 penguin
+   1 pika
+   1 pink anemone fish
+   2 platypus
+   1 porcupine
+   1 ptarmigan
+   1 pudu
+   1 pygmy seahorse
+   1 pygmy shrew
+   1 quail
+   1 quokka
+   2 quoll
+   2 raccoon
+   1 rattlesnake
+   1 red panda
+   1 red-eyed crocodile skink
+   1 reeve’s muntjac
+   1 ring-tailed lemur
+   1 rubber boa
+   1 saiga
+   1 salamander
+   1 salps
+   1 sand dab
+   1 sculpin
+   1 sea cucumber
+   1 sea slug
+   1 sea squirt
+   1 shrew
+   1 siphonophore
+   1 sloth
+   1 slow loris
+   1 snail darter
+   1 snake
+   1 spider monkey
+   1 springbok
+   1 starfish
+   1 stargazer
+   1 stick insect
+   1 stingray
+   2 sugar glider
+   1 tanuki
+   1 tardigrade
+   1 tarsier
+   1 tawny frogmouth
+   1 tenrec
+   1 thylacine
+   1 tragopan
+   1 trilobites
+   1 vampire squid
+   1 wallaby
+   1 water deer
+   1 weasel
+   2 whale
+   1 whelk
+   1 wolverine
+   1 wombat
+   1 yak
+   1 yeti crab

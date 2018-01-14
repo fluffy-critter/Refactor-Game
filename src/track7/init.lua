@@ -130,8 +130,6 @@ function Game:init()
 
     self.actors = {}
 
-    self.monk.cx = 256/2 - 4
-    self.monk.cy = 686/2 - 24
     self.monkShader = shaders.load('track7/windDistort.fs')
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
@@ -142,7 +140,7 @@ function Game:init()
 
     local images = {}
 
-    for n = 1,2 do
+    for n = 1,3 do
         local x = (n - 1) % 5
         local y = math.floor((n - 1)/5) % 5
         local page = math.floor((n - 1)/25) + 1
@@ -155,7 +153,7 @@ function Game:init()
     end
 
     -- temporary for testing
-    self.monk.face = self.faces[2]
+    -- self.monk.face = self.faces[2]
 end
 
 function Game:start()
