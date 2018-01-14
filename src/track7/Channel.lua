@@ -124,16 +124,17 @@ function Channel:checkCollision(x, y, r)
                 end
             end
 
-            if x + r < math.min(top[1], bottom[1]) then
-                -- we're so deep inside that we're stuck between slices
-                ln = {math.min(top[1], bottom[1]) - x - r, 0}
-                nrm = nrm and {nrm[1] + ln[1], nrm[2]} or ln
-            end
+            if nrm and nrm[1] == 0 then
+                -- oops we're stuck inside
+                local left = math.max(top[1], bottom[1])
+                local right = math.min(top[2], bottom[2])
 
-            if x - r > math.max(top[2], bottom[2]) then
-                -- we're so deep inside that we're stuck between slices
-                ln = {x - r - math.min(top[2], bottom[2]), 0}
-                nrm = nrm and {nrm[1] + ln[1], nrm[2]} or ln
+                if x - r < left then
+                    nrm[1] = nrm[1] + left - x + r
+                end
+                if x + r > right then
+                    nrm[1] = nrm[1] - x + r - right
+                end
             end
         end
 

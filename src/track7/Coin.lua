@@ -36,16 +36,19 @@ end
 
 function Coin:update(dt, maxY)
     self.age = self.age + dt
+
     self.frameTime = self.frameTime + dt*self.frameSpeed
 
     if self.channel then
         local nrm = self.channel:checkCollision(self.x, self.y, self.r)
         if nrm then
+            local oldV = geom.vectorLength({self.vx, self.vy})
+            local displace = geom.vectorLength(nrm)
+            self.frameSpeed = self.frameSpeed*(oldV - displace*60)/(oldV + 0.1)
+
             self.x = self.x + nrm[1]
             self.y = self.y + nrm[2]
             self.vx, self.vy = geom.reflectVector(nrm, self.vx*self.elastic, self.vy*self.elastic)
-
-            self.frameSpeed = -self.frameSpeed*1.1
         end
     end
 
@@ -67,6 +70,9 @@ function Coin:draw()
     if self.spriteSheet and self.quads then
         local frame = math.floor(self.frameTime) % #self.quads + 1
         local quad = self.quads[frame]
+        if not quad then
+            print("frame=" .. frame .. " frameSpeed=" .. self.frameSpeed)
+        end
         local _,_,w,h = quad:getViewport()
         love.graphics.draw(self.spriteSheet, quad, self.x, self.y, 0,
             self.r*2/self.baseSize, self.r*2/self.baseSize, w/2, h/2)
