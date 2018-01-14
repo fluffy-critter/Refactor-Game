@@ -1,9 +1,10 @@
 Animals in spritesheet order:
 
-Basset hound
-Cat
-Kudu (@rejemy)
-Axolotl (a bunch of people)
+1. Basset hound
+2. Cat
+3. Kudu (@rejemy)
+4. Axolotl (a bunch of people)
+5. Armadillo (@momomoto)
 
 
 Other suggestions (and times suggested)
@@ -20,7 +21,6 @@ Other suggestions (and times suggested)
    1 antelope
    1 arctic fox
    1 argonaut
-   1 armadillo
    1 auroch
    1 aye-aye
    1 bandicoot
