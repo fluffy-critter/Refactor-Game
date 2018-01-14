@@ -274,7 +274,12 @@ function Game:update(dt)
             print(event.track, event.note, event.velocity)
         end
 
-        -- TODO differentiate different coin types
+        if self.nextFace then
+            self.monk.face = self.nextFace
+            self.nextFace = nil
+            self.faceTime = 0
+        end
+
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
         local jump = 540*1.5*4
 
@@ -305,13 +310,13 @@ function Game:update(dt)
                 self.score = self.score + 100
 
                 if #self.faces > 0 then
-                    -- grab a random face, remove from queue
+                    -- grab a random face to set on next note, remove from queue
                     local idx = math.random(1,#self.faces)
-                    self.monk.face = self.faces[idx]
+                    self.nextFace = self.faces[idx]
                     self.faces[idx] = self.faces[#self.faces]
                     table.remove(self.faces, #self.faces)
 
-                    self.faceTime = 0
+                    -- TODO add poof effect actor
                 end
 
                 return true
@@ -393,7 +398,8 @@ function Game:draw()
         if self.monk.face then
             local alpha
             if self.faceTime then
-                alpha = 255*(1 - util.smoothStep(math.min(1, self.faceTime)))
+                local t = math.min(1, self.faceTime/1.5)
+                alpha = 255*(1 - util.smoothStep(t*t))
             else
                 alpha = 255
             end
