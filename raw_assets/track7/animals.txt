@@ -7,6 +7,8 @@ Animals in spritesheet order:
 5. Armadillo (@momomoto)
 6. Echidna (a bunch of people)
 7. Opossum (a bunch of people)
+8. Wallaby (@rejemy)
+
 
 
 Other suggestions (and times suggested)
@@ -177,7 +179,6 @@ Other suggestions (and times suggested)
    1 tragopan
    1 trilobites
    1 vampire squid
-   1 wallaby
    1 water deer
    1 weasel
    1 whelk
@@ -195,7 +196,6 @@ Other suggestions (and times suggested)
    2 dugong
    2 komodo dragon
    2 marmoset
-   2 opossum
    2 pangolin
    2 platypus
    2 quoll

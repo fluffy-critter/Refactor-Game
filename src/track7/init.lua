@@ -138,7 +138,7 @@ function Game:init()
 
     self.faces = {}
 
-    for n = 1,7 do
+    for n = 1,8 do
         local x = (n - 1) % 5
         local y = math.floor((n - 1)/5) % 5
         local page = math.floor((n - 1)/25) + 1
