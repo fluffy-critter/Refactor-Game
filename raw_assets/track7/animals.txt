@@ -5,6 +5,8 @@ Animals in spritesheet order:
 3. Kudu (@rejemy)
 4. Axolotl (a bunch of people)
 5. Armadillo (@momomoto)
+6. Echidna (a bunch of people)
+7. Opossum (a bunch of people)
 
 
 Other suggestions (and times suggested)
@@ -200,5 +202,4 @@ Other suggestions (and times suggested)
    2 raccoon
    2 sugar glider
    2 whale
-   3 echidna
    3 lemur
