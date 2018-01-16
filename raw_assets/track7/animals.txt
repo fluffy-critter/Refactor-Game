@@ -8,6 +8,9 @@ Animals in spritesheet order:
 6. Echidna (a bunch of people)
 7. Opossum (a bunch of people)
 8. Wallaby (@rejemy)
+9. Kiwi
+10. Pigeon
+11. Ibex
 
 
 
