@@ -11,6 +11,7 @@ Animals in spritesheet order:
 9. Kiwi
 10. Pigeon
 11. Ibex
+12. Capybara
 
 
 
