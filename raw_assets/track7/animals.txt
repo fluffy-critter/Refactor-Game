@@ -17,6 +17,8 @@ Animals in spritesheet order:
 15. Bullfrog
 16. Chevrotain
 17. King snake
+18. Giraffe
+19. Chicken
 
 
 
