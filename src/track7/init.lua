@@ -138,7 +138,7 @@ function Game:init()
 
     self.faces = {}
 
-    for n = 1,12 do
+    for n = 1,17 do
         local x = (n - 1) % 5
         local y = math.floor((n - 1)/5) % 5
         local page = math.floor((n - 1)/25) + 1
@@ -307,7 +307,7 @@ function Game:update(dt)
             spawn.onCollect = function()
                 self.score = self.score + 100
 
-                if #self.faces > 0 then
+                if #self.faces > 0 and not self.nextFace then
                     -- grab a random face to set on next note, remove from queue
                     local idx = math.random(1,#self.faces)
                     self.nextFace = self.faces[idx]

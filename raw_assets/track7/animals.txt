@@ -12,6 +12,11 @@ Animals in spritesheet order:
 10. Pigeon
 11. Ibex
 12. Capybara
+13. Red fox
+14. Cuttlefish
+15. Bullfrog
+16. Chevrotain
+17. King snake
 
 
 
