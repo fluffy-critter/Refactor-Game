@@ -170,6 +170,8 @@ function Game:init()
         "Lemur",
         "Marmoset",
         "Tragopan", -- who's a pretty bird?
+
+        -- page 2, row 1
     }
 
     for n,name in ipairs(aminals) do
@@ -221,10 +223,18 @@ function Game:update(dt)
     local ax = -self.monk.vx*self.monk.dampX
     local ay = 200
 
-    -- If we're heading down, apply wind force to the monk
+    if input.y < 0 then
+        ay = ay + 50*input.y
+    end
+
+    ax = ax + 2*math.abs(self.monk.vy)*monkUp[1]
+
     if self.monk.vy > 0 then
-        ax = ax + 2*self.monk.vy*monkUp[1]
+        -- If we're heading down, apply wind resistance to the monk
         ay = ay + self.monk.vy*monkUp[2]*0.1
+    else
+        -- Increase the fall rate until we are going downward
+        ay = ay*2
     end
 
     self.monk.x = self.monk.x + (self.monk.vx + 0.5*ax*dt)*dt
