@@ -1,29 +1,3 @@
-Animals in spritesheet order:
-
-1. Basset hound
-2. Cat
-3. Kudu (@rejemy)
-4. Axolotl (a bunch of people)
-5. Armadillo (@momomoto)
-6. Echidna (a bunch of people)
-7. Opossum (a bunch of people)
-8. Wallaby (@rejemy)
-9. Kiwi
-10. Pigeon
-11. Ibex
-12. Capybara
-13. Red fox
-14. Cuttlefish
-15. Bullfrog
-16. Chevrotain
-17. King snake
-18. Giraffe
-19. Chicken
-
-
-
-Other suggestions (and times suggested)
-
    1 aardvark
    1 african clawed frog
    1 alligator

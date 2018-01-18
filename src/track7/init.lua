@@ -138,7 +138,38 @@ function Game:init()
 
     self.faces = {}
 
-    for n = 1,19 do
+    -- maybe we'll use this for something?
+    local aminals = {
+        -- page 1, row 1
+        "Basset hound",
+        "Cat",
+        "Kudu",
+        "Axolotl",
+        "Armadillo",
+        -- row 2
+        "Echidna",
+        "Opossum",
+        "Wallaby",
+        "Kiwi",
+        "Pigeon",
+        -- row 3
+        "Ibex",
+        "Capybara",
+        "Red fox",
+        "Cuttlefish",
+        "Bullfrog",
+        -- row 4
+        "Chevrotain",
+        "King snake",
+        "Giraffe",
+        "Chicken",
+        "Meerkat",
+        -- row 5
+        "Dik-dik",
+
+    }
+
+    for n,name in ipairs(aminals) do
         local x = (n - 1) % 5
         local y = math.floor((n - 1)/5) % 5
         local page = math.floor((n - 1)/25) + 1
@@ -146,7 +177,9 @@ function Game:init()
         local sheet = imagepool.load('track7/faces-' .. page .. '.png', {mipmaps=true})
         self.faces[n] = {
             sheet = sheet,
-            quad = love.graphics.newQuad(x*1024/5, y*1024/5, 1024/5, 1024/5, 1024, 1024)
+            quad = love.graphics.newQuad(x*1024/5, y*1024/5, 1024/5, 1024/5, 1024, 1024),
+            index = n,
+            name = name
         }
     end
 
