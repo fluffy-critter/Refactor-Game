@@ -166,7 +166,10 @@ function Game:init()
         "Meerkat",
         -- row 5
         "Dik-dik",
-
+        "Okapi",
+        "Lemur",
+        "Marmoset",
+        "Tragopan", -- who's a pretty bird?
     }
 
     for n,name in ipairs(aminals) do
