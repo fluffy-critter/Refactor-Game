@@ -90,7 +90,15 @@ function Game:init()
         vy = 0,
         tiltX = 0,
         theta = 0,
-        r = 100
+        r = 100,
+
+        -- based on the spritesheet quad
+        cx = 256/2 - 4,
+        cy = 686/2 - 24,
+
+        -- face center x/y
+        fx = 1024/5/2,
+        fy = 1024/5 + 160/2
     }
 
     -- set the arena boundaries
@@ -122,13 +130,66 @@ function Game:init()
 
     self.actors = {}
 
-    self.monk.cx = 256/2 - 4
-    self.monk.cy = 686/2 - 24
     self.monkShader = shaders.load('track7/windDistort.fs')
 
     self.scoreFont = love.graphics.newImageFont('track7/scorefont.png', '0123456789')
     self.debugFont = love.graphics.newFont(12)
     self.background = imagepool.load('track7/background.jpg')
+
+    self.faces = {}
+
+    -- maybe we'll use this for something?
+    local aminals = {
+        -- page 1, row 1
+        "Basset hound",
+        "Cat",
+        "Kudu",
+        "Axolotl",
+        "Armadillo",
+        -- row 2
+        "Echidna",
+        "Opossum",
+        "Wallaby",
+        "Kiwi",
+        "Pigeon",
+        -- row 3
+        "Ibex",
+        "Capybara",
+        "Red fox",
+        "Cuttlefish",
+        "Bullfrog",
+        -- row 4
+        "Chevrotain",
+        "King snake",
+        "Giraffe",
+        "Chicken",
+        "Meerkat",
+        -- row 5
+        "Dik-dik",
+        "Okapi",
+        "Lemur",
+        "Marmoset",
+        "Tragopan", -- who's a pretty bird?
+
+        -- page 2, row 1
+    }
+
+    for n,name in ipairs(aminals) do
+        local x = (n - 1) % 5
+        local y = math.floor((n - 1)/5) % 5
+        local page = math.floor((n - 1)/25) + 1
+
+        local sheet = imagepool.load('track7/faces-' .. page .. '.png', {mipmaps=true})
+        self.faces[n] = {
+            sheet = sheet,
+            quad = love.graphics.newQuad(x*1024/5, y*1024/5, 1024/5, 1024/5, 1024, 1024),
+            index = n,
+            name = name
+        }
+    end
+
+    -- temporary for testing
+    -- self.monk.face = self.faces[#self.faces]
 end
 
 function Game:start()
@@ -150,6 +211,10 @@ function Game:update(dt)
         end
     end
 
+    if self.faceTime then
+        self.faceTime = self.faceTime + dt
+    end
+
     self.monk.tiltX = math.pow(0.1, dt)*(self.monk.tiltX + input.x*dt)
 
     local monkUp = geom.normalize({self.monk.tiltX, -0.5})
@@ -158,10 +223,18 @@ function Game:update(dt)
     local ax = -self.monk.vx*self.monk.dampX
     local ay = 200
 
-    -- If we're heading down, apply wind force to the monk
+    if input.y < 0 then
+        ay = ay + 50*input.y
+    end
+
+    ax = ax + 2*math.abs(self.monk.vy)*monkUp[1]
+
     if self.monk.vy > 0 then
-        ax = ax + 2*self.monk.vy*monkUp[1]
+        -- If we're heading down, apply wind resistance to the monk
         ay = ay + self.monk.vy*monkUp[2]*0.1
+    else
+        -- Increase the fall rate until we are going downward
+        ay = ay*2
     end
 
     self.monk.x = self.monk.x + (self.monk.vx + 0.5*ax*dt)*dt
@@ -245,7 +318,12 @@ function Game:update(dt)
             print(event.track, event.note, event.velocity)
         end
 
-        -- TODO differentiate different coin types
+        if self.nextFace then
+            self.monk.face = self.nextFace
+            self.nextFace = nil
+            self.faceTime = 0
+        end
+
         local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
         local jump = 540*1.5*4
 
@@ -271,8 +349,23 @@ function Game:update(dt)
         if event.track == 3 then
             spawn.quads = self.itemQuads.gem
             spawn.frameSpeed = spawn.frameSpeed*2
-            -- TODO onCollect
-            -- TODO maybe gems should get their own draw() which uses actual rotation and lighting?
+
+            spawn.onCollect = function()
+                self.score = self.score + 100
+
+                if #self.faces > 0 and not self.nextFace then
+                    -- grab a random face to set on next note, remove from queue
+                    local idx = math.random(1,#self.faces)
+                    self.nextFace = self.faces[idx]
+                    self.faces[idx] = self.faces[#self.faces]
+                    table.remove(self.faces, #self.faces)
+
+                    -- TODO add poof effect actor
+                end
+
+                return true
+            end
+
         end
 
         table.insert(self.actors, Coin.new(spawn))
@@ -345,6 +438,25 @@ function Game:draw()
             self.monk.x, self.monk.y, self.monk.theta,
             0.8, 0.8, self.monk.cx, self.monk.cy)
         love.graphics.setShader()
+
+        if self.monk.face then
+            local alpha
+            if self.faceTime then
+                local t = math.min(1, self.faceTime/1.5)
+                alpha = 255*(1 - util.smoothStep(t*t))
+            else
+                alpha = 255
+            end
+
+            if alpha > 0 then
+                love.graphics.setColor(255, 255, 255, alpha)
+                love.graphics.draw(self.monk.face.sheet, self.monk.face.quad,
+                    self.monk.x, self.monk.y, self.monk.theta,
+                    0.8, 0.8, self.monk.fx, self.monk.fy)
+            else
+                self.monk.face = nil
+            end
+        end
 
         if config.debug then
             love.graphics.circle("line", self.monk.x, self.monk.y, self.monk.r)
