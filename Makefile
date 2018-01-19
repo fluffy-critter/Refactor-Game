@@ -153,7 +153,7 @@ publish-osx: $(DEST)/.published-osx-$(GAME_VERSION)
 $(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app $(DEST)/osx/LICENSE
 	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
 
-publish-osx-jam: $(DEST)/.published-osx-$(GAME_VERSION)
+publish-osx-jam: $(DEST)/.published-osx-jam-$(GAME_VERSION)
 $(DEST)/.published-osx-jam-$(GAME_VERSION): $(DEST)/osx-jam/$(NAME)-jam.app $(DEST)/osx-jam/LICENSE
 	butler push $(DEST)/osx-jam $(TARGET):osx-jam --userversion $(GAME_VERSION) && touch $(@)
 
