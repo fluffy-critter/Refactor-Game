@@ -123,7 +123,7 @@ $(DEST)/love-jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
 	zip -9r ../$(@) $(JAM_TRACK)
 
-publish-love-jam: publish $(DEST)/.published-love-jam-$(GAME_VERSION)
+publish-love-jam: $(DEST)/.published-love-jam-$(GAME_VERSION)
 $(DEST)/.published-love-jam-$(GAME_VERSION): $(DEST)/love-jam/$(NAME)-jam.love $(DEST)/love-jam/LICENSE
 	butler push $(DEST)/love-jam $(TARGET):love-jam --userversion $(GAME_VERSION) && touch $(@)
 
