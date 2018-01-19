@@ -39,7 +39,7 @@ JAM_TRACK=track7
 .PHONY: commit-check
 .PHONY: love-bundle osx win32 win64 bundle-win32
 .PHONY: jam love-jam osx-jam win32-jam win64-jam
-.PHONY: submodules assets tests checks version
+.PHONY: submodules tests checks version
 
 all: submodules checks tests love-bundle osx win32 win64 bundle-win32
 
@@ -54,6 +54,8 @@ version:
 
 publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
 	@echo "Done publishing build $(GAME_VERSION)"
+
+publish-all: publish publish-jam
 
 publish-jam: publish-love-jam publish-osx-jam publish-win32-jam publish-win64-jam
 
@@ -70,9 +72,6 @@ publish-wait:
 
 commit-check:
 	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
-
-assets:
-	@ ./update-art.sh
 
 tests:
 	@which love 1>/dev/null || (echo \
@@ -106,7 +105,7 @@ $(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love $(DEST)/love/
 	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # .love bundle
-love-bundle: assets $(DEST)/love/$(NAME).love
+love-bundle: submodules $(DEST)/love/$(NAME).love
 $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	echo $(@)
 	mkdir -p $(DEST)/love && \
@@ -115,7 +114,7 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) . -x 'test'
 
 # .love bundle, jam-specific
-love-jam: assets $(DEST)/love-jam/$(NAME)-jam.love
+love-jam: submodules $(DEST)/love-jam/$(NAME)-jam.love
 $(DEST)/love-jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	echo $(@)
 	mkdir -p $(DEST)/love-jam && \
