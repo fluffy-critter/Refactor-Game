@@ -61,7 +61,7 @@ publish-jam: publish-love-jam publish-osx-jam publish-win32-jam publish-win64-ja
 
 jam: love-jam osx-jam win32-jam win64-jam
 
-publish-precheck: commit-check checks test-bundle
+publish-precheck: commit-check checks
 
 publish-status:
 	butler status $(TARGET)
