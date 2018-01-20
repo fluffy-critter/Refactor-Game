@@ -1,7 +1,7 @@
 # ugh this is such a mess, maybe I should use cmake or scons or something
 
 # itch.io target
-TARGET="fluffy/Refactor"
+TARGET=fluffy/Refactor
 
 # game directory
 SRC=src
@@ -14,6 +14,7 @@ DEPS=build_deps
 
 # Application name
 NAME=Refactor
+BUNDLE_ID=biz.beesbuzz.Refactor
 
 # LOVE version to fetch and build against
 LOVE_VERSION=0.10.2
@@ -31,14 +32,15 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 # Which track to include in the current jam build
 JAM_TRACK=track7
 
+# supported publish channels
+CHANNELS=love osx win32 win64
+
 .PHONY: clean all run
-.PHONY: publish publish-precheck publish-love publish-osx publish-win32 publish-win64
-.PHONY: publish-jam publish-osx-jam publish-win32-jam publish-win64-jam
-.PHONY: publish-all
+.PHONY: publish publish-precheck publish-jam publish-all
 .PHONY: publish-status publish-wait
 .PHONY: commit-check
 .PHONY: love-bundle osx win32 win64 bundle-win32
-.PHONY: jam love-jam osx-jam win32-jam win64-jam
+.PHONY: love-jam osx-jam win32-jam win64-jam
 .PHONY: submodules tests checks version
 
 all: submodules checks tests love-bundle osx win32 win64 bundle-win32
@@ -52,16 +54,18 @@ submodules:
 version:
 	@echo "$(GAME_VERSION)"
 
-publish: publish-precheck publish-love publish-osx publish-win32 publish-win64 publish-status
-	@echo "Done publishing build $(GAME_VERSION)"
-
 publish-all: publish publish-jam
 
-publish-jam: publish-love-jam publish-osx-jam publish-win32-jam publish-win64-jam
+
+publish: publish-precheck $(foreach tgt,$(CHANNELS),$(call butler-push,$(tgt))) publish-status
+	@echo "Done publishing build $(GAME_VERSION)"
+
+publish-jam: publish-precheck $(foreach tgt,$(CHANNELS),$(call butler-push,$(tgt)-jam))
+	@echo "Done publishing jam build $(GAME_VERSION)"
 
 jam: love-jam osx-jam win32-jam win64-jam
 
-publish-precheck: commit-check checks
+publish-precheck: commit-check tests checks
 
 publish-status:
 	butler status $(TARGET)
@@ -88,6 +92,21 @@ checks:
 run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
+staging-love: love-bundle
+staging-osx: osx
+staging-win32: win32
+staging-win64: win64
+
+staging-love-jam: love-jam
+staging-osx-jam: osx-jam
+staging-win32-jam: win32-jam
+staging-win64-jam: win64-jam
+
+butler-push=$(DEST)/.published-$(GAME_VERSION)_$(1)
+
+$(DEST)/.published-$(GAME_VERSION)_%: staging-% $(DEST)/%/LICENSE
+	butler push $(DEST)/$(lastword $(subst _, ,$(@))) $(TARGET):$(lastword $(subst _, ,$(@))) --userversion $(GAME_VERSION) && touch $(@)
+
 # hacky way to inject the distfiles content
 $(DEST)/%/LICENSE: LICENSE $(wildcard distfiles/*)
 	echo $(@)
@@ -99,10 +118,6 @@ $(DEPS)/love/%:
 	echo $(@)
 	mkdir -p $(DEPS)/love
 	curl -L -o $(@) https://bitbucket.org/rude/love/downloads/$(shell basename $(@))
-
-publish-love: $(DEST)/.published-love-$(GAME_VERSION)
-$(DEST)/.published-love-$(GAME_VERSION): $(DEST)/love/$(NAME).love $(DEST)/love/LICENSE
-	butler push $(DEST)/love $(TARGET):love-bundle --userversion $(GAME_VERSION) && touch $(@)
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
@@ -123,39 +138,26 @@ $(DEST)/love-jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
 	zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
 	zip -9r ../$(@) $(JAM_TRACK)
 
-publish-love-jam: $(DEST)/.published-love-jam-$(GAME_VERSION)
-$(DEST)/.published-love-jam-$(GAME_VERSION): $(DEST)/love-jam/$(NAME)-jam.love $(DEST)/love-jam/LICENSE
-	butler push $(DEST)/love-jam $(TARGET):love-jam --userversion $(GAME_VERSION) && touch $(@)
-
 # macOS version
 osx: $(DEST)/osx/$(NAME).app
-$(DEST)/osx/$(NAME).app: $(DEST)/love/$(NAME).love $(wildcard osx/*) $(DEST)/deps/love.app
+$(DEST)/osx/$(NAME).app: love-bundle $(wildcard osx/*) $(DEST)/deps/love.app
 	echo $(@)
 	mkdir -p $(DEST)/osx
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
-	sed 's/{TITLE}/$(NAME)/' osx/Info.plist > $(@)/Contents/Info.plist && \
+	sed 's/{TITLE}/$(NAME)/;s/{BUNDLE_ID}/$(BUNDLE_ID)/' osx/Info.plist > $(@)/Contents/Info.plist && \
 	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love/$(NAME).love $(@)/Contents/Resources
 
 osx-jam: $(DEST)/osx-jam/$(NAME)-jam.app
-$(DEST)/osx-jam/$(NAME)-jam.app: $(DEST)/love-jam/$(NAME)-jam.love $(wildcard osx/*) $(DEST)/deps/love.app
+$(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.app
 	echo $(@)
 	mkdir -p $(DEST)/osx-jam
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
-	sed 's/{TITLE}/$(NAME) (jam version)/' osx/Info.plist > $(@)/Contents/Info.plist && \
+	sed 's/{TITLE}/$(NAME) (jam version)/;s/{BUNDLE_ID}/$(BUNDLE_ID)Jam/' osx/Info.plist > $(@)/Contents/Info.plist && \
 	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love-jam/$(NAME)-jam.love $(@)/Contents/Resources
-
-
-publish-osx: $(DEST)/.published-osx-$(GAME_VERSION)
-$(DEST)/.published-osx-$(GAME_VERSION): $(DEST)/osx/$(NAME).app $(DEST)/osx/LICENSE
-	butler push $(DEST)/osx $(TARGET):osx --userversion $(GAME_VERSION) && touch $(@)
-
-publish-osx-jam: $(DEST)/.published-osx-jam-$(GAME_VERSION)
-$(DEST)/.published-osx-jam-$(GAME_VERSION): $(DEST)/osx-jam/$(NAME)-jam.app $(DEST)/osx-jam/LICENSE
-	butler push $(DEST)/osx-jam $(TARGET):osx-jam --userversion $(GAME_VERSION) && touch $(@)
 
 # OSX build dependencies
 $(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macosx-x64.zip
@@ -195,13 +197,6 @@ $(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32-jam
 	cat $(^) > $(@)
 
-publish-win32: $(DEST)/.published-win32-$(GAME_VERSION)
-$(DEST)/.published-win32-$(GAME_VERSION): $(DEST)/win32/$(NAME).exe $(DEST)/win32/LICENSE
-	butler push $(DEST)/win32 $(TARGET):win32 --userversion $(GAME_VERSION) && touch $(@)
-
-publish-win32-jam: $(DEST)/.published-win32-jam-$(GAME_VERSION)
-$(DEST)/.published-win32-jam-$(GAME_VERSION): $(DEST)/win32-jam/$(NAME)-jam.exe $(DEST)/win32-jam/LICENSE
-	butler push $(DEST)/win32-jam $(TARGET):win32-jam --userversion $(GAME_VERSION) && touch $(@)
 
 # Win64 version
 win64: $(WIN64_ROOT)/love.exe $(DEST)/win64/$(NAME).exe
@@ -218,17 +213,7 @@ $(DEST)/win64-jam/$(NAME)-jam.exe: windows/refactor-win64.exe $(DEST)/love-jam/$
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64-jam
 	cat $(^) > $(@)
 
-publish-win64: $(DEST)/.published-win64-$(GAME_VERSION)
-$(DEST)/.published-win64-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe $(DEST)/win64/LICENSE
-	butler push $(DEST)/win64 $(TARGET):win64 --userversion $(GAME_VERSION) && touch $(@)
-
-publish-win64-jam: $(DEST)/.published-win64-jam-$(GAME_VERSION)
-$(DEST)/.published-win64-jam-$(GAME_VERSION): $(DEST)/win64/$(NAME).exe $(DEST)/win64-jam/LICENSE
-	butler push $(DEST)/win64-jam $(TARGET):win64-jam --userversion $(GAME_VERSION) && touch $(@)
-
 WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
 bundle-win32: $(DEST)/$(WIN32_BUNDLE_FILENAME)
 $(DEST)/$(WIN32_BUNDLE_FILENAME): $(DEST)/win32/$(NAME).exe $(DEST)/win32/LICENSE
 	cd $(DEST)/win32 && zip -9r ../$(WIN32_BUNDLE_FILENAME) *
-
-
