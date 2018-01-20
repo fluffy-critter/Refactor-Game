@@ -43,6 +43,16 @@ CHANNELS=love osx win32 win64
 .PHONY: love-jam osx-jam win32-jam win64-jam
 .PHONY: submodules tests checks version
 
+# necessary to expand the PUBLISH_CHANNELS variable for the publish rules
+.SECONDEXPANSION:
+
+# don't remove secondary files
+.SECONDARY:
+
+publish-dep=$(DEST)/.published-$(GAME_VERSION)_$(1)
+PUBLISH_CHANNELS=$(foreach tgt,$(CHANNELS),$(call publish-dep,$(tgt)))
+JAM_CHANNELS=$(foreach tgt,$(CHANNELS),$(call publish-dep,$(tgt)-jam))
+
 all: submodules checks tests love-bundle osx win32 win64 bundle-win32
 
 clean:
@@ -56,12 +66,11 @@ version:
 
 publish-all: publish publish-jam
 
+publish: publish-precheck $$(PUBLISH_CHANNELS) publish-status
+	@echo "$(^) Done publishing build $(GAME_VERSION)"
 
-publish: publish-precheck $(foreach tgt,$(CHANNELS),$(call butler-push,$(tgt))) publish-status
-	@echo "Done publishing build $(GAME_VERSION)"
-
-publish-jam: publish-precheck $(foreach tgt,$(CHANNELS),$(call butler-push,$(tgt)-jam))
-	@echo "Done publishing jam build $(GAME_VERSION)"
+publish-jam: publish-precheck $$(JAM_CHANNELS)
+	@echo "$(^) Done publishing jam build $(GAME_VERSION)"
 
 jam: love-jam osx-jam win32-jam win64-jam
 
@@ -69,13 +78,13 @@ publish-precheck: commit-check tests checks
 
 publish-status:
 	butler status $(TARGET)
-	@ echo "Current version: $(GAME_VERSION)"
+	@echo "Current version: $(GAME_VERSION)"
 
 publish-wait:
-	@ while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
+	@while butler status $(TARGET) | grep '•' ; do sleep 5 ; done
 
 commit-check:
-	@ [ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
+	@[ "$(GITSTATUS)" == "dirty" ] && echo "You have uncommitted changes" && exit 1 || exit 0
 
 tests:
 	@which love 1>/dev/null || (echo \
@@ -102,7 +111,6 @@ staging-osx-jam: osx-jam
 staging-win32-jam: win32-jam
 staging-win64-jam: win64-jam
 
-butler-push=$(DEST)/.published-$(GAME_VERSION)_$(1)
 
 $(DEST)/.published-$(GAME_VERSION)_%: staging-% $(DEST)/%/LICENSE
 	butler push $(DEST)/$(lastword $(subst _, ,$(@))) $(TARGET):$(lastword $(subst _, ,$(@))) --userversion $(GAME_VERSION) && touch $(@)
