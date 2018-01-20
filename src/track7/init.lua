@@ -185,6 +185,13 @@ function Game:init()
         "Tragopan", -- who's a pretty bird?
 
         -- page 2, row 1
+        "Hyrax",
+        "Cheetah",
+        "Kangaroo",
+        "Platypus", -- of COURSE there's a platypus
+        "Tanuki", -- pls dont sue me nintendo
+        -- row 2
+        "Dugong/manatee", -- yes I realize they are different
     }
 
     for n,name in ipairs(aminals) do
