@@ -67,10 +67,10 @@ version:
 publish-all: publish publish-jam
 
 publish: publish-precheck $$(PUBLISH_CHANNELS) publish-status
-	@echo "$(^) Done publishing build $(GAME_VERSION)"
+	@echo "Done publishing full build $(GAME_VERSION)"
 
 publish-jam: publish-precheck $$(JAM_CHANNELS)
-	@echo "$(^) Done publishing jam build $(GAME_VERSION)"
+	@echo "Done publishing jam build $(GAME_VERSION)"
 
 jam: love-jam osx-jam win32-jam win64-jam
 
