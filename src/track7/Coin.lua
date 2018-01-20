@@ -43,12 +43,15 @@ function Coin:update(dt, maxY)
         local nrm = self.channel:checkCollision(self.x, self.y, self.r)
         if nrm then
             local oldV = geom.vectorLength({self.vx, self.vy})
-            local displace = geom.vectorLength(nrm)
-            self.frameSpeed = self.frameSpeed*(oldV - displace*60)/(oldV + 0.1)
 
             self.x = self.x + nrm[1]
             self.y = self.y + nrm[2]
             self.vx, self.vy = geom.reflectVector(nrm, self.vx*self.elastic, self.vy*self.elastic)
+
+            local newV = geom.vectorLength({self.vx, self.vy})
+
+            self.frameSpeed = util.clamp((self.frameSpeed + nrm[1]*10)*(newV + 100)/(oldV + 100)/self.elastic,
+                -60, 60)
         end
     end
 

@@ -15,7 +15,7 @@ Time is in MIDI clocks, which relate to time as follows:
 
     = 960 clocks per second
 
-(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
+(c)2018 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 ]]
 
 

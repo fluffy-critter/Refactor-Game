@@ -1,7 +1,7 @@
 --[[
 Refactor: 7 - flight
 
-(c)2017 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
+(c)2018 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 ]]
 
 local util = require('util')
@@ -102,7 +102,12 @@ function Game:init()
     }
 
     -- set the arena boundaries
-    self.bounds = {center = 0, width = 1100}
+    self.bounds = {
+        center = 0,
+        width = 1100,
+        minWidth = 400,
+        maxWidth = 600
+    }
 
     -- configure the mountain channel
     self.channel = Channel.new({
@@ -126,6 +131,14 @@ function Game:init()
         -- track the minimum and maximum note values
         self.bounds.minNote = math.min(data[3], self.bounds.minNote or data[3])
         self.bounds.maxNote = math.max(data[3], self.bounds.maxNote or data[3])
+    end
+
+    local ramp = love.filesystem.load('track7/leveldata.lua')()
+    for _,data in ipairs(ramp) do
+        self.events:insert(data[1], function()
+            self.bounds.minWidth = data[2]
+            self.bounds.maxWidth = data[3]
+        end)
     end
 
     self.actors = {}
@@ -272,7 +285,11 @@ function Game:update(dt)
         local maxLeft = math.min(curLeft, -900)
         local maxRight = math.max(curRight, 900)
 
-        b.width = util.clamp(b.width + math.random(-10, 10), 250, math.max(b.width, 600))
+        -- If the width already exceeds the maxima let it ratchet towardcs but don't let it go further away
+        local minWidth = math.min(b.width, b.minWidth)
+        local maxWidth = math.max(b.width, b.maxWidth)
+
+        b.width = util.clamp(b.width + math.random(-10, 10), minWidth, maxWidth)
         b.center = util.clamp(b.center + math.random(-100, 100), maxLeft + b.width, maxRight - b.width)
 
         return {b.center - b.width, b.center + b.width}
@@ -314,61 +331,66 @@ function Game:update(dt)
     local now = self:musicPos()
     while not self.events:empty() and self.events:next_key() <= now do
         local _,event = self.events:pop()
-        if config.debug then
-            print(event.track, event.note, event.velocity)
-        end
 
-        if self.nextFace then
-            self.monk.face = self.nextFace
-            self.nextFace = nil
-            self.faceTime = 0
-        end
-
-        local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
-        local jump = 540*1.5*4
-
-        local spawn = {
-            y = self.camera.y + 540,
-            x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
-            vx = math.random(-event.velocity, event.velocity),
-            vy = self.monk.vy - jump,
-            ay = ay + jump*2,
-            sprite = self.itemSprites,
-            quad = self.itemQuads.coin,
-            channel = self.channel,
-            onCollect = function()
-                self.score = self.score + 1
-                return true -- TODO fade out instead?
-            end,
-            spriteSheet = self.itemSprites,
-            quads = self.itemQuads.coin,
-            frameSpeed = (12 + event.velocity/25) * (math.random(0,1)*2 - 1),
-            frameTime = math.random()*1000
-        }
-
-        if event.track == 3 then
-            spawn.quads = self.itemQuads.gem
-            spawn.frameSpeed = spawn.frameSpeed*2
-
-            spawn.onCollect = function()
-                self.score = self.score + 100
-
-                if #self.faces > 0 and not self.nextFace then
-                    -- grab a random face to set on next note, remove from queue
-                    local idx = math.random(1,#self.faces)
-                    self.nextFace = self.faces[idx]
-                    self.faces[idx] = self.faces[#self.faces]
-                    table.remove(self.faces, #self.faces)
-
-                    -- TODO add poof effect actor
-                end
-
-                return true
+        if type(event) == "function" then
+            event(now)
+        else
+            if config.debug then
+                print(event.track, event.note, event.velocity)
             end
 
-        end
+            if self.nextFace then
+                self.monk.face = self.nextFace
+                self.nextFace = nil
+                self.faceTime = 0
+            end
 
-        table.insert(self.actors, Coin.new(spawn))
+            local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
+            local jump = 540*1.5*4
+
+            local spawn = {
+                y = self.camera.y + 540,
+                x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
+                vx = math.random(-event.velocity, event.velocity),
+                vy = self.monk.vy - jump,
+                ay = ay + jump*2,
+                sprite = self.itemSprites,
+                quad = self.itemQuads.coin,
+                channel = self.channel,
+                onCollect = function()
+                    self.score = self.score + 1
+                    return true -- TODO fade out instead?
+                end,
+                spriteSheet = self.itemSprites,
+                quads = self.itemQuads.coin,
+                frameSpeed = (12 + event.velocity/25) * (math.random(0,1)*2 - 1),
+                frameTime = math.random()*1000
+            }
+
+            if event.track == 3 then
+                spawn.quads = self.itemQuads.gem
+                spawn.frameSpeed = spawn.frameSpeed*2
+
+                spawn.onCollect = function()
+                    self.score = self.score + 100
+
+                    if #self.faces > 0 and not self.nextFace then
+                        -- grab a random face to set on next note, remove from queue
+                        local idx = math.random(1,#self.faces)
+                        self.nextFace = self.faces[idx]
+                        self.faces[idx] = self.faces[#self.faces]
+                        table.remove(self.faces, #self.faces)
+
+                        -- TODO add poof effect actor
+                    end
+
+                    return true
+                end
+
+            end
+
+            table.insert(self.actors, Coin.new(spawn))
+        end
     end
 
     util.runQueue(self.actors, function(actor)
@@ -480,6 +502,18 @@ function Game:draw()
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, minX + 16, minY + 16)
+
+        if config.debug then
+            love.graphics.setColor(255,128,0)
+            love.graphics.line(-self.bounds.minWidth, minY, -self.bounds.minWidth, maxY)
+            love.graphics.line(self.bounds.minWidth, minY, self.bounds.minWidth, maxY)
+
+            love.graphics.setColor(128,255,0)
+            love.graphics.line(-self.bounds.maxWidth, minY, -self.bounds.maxWidth, maxY)
+            love.graphics.line(self.bounds.maxWidth, minY, self.bounds.maxWidth, maxY)
+        end
+
+
         love.graphics.pop()
 
         if self.endingTime then
