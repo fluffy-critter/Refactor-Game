@@ -150,6 +150,7 @@ function Game:init()
     self.background = imagepool.load('track7/background.jpg')
 
     self.faces = {}
+    self.usedFaces = {}
 
     -- maybe we'll use this for something?
     local aminals = {
@@ -388,10 +389,18 @@ function Game:update(dt)
                 spawn.onCollect = function()
                     self.score = self.score + 100
 
+                    if #self.faces == 0 then
+                        self.faces = self.usedFaces
+                        self.usedFaces = {}
+                    end
+
                     if #self.faces > 0 and not self.nextFace then
                         -- grab a random face to set on next note, remove from queue
                         local idx = math.random(1,#self.faces)
-                        self.nextFace = self.faces[idx]
+                        local face = self.faces[idx]
+                        table.insert(self.usedFaces, face)
+
+                        self.nextFace = face
                         self.faces[idx] = self.faces[#self.faces]
                         table.remove(self.faces, #self.faces)
 
