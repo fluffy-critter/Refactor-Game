@@ -192,6 +192,13 @@ function Game:init()
         "Tanuki", -- pls dont sue me nintendo
         -- row 2
         "Dugong/manatee", -- yes I realize they are different
+        "Emu",
+        "Bonobo",
+        "Ant",
+        "Kakapo", -- You are being shagged by a rare parrot
+        -- row 3
+        "Pangolin",
+        "Quoll",
     }
 
     for n,name in ipairs(aminals) do
