@@ -200,6 +200,9 @@ function Game:init()
         -- row 3
         "Pangolin",
         "Quoll",
+        "Anglerfish",
+        "Raccoon",
+        "Dormouse",
     }
 
     for n,name in ipairs(aminals) do
