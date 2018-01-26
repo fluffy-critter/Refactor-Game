@@ -524,6 +524,13 @@ function Game:draw()
 
         love.graphics.pop()
 
+        if self.endingTime then
+            -- fade to white
+            local alpha = math.min(255, self.endingTime*255/self.ending.duration)
+            love.graphics.setColor(255, 255, 255, alpha)
+            love.graphics.rectangle("fill", 0, 0, ww, hh)
+        end
+
         -- draw the scoreboard
         love.graphics.push()
         love.graphics.translate(tx, ty)
@@ -547,13 +554,6 @@ function Game:draw()
 
 
         love.graphics.pop()
-
-        if self.endingTime then
-            -- fade to white
-            local alpha = math.min(255, self.endingTime*255/self.ending.duration)
-            love.graphics.setColor(255, 255, 255, alpha)
-            love.graphics.rectangle("fill", 0, 0, ww, hh)
-        end
 
     end)
     return self.canvas
