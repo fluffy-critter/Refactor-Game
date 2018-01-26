@@ -101,6 +101,10 @@ checks:
 run: love-bundle
 	love $(DEST)/love/$(NAME).love
 
+$(DEST)/.latest-change: $(shell find $(SRC) -type f)
+	mkdir -p $(DEST)
+	touch $(@)
+
 staging-love: love-bundle
 staging-osx: osx
 staging-win32: win32
@@ -129,7 +133,7 @@ $(DEPS)/love/%:
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
-$(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
+$(DEST)/love/$(NAME).love: $(DEST)/.latest-change
 	echo $(@)
 	mkdir -p $(DEST)/love && \
 	cd $(SRC) && \
@@ -138,7 +142,7 @@ $(DEST)/love/$(NAME).love: $(shell find $(SRC) -type f)
 
 # .love bundle, jam-specific
 love-jam: submodules $(DEST)/love-jam/$(NAME)-jam.love
-$(DEST)/love-jam/$(NAME)-jam.love: $(shell find $(SRC) -type f)
+$(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change
 	echo $(@)
 	mkdir -p $(DEST)/love-jam && \
 	cd $(SRC) && \
@@ -223,5 +227,5 @@ $(DEST)/win64-jam/$(NAME)-jam.exe: windows/refactor-win64.exe $(DEST)/love-jam/$
 
 WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
 bundle-win32: $(DEST)/$(WIN32_BUNDLE_FILENAME)
-$(DEST)/$(WIN32_BUNDLE_FILENAME): $(DEST)/win32/$(NAME).exe $(DEST)/win32/LICENSE
+$(DEST)/$(WIN32_BUNDLE_FILENAME): win32
 	cd $(DEST)/win32 && zip -9r ../$(WIN32_BUNDLE_FILENAME) *
