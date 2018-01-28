@@ -1,6 +1,8 @@
 All included work is copyright ©2017 j "fluffy" shagam unless otherwise
 specified.
 
+-- CODE --
+
 Code, Lua and otherwise, is available under the ISC license, viewable at
 https://opensource.org/licenses/ISC and reproduced here:
 
@@ -16,29 +18,45 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 
-Other assets including but not limited to art, music, and sound are available
-under the terms of Creative Commons Attribution NonCommercial ShareAlike 4.0,
-viewable at https://creativecommons.org/licenses/by-nc-sa/4.0/; the executive
-summary is that you may use these elements within your own works provided that
-you give credit and also release your work under the same terms.
+-- ASSETS --
 
--- Third Party Credits --
+Non-code assets including but not limited to art, music, and sound are available
+under the terms of Creative Commons Attribution NonCommercial 4.0,
+viewable at https://creativecommons.org/licenses/by-nc/4.0/; the executive
+summary is that you may use these elements within your own works provided that
+you give credit and do not use it in commercial (i.e. paid or otherwise for-
+profit) purposes.
+
+Creative Commons licenses are non-exclusive; if you would like to use my assets
+under some other arrangement, please contact me at fluffy@beesbuzz.biz and we
+can work something out.
+
+-- THIRD PARTY USAGE --
+
+The above licenses do not apply to third-party assets or libraries; please see
+their respective licenses for their terms of usage.
+
 
 Libraries:
 
-    LÖVE - http://love2d.org
+    LÖVE - http://love2d.org (zlib/libpng license)
 
-    cute - https://github.com/gtrogers/Cute
+    cute - https://github.com/gtrogers/Cute (MIT license)
 
-    lua-heaps - https://github.com/geoffleyland/lua-heaps
+    lua-heaps - https://github.com/geoffleyland/lua-heaps (MIT license)
 
 Fonts:
 
-    Libre Bodoni - https://github.com/impallari/Libre-Bodoni
+    Libre Bodoni - https://github.com/impallari/Libre-Bodoni (SIL Open Font license)
 
     Century Gothic © Monotype - https://www.fonts.com/font/monotype/century-gothic
+    (proprietary; this software only contains bitmap renditions of specific text)
 
-    Return of Ganon - http://www.dafont.com/return-of-ganon.font
+    Return of Ganon © codeman38 - http://www.zone38.net/font/ (custom license)
+
+    Chrono Trigger Proportional © Patrick Lauke -
+    https://fontstruct.com/fontstructions/show/686445/chrono_trigger_proportional
+    (Creative Commons Attribution)
 
 Tools:
 
