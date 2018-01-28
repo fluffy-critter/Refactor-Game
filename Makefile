@@ -199,14 +199,14 @@ win32: $(WIN32_ROOT)/love.exe $(DEST)/win32/$(NAME).exe
 $(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
 	echo $(@)
 	mkdir -p $(DEST)/win32
-	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32
+	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32
 	cat $(^) > $(@)
 
 win32-jam: $(WIN32_ROOT)/love.exe $(DEST)/win32-jam/$(NAME)-jam.exe
 $(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$(NAME)-jam.love
 	echo $(@)
 	mkdir -p $(DEST)/win32-jam
-	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(WIN32_ROOT)/license.txt $(DEST)/win32-jam
+	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32-jam
 	cat $(^) > $(@)
 
 
@@ -215,14 +215,14 @@ win64: $(WIN64_ROOT)/love.exe $(DEST)/win64/$(NAME).exe
 $(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
 	echo $(@)
 	mkdir -p $(DEST)/win64
-	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64
+	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64
 	cat $(^) > $(@)
 
 win64-jam: $(WIN64_ROOT)/love.exe $(DEST)/win64-jam/$(NAME)-jam.exe
 $(DEST)/win64-jam/$(NAME)-jam.exe: windows/refactor-win64.exe $(DEST)/love-jam/$(NAME)-jam.love
 	echo $(@)
 	mkdir -p $(DEST)/win64-jam
-	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(WIN64_ROOT)/license.txt $(DEST)/win64-jam
+	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64-jam
 	cat $(^) > $(@)
 
 WIN32_BUNDLE_FILENAME=refactor-win32-$(GAME_VERSION).zip
