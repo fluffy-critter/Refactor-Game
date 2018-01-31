@@ -22,10 +22,20 @@ float ybrt(float x0, float x1) {
 }
 
 vec4 effect(vec4 color, Image txt, vec2 itc, vec2 screen_coords) {
-    // little bit of CRT bulge
-    // TODO: on lower-resolution screens we end up causing aliasing especially towards the edges; we need to fix that somehow
-    vec2 tc = vec2((itc.x - 0.5)*(itc.y*(itc.y - 1)*0.02 + 1.0) + 0.5,
-                   (itc.y - 0.5)*(itc.x*(itc.x - 1)*0.05 + 1.0) + 0.5);
+    /* TODO: crt bulge
+
+    on lower-resolution screens (i.e. 1080p or lower) we end up causing aliasing especially towards the edges; we need to fix that
+    somehow
+
+    possibilities:
+    - sample neighboring rows and filter ourselves
+    - render screen to undistorted canvas and have separate distort shader
+    - just get rid of distortion since it's not really noticeable except for how it goes wrong anyway and flat tubes
+      were totally a thing in the 90s
+    */
+    //vec2 tc = vec2((itc.x - 0.5)*(itc.y*(itc.y - 1)*0.02 + 1.0) + 0.5,
+    //               (itc.y - 0.5)*(itc.x*(itc.x - 1)*0.05 + 1.0) + 0.5);
+    vec2 tc = itc;
 
 
     // typical 14" 90s CRT was 1152 dots wide on the shadow mask; we cut this a
