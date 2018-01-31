@@ -190,10 +190,11 @@ function love.keypressed(...)
 end
 
 local function credits()
+    -- TODO come up with a better space breaking priority mechanism (one better than font:getWrap)
     local creditsLines = {
         {font=fonts.menu.h1, text="Refactor"},
         "\n",
-        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam unless otherwise specified',
+        'All music, code, and art ©2015-2017 j.\194\160“fluffy” shagam unless otherwise specified',
         {
             font=fonts.menu.url,
             text="http://sockpuppet.us/ • http://beesbuzz.biz/ • http://fluffy.itch.io/"
@@ -217,22 +218,29 @@ local function credits()
     local canvas
 
     return {
-        draw = function()
+        scrollY = 0,
+        height = 0,
+        draw = function(self)
             love.graphics.setBlendMode("alpha")
             love.graphics.setColor(255,255,255,255)
 
             -- TODO better sizing
-            local width = love.graphics.getWidth()/3
+            local width = math.ceil(love.graphics.getWidth()/3)
+            local height = love.graphics.getHeight()
 
             -- TODO proper measurement (really I should just do a friggin' text canvas object, huh?)
-            if not canvas or canvas:getWidth() < width then
-                canvas = love.graphics.newCanvas(width, love.graphics.getHeight())
+            if not canvas or canvas:getWidth() < width or canvas:getHeight() < height then
+                canvas = love.graphics.newCanvas(width, height)
             end
 
             canvas:renderTo(function()
                 love.graphics.setBlendMode("alpha")
                 love.graphics.setColor(255,255,255,255)
                 love.graphics.clear(0,0,0,0)
+
+                love.graphics.push()
+                love.graphics.translate(0, -self.scrollY)
+
                 local y = 0
                 for _,line in ipairs(creditsLines) do
                     local text
@@ -254,6 +262,10 @@ local function credits()
                         y = y + font:getHeight()
                     end
                 end
+
+                self.height = y
+
+                love.graphics.pop()
             end)
 
             love.graphics.setBlendMode("alpha","premultiplied")
@@ -265,9 +277,21 @@ local function credits()
             end
             love.graphics.setColor(255,255,255,255)
             love.graphics.draw(canvas,8,8)
+
+            if height < self.height then
+                local yh = height*height/self.height
+                local y0 = self.scrollY*height/self.height
+                love.graphics.rectangle("fill", 0, y0, 4, yh)
+            end
         end,
-        onButtonPress = function()
-            menuStack[#menuStack] = nil
+        update = function(self, dt)
+            local maxScroll = math.max(0, self.height - love.graphics.getHeight())
+            self.scrollY = util.clamp(self.scrollY + input.y*dt*500, 0, maxScroll)
+        end,
+        onButtonPress = function(_, button)
+            if button == "back" or button == "a" or button == "b" then
+                menuStack[#menuStack] = nil
+            end
         end
     }
 end
@@ -467,6 +491,8 @@ function love.update(dt)
 
     if currentGame and playing.state ~= PlayState.paused then
         currentGame:update(dt*mul)
+    elseif menuStack[#menuStack] and menuStack[#menuStack].update then
+        menuStack[#menuStack]:update(dt*mul)
     end
 
     frameTime = frameTime + dt
