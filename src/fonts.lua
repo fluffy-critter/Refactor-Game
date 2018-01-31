@@ -5,41 +5,16 @@ Refactor
 
 ]]
 
-local fonts = {
-    hidpi = false,
+local fonts = {}
 
-    menu = {
-        hidpi = {
-            regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 48),
-            h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 64),
-            h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 56),
-        },
-        plain = {
-            regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 24),
-            h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 32),
-            h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 28),
-        },
-    },
-    debug = love.graphics.newFont(16),
+function fonts.setPixelScale(scale)
+    fonts.menu = {
+        regular = love.graphics.newFont("fonts/LibreBodoni-Regular.otf", 24*scale),
+        h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 32*scale),
+        h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 28*scale),
+    }
 
-    -- TODO make helvetica with black outline for URLs on menu
-    --helveticaOutline = love.graphics.newFont("fonts/helveticaOutline.fnt")
-}
-
-local multires = {
-    __index = function(o,k)
-        if fonts.hidpi and o.hidpi[k] then
-            return o.hidpi[k]
-        end
-
-        if o.plain[k] then
-            return o.plain[k]
-        end
-
-        return rawget(o, k)
-    end
-}
-
-setmetatable(fonts.menu, multires)
+    fonts.debug = love.graphics.newFont(16*scale)
+end
 
 return fonts

@@ -85,8 +85,6 @@ local playing = {
 }
 
 local menuVolume = 0
-
-local highdpi = false
 local vsync
 
 local frameCount = 0
@@ -323,11 +321,8 @@ local function applyGraphicsConfig()
         minheight = 480
     })
 
-    local ww, hh, flags = love.window.getMode()
-    highdpi = flags.highdpi
+    local _, _, flags = love.window.getMode()
     vsync = flags.vsync
-
-    print("ww=" .. ww .. " hh=" .. hh .. " highdpi=" .. tostring(highdpi))
 
     local refresh = config.targetFPS or flags.refreshrate
     if not refresh or refresh == 0 then
@@ -337,7 +332,7 @@ local function applyGraphicsConfig()
 
     renderScale = config.scaleFactor
 
-    fonts.hidpi = highdpi
+    fonts.setPixelScale(love.window.getPixelScale())
 end
 
 function love.load(args)
@@ -352,19 +347,6 @@ function love.load(args)
             table.insert(tracks, chunk())
         end
     end
-
-    -- temporary hack to see if highdpi support is even possible
-    local screenHighDPI = false
-    for idx,mode in ipairs(love.window.getFullscreenModes()) do
-        print(idx)
-	for k,v in pairs(mode) do
-	    print('',k,v)
-	end
-	if mode.width and mode.width > 2560 then
-	    screenHighDPI = true
-	end
-    end
-    config.highdpi = config.highdpi and screenHighDPI
 
     applyGraphicsConfig()
 
@@ -571,7 +553,7 @@ function love.draw()
         love.graphics.setShader()
     else
         love.graphics.push()
-        local res = highdpi and 2 or 1
+        local res = love.window.getPixelScale()
         love.graphics.scale(res)
 
         love.graphics.clear(0,0,0)
