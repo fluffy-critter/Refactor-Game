@@ -241,7 +241,7 @@ local function credits()
                 love.graphics.push()
                 love.graphics.translate(0, -self.scrollY)
 
-                local y = 0
+                local y = 8
                 for _,line in ipairs(creditsLines) do
                     local text
                     if type(line) == "string" then
@@ -272,11 +272,11 @@ local function credits()
             love.graphics.setColor(0,0,0,512)
             for x=-2,2 do
                 for y=-2,2 do
-                    love.graphics.draw(canvas, x+8, y+8)
+                    love.graphics.draw(canvas, x+8, y)
                 end
             end
             love.graphics.setColor(255,255,255,255)
-            love.graphics.draw(canvas,8,8)
+            love.graphics.draw(canvas,8,0)
 
             if height < self.height then
                 local yh = height*height/self.height
