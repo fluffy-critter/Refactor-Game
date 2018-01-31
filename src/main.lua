@@ -323,9 +323,11 @@ local function applyGraphicsConfig()
         minheight = 480
     })
 
-    local _, _, flags = love.window.getMode()
+    local ww, hh, flags = love.window.getMode()
     highdpi = flags.highdpi
     vsync = flags.vsync
+
+    print("ww=" .. ww .. " hh=" .. hh .. " highdpi=" .. tostring(highdpi))
 
     local refresh = config.targetFPS or flags.refreshrate
     if not refresh or refresh == 0 then
@@ -350,6 +352,19 @@ function love.load(args)
             table.insert(tracks, chunk())
         end
     end
+
+    -- temporary hack to see if highdpi support is even possible
+    local screenHighDPI = false
+    for idx,mode in ipairs(love.window.getFullscreenModes()) do
+        print(idx)
+	for k,v in pairs(mode) do
+	    print('',k,v)
+	end
+	if mode.width and mode.width > 2560 then
+	    screenHighDPI = true
+	end
+    end
+    config.highdpi = config.highdpi and screenHighDPI
 
     applyGraphicsConfig()
 
