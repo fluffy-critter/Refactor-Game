@@ -209,6 +209,8 @@ function Game:init()
         "Lamb",
         "Coatimundi",
         "Weasel", -- dook dook
+        -- row 5
+        "Snail",
     }
 
     for n,name in ipairs(aminals) do
