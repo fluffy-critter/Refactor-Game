@@ -326,6 +326,14 @@ local function mainmenu()
             end
         })
     end
+    if #tracks == 1 then
+        table.insert(choices, {
+            label = "Get full game",
+            onSelect = function()
+                love.system.openURL('http://fluffy.itch.io/refactor')
+            end
+        })
+    end
 
     table.insert(choices, {})
     table.insert(choices, {
