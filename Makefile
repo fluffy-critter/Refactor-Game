@@ -20,7 +20,7 @@ BUNDLE_ID=biz.beesbuzz.Refactor
 LOVE_VERSION=0.10.2
 
 # Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
-BASEVERSION=0.3.0
+BASEVERSION=0.3.1
 
 # Determine the full version string based on the tag
 COMMITHASH=$(shell git rev-parse --short HEAD)
