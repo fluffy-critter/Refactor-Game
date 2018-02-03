@@ -48,6 +48,7 @@ local util = require('util')
 local input = require('input')
 local fonts = require('fonts')
 local imagepool = require('imagepool')
+local playlist = require('playlist')
 
 local Menu = require('Menu')
 
@@ -74,8 +75,6 @@ end
 
 local tracks = {}
 local currentGame
-
-local playlist = {}
 
 local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending", "menu")
 local playing = {
@@ -128,7 +127,7 @@ local function startGame(game)
         renderScale = currentGame:setScale(renderScale)
     end
 
-    config.lastGameDesc = currentGame.META.description
+    playlist.lastDesc = currentGame.META.description
 
     currentGame:start()
 end
@@ -172,7 +171,7 @@ function input.onPress(button)
         config.save()
     elseif currentGame and button == 'back' then
         playing.state = PlayState.ending
-        playlist = {}
+        playlist.tracks = {}
     elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     elseif not currentGame then
@@ -309,7 +308,7 @@ local function mainmenu()
         table.insert(choices, {
             label = "Play all",
             onSelect = function()
-                playlist = util.shallowCopy(tracks)
+                playlist.tracks = util.shallowCopy(tracks)
             end
         })
         table.insert(choices, {})
@@ -510,9 +509,9 @@ function love.update(dt)
         if playing.state ~= PlayState.paused then
             currentGame:update(dt*mul)
         end
-    elseif #playlist > 0 then
-        startGame(playlist[1])
-        table.remove(playlist, 1)
+    elseif #playlist.tracks > 0 then
+        startGame(playlist.tracks[1])
+        table.remove(playlist.tracks, 1)
     elseif menuStack[#menuStack] and menuStack[#menuStack].update then
         menuStack[#menuStack]:update(dt*mul)
     end

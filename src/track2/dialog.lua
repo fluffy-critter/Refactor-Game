@@ -40,9 +40,10 @@ track stuff.
 ]]
 
 local config = require('config')
+local playlist = require('playlist')
 
 if config.debug then
-    print(config.lastGameDesc)
+    print(playlist.lastDesc)
 end
 
 local dialog = {
@@ -1810,7 +1811,7 @@ local dialog = {
             responses = {
                 {"Not a game...", {}},
                 {"Yeah, it's called 'Refactor'", {}, "brain_problems"},
-                {"I want the " .. (config.lastGameDesc or "deer factory") .. " back.", {}, "brain_problems"}
+                {"I want the " .. playlist.lastDesc .. " back.", {}, "brain_problems"}
             }
         },
 
