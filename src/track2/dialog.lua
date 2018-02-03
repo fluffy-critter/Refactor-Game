@@ -39,9 +39,10 @@ track stuff.
 
 ]]
 
--- TODO game should store the previously-played game, this thing changes based on it
-local function prevTrackDescription()
-    return "bouncing balls"
+local config = require('config')
+
+if config.debug then
+    print(config.lastGameDesc)
 end
 
 local dialog = {
@@ -1809,7 +1810,7 @@ local dialog = {
             responses = {
                 {"Not a game...", {}},
                 {"Yeah, it's called 'Refactor'", {}, "brain_problems"},
-                {"I want the " .. prevTrackDescription() .. " back.", {}, "brain_problems"}
+                {"I want the " .. (config.lastGameDesc or "deer factory") .. " back.", {}, "brain_problems"}
             }
         },
 

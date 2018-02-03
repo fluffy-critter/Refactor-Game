@@ -127,6 +127,9 @@ local function startGame(game)
     if currentGame.setScale then
         renderScale = currentGame:setScale(renderScale)
     end
+
+    config.lastGameDesc = currentGame.META.description
+
     currentGame:start()
 end
 

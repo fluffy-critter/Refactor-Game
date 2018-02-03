@@ -14,7 +14,7 @@ local config = {
     height = 720,
     vsync = true,
     kiosk = false,
-    highdpi = false,
+    highdpi = true,
     adaptive = true,
     scaleFactor = 1,
     targetFPS = nil
@@ -35,7 +35,7 @@ function config.save()
             if type(v) == "number" or type(v) == "boolean" then
                 file:write(depth .. string.format('%s=%s,\n', k, v))
             elseif type(v) == "string" then
-                file:write(depth .. string.format('%s="%s"\n', k, v:gsub('"', '\\"')))
+                file:write(depth .. string.format('%s="%s",\n', k, v:gsub('"', '\\"')))
             elseif type(v) == "table" then
                 file:write(depth .. string.format('%s=', k))
                 writeTable(v, depth)
