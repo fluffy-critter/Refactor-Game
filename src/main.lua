@@ -75,6 +75,8 @@ end
 local tracks = {}
 local currentGame
 
+local playlist = {}
+
 local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending", "menu")
 local playing = {
     state = PlayState.menu,
@@ -167,6 +169,7 @@ function input.onPress(button)
         config.save()
     elseif currentGame and button == 'back' then
         playing.state = PlayState.ending
+        playlist = {}
     elseif currentGame and currentGame.onButtonPress then
         currentGame:onButtonPress(button)
     elseif not currentGame then
@@ -298,6 +301,17 @@ end
 
 local function mainmenu()
     local choices = {}
+
+    if #tracks > 1 then
+        table.insert(choices, {
+            label = "Play all",
+            onSelect = function()
+                playlist = util.shallowCopy(tracks)
+            end
+        })
+        table.insert(choices, {})
+    end
+
     for _,track in ipairs(tracks) do
         table.insert(choices, {
             label = string.format("%d. %s (%d:%d)",
@@ -489,8 +503,13 @@ function love.update(dt)
 
     local mul = playing.speed
 
-    if currentGame and playing.state ~= PlayState.paused then
-        currentGame:update(dt*mul)
+    if currentGame then
+        if playing.state ~= PlayState.paused then
+            currentGame:update(dt*mul)
+        end
+    elseif #playlist > 0 then
+        startGame(playlist[1])
+        table.remove(playlist, 1)
     elseif menuStack[#menuStack] and menuStack[#menuStack].update then
         menuStack[#menuStack]:update(dt*mul)
     end
