@@ -74,12 +74,12 @@ function TextBox:onButtonPress(key)
             or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime))
             and not self.cantInterrupt then
             self.state = TextBox.states.ready
-            self.stateAge = self.minDisplayTime
+            self.stateAge = self.minDisplayTime*.75
             self.interrupted = true
             if self.onInterrupt then
                 self:onInterrupt()
             end
-        elseif self.state == TextBox.states.ready then
+        elseif self.state == TextBox.states.ready and self.stateAge >= self.minDisplayTime then
             if self.choices then
                 self.selected = self.index
                 local choice = self.choices[self.index]
