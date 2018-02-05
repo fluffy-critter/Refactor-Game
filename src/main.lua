@@ -199,7 +199,7 @@ local function credits()
     local creditsLines = {
         {font=fonts.menu.h1, text="Refactor"},
         "\n",
-        'All music, code, and art ©2015-2017 j.\194\160“fluffy” shagam unless otherwise specified',
+        'All music, code, and art ©2015-2017 j.\194\160“fluffy”\194\160shagam unless otherwise specified',
         {
             font=fonts.menu.url,
             text="http://sockpuppet.us/ • http://beesbuzz.biz/ • http://fluffy.itch.io/"
@@ -258,7 +258,7 @@ local function credits()
                     local font = line.font or fonts.menu.regular
 
                     love.graphics.setFont(font)
-                    local _, wrappedtext = font:getWrap(text, width)
+                    local _, wrappedtext = util.fairWrap(font, text, width)
                     for _,s in ipairs(wrappedtext) do
                         -- trim out any separators that got orphaned
                         s = s:gsub("^ *• ", ""):gsub(" *• *$", "")

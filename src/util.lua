@@ -353,4 +353,22 @@ function util.runQueue(queue, consume)
     end
 end
 
+-- attempt to wrap text based on fair splitting
+function util.fairWrap(font, s, width)
+    -- get the maximum output width and the minimum line count
+    local maxWidth, split = font:getWrap(s, width)
+    local minLines = #split
+
+    local minWidth, split = font:getWrap(s, width/minLines)
+    local curWidth = minWidth
+    while #split > minLines do
+        -- TODO better search function
+        minWidth = math.ceil((minWidth + maxWidth)/2)
+        curWidth, split = font:getWrap(s, minWidth)
+    end
+
+    return curWidth, split
+end
+
+
 return util
