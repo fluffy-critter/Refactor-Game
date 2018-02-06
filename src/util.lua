@@ -359,15 +359,24 @@ function util.fairWrap(font, s, width)
     local maxWidth, split = font:getWrap(s, width)
     local minLines = #split
 
-    local minWidth, split = font:getWrap(s, width/minLines)
-    local curWidth = minWidth
-    while #split > minLines do
-        -- TODO better search function
-        minWidth = math.ceil((minWidth + maxWidth)/2)
-        curWidth, split = font:getWrap(s, minWidth)
+    if minLines <= 1 then
+        return maxWidth, split
     end
 
-    return curWidth, split
+    local minWidth, split = font:getWrap(s, 1)
+    local outWidth = minWidth
+    while outWidth < maxWidth do
+        local curWidth = math.ceil((minWidth + maxWidth)/2)
+        outWidth, split = font:getWrap(s, math.ceil((minWidth + maxWidth)/2))
+        -- print(curWidth, minWidth, maxWidth, #split, minLines)
+        if #split > minLines then
+            minWidth = curWidth + 1
+        else
+            maxWidth = outWidth
+        end
+    end
+
+    return outWidth, split
 end
 
 
