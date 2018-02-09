@@ -363,7 +363,8 @@ function util.fairWrap(font, s, width)
         return maxWidth, split
     end
 
-    local minWidth, split = font:getWrap(s, 1)
+    local minWidth
+    minWidth, split = font:getWrap(s, 1)
     local outWidth = minWidth
     while outWidth < maxWidth do
         local curWidth = math.ceil((minWidth + maxWidth)/2)
