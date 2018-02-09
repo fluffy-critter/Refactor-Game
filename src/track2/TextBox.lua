@@ -8,6 +8,7 @@ Refactor: 2 - Strangers
 local util = require('util')
 local imagepool = require('imagepool')
 local fonts = require('track2.fonts')
+local input = require('input')
 
 local TextBox = {
     states = util.enum("opening", "writing", "ready", "closing", "closed")
@@ -49,7 +50,7 @@ function TextBox:onInit()
         openTime = 0.25, -- time to open (in seconds)
         charTime = 1/30, -- time to print a character
         pauseTime = 1/4, -- time to wait on a pause (%)
-        minDisplayTime = 0.5, -- Minimum time in seconds for text to display before dismissal
+        minDisplayTime = 0.25, -- Minimum time in seconds for text to display before dismissal
         closeTime = 0.1,
         selectBlinkTime = 0.1, -- how long the select blinks after a movement
 
@@ -59,9 +60,14 @@ function TextBox:onInit()
         doneSound = nil,  -- Sound to play when text finishes naturally
     })
 
-    self.state = TextBox.states.opening
-    self.stateAge = 0
+    self:setState(TextBox.states.opening)
     self.nextChar = 0 -- time remaining until the next character prints
+end
+
+function TextBox:setState(state)
+    self.state = state
+    self.stateAge = 0
+    self.selectAge = 0
 end
 
 function TextBox:onButtonPress(key)
@@ -69,12 +75,9 @@ function TextBox:onButtonPress(key)
         return false
     end
 
-    if key == 'a' then
-        if (self.state < TextBox.states.ready
-            or (self.state == TextBox.states.ready and self.text and self.stateAge < self.minDisplayTime))
-            and not self.cantInterrupt then
-            self.state = TextBox.states.ready
-            self.stateAge = self.minDisplayTime*.75
+    if input.isButton(key) then
+        if self.state < TextBox.states.ready and not self.cantInterrupt then
+            self:setState(TextBox.states.ready)
             self.interrupted = true
             if self.onInterrupt then
                 self:onInterrupt()
@@ -109,7 +112,7 @@ function TextBox:onButtonPress(key)
             self.selectSound:play()
         end
 
-        self.stateAge = 0
+        self.selectAge = 0
         return true
     end
 
@@ -123,8 +126,9 @@ end
 
 function TextBox:update(dt)
     self.stateAge = self.stateAge + dt
+    self.selectAge = self.selectAge + dt
 
-    -- TODO maybe just do this when self.text and/or metrics change?
+    -- TODO just do this when self.text changes
     self.wrapped = nil
     if self.text and (self.state == TextBox.states.writing or self.state == TextBox.states.ready) then
         local _, wrapped = self:getWrappedText(self.text)
@@ -132,14 +136,19 @@ function TextBox:update(dt)
     end
 
     if self.state == TextBox.states.opening and self.stateAge > self.openTime then
-        self.state = TextBox.states.writing
-        self.stateAge = 0
+        if self.text then
+            self:setState(TextBox.states.writing)
+        else
+            self:setState(TextBox.states.ready)
+        end
     elseif self.state == TextBox.states.writing then
         if not self.wrapped or self.charsPrinted >= self.wrapped:len() then
-            self.state = TextBox.states.ready
+            self:setState(TextBox.states.ready)
+
             if self.onReady then
                 self:onReady()
             end
+
             if self.doneSound then
                 self.doneSound:stop()
                 self.doneSound:rewind()
@@ -167,8 +176,9 @@ function TextBox:update(dt)
         end
     elseif self.state == TextBox.states.ready then
         self.charsPrinted = self.wrapped and self.wrapped:len()
+        self.selectAge = self.selectAge + dt
     elseif self.state == TextBox.states.closing and self.stateAge > self.closeTime then
-        self.state = TextBox.states.closed
+        self:setState(TextBox.states.closed)
         if self.onClose then
             self:onClose()
         end
@@ -177,8 +187,7 @@ end
 
 function TextBox:close()
     if self.state < TextBox.states.closing then
-        self.state = TextBox.states.closing
-        self.stateAge = 0
+        self:setState(TextBox.states.closing)
     end
 end
 
@@ -247,7 +256,7 @@ function TextBox:draw()
         local yinc = self.font:getLineHeight() * self.font:getHeight()
         for n,choice in ipairs(self.choices) do
             love.graphics.print(choice.text, left + 16, y)
-            if n == self.index and self.stateAge > self.selectBlinkTime then
+            if n == self.index and self.selectAge > self.selectBlinkTime then
                 love.graphics.print(">", left + 8, y)
             end
             y = y + yinc

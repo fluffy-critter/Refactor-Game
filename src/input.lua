@@ -86,6 +86,14 @@ util.applyDefaults(buttonMap, {
     rightshoulder = config.debug and 'skip'
 })
 
+function input.isButton(key)
+    return key == 'a' or key == 'b' or key == 'x' or key == 'y'
+end
+
+function input.isDirection(key)
+    return key == 'up' or key == 'down' or key == 'left' or key == 'right'
+end
+
 local function handlePress(which, map)
     local event = map[which]
     if event and not input.pressed[event] then
