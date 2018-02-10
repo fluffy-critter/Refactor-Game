@@ -311,12 +311,20 @@ function Game:update(dt)
         local maxLeft = math.min(curLeft, -900)
         local maxRight = math.max(curRight, 900)
 
-        -- If the width already exceeds the maxima let it ratchet towardcs but don't let it go further away
+        -- If the width already exceeds the maxima let it ratchet towards but don't let it go further away
         local minWidth = math.min(b.width, b.minWidth)
         local maxWidth = math.max(b.width, b.maxWidth)
-
         b.width = util.clamp(b.width + math.random(-10, 10), minWidth, maxWidth)
-        b.center = util.clamp(b.center + math.random(-100, 100), maxLeft + b.width, maxRight - b.width)
+
+        -- and ratchet the channel so it doesn't intersect the monk (but don't make it so obvious)
+        local step = math.random(-100, 100)
+        local minCenter = self.monk.x + self.monk.r - b.width + 1
+        local maxCenter = self.monk.x - self.monk.r + b.width - 1
+        if b.center + step < minCenter or b.center + step > maxCenter then
+            step = -step
+        end
+
+        b.center = util.clamp(b.center + step, maxLeft + b.width, maxRight - b.width)
 
         return {b.center - b.width, b.center + b.width}
     end)
