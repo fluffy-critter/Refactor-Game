@@ -47,6 +47,8 @@ function Menu:draw()
         self.canvas = love.graphics.newCanvas(w, h)
     end
 
+    -- TODO scrolling
+
     local tooltip
     self.canvas:renderTo(function()
         love.graphics.clear(0,0,0,0)
