@@ -47,18 +47,15 @@ function Menu:draw()
         self.canvas = love.graphics.newCanvas(w, h)
     end
 
+    local tooltip
     self.canvas:renderTo(function()
-        local font = self.font or fonts.menu.regular
         love.graphics.clear(0,0,0,0)
         love.graphics.setBlendMode("alpha")
-        love.graphics.setFont(font)
 
         local y = 0
         for n,item in ipairs(self.choices) do
-            if item.font then
-                font = item.font
-                love.graphics.setFont(font)
-            end
+            local font = item.font or self.font or fonts.menu.regular
+            love.graphics.setFont(font)
             local fontSize = font:getHeight()
 
             if n == self.pos then
@@ -66,6 +63,7 @@ function Menu:draw()
                 if item.onSelect then
                     love.graphics.print(">", 0, y)
                 end
+                tooltip = item.tooltip
             elseif item.onSelect then
                 love.graphics.setColor(200,200,200,255)
             else
@@ -89,6 +87,23 @@ function Menu:draw()
     end
     love.graphics.setColor(255,255,255,255)
     love.graphics.draw(self.canvas, 8, 8)
+
+    if tooltip then
+        love.graphics.setBlendMode("alpha")
+        local font = self.tooltipFont or fonts.menu.tooltip
+        local fontSize = font:getHeight()
+
+        love.graphics.setFont(font)
+        local lw = font:getWrap(tooltip, 65535) + fontSize*3/4 + 8
+        local lh = fontSize + 16
+        local ly = love.graphics.getHeight() - lh
+
+        love.graphics.setColor(0,0,0,127)
+        love.graphics.rectangle("fill", 0, ly, lw, lh)
+
+        love.graphics.setColor(255,255,255,255)
+        love.graphics.print(tooltip, 8 + fontSize*3/8, ly + 8)
+    end
 
     love.graphics.setShader()
 end

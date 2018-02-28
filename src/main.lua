@@ -411,6 +411,7 @@ function love.load(args)
                     track.META.title,
                     track.META.duration / 60,
                     track.META.duration % 60),
+                tooltip = string.format("%s / %s", track.META.genre, track.META.style),
                 onSelect = track.new and function()
                     startGame(track)
                 end
