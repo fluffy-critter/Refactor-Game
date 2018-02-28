@@ -27,7 +27,9 @@ local Game = {
         tracknum = 2,
         title = "strangers",
         duration = 3*60 + 11,
-        description = "weird little story"
+        description = "weird little story",
+        genre = "electropop",
+        style = "JRPG"
     }
 }
 

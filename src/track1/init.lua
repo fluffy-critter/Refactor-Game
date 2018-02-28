@@ -31,6 +31,8 @@ local Game = {
         title = "little bouncing ball",
         duration = 5*60 + 26,
         description = "bouncing balls",
+        genre = "dubstep",
+        style = "ball breaker"
     }
 }
 

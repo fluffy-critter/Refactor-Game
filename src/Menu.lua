@@ -66,8 +66,10 @@ function Menu:draw()
                 if item.onSelect then
                     love.graphics.print(">", 0, y)
                 end
-            else
+            elseif item.onSelect then
                 love.graphics.setColor(200,200,200,255)
+            else
+                love.graphics.setColor(192,192,192,127)
             end
             if item.label then
                 love.graphics.print(item.label, fontSize*3/4, y)

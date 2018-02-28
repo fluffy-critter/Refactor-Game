@@ -74,6 +74,21 @@ local function blitCanvas(canvas, aspect)
 end
 
 local tracks = {}
+local trackListing = {
+    "little bouncing ball",
+    "strangers",
+    "sliced by a mandolin",
+    "deer drinking from the catacomb stream",
+    "road to nowhere",
+    "silica",
+    "flight",
+    "and counting",
+    "roundsabout",
+    "soliloquy",
+    "circle",
+    "feed",
+    "adding up to nothing"
+}
 local currentGame
 
 local PlayState = util.enum("starting", "playing", "pausing", "paused", "resuming", "ending", "menu")
@@ -308,23 +323,19 @@ local function mainmenu()
         table.insert(choices, {
             label = "Play all",
             onSelect = function()
-                playlist.tracks = util.shallowCopy(tracks)
+                for _,item in ipairs(tracks) do
+                    if item.track then
+                        table.insert(playlist.tracks, item.track)
+                    end
+                end
+                print("playlist length = " .. #playlist.tracks)
             end
         })
         table.insert(choices, {})
     end
 
     for _,track in ipairs(tracks) do
-        table.insert(choices, {
-            label = string.format("%d. %s (%d:%d)",
-                track.META.tracknum,
-                track.META.title,
-                track.META.duration / 60,
-                track.META.duration % 60),
-            onSelect = function()
-                startGame(track)
-            end
-        })
+        table.insert(choices, track)
     end
     if #tracks == 1 then
         table.insert(choices, {
@@ -392,7 +403,22 @@ function love.load(args)
     for i=1,13 do
         local chunk = love.filesystem.load("track" .. i .. "/init.lua")
         if chunk then
-            table.insert(tracks, chunk())
+            local track = chunk()
+            table.insert(tracks, {
+                track = track,
+                label = string.format("%d. %s (%d:%d)",
+                    track.META.tracknum,
+                    track.META.title,
+                    track.META.duration / 60,
+                    track.META.duration % 60),
+                onSelect = track.new and function()
+                    startGame(track)
+                end
+            })
+        else
+            table.insert(tracks, {
+                label = string.format("%d. %s", i, trackListing[i])
+            })
         end
     end
 

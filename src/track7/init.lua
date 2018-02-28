@@ -23,6 +23,8 @@ local Game = {
         title = "flight",
         duration = 2*60 + 20,
         description = "falling monk",
+        genre = "mindfulness",
+        style = "zen"
     }
 }
 
