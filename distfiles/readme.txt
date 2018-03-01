@@ -1,5 +1,5 @@
-Refactor
-(c)2017 fluffy, http://beesbuzz.biz
+Refactor, version {VERSION}
+(c)2018 fluffy, http://beesbuzz.biz
 
 HOW TO PLAY
 
