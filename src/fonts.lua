@@ -13,6 +13,7 @@ function fonts.setPixelScale(scale)
         h1 = love.graphics.newFont("fonts/LibreBodoni-Bold.otf", 32*scale),
         h2 = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 28*scale),
         tooltip = love.graphics.newFont("fonts/LibreBodoni-Italic.otf", 18*scale),
+        versionText = love.graphics.newFont(12*scale),
         url = love.graphics.newFont(18*scale)
     }
 

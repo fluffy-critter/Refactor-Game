@@ -398,8 +398,8 @@ function love.load(args)
     cute.go(args)
 
     -- scan for all of the existing tracks and add them to the track list
-    -- TODO is there a way to scan the actual bundle directly? I'm not finding it...
     -- TODO maybe we could only actually load the game when we need it?
+    local count = 0
     for i=1,13 do
         local chunk = love.filesystem.load("track" .. i .. "/init.lua")
         if chunk then
@@ -416,11 +416,18 @@ function love.load(args)
                     startGame(track)
                 end
             })
+            count = count + 1
         else
             table.insert(tracks, {
                 label = string.format("%d. %s", i, trackListing[i])
             })
         end
+    end
+    if count == 1 then
+        -- we only loaded one actual track, so this is a singles pack
+        util.runQueue(tracks, function(track)
+            return not track.onSelect
+        end)
     end
 
     applyGraphicsConfig()
@@ -663,6 +670,10 @@ function love.draw()
 
         love.graphics.pop()
         menuStack[#menuStack]:draw()
+
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setFont(fonts.menu.versionText)
+        love.graphics.printf("version " .. config.version, 0, 8, love.graphics.getWidth() - 8, "right")
     end
 
     -- love.graphics.setColor(255,255,255,255)
