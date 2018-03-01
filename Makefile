@@ -143,22 +143,25 @@ $(DEPS)/love/%:
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
-$(DEST)/love/$(NAME).love: $(DEST)/.latest-change
+$(DEST)/love/$(NAME).love: $(DEST)/.latest-change Makefile
 	echo $(@)
-	mkdir -p $(DEST)/love && \
-	cd $(SRC) && \
-	rm -f ../$(@) && \
-	zip -9r ../$(@) . -x 'test'
+	mkdir -p $(DEST)/love
+	rm -f $(@)
+	cd $(SRC) && zip -9r ../$(@) . -x 'test'
+	echo "$(GAME_VERSION)" > $(DEST)/version.txt
+	zip -9j $(@) $(DEST)/version.txt
 
 # .love bundle, jam-specific
 love-jam: submodules $(DEST)/love-jam/$(NAME)-jam.love
-$(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change
+$(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change Makefile
 	echo $(@)
-	mkdir -p $(DEST)/love-jam && \
+	mkdir -p $(DEST)/love-jam
+	rm -f $(@)
 	cd $(SRC) && \
-	rm -f ../$(@) && \
-	zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
-	zip -9r ../$(@) $(JAM_TRACK)
+		zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
+		zip -9r ../$(@) $(JAM_TRACK)
+	echo "$(GAME_VERSION) (jam edition)" > $(DEST)/version.txt
+	zip -9j $(@) $(DEST)/version.txt
 
 # macOS version
 osx: $(DEST)/osx/$(NAME).app

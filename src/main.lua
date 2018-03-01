@@ -662,6 +662,10 @@ function love.draw()
 
         love.graphics.pop()
         menuStack[#menuStack]:draw()
+
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setFont(fonts.menu.versionText)
+        love.graphics.printf("version " .. config.version, 0, 8, love.graphics.getWidth() - 8, "right")
     end
 
     -- love.graphics.setColor(255,255,255,255)

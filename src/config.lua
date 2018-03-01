@@ -66,4 +66,6 @@ end
 
 config.load()
 
+config.version = love.filesystem.read("version.txt") or "LOCAL BUILD"
+
 return config
