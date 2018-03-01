@@ -118,7 +118,7 @@ staging-win32-jam: win32-jam $(DEST)/.distfiles-$(GAME_VERSION)_win32-jam
 staging-win64-jam: win64-jam $(DEST)/.distfiles-$(GAME_VERSION)_win64-jam
 
 $(DEST)/.distfiles-$(GAME_VERSION)_%: LICENSE $(wildcard distfiles/*)
-	echo $(DEST)/$(lastword $(subst _, ,$(@))) && \
+	@echo $(DEST)/$(lastword $(subst _, ,$(@)))
 	for i in $(^) ; do \
 		sed 's/{VERSION}/$(GAME_VERSION)/g' $$i > $(DEST)/$(lastword $(subst _, ,$(@)))/$$(basename $$i) ; \
 	done && \
@@ -130,21 +130,21 @@ $(DEST)/.published-$(GAME_VERSION)_%: staging-% $(DEST)/%/LICENSE
 
 # hacky way to inject the distfiles content
 $(DEST)/%/LICENSE: $(DEST)/.distfiles-%-$(GAME_VERSION) LICENSE $(wildcard distfiles/*)
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(shell dirname $(@))
 	for i in LICENSE distfiles/* ; do sed s/{VERSION}/$(GAME_VERSION)/g "$i" > $(shell dirname $(@))/$(shell basename "$i")
 	touch $(DEST)/.distfiles-%-$(GAME_VERSION)
 
 # download build-dependency stuff
 $(DEPS)/love/%:
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEPS)/love
 	curl -L -o $(@) https://bitbucket.org/rude/love/downloads/$(shell basename $(@))
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
 $(DEST)/love/$(NAME).love: $(DEST)/.latest-change Makefile
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/love
 	rm -f $(@)
 	cd $(SRC) && zip -9r ../$(@) . -x 'test'
@@ -154,7 +154,7 @@ $(DEST)/love/$(NAME).love: $(DEST)/.latest-change Makefile
 # .love bundle, jam-specific
 love-jam: submodules $(DEST)/love-jam/$(NAME)-jam.love
 $(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change Makefile
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/love-jam
 	rm -f $(@)
 	cd $(SRC) && \
@@ -166,7 +166,7 @@ $(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change Makefile
 # macOS version
 osx: $(DEST)/osx/$(NAME).app
 $(DEST)/osx/$(NAME).app: love-bundle $(wildcard osx/*) $(DEST)/deps/love.app
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/osx
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
@@ -176,7 +176,7 @@ $(DEST)/osx/$(NAME).app: love-bundle $(wildcard osx/*) $(DEST)/deps/love.app
 
 osx-jam: $(DEST)/osx-jam/$(NAME)-jam.app
 $(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.app
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/osx-jam
 	rm -rf $(@)
 	cp -r "$(DEST)/deps/love.app" $(@) && \
@@ -186,7 +186,7 @@ $(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.ap
 
 # OSX build dependencies
 $(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macosx-x64.zip
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/deps && \
 	unzip -d $(DEST)/deps $(^)
 	touch $(@)
@@ -196,13 +196,13 @@ WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
 WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 
 $(WIN32_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win32.zip
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/deps/
 	unzip -d $(DEST)/deps $(^)
 	touch $(@)
 
 $(WIN64_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win64.zip
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/deps/
 	unzip -d $(DEST)/deps $(^)
 	touch $(@)
@@ -210,14 +210,14 @@ $(WIN64_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win64.zip
 # Win32 version
 win32: $(WIN32_ROOT)/love.exe $(DEST)/win32/$(NAME).exe
 $(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32
 	cat $(^) > $(@)
 
 win32-jam: $(WIN32_ROOT)/love.exe $(DEST)/win32-jam/$(NAME)-jam.exe
 $(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$(NAME)-jam.love
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win32-jam
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32-jam
 	cat $(^) > $(@)
@@ -226,14 +226,14 @@ $(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$
 # Win64 version
 win64: $(WIN64_ROOT)/love.exe $(DEST)/win64/$(NAME).exe
 $(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64
 	cat $(^) > $(@)
 
 win64-jam: $(WIN64_ROOT)/love.exe $(DEST)/win64-jam/$(NAME)-jam.exe
 $(DEST)/win64-jam/$(NAME)-jam.exe: windows/refactor-win64.exe $(DEST)/love-jam/$(NAME)-jam.love
-	echo $(@)
+	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win64-jam
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64-jam
 	cat $(^) > $(@)
