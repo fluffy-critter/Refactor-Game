@@ -148,7 +148,7 @@ $(DEST)/love/$(NAME).love: $(DEST)/.latest-change Makefile
 	mkdir -p $(DEST)/love
 	rm -f $(@)
 	cd $(SRC) && zip -9r ../$(@) . -x 'test'
-	echo "$(GAME_VERSION)" > $(DEST)/version.txt
+	printf "%s" "$(GAME_VERSION)" > $(DEST)/version.txt
 	zip -9j $(@) $(DEST)/version.txt
 
 # .love bundle, jam-specific
@@ -160,7 +160,7 @@ $(DEST)/love-jam/$(NAME)-jam.love: $(DEST)/.latest-change Makefile
 	cd $(SRC) && \
 		zip -9r ../$(@) . -x 'track*' 'track*/**' 'test' 'test/**' && \
 		zip -9r ../$(@) $(JAM_TRACK)
-	echo "$(GAME_VERSION) (jam edition)" > $(DEST)/version.txt
+	printf "%s" "$(GAME_VERSION) (jam edition)" > $(DEST)/version.txt
 	zip -9j $(@) $(DEST)/version.txt
 
 # macOS version
