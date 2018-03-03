@@ -66,6 +66,6 @@ end
 
 config.load()
 
-config.version = (love.filesystem.read("version.txt") or "LOCAL BUILD"):gsub("%s+$","")
+config.version = (love.filesystem.read("version") or "LOCAL BUILD"):gsub("%s+$","")
 
 return config
