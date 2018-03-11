@@ -5,22 +5,22 @@ Refactor: 2 - Strangers
 
 ]]
 
-local config = require('config')
+local config = require 'config'
 
 local DEBUG = config.debug
 
-local util = require('util')
-local gfx = require('gfx')
-local shaders = require('shaders')
-local imagepool = require('imagepool')
+local util = require 'util'
+local gfx = require 'gfx'
+local shaders = require 'shaders'
+local imagepool = require 'imagepool'
 
-local fonts = require('track2.fonts')
+local fonts = require 'track2.fonts'
 
-local TextBox = require('track2.TextBox')
+local TextBox = require 'track2.TextBox'
 
-local EventQueue = require('EventQueue')
-local Animator = require('Animator')
-local SoundGroup = require('SoundGroup')
+local EventQueue = require 'EventQueue'
+local Animator = require 'Animator'
+local SoundGroup = require 'SoundGroup'
 
 local Game = {
     META = {
@@ -101,7 +101,7 @@ function Game:init()
 
     self.border = imagepool.load('track2/border.png', {premultiply=true})
 
-    self.lyrics = require('track2.lyrics')
+    self.lyrics = require 'track2.lyrics'
     self.lyricPos = 1
     self.nextLyric = self.lyrics[self.lyricPos]
 

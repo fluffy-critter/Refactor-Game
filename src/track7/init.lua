@@ -4,18 +4,18 @@ Refactor: 7 - flight
 (c)2018 fluffy @ beesbuzz.biz. Please see the LICENSE file for license information.
 ]]
 
-local util = require('util')
-local geom = require('geom')
-local input = require('input')
-local gfx = require('gfx')
-local config = require('config')
-local heap = require('thirdparty.binary_heap')
-local shaders = require('shaders')
+local util = require 'util'
+local geom = require 'geom'
+local input = require 'input'
+local gfx = require 'gfx'
+local config = require 'config'
+local heap = require 'thirdparty.binary_heap'
+local shaders = require 'shaders'
 
-local imagepool = require('imagepool')
+local imagepool = require 'imagepool'
 
-local Coin = require('track7.Coin')
-local Channel = require('track7.Channel')
+local Coin = require 'track7.Coin'
+local Channel = require 'track7.Channel'
 
 local Game = {
     META = {

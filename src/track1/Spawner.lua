@@ -9,7 +9,7 @@ retain - whether to retain spawned items (for future killing)
 
 ]]
 
-local util = require('util')
+local util = require 'util'
 
 local Spawner = {}
 

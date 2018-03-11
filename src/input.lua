@@ -5,8 +5,8 @@ Refactor
 
 ]]
 
-local config = require('config')
-local util = require('util')
+local config = require 'config'
+local util = require 'util'
 
 local input = {
     -- ramp time for digital inputs, in seconds

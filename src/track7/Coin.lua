@@ -7,9 +7,9 @@ a coin
 
 ]]
 
-local util = require('util')
-local geom = require('geom')
-local config = require('config')
+local util = require 'util'
+local geom = require 'geom'
+local config = require 'config'
 
 local Coin = {}
 

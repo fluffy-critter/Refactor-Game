@@ -7,11 +7,11 @@ Event queue unit tests
 
 ]]
 
-local cute = require('thirdparty.cute')
+local cute = require 'thirdparty.cute'
 local notion = cute.notion
 local check = cute.check
 
-local EventQueue = require('EventQueue')
+local EventQueue = require 'EventQueue'
 
 notion("the queue functions", function()
     local eq = EventQueue.new()

@@ -1,5 +1,5 @@
-local shaders = require('shaders')
-local cute = require('thirdparty.cute')
+local shaders = require 'shaders'
+local cute = require 'thirdparty.cute'
 local notion = cute.notion
 local check = cute.check
 local minion = cute.minion

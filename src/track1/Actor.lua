@@ -22,7 +22,7 @@ draw() - render the actor
 
 ]]
 
-local geom = require('geom')
+local geom = require 'geom'
 
 local Actor = {}
 

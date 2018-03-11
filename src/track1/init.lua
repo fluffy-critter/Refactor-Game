@@ -5,25 +5,25 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
-local Ball = require('track1.Ball')
-local SuperBall = require('track1.SuperBall')
+local Ball = require 'track1.Ball'
+local SuperBall = require 'track1.SuperBall'
 
-local SparkParticle = require('track1.SparkParticle')
+local SparkParticle = require 'track1.SparkParticle'
 
-local Randomizer = require('track1.Randomizer')
-local Brick = require('track1.Brick')
-local RoamingEye = require('track1.RoamingEye')
-local FlappyBat = require('track1.FlappyBat')
+local Randomizer = require 'track1.Randomizer'
+local Brick = require 'track1.Brick'
+local RoamingEye = require 'track1.RoamingEye'
+local FlappyBat = require 'track1.FlappyBat'
 
-local Spawner = require('track1.Spawner')
+local Spawner = require 'track1.Spawner'
 
-local EventQueue = require('EventQueue')
-local geom = require('geom')
-local util = require('util')
-local gfx = require('gfx')
-local shaders = require('shaders')
-local input = require('input')
-local config = require('config')
+local EventQueue = require 'EventQueue'
+local geom = require 'geom'
+local util = require 'util'
+local gfx = require 'gfx'
+local shaders = require 'shaders'
+local input = require 'input'
+local config = require 'config'
 
 local Game = {
     META = {

@@ -6,14 +6,14 @@ Refactor: 1 - Little Bouncing Ball
 RoamingEye - it looks at you piercingly
 ]]
 
-local geom = require('geom')
-local util = require('util')
-local shaders = require('shaders')
-local gfx = require('gfx')
-local config = require('config')
+local geom = require 'geom'
+local util = require 'util'
+local shaders = require 'shaders'
+local gfx = require 'gfx'
+local config = require 'config'
 
-local Actor = require('track1.Actor')
-local StunBullet = require('track1.StunBullet')
+local Actor = require 'track1.Actor'
+local StunBullet = require 'track1.StunBullet'
 
 local RoamingEye = {}
 setmetatable(RoamingEye, {__index = Actor})

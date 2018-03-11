@@ -7,8 +7,8 @@ the channel through which we are descending
 
 ]]
 
-local util = require('util')
-local geom = require('geom')
+local util = require 'util'
+local geom = require 'geom'
 
 local Channel = {}
 

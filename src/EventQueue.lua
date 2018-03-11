@@ -7,8 +7,8 @@ Event queue runner
 
 ]]
 
-local util = require('util')
-local heap = require('thirdparty.binary_heap')
+local util = require 'util'
+local heap = require 'thirdparty.binary_heap'
 
 local EventQueue = {}
 

@@ -12,7 +12,7 @@ sounds - individual sounds we manage
 
 ]]
 
-local util = require('util')
+local util = require 'util'
 
 local SoundGroup = {}
 

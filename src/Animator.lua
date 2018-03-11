@@ -22,7 +22,7 @@ startPos and endPos need to have the same indices.
 
 ]]
 
-local util = require('util')
+local util = require 'util'
 
 local Animator = {}
 

@@ -5,7 +5,7 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
-local util = require('util')
+local util = require 'util'
 
 local HitParticle = {}
 

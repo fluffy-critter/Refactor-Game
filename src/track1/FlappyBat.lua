@@ -6,11 +6,11 @@ Refactor: 1 - Little Bouncing Ball
 Flappy Bat, Flap-Flappy Bat, Flappy Bat, god dammit
 ]]
 
-local geom = require('geom')
-local util = require('util')
-local imagepool = require('imagepool')
+local geom = require 'geom'
+local util = require 'util'
+local imagepool = require 'imagepool'
 
-local Actor = require('track1.Actor')
+local Actor = require 'track1.Actor'
 
 local FlappyBat = {}
 setmetatable(FlappyBat, {__index = Actor})

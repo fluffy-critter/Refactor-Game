@@ -60,10 +60,10 @@ Methods:
 
 ]]
 
-local HitParticle = require('track1.HitParticle')
-local util = require('util')
-local geom = require('geom')
-local gfx = require('gfx')
+local HitParticle = require 'track1.HitParticle'
+local util = require 'util'
+local geom = require 'geom'
+local gfx = require 'gfx'
 
 local Ball = {}
 

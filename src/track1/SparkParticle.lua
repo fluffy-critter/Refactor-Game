@@ -5,8 +5,8 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
-local util = require('util')
-local gfx = require('gfx')
+local util = require 'util'
+local gfx = require 'gfx'
 
 local SparkParticle = {}
 

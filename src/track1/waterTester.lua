@@ -8,8 +8,8 @@ water parameter test
 ]]
 
 local waterTester = {}
-local util = require('util')
-local shaders = require('shaders')
+local util = require 'util'
+local shaders = require 'shaders'
 
 function waterTester:init()
     local limits = love.graphics.getSystemLimits()

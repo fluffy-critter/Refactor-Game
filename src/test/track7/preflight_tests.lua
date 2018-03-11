@@ -5,11 +5,11 @@ Refactor: 7 - flight
 
 ]]
 
-local cute = require('thirdparty.cute')
+local cute = require 'thirdparty.cute'
 local notion = cute.notion
 local check = cute.check
 
-local Game = require('track7')
+local Game = require 'track7'
 
 notion("test face is disabled", function()
     local g = Game.new()

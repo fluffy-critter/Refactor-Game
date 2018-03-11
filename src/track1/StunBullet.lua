@@ -6,10 +6,10 @@ Refactor: 1 - Little Bouncing Ball
 RoamingEye - it looks at you piercingly
 ]]
 
-local geom = require('geom')
-local util = require('util')
+local geom = require 'geom'
+local util = require 'util'
 
-local Ball = require('track1.Ball')
+local Ball = require 'track1.Ball'
 local StunBullet = {}
 setmetatable(StunBullet, {__index = Ball})
 

@@ -5,12 +5,12 @@ Refactor: 2 - Strangers
 
 ]]
 
-local cute = require('thirdparty.cute')
-local util = require('util')
+local cute = require 'thirdparty.cute'
+local util = require 'util'
 local notion = cute.notion
 
-local dialog = require('track2.dialog')
-local Game = require('track2')
+local dialog = require 'track2.dialog'
+local Game = require 'track2'
 
 -- whether to check dialog coverage
 local CheckCoverage = false

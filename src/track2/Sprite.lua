@@ -14,7 +14,7 @@ animSpeed - speed multiplier on the animation
 
 ]]
 
-local util = require('util')
+local util = require 'util'
 
 local Sprite = {}
 

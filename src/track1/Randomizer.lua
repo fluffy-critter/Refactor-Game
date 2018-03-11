@@ -7,14 +7,14 @@ An alien that goes and fucks shit up
 
 ]]
 
-local util = require('util')
-local geom = require('geom')
-local imagepool = require('imagepool')
-local shaders = require('shaders')
+local util = require 'util'
+local geom = require 'geom'
+local imagepool = require 'imagepool'
+local shaders = require 'shaders'
 
-local Actor = require('track1.Actor')
-local Ball = require('track1.Ball')
-local SparkParticle = require('track1.SparkParticle')
+local Actor = require 'track1.Actor'
+local Ball = require 'track1.Ball'
+local SparkParticle = require 'track1.SparkParticle'
 
 local Randomizer = {}
 setmetatable(Randomizer, {__index = Actor})

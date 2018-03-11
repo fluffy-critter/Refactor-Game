@@ -5,14 +5,14 @@ Refactor: 2 - Strangers
 
 ]]
 
-local imagepool = require('imagepool')
-local util = require('util')
-local shaders = require('shaders')
-local gfx = require('gfx')
+local imagepool = require 'imagepool'
+local util = require 'util'
+local shaders = require 'shaders'
+local gfx = require 'gfx'
 
-local Sprite = require('track2.Sprite')
-local Animator = require('Animator')
-local TextBox = require('track2.TextBox')
+local Sprite = require 'track2.Sprite'
+local Animator = require 'Animator'
+local TextBox = require 'track2.TextBox'
 
 local scenes = {}
 

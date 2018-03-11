@@ -7,11 +7,11 @@ Utility library unit tests
 
 ]]
 
-local cute = require('thirdparty.cute')
+local cute = require 'thirdparty.cute'
 local notion = cute.notion
 local check = cute.check
 
-local geom = require('geom')
+local geom = require 'geom'
 
 notion("projectPointToLine", function()
     check(geom.projectPointToLine(0, 100, 0, 0, 100, 0)).is(0)

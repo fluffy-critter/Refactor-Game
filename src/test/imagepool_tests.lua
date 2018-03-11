@@ -1,5 +1,5 @@
-local imagepool = require('imagepool')
-local cute = require('thirdparty.cute')
+local imagepool = require 'imagepool'
+local cute = require 'thirdparty.cute'
 local notion = cute.notion
 local check = cute.check
 local minion = cute.minion

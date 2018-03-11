@@ -39,8 +39,8 @@ track stuff.
 
 ]]
 
-local config = require('config')
-local playlist = require('playlist')
+local config = require 'config'
+local playlist = require 'playlist'
 
 if config.debug then
     print(playlist.lastDesc)

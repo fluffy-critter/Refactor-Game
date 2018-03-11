@@ -5,10 +5,10 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
-local util = require('util')
-local geom = require('geom')
-local SparkParticle = require('track1.SparkParticle')
-local Ball = require('track1.Ball')
+local util = require 'util'
+local geom = require 'geom'
+local SparkParticle = require 'track1.SparkParticle'
+local Ball = require 'track1.Ball'
 
 local SuperBall = {}
 setmetatable(SuperBall, {__index = Ball})

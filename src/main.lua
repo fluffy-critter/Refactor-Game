@@ -36,21 +36,21 @@ setmetatable(_G, {
     end
 })
 
-local config = require('config')
+local config = require 'config'
 
 local DEBUG = config.debug or false
 
-local profiler = config.profiler and require('profiler')
-local cute = require('thirdparty.cute')
+local profiler = config.profiler and require 'profiler'
+local cute = require 'thirdparty.cute'
 
-local shaders = require('shaders')
-local util = require('util')
-local input = require('input')
-local fonts = require('fonts')
-local imagepool = require('imagepool')
-local playlist = require('playlist')
+local shaders = require 'shaders'
+local util = require 'util'
+local input = require 'input'
+local fonts = require 'fonts'
+local imagepool = require 'imagepool'
+local playlist = require 'playlist'
 
-local Menu = require('Menu')
+local Menu = require 'Menu'
 
 local baseTitle = "Sockpuppet - Refactor"
 
@@ -442,7 +442,7 @@ function love.load(args)
     local track
     for _,arg in ipairs(args) do
         if arg:sub(1, 5) == "track" then
-            track = require(arg)
+            track = require arg
             startGame(track)
         end
     end

@@ -5,9 +5,9 @@ Refactor: 1 - Little Bouncing Ball
 
 ]]
 
-local util = require('util')
-local Actor = require('track1.Actor')
-local HitParticle = require('track1.HitParticle')
+local util = require 'util'
+local Actor = require 'track1.Actor'
+local HitParticle = require 'track1.HitParticle'
 
 local Brick = {}
 setmetatable(Brick, {__index = Actor})

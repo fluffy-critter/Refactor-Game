@@ -9,8 +9,8 @@ Useful graphics functions
 
 local gfx = {}
 
-local imagepool = require('imagepool')
-local quadtastic = require('thirdparty.libquadtastic')
+local imagepool = require 'imagepool'
+local quadtastic = require 'thirdparty.libquadtastic'
 
 local filledCircle = imagepool.load('images/circlefill.png', {mipmaps=true})
 local hollowCircle = imagepool.load('images/circlehollow.png', {mipmaps=true})

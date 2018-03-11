@@ -11,8 +11,8 @@ Properties:
 
 ]]
 
-local util = require('util')
-local fonts = require('fonts')
+local util = require 'util'
+local fonts = require 'fonts'
 
 local Menu = {}
 
