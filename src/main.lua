@@ -375,9 +375,9 @@ local function applyGraphicsConfig()
         resizable = true,
         fullscreen = config.fullscreen,
         vsync = config.vsync,
-        highdpi = false,
+        highdpi = config.highdpi,
         minwidth = 480,
-        minheight = 480
+        minheight = 480,
     })
 
     local _, _, flags = love.window.getMode()
@@ -656,9 +656,11 @@ function love.draw()
         love.graphics.rectangle("fill", 0, 0, w, 300)
         love.graphics.setColor(1,1,1,1)
 
+        local dpi = love.window.getDPIScale()
+
         local ground = imagepool.load('mainmenu/ground.png')
-        for x = 0, w, 702 do
-            love.graphics.draw(ground, x, 0)
+        for x = 0, w, ground:getWidth()/dpi do
+            love.graphics.draw(ground, x, 0, 0, 1/dpi)
         end
 
         local bg = imagepool.load('mainmenu/forest-stuff.png')
@@ -666,7 +668,7 @@ function love.draw()
         love.graphics.draw(bg, (w - bg:getWidth()*scale)/2, 0, 0, scale, scale)
 
         local logo = imagepool.load('mainmenu/refactor-released.png')
-        love.graphics.draw(logo, w - logo:getWidth(), h - logo:getHeight())
+        love.graphics.draw(logo, w - logo:getWidth()/dpi, h - logo:getHeight()/dpi, 0, 1/dpi)
 
         love.graphics.pop()
         menuStack[#menuStack]:draw()

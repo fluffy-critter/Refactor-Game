@@ -96,11 +96,17 @@ function Game:init()
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(256, 224, { format = gfx.selectCanvasFormat("rgb565", "rgba8") })
+    self.canvas = love.graphics.newCanvas(256, 224, {
+        format = gfx.selectCanvasFormat("rgb565", "rgba8"),
+        dpiscale = 1
+    })
 
     local blurFmt = gfx.selectCanvasFormat("rgba8", "rgb8")
     if blurFmt then
-        self.back = love.graphics.newCanvas(256, 224, { format = gfx.selectCanvasFormat("rgba8") })
+        self.back = love.graphics.newCanvas(256, 224, {
+            format = gfx.selectCanvasFormat("rgba8"),
+            dpiscale = 1
+        })
     end
 
     self.border = imagepool.load('track2/border.png', {premultiply=true})
