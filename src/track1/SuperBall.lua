@@ -27,8 +27,8 @@ end
 function SuperBall:onInit()
     util.applyDefaults(self, {
         r = 20,
-        color = {255, 255, 127, 255},
-        hitColor = {255, 255, 0, 255},
+        color = {1, 1, .5, 1},
+        hitColor = {1, 1, 0, 1},
         spawnVelocity = 300,
         lives = 1,
         elasticity = 1.01,
@@ -95,7 +95,7 @@ end
 function SuperBall:onHitPaddle(...)
     Ball.onHitPaddle(self, ...)
 
-    self.game:renderWater(-255, function()
+    self.game:renderWater(-1, function()
         love.graphics.circle("fill", self.x, self.y, self.r*2)
     end)
 end
@@ -103,7 +103,7 @@ end
 function SuperBall:postUpdate(dt)
     Ball.postUpdate(self, dt)
 
-    self.game:renderWater(255, function()
+    self.game:renderWater(1, function()
         love.graphics.circle("fill", self.x, self.y, self.r/2)
     end)
 end

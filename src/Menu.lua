@@ -61,15 +61,15 @@ function Menu:draw()
             local fontSize = font:getHeight()
 
             if n == self.pos then
-                love.graphics.setColor(255,255,255,255)
+                love.graphics.setColor(1,1,1,1)
                 if item.onSelect then
                     love.graphics.print(">", 0, y)
                 end
                 tooltip = item.tooltip
             elseif item.onSelect then
-                love.graphics.setColor(200,200,200,255)
+                love.graphics.setColor(.8,.8,.8,1)
             else
-                love.graphics.setColor(192,192,192,127)
+                love.graphics.setColor(.75,.75,.75,.5)
             end
             if item.label then
                 love.graphics.print(item.label, fontSize*3/4, y)
@@ -80,14 +80,14 @@ function Menu:draw()
     end)
 
     love.graphics.setBlendMode("alpha", "premultiplied")
-    love.graphics.setColor(0,0,0,512)
+    love.graphics.setColor(0,0,0,2)
     -- TODO maybe use gaussBlur or something? I dunno
     for x=6,10 do
         for y=6,10 do
             love.graphics.draw(self.canvas, x, y)
         end
     end
-    love.graphics.setColor(255,255,255,255)
+    love.graphics.setColor(1,1,1,1)
     love.graphics.draw(self.canvas, 8, 8)
 
     if tooltip then
@@ -100,10 +100,10 @@ function Menu:draw()
         local lh = fontSize + 16
         local ly = love.graphics.getHeight() - lh
 
-        love.graphics.setColor(0,0,0,127)
+        love.graphics.setColor(0,0,0,.5)
         love.graphics.rectangle("fill", 0, ly, lw, lh)
 
-        love.graphics.setColor(255,255,255,255)
+        love.graphics.setColor(1,1,1,1)
         love.graphics.print(tooltip, 8 + fontSize*3/8, ly + 8)
     end
 

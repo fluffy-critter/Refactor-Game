@@ -30,8 +30,8 @@ function StunBullet:onInit()
         haloLength = 0.1,
         isBullet = true,
         shots = 1,
-        bulletColor = {255, 128, 64},
-        safeColor = {128, 255, 255},
+        bulletColor = {1, .5, .25},
+        safeColor = {.5, 1, 1},
         stunTime = self.game.BPM/180,
         recoil = 50
     })
@@ -50,11 +50,8 @@ function StunBullet:onHitPaddle(nrm, paddle)
         self.onHitPaddle = Ball.onHitPaddle
     end
 
-    self.game.layers.water:renderTo(function()
-        love.graphics.setColorMask(true, false, false, false)
-        love.graphics.setColor(-255,255,255)
+    self.game:renderWater(-1, function()
         love.graphics.circle("fill", self.x, self.y, self.r)
-        love.graphics.setColorMask(true, true, true, true)
     end)
 
     paddle:stun(self.stunTime)

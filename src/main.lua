@@ -15,8 +15,8 @@ Game class objects are expected to have:
 Game instances are expected to have:
 
     music - an object that presents at least the following subset of the audio source API:
+        play()
         pause()
-        resume()
         stop()
         setPitch(multiplier)
         setVolume(multiplier)
@@ -153,7 +153,7 @@ local function onPause()
     if playing.state == PlayState.pausing or playing.state == PlayState.paused then
         playing.state = PlayState.resuming
         if playing.resumeMusic then
-            currentGame.music:resume()
+            currentGame.music:play()
         end
     else
         if playing.state ~= PlayState.resuming then
@@ -604,7 +604,7 @@ function love.draw()
         screen.state = ScreenState.ready
         love.resize(love.graphics.getWidth(), love.graphics.getHeight())
         if screen.resumeMusic then
-            currentGame.music:resume()
+            currentGame.music:play()
         end
     end
 

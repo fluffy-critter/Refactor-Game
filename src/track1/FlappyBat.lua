@@ -33,7 +33,7 @@ function FlappyBat:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 24,
-        color = util.shuffle({255, 192, 96, 64}),
+        color = util.shuffle({1, .75, .375, .25}),
         flapInterval = 60/self.game.BPM,
         flapVY = -600,
         scoreHit = 100,
@@ -184,15 +184,15 @@ end
 
 function FlappyBat:draw()
     self.game.layers.overlay:renderTo(function()
-        local alpha = 255
+        local alpha = 1
         local frame
         if self.state == FlappyBat.states.dying then
-            alpha = math.max(0, 255*(1 - self.stateAge/self.deathTime))
+            alpha = math.max(0, (1 - self.stateAge/self.deathTime))
         elseif self.state == FlappyBat.states.spawning then
-            alpha = 255*self.stateAge/self.spawnTime
+            alpha = self.stateAge/self.spawnTime
         elseif self.state == FlappyBat.states.hit then
             local flash = math.floor(self.stateAge/self.hitFlashRate) % 2
-            alpha = 127 + 128*flash
+            alpha = .5 + .5*flash
         end
 
         if self.state == FlappyBat.states.dying then

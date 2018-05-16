@@ -92,7 +92,7 @@ function Game:setScale(scale)
         -- rescale the old canvas so we can preserve the realtime-ish reflections
         self.canvas:renderTo(function()
             love.graphics.setBlendMode("replace")
-            love.graphics.setColor(255,255,255,255)
+            love.graphics.setColor(1,1,1,1)
             love.graphics.draw(prevCanvas, 0, 0, 0, w/prevCanvas:getWidth(), h/prevCanvas:getHeight())
         end)
     end
@@ -101,12 +101,12 @@ function Game:setScale(scale)
     local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
 
     local msaa = math.min(config.msaa or limits.canvasmsaa, limits.canvasmsaa)
-    self.layers.arena = love.graphics.newCanvas(w, h, pixelfmt, msaa)
-    self.layers.overlay = love.graphics.newCanvas(w, h, pixelfmt)
+    self.layers.arena = love.graphics.newCanvas(w, h, { format = pixelfmt, msaa = msaa })
+    self.layers.overlay = love.graphics.newCanvas(w, h, { format = pixelfmt })
 
     local tonemapFmt = gfx.selectCanvasFormat("rgba8")
     if tonemapFmt then
-        self.layers.toneMap = love.graphics.newCanvas(w, h, tonemapFmt)
+        self.layers.toneMap = love.graphics.newCanvas(w, h, { format = tonemapFmt })
         self.shaders.gaussToneMap = shaders.load("shaders/gaussToneMap.fs")
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
@@ -118,7 +118,7 @@ function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
 
-    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3')
+    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3', 'stream')
     self.phase = -1
     self.score = 0
 
@@ -129,8 +129,8 @@ function Game:init()
     -- water always renders at 720p
     local waterFormat = gfx.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
-        self.layers.water = love.graphics.newCanvas(1280, 720, waterFormat)
-        self.layers.waterBack = love.graphics.newCanvas(1280, 720, waterFormat)
+        self.layers.water = love.graphics.newCanvas(1280, 720, { format = waterFormat })
+        self.layers.waterBack = love.graphics.newCanvas(1280, 720, { format = waterFormat })
         self.waterParams = {
             fluidity = 1.5,
             damp = 0.913,
@@ -153,7 +153,7 @@ function Game:init()
     }
 
     self.paddleDefaults = {
-        color = {255, 255, 255, 255},
+        color = {1, 1, 1, 1},
 
         w = 60,
         h = 6,
@@ -217,9 +217,9 @@ function Game:init()
     -- initialize with the starter ball
     self.starterBall = Ball.new(self, {
         r = 10,
-        color = {128, 255, 255, 255},
+        color = {.5, 1, 1, 1},
         lives = 3,
-        hitColor = {0, 128, 128, 255},
+        hitColor = {0, .5, 1, 1},
         ay = 30,
         minVelocity = 0,
         preUpdate = function(ball, dt)
@@ -273,10 +273,10 @@ function Game:setGameEvents()
     local function brickLivesColor(lives)
         local brt = math.random()*0.1 + 0.9
         return {
-            util.lerp(128, 255, lives/5)*brt,
-            util.lerp(240, 128, lives/5)*brt,
-            util.lerp(255, 192, lives/5)*brt,
-            255
+            util.lerp(.5, 1, lives/5)*brt,
+            util.lerp(.9, .5, lives/5)*brt,
+            util.lerp(1, .75, lives/5)*brt,
+            1
         }
     end
 
@@ -292,8 +292,8 @@ function Game:setGameEvents()
                     table.insert(self.balls, Ball.new(self, {
                         r = 4,
                         elasticity = 0.9,
-                        color = {255, 255, 128, 255},
-                        hitColor = {255, 255, 0, 128},
+                        color = {1, 1, .5, 1},
+                        hitColor = {1, 1, 0, .5},
                         beatSync = 0.5,
                         onStart = function(ball)
                             Ball.onStart(ball)
@@ -998,7 +998,8 @@ function Game:draw()
 
         love.graphics.setBlendMode("alpha")
         -- love.graphics.setColor(10,10,40,80)
-        love.graphics.setColor(192, 255, 255, 20)
+
+        love.graphics.setColor(.75, 1, 1, .08)
         love.graphics.rectangle("fill", 0, 0, 1280, self.bounds.top)
         love.graphics.rectangle("fill", 0, self.bounds.top, self.bounds.left, self.bounds.bottom - self.bounds.top)
         love.graphics.rectangle("fill", self.bounds.right, self.bounds.top,
@@ -1008,7 +1009,7 @@ function Game:draw()
         local p = self.paddle
         love.graphics.setBlendMode("alpha")
         if p.stunned > 0 and math.floor(p.stunned/p.stunFlashInterval) % 2 == 0 then
-            love.graphics.setColor(p.color[1], p.color[2], p.color[3], 128)
+            love.graphics.setColor(p.color[1], p.color[2], p.color[3], .5)
         else
             love.graphics.setColor(unpack(p.color))
         end
@@ -1041,18 +1042,20 @@ function Game:draw()
 
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.clear(0,0,0,255)
-        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.clear(0,0,0,1)
+        love.graphics.setColor(1,1,1,1)
 
         if self.waterParams then
+            local pulse = self.timeMapper and self.timeMapper(self:musicPos()) or 1
+
             local shader = self.shaders.waterReflect
             love.graphics.setShader(shader)
             shader:send("psize", {1.0/1280, 1.0/720})
             shader:send("rsize", self.waterParams.rsize)
             shader:send("fresnel", self.waterParams.fresnel);
             shader:send("source", self.layers.arena)
-            shader:send("bgColor", {0, 0, 0, 0})
-            shader:send("waveColor", {0.1, 0, 0.5, 1})
+            shader:send("bgColor", {util.lerp(-0.1,0,pulse), 0, 0, 0})
+            shader:send("waveColor", {0.1, util.lerp(0.2,0,pulse), 0.5, 1})
             love.graphics.draw(self.layers.water, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end
@@ -1061,7 +1064,7 @@ function Game:draw()
         love.graphics.draw(self.layers.overlay)
 
         love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(255,255,255,255)
+        love.graphics.setColor(1,1,1,1)
         love.graphics.setFont(self.scoreFont)
         love.graphics.scale(self.scale)
         love.graphics.print(self.score, 0, 0)
@@ -1083,7 +1086,7 @@ function Game:draw()
             })
         self.canvas:renderTo(function()
             love.graphics.setBlendMode("add", "premultiplied")
-            love.graphics.setColor(192, 192, 192, 192)
+            love.graphics.setColor(.75, .75, .75, .75)
             love.graphics.setShader(self.shaders.gaussBlur)
             self.shaders.gaussBlur:send("sampleRadius", {0, 1/720})
             love.graphics.draw(self.layers.toneMap)
@@ -1100,7 +1103,7 @@ function Game:renderWater(val, f)
     if self.layers.water then
         self.layers.water:renderTo(function()
             love.graphics.setColorMask(true, false, false, false)
-            love.graphics.setColor(val,255,255)
+            love.graphics.setColor(val,1,1)
             f()
             love.graphics.setColorMask(true, true, true, true)
         end)
