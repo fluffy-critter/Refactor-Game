@@ -23,7 +23,7 @@ function Coin.new(o)
         y = 0,
         r = 30,
         elastic = 0.3,
-        color = {255,255,255},
+        color = {1,1,1},
         age = 0,
         frameSpeed = 12,
         frameTime = 0,

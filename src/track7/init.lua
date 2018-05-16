@@ -66,7 +66,7 @@ function Game:setScale(scale)
     self.canvas = love.graphics.newCanvas(
         math.floor(scale*self.screenSize.w),
         math.floor(scale*self.screenSize.h),
-        pixelfmt)
+        {format = pixelfmt})
 
     return scale
 end
@@ -117,7 +117,7 @@ function Game:init()
         wallQuad = self.itemQuads.wall,
     })
 
-    self.music = love.audio.newSource('track7/07-flight.mp3')
+    self.music = love.audio.newSource('track7/07-flight.mp3', 'stream')
     -- self.music:setVolume(0)
 
     -- parse the note event list
@@ -453,7 +453,7 @@ function Game:draw()
     love.graphics.setBlendMode("alpha", "alphamultiply")
 
     self.canvas:renderTo(function()
-        love.graphics.clear(71, 143, 229, 255)
+        love.graphics.clear(71/255, 143/255, 229/255, 1)
 
         local ww = self.canvas:getWidth()
         local hh = self.canvas:getHeight()
@@ -477,7 +477,7 @@ function Game:draw()
         love.graphics.translate(tx, ty)
         love.graphics.scale(scale)
 
-        love.graphics.setColor(255,255,255,255)
+        love.graphics.setColor(1,1,1,1)
         local bgScale = (maxX - minX)/self.background:getWidth()
         local bgPad = maxY - self.background:getHeight()*bgScale
         -- maximum velocity is around 1700, so maximum Y offset is about 1700*140 = 238000
@@ -491,7 +491,7 @@ function Game:draw()
         self.channel:draw(minY + self.camera.y, maxY + self.camera.y, minX, maxX)
 
         -- draw the monk
-        love.graphics.setColor(255,255,255)
+        love.graphics.setColor(1,1,1)
 
         love.graphics.setShader(self.monkShader)
         local windSpeed = 0.015*math.min(1, self.monk.vy/3000)
@@ -509,13 +509,13 @@ function Game:draw()
             local alpha
             if self.faceTime then
                 local t = math.min(1, self.faceTime/1.5)
-                alpha = 255*(1 - util.smoothStep(t*t))
+                alpha = 1 - util.smoothStep(t*t)
             else
-                alpha = 255
+                alpha = 1
             end
 
             if alpha > 0 then
-                love.graphics.setColor(255, 255, 255, alpha)
+                love.graphics.setColor(1, 1, 1, alpha)
                 love.graphics.draw(self.monk.face.sheet, self.monk.face.quad,
                     self.monk.x, self.monk.y, self.monk.theta,
                     0.8, 0.8, self.monk.fx, self.monk.fy)
@@ -538,8 +538,8 @@ function Game:draw()
 
         if self.endingTime then
             -- fade to white
-            local alpha = math.min(255, self.endingTime*255/self.ending.duration)
-            love.graphics.setColor(255, 255, 255, alpha)
+            local alpha = math.min(1, self.endingTime/self.ending.duration)
+            love.graphics.setColor(1, 1, 1, alpha)
             love.graphics.rectangle("fill", 0, 0, ww, hh)
         end
 
@@ -548,18 +548,18 @@ function Game:draw()
         love.graphics.translate(tx, ty)
         love.graphics.scale(scale)
 
-        love.graphics.setColor(255,255,255)
+        love.graphics.setColor(1, 1, 1)
         love.graphics.draw(self.itemSprites, self.itemQuads.paper, minX - 100, minY, 0, 0.5, 0.5)
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(self.scoreFont)
         love.graphics.print(self.score, minX + 16, minY + 16)
 
         if config.debug then
-            love.graphics.setColor(255,128,0)
+            love.graphics.setColor(1, 0.5, 0)
             love.graphics.line(-self.bounds.minWidth, minY, -self.bounds.minWidth, maxY)
             love.graphics.line(self.bounds.minWidth, minY, self.bounds.minWidth, maxY)
 
-            love.graphics.setColor(128,255,0)
+            love.graphics.setColor(0.5, 1, 0)
             love.graphics.line(-self.bounds.maxWidth, minY, -self.bounds.maxWidth, maxY)
             love.graphics.line(self.bounds.maxWidth, minY, self.bounds.maxWidth, maxY)
         end

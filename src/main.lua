@@ -113,9 +113,9 @@ local fps
 local updateTime = 0
 
 local bgLoops = {
-    love.audio.newSource('mainmenu/loop1.mp3'),
-    love.audio.newSource('mainmenu/loop2.mp3'),
-    love.audio.newSource('mainmenu/loop3.mp3')
+    love.audio.newSource('mainmenu/loop1.mp3', 'stream'),
+    love.audio.newSource('mainmenu/loop2.mp3', 'stream'),
+    love.audio.newSource('mainmenu/loop3.mp3', 'stream')
 }
 
 local ScreenState = util.enum("ready", "configwait")
@@ -375,7 +375,7 @@ local function applyGraphicsConfig()
         resizable = true,
         fullscreen = config.fullscreen,
         vsync = config.vsync,
-        highdpi = config.highdpi,
+        highdpi = false,
         minwidth = 480,
         minheight = 480
     })
@@ -391,7 +391,7 @@ local function applyGraphicsConfig()
 
     renderScale = config.scaleFactor
 
-    fonts.setPixelScale(love.window.getPixelScale())
+    fonts.setPixelScale(1)
 end
 
 function love.load(args)
@@ -484,7 +484,7 @@ function love.update(dt)
     if playing.state == PlayState.menu then
         if menuVolume == 0 then
             for _,loop in ipairs(bgLoops) do
-                loop:resume()
+                loop:play()
             end
         end
         menuVolume = math.min(1, menuVolume + dt)
@@ -642,7 +642,7 @@ function love.draw()
         love.graphics.setShader()
     else
         love.graphics.push()
-        local res = love.window.getPixelScale()
+        local res = love.window.getDPIScale()
         love.graphics.scale(res)
 
         love.graphics.clear(0,0,0)

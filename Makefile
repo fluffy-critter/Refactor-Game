@@ -17,7 +17,7 @@ NAME=Refactor
 BUNDLE_ID=biz.beesbuzz.Refactor
 
 # LOVE version to fetch and build against
-LOVE_VERSION=0.10.2
+LOVE_VERSION=11.1
 
 # Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
 BASEVERSION=0.3.2

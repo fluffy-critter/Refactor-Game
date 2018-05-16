@@ -13,7 +13,7 @@ function love.conf(t)
     t.window.resizable = true
     t.window.fullscreen = false
 
-    t.version = "0.10.2"
+    t.version = "11.1"
 
     t.identity = "SockpuppetRefactor"
     t.window.title = "Sockpuppet - Refactor"
