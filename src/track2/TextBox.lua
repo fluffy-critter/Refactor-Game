@@ -108,7 +108,6 @@ function TextBox:onButtonPress(key)
 
         if play and self.selectSound then
             self.selectSound:stop()
-            self.selectSound:rewind()
             self.selectSound:play()
         end
 
@@ -151,7 +150,6 @@ function TextBox:update(dt)
 
             if self.doneSound then
                 self.doneSound:stop()
-                self.doneSound:rewind()
                 self.doneSound:play()
             end
         else
@@ -168,7 +166,6 @@ function TextBox:update(dt)
                     self.nextChar = self.charTime
                     if self.printSound then
                         self.printSound:stop()
-                        self.printSound:rewind()
                         self.printSound:play()
                     end
                 end

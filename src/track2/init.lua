@@ -85,18 +85,18 @@ function Game:init()
 
     self.sounds = {}
     self.music = SoundGroup.new({
-        bgm = love.audio.newSource('track2/02-strangers.mp3'),
+        bgm = love.audio.newSource('track2/02-strangers.mp3', 'stream'),
         sounds = self.sounds
     })
 
     self.phase = -1
     self.score = 0
 
-    self.canvas = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgb565", "rgba8"))
+    self.canvas = love.graphics.newCanvas(256, 224, { format = gfx.selectCanvasFormat("rgb565", "rgba8") })
 
     local blurFmt = gfx.selectCanvasFormat("rgba8", "rgb8")
     if blurFmt then
-        self.back = love.graphics.newCanvas(256, 224, gfx.selectCanvasFormat("rgba8"))
+        self.back = love.graphics.newCanvas(256, 224, { format = gfx.selectCanvasFormat("rgba8") })
     end
 
     self.border = imagepool.load('track2/border.png', {premultiply=true})
@@ -234,8 +234,8 @@ function Game:start()
     self:addAnimation({
         target = self,
         property = "flashColor",
-        startPos = {255,255,255,0},
-        endPos = {255,255,255,255},
+        startPos = {1,1,1,0},
+        endPos = {1,1,1,1},
         onStart = function(target)
             target.flashColor = {0,0,0,0}
         end,
@@ -386,7 +386,7 @@ function Game:start()
             self:addAnimation({
                 target = self,
                 property = "flashColor",
-                startPos = {255,255,255,255},
+                startPos = {1,1,1,1},
                 endPos = flashOut,
                 easing = Animator.Easing.ease_out,
             }, {13}, {13,0,1})
@@ -396,13 +396,13 @@ function Game:start()
                 target = self,
                 property = "flashColor",
                 startPos = {0,0,0,0},
-                endPos = {0,0,0,255},
+                endPos = {0,0,0,1},
                 easing = Animator.Easing.ease_out,
             }, {14,3,3}, {15,0,0})
             self:addAnimation({
                 target = self,
                 property = "flashColor",
-                startPos = {0,0,0,255},
+                startPos = {0,0,0,1},
                 endPos = {0,0,0,0},
                 easing = Animator.Easing.ease_out,
             }, {15,0,0}, {15,1,0})
@@ -536,7 +536,6 @@ function Game:update(dt)
 
             if self.textBox.choices then
                 self.sounds.timeout:stop()
-                self.sounds.timeout:rewind()
                 self.sounds.timeout:play()
             end
         end
@@ -776,19 +775,19 @@ end
 
 function Game:draw()
     self.canvas:renderTo(function()
-        love.graphics.clear(0, 0, 0, 255)
+        love.graphics.clear(0, 0, 0, 1)
 
         love.graphics.setBlendMode("alpha")
 
         if self.phase < 17 then
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
 
             util.runQueue(self.sceneStack, function(scene)
                 return not scene:draw()
             end)
 
             love.graphics.setBlendMode("alpha", "premultiplied")
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
             if self.phase >= 13 and self.phase < 15 then
                 -- throb the border during the instrumental
                 local musicPos = self:musicPos()
@@ -814,11 +813,11 @@ function Game:draw()
             local font = fonts.chronoTrigger
             local width = font:getWrap(self.lyricText, 256)
 
-            love.graphics.setColor(0, 0, 0, 127)
+            love.graphics.setColor(0, 0, 0, 0.5)
             love.graphics.rectangle("fill", 0, 0, width + 4, 14)
 
             love.graphics.setFont(font)
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
             love.graphics.print(self.lyricText, 2, 0)
         end
 
@@ -826,7 +825,7 @@ function Game:draw()
             local y = fonts.debug:getHeight()
 
             love.graphics.setFont(fonts.debug)
-            love.graphics.setColor(255,255,127)
+            love.graphics.setColor(1, 1, 0.5)
             love.graphics.print(string.format("%d:%d:%.2f", unpack(self:musicPos()))
                 .. ' ' .. self.dialogState, 0, y)
             y = y + fonts.debug:getHeight()
@@ -843,7 +842,7 @@ function Game:draw()
                 local nextState = self.textBox.choices[self.textBox.index].debugText or self.dialogState or 'nil'
                 love.graphics.setColor(0, 0, 0)
                 love.graphics.print("choice -> " .. nextState, 1, y+1)
-                love.graphics.setColor(255, 255, 255)
+                love.graphics.setColor(1, 1, 1)
                 love.graphics.print("choice -> " .. nextState, 0, y)
                 -- y = y + fonts.debug:getHeight()
             end
@@ -854,14 +853,14 @@ function Game:draw()
     if self.back then
         self.back:renderTo(function()
             love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(255, 255, 255, 150)
+            love.graphics.setColor(1, 1, 1, .6)
             love.graphics.draw(self.canvas)
         end)
     end
 
     self.scaled:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
         local shader = self.crtScaler
         love.graphics.setShader(shader)
         shader:send("screenSize", {256, 224})
