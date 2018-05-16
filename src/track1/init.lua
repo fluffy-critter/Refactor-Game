@@ -95,10 +95,15 @@ function Game:setScale(scale)
             love.graphics.setColor(1,1,1,1)
             love.graphics.draw(prevCanvas, 0, 0, 0, w/prevCanvas:getWidth(), h/prevCanvas:getHeight())
         end)
+        prevCanvas:release()
     end
 
     local limits = love.graphics.getSystemLimits()
     local pixelfmt = gfx.selectCanvasFormat("rgba8", "rgba4", "rgb5a1")
+
+    for _,layer in pairs(self.layers) do
+        layer:release()
+    end
 
     local msaa = math.min(config.msaa or limits.canvasmsaa, limits.canvasmsaa)
     self.layers.arena = love.graphics.newCanvas(w, h, { format = pixelfmt, msaa = msaa })
@@ -124,25 +129,26 @@ function Game:init()
 
 
     self.layers = {}
+    self.water = {}
     self.shaders = {}
 
     -- water always renders at 720p
     local waterFormat = gfx.selectCanvasFormat("rgba16f", "rg32f", "rgba32f")
     if waterFormat then
-        self.layers.water = love.graphics.newCanvas(1280, 720, { format = waterFormat })
-        self.layers.waterBack = love.graphics.newCanvas(1280, 720, { format = waterFormat })
-        self.waterParams = {
-            fluidity = 1.5,
-            damp = 0.913,
-            timeStep = 15,
-            rsize = 32,
-            fresnel = 0.1,
-            sampleRadius = 5.5,
+        self.water = {
+            front = love.graphics.newCanvas(1280, 720, { format = waterFormat }),
+            back = love.graphics.newCanvas(1280, 720, { format = waterFormat }),
+            params = {
+                fluidity = 1.5,
+                damp = 0.913,
+                timeStep = 15,
+                rsize = 32,
+                fresnel = 0.1,
+                sampleRadius = 5.5,
+            }
         }
         self.shaders.waterRipple = shaders.load("track1/waterRipple.fs")
         self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
-    else
-        self.layers.water = love.graphics.newCanvas(10,10) -- placeholder canvas to keep random entities happy
     end
 
     self.bounds = {
@@ -975,13 +981,13 @@ function Game:update(raw_dt)
     end
     self.deferred = {}
 
-    if self.waterParams then
-        self.layers.water, self.layers.waterBack = util.mapShader(self.layers.water, self.layers.waterBack,
+    if self.water.params then
+        self.water.front, self.water.back = util.mapShader(self.water.front, self.water.back,
             self.shaders.waterRipple, {
-                psize = {self.waterParams.sampleRadius/1280, self.waterParams.sampleRadius/720},
-                damp = self.waterParams.damp,
-                fluidity = self.waterParams.fluidity,
-                dt = self.waterParams.timeStep*math.min(raw_dt, 1/30)
+                psize = {self.water.params.sampleRadius/1280, self.water.params.sampleRadius/720},
+                damp = self.water.params.damp,
+                fluidity = self.water.params.fluidity,
+                dt = self.water.params.timeStep*math.min(raw_dt, 1/30)
             })
     end
 end
@@ -1045,18 +1051,18 @@ function Game:draw()
         love.graphics.clear(0,0,0,1)
         love.graphics.setColor(1,1,1,1)
 
-        if self.waterParams then
+        if self.water.params then
             local pulse = self.timeMapper and self.timeMapper(self:musicPos()) or 1
 
             local shader = self.shaders.waterReflect
             love.graphics.setShader(shader)
             shader:send("psize", {1.0/1280, 1.0/720})
-            shader:send("rsize", self.waterParams.rsize)
-            shader:send("fresnel", self.waterParams.fresnel);
+            shader:send("rsize", self.water.params.rsize)
+            shader:send("fresnel", self.water.params.fresnel);
             shader:send("source", self.layers.arena)
             shader:send("bgColor", {util.lerp(-0.1,0,pulse), 0, 0, 0})
             shader:send("waveColor", {0.1, util.lerp(0.2,0,pulse), 0.5, 1})
-            love.graphics.draw(self.layers.water, 0, 0, 0, self.scale, self.scale)
+            love.graphics.draw(self.water.front, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end
 
@@ -1095,13 +1101,13 @@ function Game:draw()
     end
 
     return self.canvas
-    -- return self.layers.water;
+    -- return self.water.front;
     -- return self.layers.toneMap
 end
 
 function Game:renderWater(val, f)
-    if self.layers.water then
-        self.layers.water:renderTo(function()
+    if self.water.front then
+        self.water.front:renderTo(function()
             love.graphics.setColorMask(true, false, false, false)
             love.graphics.setColor(val,1,1)
             f()

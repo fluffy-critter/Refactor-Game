@@ -70,6 +70,10 @@ function Game:setScale(scale)
         return scale
     end
 
+    if self.scaled then
+        self.scaled:release()
+    end
+
     self.scaled = love.graphics.newCanvas(1920*newScale, 1440*newScale)
     self.scale = newScale
     print("Now rendering at", self.scaled:getDimensions())

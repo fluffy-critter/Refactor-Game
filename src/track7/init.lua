@@ -63,6 +63,10 @@ function Game:setScale(scale)
 
     -- Set the canvas to the screen resolution directly
     self.scale = scale
+    if self.canvas then
+        self.canvas:release()
+    end
+
     self.canvas = love.graphics.newCanvas(
         math.floor(scale*self.screenSize.w),
         math.floor(scale*self.screenSize.h),
