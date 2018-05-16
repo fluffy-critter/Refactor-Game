@@ -15,8 +15,8 @@ Game class objects are expected to have:
 Game instances are expected to have:
 
     music - an object that presents at least the following subset of the audio source API:
+        play()
         pause()
-        resume()
         stop()
         setPitch(multiplier)
         setVolume(multiplier)
@@ -113,9 +113,9 @@ local fps
 local updateTime = 0
 
 local bgLoops = {
-    love.audio.newSource('mainmenu/loop1.mp3'),
-    love.audio.newSource('mainmenu/loop2.mp3'),
-    love.audio.newSource('mainmenu/loop3.mp3')
+    love.audio.newSource('mainmenu/loop1.mp3', 'stream'),
+    love.audio.newSource('mainmenu/loop2.mp3', 'stream'),
+    love.audio.newSource('mainmenu/loop3.mp3', 'stream')
 }
 
 local ScreenState = util.enum("ready", "configwait")
@@ -153,7 +153,7 @@ local function onPause()
     if playing.state == PlayState.pausing or playing.state == PlayState.paused then
         playing.state = PlayState.resuming
         if playing.resumeMusic then
-            currentGame.music:resume()
+            currentGame.music:play()
         end
     else
         if playing.state ~= PlayState.resuming then
@@ -242,7 +242,7 @@ local function credits()
         height = 0,
         draw = function(self)
             love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(255,255,255,255)
+            love.graphics.setColor(1,1,1,1)
 
             -- TODO better sizing
             local width = math.ceil(love.graphics.getWidth()/3)
@@ -255,7 +255,7 @@ local function credits()
 
             canvas:renderTo(function()
                 love.graphics.setBlendMode("alpha")
-                love.graphics.setColor(255,255,255,255)
+                love.graphics.setColor(1,1,1,1)
                 love.graphics.clear(0,0,0,0)
 
                 love.graphics.push()
@@ -289,13 +289,13 @@ local function credits()
             end)
 
             love.graphics.setBlendMode("alpha","premultiplied")
-            love.graphics.setColor(0,0,0,512)
+            love.graphics.setColor(0,0,0,2)
             for x=-2,2 do
                 for y=-2,2 do
                     love.graphics.draw(canvas, x+8, y)
                 end
             end
-            love.graphics.setColor(255,255,255,255)
+            love.graphics.setColor(1,1,1,1)
             love.graphics.draw(canvas,8,0)
 
             if height < self.height then
@@ -375,7 +375,7 @@ local function applyGraphicsConfig()
         resizable = true,
         fullscreen = config.fullscreen,
         vsync = config.vsync,
-        highdpi = config.highdpi,
+        highdpi = false,
         minwidth = 480,
         minheight = 480
     })
@@ -391,7 +391,7 @@ local function applyGraphicsConfig()
 
     renderScale = config.scaleFactor
 
-    fonts.setPixelScale(love.window.getPixelScale())
+    fonts.setPixelScale(1)
 end
 
 function love.load(args)
@@ -484,7 +484,7 @@ function love.update(dt)
     if playing.state == PlayState.menu then
         if menuVolume == 0 then
             for _,loop in ipairs(bgLoops) do
-                loop:resume()
+                loop:play()
             end
         end
         menuVolume = math.min(1, menuVolume + dt)
@@ -604,14 +604,14 @@ function love.draw()
         screen.state = ScreenState.ready
         love.resize(love.graphics.getWidth(), love.graphics.getHeight())
         if screen.resumeMusic then
-            currentGame.music:resume()
+            currentGame.music:play()
         end
     end
 
     if profiler then profiler.attach("draw") end
 
     if currentGame then
-        love.graphics.clear(32, 32, 32)
+        love.graphics.clear(1/8, 1/8, 1/8)
 
         love.graphics.push()
         love.graphics.origin()
@@ -619,7 +619,7 @@ function love.draw()
         local canvas, aspect = currentGame:draw()
 
         love.graphics.setBlendMode("alpha", "premultiplied")
-        local brt = 255*util.smoothStep(playing.fade)
+        local brt = util.smoothStep(playing.fade)
         love.graphics.setColor(brt, brt, brt)
 
         if playing.state ~= PlayState.playing then
@@ -642,7 +642,7 @@ function love.draw()
         love.graphics.setShader()
     else
         love.graphics.push()
-        local res = love.window.getPixelScale()
+        local res = love.window.getDPIScale()
         love.graphics.scale(res)
 
         love.graphics.clear(0,0,0)
@@ -652,9 +652,9 @@ function love.draw()
         local w = love.graphics:getWidth()/res
         local h = love.graphics:getHeight()/res
 
-        love.graphics.setColor(44,48,0)
+        love.graphics.setColor(44/255,48/255,0)
         love.graphics.rectangle("fill", 0, 0, w, 300)
-        love.graphics.setColor(255,255,255,255)
+        love.graphics.setColor(1,1,1,1)
 
         local ground = imagepool.load('mainmenu/ground.png')
         for x = 0, w, 702 do
@@ -676,7 +676,7 @@ function love.draw()
         love.graphics.printf("version " .. config.version, 0, 8, love.graphics.getWidth() - 8, "right")
     end
 
-    -- love.graphics.setColor(255,255,255,255)
+    -- love.graphics.setColor(1,1,1,1)
     -- love.graphics.circle("fill", input.x*100 + 100, input.y*100 + 100, 5)
 
     if profiler then

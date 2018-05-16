@@ -31,7 +31,7 @@ end
 function HitParticle:draw()
     love.graphics.setBlendMode(self.blendMode)
     love.graphics.setColor(self.color[1], self.color[2], self.color[3],
-        (self.color[4] or 255)*util.clamp(1 - self.time/self.lifetime, 0, 1))
+        (self.color[4] or 1)*util.clamp(1 - self.time/self.lifetime, 0, 1))
     love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 end
 

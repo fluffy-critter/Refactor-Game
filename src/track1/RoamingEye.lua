@@ -36,10 +36,10 @@ function RoamingEye:onInit()
     util.applyDefaults(self, {
         lives = 3,
         r = 32,
-        ballColor = {128, 192, 192},
-        irisColor = {128, 0, 192},
+        ballColor = {.5,.75,.75},
+        irisColor = {.5, 0, .75},
         pupilColor = {0, 0, 0},
-        chargeColor = {255, 0, 0, 192},
+        chargeColor = {1, 0, 0, .75},
         shootInterval = 4,
         shootChargeTime = 2,
         shootSpeed = 300,
@@ -96,7 +96,7 @@ function RoamingEye:onInit()
     self.scale = size/self.r/2
 
     local canvasFormat = gfx.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
-    self.canvas = love.graphics.newCanvas(size, size, canvasFormat, 2)
+    self.canvas = love.graphics.newCanvas(size, size, {format=canvasFormat, msaa=2})
 
     self.shader = shaders.load("track1/sphereDistort.fs")
 end
@@ -269,14 +269,14 @@ function RoamingEye:drawPost()
     end)
 
     self.game.layers.overlay:renderTo(function()
-        local alpha = 255
+        local alpha = 1
         if self.state == RoamingEye.states.dying then
-            alpha = 255*(1 - self.stateAge/self.deathTime)
+            alpha = (1 - self.stateAge/self.deathTime)
         elseif self.state == RoamingEye.states.spawning then
-            alpha = 255*self.stateAge/self.spawnTime
+            alpha = self.stateAge/self.spawnTime
         elseif self.state == RoamingEye.states.hit then
             local flash = math.floor(self.stateAge/self.hitFlashRate) % 2
-            alpha = 127 + 128*flash
+            alpha = .5 + .5*flash
         end
 
         love.graphics.setBlendMode("alpha", "premultiplied")
@@ -308,16 +308,16 @@ function RoamingEye:drawPost()
 
         love.graphics.setBlendMode("alpha", "alphamultiply")
         if self.state == RoamingEye.states.spawning or self.state == RoamingEye.states.dying then
-            love.graphics.setColor(255, 255, 255, alpha)
+            love.graphics.setColor(1, 1, 1, alpha)
             gfx.circle(true, self.x, self.y, self.r)
         end
 
         if false and config.debug then
-            love.graphics.setColor(0,0,255,alpha)
+            love.graphics.setColor(0,0,1,alpha)
             love.graphics.line(self.posX, self.posY, self.tgtX, self.tgtY)
-            love.graphics.setColor(255,0,0,alpha)
+            love.graphics.setColor(1,0,0,alpha)
             gfx.circle(false, self.posX, self.posY, 10)
-            love.graphics.setColor(0,255,0,alpha)
+            love.graphics.setColor(0,1,0,alpha)
             gfx.circle(false, self.tgtX, self.tgtY, 10)
         end
     end)

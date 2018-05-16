@@ -134,18 +134,18 @@ end
 function Randomizer:draw()
     self.game.layers.overlay:renderTo(function()
         love.graphics.setBlendMode("alpha")
-        local alpha = 255
+        local alpha = 1
         if self.state == Randomizer.states.dying then
-            alpha = util.clamp(255*(1 - self.stateAge/self.deadTime), 0, 255)
+            alpha = util.clamp(1 - self.stateAge/self.deadTime, 0, 1)
         elseif self.state == Randomizer.states.hit then
             local flash = math.floor(self.stateAge/self.hitFlashRate) % 2
-            alpha = 127 + 128*flash
+            alpha = .5 + .5*flash
         end
-        love.graphics.setColor(math.random(192,255), math.random(192,255), math.random(192,255), alpha)
+        love.graphics.setColor(math.random()*.25+.75, math.random()*.25+.75, math.random()*.25+.75, alpha)
         local w = math.random(self.w - self.sizefuck, self.w)
         local h = math.random(self.h - self.sizefuck, self.h)
 
-        w = w * (math.random(0,1)*2 - 1)*alpha/255
+        w = w * (math.random(0,1)*2 - 1)
         h = h * (math.random(0,1)*2 - 1)
 
         local shader = self.shader
@@ -177,7 +177,7 @@ function Randomizer:preUpdate(_, dt)
                 table.insert(game.balls, Ball.new(game, {
                     x = self.x,
                     y = self.y + self.h,
-                    color = {math.random(128,255), math.random(128,255), math.random(128,255), 255},
+                    color = {math.random()*.5+.5, math.random()*.5+.5, math.random()*.5+.5, 1},
                     r = math.random(3,7),
                     ay = 150,
                     vy = 300,
@@ -283,7 +283,7 @@ function Randomizer:onHitBall(nrm, ball)
             r = math.random()*3,
             vx = vx,
             vy = vy,
-            color = {math.random(128,255), math.random(128,255), math.random(128,255), 255},
+            color = {math.random()*.5+.5, math.random()*.5+.5, math.random()*.5+.5, 1},
             lifetime = self.particleLifetime
         }))
     end

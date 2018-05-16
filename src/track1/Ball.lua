@@ -81,8 +81,8 @@ end
 function Ball:onInit()
     util.applyDefaults(self, {
         r = 6,
-        color = {255, 192, 192, 255},
-        hitColor = {255, 64, 64, 192},
+        color = {1, .75, .75, 1},
+        hitColor = {1, .25, .25, .75},
         vx = 0,
         vy = 0,
         ax = 0,

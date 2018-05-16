@@ -19,7 +19,7 @@ function waterTester:init()
     self.layers = {}
     self.layers.arena = love.graphics.newCanvas(1280, 720, "rgba8", limits.canvasmsaa)
     self.layers.arena:renderTo(function()
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
         love.graphics.rectangle("fill", (1280 - 64)/2, (720 - 500)/2, 64, 500)
     end)
 
@@ -91,9 +91,9 @@ function waterTester:update(dt)
         local ofsy = math.sin(self.phase*0.003)*320/2
 
         love.graphics.setColorMask(true, false, false, false)
-        love.graphics.setColor(255, 0, 0)
+        love.graphics.setColor(1, 0, 0)
         love.graphics.rectangle("fill", 1280/2 - 32 + ofsx, 720/2 - 32 + ofsy, 64, 64)
-        love.graphics.setColor(-255, 0, 0)
+        love.graphics.setColor(-1, 0, 0)
         love.graphics.rectangle("fill", 1280/2 - 32 - ofsx, 720/2 - 32 - ofsy, 64, 64)
         love.graphics.setColorMask(true, true, true, true)
     end)
@@ -110,8 +110,8 @@ end
 function waterTester:draw()
     self.canvas:renderTo(function()
         love.graphics.setBlendMode("alpha", "premultiplied")
-        love.graphics.clear(0,0,0,255)
-        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.clear(0,0,0,1)
+        love.graphics.setColor(1,1,1,1)
 
         love.graphics.setShader(shaders.waterReflect)
         shaders.waterReflect:send("psize", {1/1280, 1/720})

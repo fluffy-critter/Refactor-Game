@@ -271,7 +271,7 @@ function scenes.kitchen()
         end,
 
         draw = function(_)
-            love.graphics.setColor(255,255,255)
+            love.graphics.setColor(1, 1, 1)
             drawLayers(layers)
             return true
         end
@@ -299,11 +299,11 @@ function scenes.phase11(game, duration)
             local p = math.floor(-util.smoothStep(x)*panSize + 0.5)
 
             if x < 0.02 then
-                love.graphics.setColor(255,255,255,x*50*255)
+                love.graphics.setColor(1, 1, 1,x*50)
             elseif x < 0.98 then
-                love.graphics.setColor(255,255,255,255)
+                love.graphics.setColor(1, 1, 1, 1)
             else
-                love.graphics.setColor(255,255,255,(1 - x)*50*255)
+                love.graphics.setColor(1, 1, 1, (1 - x)*50)
             end
             if x < 0.5 then
                 love.graphics.draw(image, p)
@@ -391,7 +391,7 @@ function scenes.missing(label)
         update = function() end,
         draw = function()
             love.graphics.clear(0,0,0)
-            love.graphics.setColor(255,255,255)
+            love.graphics.setColor(1, 1, 1)
             love.graphics.print("(scene missing: " .. label .. ")", 64, 128)
             return true
         end
@@ -501,7 +501,7 @@ function scenes.endKitchen(game, version)
             updateLayers(layers, dt)
         end,
         draw = function(_)
-            love.graphics.setColor(255,255,255)
+            love.graphics.setColor(1, 1, 1)
             drawLayers(layers)
             return true
         end
@@ -836,17 +836,17 @@ function scenes.vacation()
                 local depth = t < 0.5 and 1 or 1 - util.smoothStep((t - 0.5)*2)
 
                 love.graphics.setShader(waterMask)
-                love.graphics.setColor(7,131,189,255*depth)
+                love.graphics.setColor(7/255,131/255,189/255,depth)
                 love.graphics.draw(self.image, x, y)
                 love.graphics.setShader()
 
-                love.graphics.setColor(5,81,138,255*depth)
+                love.graphics.setColor(5/255,81/255,138/255,depth)
                 love.graphics.draw(self.image, x/2, 24 - 9*util.smoothStep(t))
 
-                love.graphics.setColor(4,56,113,255)
+                love.graphics.setColor(4/255,56/255,113/255,1)
                 love.graphics.draw(self.image, 0, 24)
 
-                love.graphics.setColor(255,255,255)
+                love.graphics.setColor(1, 1, 1)
            end
         },
         -- beach ball
@@ -866,9 +866,9 @@ function scenes.vacation()
                 local theta = math.sin(beat*math.pi/2)*math.pi/2
                 love.graphics.draw(filteredSprites, quads.ball.base, x, y, theta, 1, 1, 8, 8)
 
-                love.graphics.setColor(255,255,255,y*2)
+                love.graphics.setColor(1, 1, 1, y*2/255)
                 love.graphics.draw(filteredSprites, quads.ball.shadow, x - 8, 91.5)
-                love.graphics.setColor(255,255,255,255)
+                love.graphics.setColor(1, 1, 1, 1)
             end
         },
         -- rose's head
@@ -899,9 +899,9 @@ function scenes.vacation()
             draw = function(self)
                 local t = (beat/4 + 0.5)%1
                 local y = math.min(0, (1000*t - 200)*t)
-                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.setColor(1, 1, 1, (128 + y*8)/255)
                 love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
-                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
             end
         },
@@ -913,9 +913,9 @@ function scenes.vacation()
             draw = function(self)
                 local t = (beat/4)%1
                 local y = math.min(0, (1000*t - 200)*t)
-                love.graphics.setColor(255, 255, 255, 128 + y*8)
+                love.graphics.setColor(1, 1, 1, (128 + y*8)/255)
                 love.graphics.draw(self.sheet, quads.kids.shadow, self.pos[1]+1, 92)
-                love.graphics.setColor(255, 255, 255, 255)
+                love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.draw(self.sheet, self.frame, self.pos[1], self.pos[2] + y)
             end
         },

@@ -152,7 +152,7 @@ function Channel:draw(startY, endY, minX, maxX)
     local dflEdge = {minX - 200, maxX + 200}
 
     -- background edges
-    love.graphics.setColor(0, 0, 0, 128)
+    love.graphics.setColor(0, 0, 0, .5)
     for i = startIdx - 2, endIdx + 2 do
         local y0 = i*self.interval
         local top = self.edges[i] or dflEdge
@@ -179,7 +179,7 @@ function Channel:draw(startY, endY, minX, maxX)
             local nrm = geom.normalize({bottom[1] - top[1], self.interval})
             local lgt = nrm[1]
 
-            love.graphics.setColor(34 + 8*lgt, 24 + 5*lgt, 7 + 15*lgt)
+            love.graphics.setColor((34 + 8*lgt)/255, (24 + 5*lgt)/255, (7 + 15*lgt)/255)
             love.graphics.polygon("fill",
                 top[1], y0,
                 bottom[1], y1,
@@ -189,14 +189,14 @@ function Channel:draw(startY, endY, minX, maxX)
             nrm = geom.normalize({top[2] - bottom[2], self.interval})
             lgt = nrm[1]
 
-            love.graphics.setColor(34 + 8*lgt, 24 + 5*lgt, 7 + 15*lgt)
+            love.graphics.setColor((34 + 8*lgt)/255, (24 + 5*lgt)/255, (7 + 15*lgt)/255)
             love.graphics.polygon("fill",
                 top[2], y0,
                 bottom[2], y1,
                 bottom[2] + self.interval, y1,
                 top[2] + self.interval, y0)
 
-            love.graphics.setColor(20,16,0)
+            love.graphics.setColor(20/255,16/255,0)
 
             love.graphics.polygon("fill",
                 minX, y0,
@@ -214,7 +214,7 @@ function Channel:draw(startY, endY, minX, maxX)
     end
 
     -- foreground edges
-    love.graphics.setColor(34, 24, 7)
+    love.graphics.setColor(34/255, 24/255, 7/255)
     for i = startIdx - 2, endIdx + 2 do
         local y0 = i*self.interval
         local top = self.edges[i] or dflEdge

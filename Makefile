@@ -17,10 +17,10 @@ NAME=Refactor
 BUNDLE_ID=biz.beesbuzz.Refactor
 
 # LOVE version to fetch and build against
-LOVE_VERSION=0.10.2
+LOVE_VERSION=11.1
 
 # Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
-BASEVERSION=0.3.2
+BASEVERSION=0.3.3
 
 # Determine the full version string based on the tag
 COMMITHASH=$(shell git rev-parse --short HEAD)
@@ -185,15 +185,15 @@ $(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.ap
 	cp $(DEST)/love-jam/$(NAME)-jam.love $(@)/Contents/Resources
 
 # OSX build dependencies
-$(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macosx-x64.zip
+$(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macos.zip
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/deps && \
 	unzip -d $(DEST)/deps $(^)
 	touch $(@)
 
 # Windows build dependencies
-WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
-WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
+WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION).0-win32
+WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION).0-win64
 
 $(WIN32_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win32.zip
 	@echo BUILDING: $(@)
@@ -208,15 +208,18 @@ $(WIN64_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win64.zip
 	touch $(@)
 
 # Win32 version
+WIN32_EXE = $(WIN32_ROOT)/love.exe
+#WIN32_EXE = windows/refactor-win32.exe
+
 win32: $(WIN32_ROOT)/love.exe $(DEST)/win32/$(NAME).exe
-$(DEST)/win32/$(NAME).exe: windows/refactor-win32.exe $(DEST)/love/$(NAME).love
+$(DEST)/win32/$(NAME).exe: $(WIN32_EXE) $(DEST)/love/$(NAME).love
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win32
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32
 	cat $(^) > $(@)
 
 win32-jam: $(WIN32_ROOT)/love.exe $(DEST)/win32-jam/$(NAME)-jam.exe
-$(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$(NAME)-jam.love
+$(DEST)/win32-jam/$(NAME)-jam.exe: $(WIN32_EXE) $(DEST)/love-jam/$(NAME)-jam.love
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win32-jam
 	cp -r $(wildcard $(WIN32_ROOT)/*.dll) $(DEST)/win32-jam
@@ -224,15 +227,18 @@ $(DEST)/win32-jam/$(NAME)-jam.exe: windows/refactor-win32.exe $(DEST)/love-jam/$
 
 
 # Win64 version
+WIN64_EXE = $(WIN64_ROOT)/love.exe
+#WIN64_EXE = windows/refactor-win64.exe
+
 win64: $(WIN64_ROOT)/love.exe $(DEST)/win64/$(NAME).exe
-$(DEST)/win64/$(NAME).exe: windows/refactor-win64.exe $(DEST)/love/$(NAME).love
+$(DEST)/win64/$(NAME).exe: $(WIN64_EXE) $(DEST)/love/$(NAME).love
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win64
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64
 	cat $(^) > $(@)
 
 win64-jam: $(WIN64_ROOT)/love.exe $(DEST)/win64-jam/$(NAME)-jam.exe
-$(DEST)/win64-jam/$(NAME)-jam.exe: windows/refactor-win64.exe $(DEST)/love-jam/$(NAME)-jam.love
+$(DEST)/win64-jam/$(NAME)-jam.exe: $(WIN64_EXE) $(DEST)/love-jam/$(NAME)-jam.love
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/win64-jam
 	cp -r $(wildcard $(WIN64_ROOT)/*.dll) $(DEST)/win64-jam
