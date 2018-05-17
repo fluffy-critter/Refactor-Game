@@ -72,7 +72,7 @@ publish: publish-precheck $$(PUBLISH_CHANNELS) publish-status
 publish-jam: publish-precheck $$(JAM_CHANNELS)
 	@echo "Done publishing jam build $(GAME_VERSION)"
 
-jam: love-jam osx-jam win32-jam win64-jam
+jam: love-jam osx-jam linux-jam win32-jam win64-jam
 
 publish-precheck: commit-check tests checks
 
