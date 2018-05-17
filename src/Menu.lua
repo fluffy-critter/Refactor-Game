@@ -80,11 +80,11 @@ function Menu:draw()
     end)
 
     love.graphics.setBlendMode("alpha", "premultiplied")
-    love.graphics.setColor(0,0,0,2)
-    -- TODO maybe use gaussBlur or something? I dunno
-    for x=6,10 do
-        for y=6,10 do
-            love.graphics.draw(self.canvas, x, y)
+    love.graphics.setColor(0,0,0,5)
+    local dpi = love.window.getDPIScale()
+    for x=-1,1,1/dpi do
+        for y=-1,1,1/dpi do
+            love.graphics.draw(self.canvas, 8 + x, 8 + y)
         end
     end
     love.graphics.setColor(1,1,1,1)
