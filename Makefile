@@ -33,14 +33,14 @@ GITSTATUS=$(shell git status --porcelain | grep -q . && echo "dirty" || echo "cl
 JAM_TRACK=track7
 
 # supported publish channels
-CHANNELS=love osx win32 win64
+CHANNELS=love osx win32 win64 linux
 
 .PHONY: clean all run
 .PHONY: publish publish-precheck publish-jam publish-all
 .PHONY: publish-status publish-wait
 .PHONY: commit-check
-.PHONY: love-bundle osx win32 win64 bundle-win32
-.PHONY: love-jam osx-jam win32-jam win64-jam
+.PHONY: love-bundle osx linux win32 win64 bundle-win32
+.PHONY: love-jam osx-jam linux-jam win32-jam win64-jam
 .PHONY: submodules tests checks version
 
 # necessary to expand the PUBLISH_CHANNELS variable for the publish rules
@@ -111,11 +111,13 @@ staging-love: love-bundle $(DEST)/.distfiles-$(GAME_VERSION)_love
 staging-osx: osx $(DEST)/.distfiles-$(GAME_VERSION)_osx
 staging-win32: win32 $(DEST)/.distfiles-$(GAME_VERSION)_win32
 staging-win64: win64 $(DEST)/.distfiles-$(GAME_VERSION)_win64
+staging-linux: linux $(DEST)/.distfiles-$(GAME_VERSION)_linux
 
 staging-love-jam: love-jam $(DEST)/.distfiles-$(GAME_VERSION)_love-jam
 staging-osx-jam: osx-jam $(DEST)/.distfiles-$(GAME_VERSION)_osx-jam
 staging-win32-jam: win32-jam $(DEST)/.distfiles-$(GAME_VERSION)_win32-jam
 staging-win64-jam: win64-jam $(DEST)/.distfiles-$(GAME_VERSION)_win64-jam
+staging-linux-jam: linux-jam $(DEST)/.distfiles-$(GAME_VERSION)_linux-jam
 
 $(DEST)/.distfiles-$(GAME_VERSION)_%: LICENSE $(wildcard distfiles/*)
 	@echo $(DEST)/$(lastword $(subst _, ,$(@)))
@@ -183,6 +185,29 @@ $(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.ap
 	sed 's/{TITLE}/$(NAME)/;s/{BUNDLE_ID}/$(BUNDLE_ID)/;s/{VERSION}/$(GAME_VERSION)/g' osx/Info.plist > $(@)/Contents/Info.plist && \
 	cp osx/*.icns $(@)/Contents/Resources/ && \
 	cp $(DEST)/love-jam/$(NAME)-jam.love $(@)/Contents/Resources
+
+#Linux version
+LINUX_32_BUNDLE=$(DEPS)/love/love-$(LOVE_VERSION)-linux-x86_64.AppImage
+LINUX_64_BUNDLE=$(DEPS)/love/love-$(LOVE_VERSION)-linux-i686.AppImage
+
+linux: $(DEST)/linux/$(NAME)
+$(DEST)/linux/$(NAME): linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE)
+	@echo BUILDING: $(@)
+	mkdir -p $(DEST)/linux/lib $(DEST)/linux/bin
+	cp $(DEST)/love/$(NAME).love $(DEST)/linux/lib && \
+	sed 's,{BUNDLENAME},$(NAME).love,g;s,{LOVEVERSION},$(LOVE_VERSION),g' linux/launcher > $(@) && \
+	cp $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE) $(DEST)/linux/bin && \
+	chmod 755 $(DEST)/linux/bin/* $(@)
+
+linux-jam: $(DEST)/linux-jam/$(NAME)-jam
+$(DEST)/linux-jam/$(NAME)-jam: linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE)
+	@echo BUILDING: $(@)
+	mkdir -p $(DEST)/linux-jam/lib $(DEST)/linux-jam/bin
+	cp $(DEST)/love-jam/$(NAME)-jam.love $(DEST)/linux-jam/lib && \
+	sed 's,{BUNDLENAME},$(NAME)-jam.love,g;s,{LOVEVERSION},$(LOVE_VERSION),g' linux/launcher > $(@) && \
+	cp $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE) $(DEST)/linux-jam/bin && \
+	chmod 755 $(DEST)/linux-jam/bin/* $(@)
+
 
 # OSX build dependencies
 $(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macos.zip
