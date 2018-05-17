@@ -197,16 +197,16 @@ $(DEST)/linux/$(NAME): linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_
 	cp $(DEST)/love/$(NAME).love $(DEST)/linux/lib && \
 	sed 's,{BUNDLENAME},lib/$(NAME).love,g;s,{LOVEVERSION},$(LOVE_VERSION),g' linux/launcher > $(@) && \
 	cp $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE) $(DEST)/linux/bin && \
-	chmod 755 $(@)
+	chmod 755 $(DEST)/linux/bin/* $(@)
 
-linux-jam: $(DEST)/linux-jam/$(NAME)
-$(DEST)/linux-jam/$(NAME): linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE)
+linux-jam: $(DEST)/linux-jam/$(NAME)-jam
+$(DEST)/linux-jam/$(NAME)-jam: linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE)
 	@echo BUILDING: $(@)
 	mkdir -p $(DEST)/linux-jam/lib $(DEST)/linux-jam/bin
 	cp $(DEST)/love-jam/$(NAME)-jam.love $(DEST)/linux-jam/lib && \
 	sed 's,{BUNDLENAME},lib/$(NAME)-jam.love,g;s,{LOVEVERSION},$(LOVE_VERSION),g' linux/launcher > $(@) && \
 	cp $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE) $(DEST)/linux-jam/bin && \
-	chmod 755 $(@)
+	chmod 755 $(DEST)/linux-jam/bin/* $(@)
 
 
 # OSX build dependencies
