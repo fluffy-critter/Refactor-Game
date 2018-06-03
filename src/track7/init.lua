@@ -121,7 +121,7 @@ function Game:init()
         wallQuad = self.itemQuads.wall,
     })
 
-    self.music = love.audio.newSource('track7/07-flight.mp3', 'stream')
+    self.music = love.audio.newSource('track7/07-flight.mp3', 'static')
     -- self.music:setVolume(0)
 
     -- parse the note event list

@@ -123,7 +123,7 @@ function Game:init()
     self.BPM = BPM
     self.syncBeats = true -- try to synchronize ball paddle bounces to beats
 
-    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3', 'stream')
+    self.music = love.audio.newSource('track1/01-little-bouncing-ball.mp3', 'static')
     self.phase = -1
     self.score = 0
 
@@ -1078,6 +1078,7 @@ function Game:draw()
         if config.debug then
             love.graphics.setFont(self.debugFont)
             love.graphics.print(self.canvas:getWidth() .. ' ' .. self.canvas:getHeight(), 512, 0)
+            love.graphics.print(table.concat(self:musicPos(),':'), 0, 720 - 16)
         end
 
         love.graphics.origin()
