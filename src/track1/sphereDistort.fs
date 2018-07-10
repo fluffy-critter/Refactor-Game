@@ -16,7 +16,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
     if (r2 > 1.) discard;
 
     float mask = r2 > 0.95 ? 1. - smoothstep(0.95, 1.0, r2) : 1.;
-    // float mask = 1;
+    // float mask = 1. - smoothstep(0.95, 1.0, r2);
 
     vec3 nrm = vec3(pos, sqrt(1. - r2));
 
