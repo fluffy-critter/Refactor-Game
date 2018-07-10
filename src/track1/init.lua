@@ -556,7 +556,7 @@ function Game:setGameEvents()
             -- and the start of each stab is on 3/4 beats
             local stabOfs = offset % .75
 
-            return 2*(.75 - stabOfs)
+            return 1.5*(.75 - stabOfs) + .5
         end,
         ramp = function(time)
             local _, _, beat = unpack(time)
@@ -1052,7 +1052,7 @@ function Game:draw()
         love.graphics.setColor(1,1,1,1)
 
         if self.water.params then
-            local pulse = self.timeMapper and self.timeMapper(self:musicPos()) or 1
+            local pulse = 1
 
             local shader = self.shaders.waterReflect
             love.graphics.setShader(shader)
