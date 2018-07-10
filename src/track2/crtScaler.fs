@@ -68,7 +68,7 @@ vec4 effect(vec4 color, Image txt, vec2 itc, vec2 screen_coords) {
     vec2 pixelSoft = vec2(tc.x, (floor(rowT) + 0.5)/screenSize.y);
     vec2 pixelHard = vec2((floor(tc.x*screenSize.x) + 0.5)/screenSize.x, pixelSoft.y);
     float xofs = fract(tc.x*screenSize.x);
-    float blend = 4.0*xofs*(1.0 - xofs);
+    float blend = sqrt(4.0*xofs*(1.0 - xofs));
     vec4 pixelColor = blend*Texel(txt, pixelHard) + (1.0 - blend)*Texel(txt, pixelSoft);
 
     return color * vec4(pixelColor.rgb * maskColor * beamColor, 1.0);

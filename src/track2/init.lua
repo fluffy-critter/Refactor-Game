@@ -863,7 +863,7 @@ function Game:draw()
     if self.back then
         self.back:renderTo(function()
             love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(1, 1, 1, .6)
+            love.graphics.setColor(1, 1, 1, .8)
             love.graphics.draw(self.canvas)
         end)
     end
