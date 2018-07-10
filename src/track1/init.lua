@@ -116,6 +116,12 @@ function Game:setScale(scale)
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
 
+    for _,actor in ipairs(self.actors) do
+        if actor.setScale then
+            actor:setScale(self.scale)
+        end
+    end
+
     return self.scale
 end
 

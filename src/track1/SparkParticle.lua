@@ -21,8 +21,8 @@ function SparkParticle.new(cfg)
         blendMode = "add",
         vx = 0,
         vy = 0,
-        ax = 0,
-        ay = 0
+        -- ax = 0,
+        -- ay = 0
     })
 
     self.time = 0
@@ -33,8 +33,8 @@ end
 function SparkParticle:update(dt)
     self.time = self.time + dt
 
-    self.vx = self.vx + dt*self.ax
-    self.vy = self.vy + dt*self.ay
+    -- self.vx = self.vx + dt*self.ax
+    -- self.vy = self.vy + dt*self.ay
 
     self.x = self.x + dt*self.vx
     self.y = self.y + dt*self.vy

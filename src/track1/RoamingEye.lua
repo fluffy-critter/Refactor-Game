@@ -92,13 +92,21 @@ function RoamingEye:onInit()
     self.lookX = 0
     self.lookY = 0
 
-    local size = math.ceil(2*self.game.scale*self.r)
-    self.scale = size/self.r/2
+    self.canvasFormat = gfx.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
 
-    local canvasFormat = gfx.selectCanvasFormat("rgba4", "rgba8", "rgb5a1")
-    self.canvas = love.graphics.newCanvas(size, size, {format=canvasFormat, msaa=2})
+    self:setScale(self.game.scale)
 
     self.shader = shaders.load("track1/sphereDistort.fs")
+end
+
+function RoamingEye:setScale(scale)
+    local size = math.ceil(2*scale*self.r)
+    self.scale = size/self.r/2
+
+    if self.canvas then
+        self.canvas:release()
+    end
+    self.canvas = love.graphics.newCanvas(size, size, {format=self.canvasFormat, msaa=0})
 end
 
 function RoamingEye:isAlive()
@@ -283,7 +291,6 @@ function RoamingEye:drawPost()
         love.graphics.setColor(alpha, alpha, alpha, alpha)
         local shader = self.shader
         love.graphics.setShader(shader)
-        shader:send("gamma", 0.9)
         shader:send("env", self.game.canvas)
         shader:send("center", {self.x/1280, self.y/720})
         shader:send("reflectSize", {self.r/128, self.r/72})
