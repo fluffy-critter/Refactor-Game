@@ -1057,16 +1057,14 @@ function Game:draw()
         love.graphics.setColor(1,1,1,1)
 
         if self.water.params then
-            local pulse = 1
-
             local shader = self.shaders.waterReflect
             love.graphics.setShader(shader)
             shader:send("psize", {1.0/1280, 1.0/720})
             shader:send("rsize", self.water.params.rsize)
             shader:send("fresnel", self.water.params.fresnel);
             shader:send("source", self.layers.arena)
-            shader:send("bgColor", {util.lerp(-0.1,0,pulse), 0, 0, 0})
-            shader:send("waveColor", {0.1, util.lerp(0.2,0,pulse), 0.5, 1})
+            shader:send("bgColor", {-0.1, 0, 0, 0})
+            shader:send("waveColor", {0.1, 0.3, 0.75, 1})
             love.graphics.draw(self.water.front, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end
