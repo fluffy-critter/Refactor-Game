@@ -829,14 +829,19 @@ function Game:update(raw_dt)
     self.spawner:update(raw_dt)
 
     local function physicsUpdate(dt)
+        local frictionX = p.friction
+        if util.sign(p.vx) == -util.sign(input.x) then
+            frictionX = math.pow(p.friction, 10)
+        end
+
+        p.vx = p.vx * math.pow(frictionX, dt)
+        p.vy = p.vy * math.pow(p.friction, dt)
+
         if p.stunned > 0 then
             p.stunned = p.stunned - dt
         else
             p.vx = p.vx + p.speed*dt*input.x
         end
-
-        p.vx = p.vx * math.pow(p.friction, dt)
-        p.vy = p.vy * math.pow(p.friction, dt)
 
         p.x = p.x + dt * p.vx
         p.y = p.y + dt * p.vy
