@@ -56,6 +56,16 @@ function Brick:kill()
     end
 end
 
+function Brick:getAABB()
+    if not self.cachedAABB then
+        self.cachedAABB = {
+            self.x - self.w/2, self.y - self.h/2,
+            self.x + self.w/2, self.y + self.h/2
+        }
+    end
+    return self.cachedAABB
+end
+
 function Brick:getPolygon()
     if not self.cachedPolygon then
         self.cachedPolygon =  {

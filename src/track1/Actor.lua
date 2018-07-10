@@ -28,34 +28,36 @@ local Actor = {}
 
 function Actor:checkHitBalls(balls)
     -- default implementation - test each ball against the bounding circle and then the polygon, memoizing as we go
-    local poly, aabb
-    local bcircle = self:getBoundingCircle()
+    local poly, aabb, bcircle
 
     local function checkBall(ball)
         if not self:isTangible(ball) then
             return false
         end
 
-        if bcircle then
-            if not geom.pointPointCollision(ball.x, ball.y, ball.r, unpack(bcircle)) then
-                return false
-            end
-
-            -- TODO: fail the bound check if the ball is moving away as well
+        if bcircle == nil then
+            bcircle = self:getBoundingCircle()
+        end
+        if not bcircle then
+            return false
         end
 
+        if not geom.pointPointCollision(ball.x, ball.y, ball.r, unpack(bcircle)) then
+            return false
+        end
+
+        if poly == nil then
+            poly = self:getPolygon() or false
+        end
         if not poly then
-            poly = self:getPolygon()
-            if not poly then
-                return false
-            end
+            return false
         end
 
+        if aabb == nil then
+            aabb = self:getAABB() or geom.getAABB(poly) or false
+        end
         if not aabb then
-            aabb = geom.getAABB(poly)
-            if not aabb then
-                return false
-            end
+            return false
         end
 
         if not geom.pointAABBCollision(ball.x, ball.y, ball.r, aabb) then
@@ -65,6 +67,11 @@ function Actor:checkHitBalls(balls)
         return geom.pointPolyCollision(ball.x, ball.y, ball.r, poly)
     end
 
+    --[[
+        TODO store actors in a spatial partitioning structure and have the ball
+        run the check against actors which are
+        in nearby cells
+    ]]
     for _,ball in pairs(balls) do
         local nrm = checkBall(ball)
         if nrm then
@@ -75,6 +82,10 @@ end
 
 function Actor:getBoundingCircle()
     -- no default
+end
+
+function Actor:getAABB()
+    return nil
 end
 
 function Actor:getPolygon()
