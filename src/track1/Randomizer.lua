@@ -110,8 +110,6 @@ function Randomizer:onInit()
 
     self.images = {
         imagepool.load("track1/glitch.png", {nearest = true}),
-        self.game.canvas,
-        self.game.layers.water
     }
     for _,v in pairs(imagepool.pool) do
         table.insert(self.images, v)

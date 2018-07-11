@@ -116,6 +116,12 @@ function Game:setScale(scale)
         self.shaders.gaussBlur = shaders.load("shaders/gaussBlur.fs")
     end
 
+    for _,actor in ipairs(self.actors) do
+        if actor.setScale then
+            actor:setScale(self.scale)
+        end
+    end
+
     return self.scale
 end
 
@@ -556,7 +562,7 @@ function Game:setGameEvents()
             -- and the start of each stab is on 3/4 beats
             local stabOfs = offset % .75
 
-            return 2*(.75 - stabOfs)
+            return 1.5*(.75 - stabOfs) + .5
         end,
         ramp = function(time)
             local _, _, beat = unpack(time)
@@ -829,14 +835,19 @@ function Game:update(raw_dt)
     self.spawner:update(raw_dt)
 
     local function physicsUpdate(dt)
+        local frictionX = p.friction
+        if util.sign(p.vx) == -util.sign(input.x) then
+            frictionX = math.pow(p.friction, 10)
+        end
+
+        p.vx = p.vx * math.pow(frictionX, dt)
+        p.vy = p.vy * math.pow(p.friction, dt)
+
         if p.stunned > 0 then
             p.stunned = p.stunned - dt
         else
             p.vx = p.vx + p.speed*dt*input.x
         end
-
-        p.vx = p.vx * math.pow(p.friction, dt)
-        p.vy = p.vy * math.pow(p.friction, dt)
 
         p.x = p.x + dt * p.vx
         p.y = p.y + dt * p.vy
@@ -1052,16 +1063,14 @@ function Game:draw()
         love.graphics.setColor(1,1,1,1)
 
         if self.water.params then
-            local pulse = self.timeMapper and self.timeMapper(self:musicPos()) or 1
-
             local shader = self.shaders.waterReflect
             love.graphics.setShader(shader)
             shader:send("psize", {1.0/1280, 1.0/720})
             shader:send("rsize", self.water.params.rsize)
             shader:send("fresnel", self.water.params.fresnel);
             shader:send("source", self.layers.arena)
-            shader:send("bgColor", {util.lerp(-0.1,0,pulse), 0, 0, 0})
-            shader:send("waveColor", {0.1, util.lerp(0.2,0,pulse), 0.5, 1})
+            shader:send("bgColor", {-0.1, 0, 0, 0})
+            shader:send("waveColor", {0.1, 0.3, 0.75, 1})
             love.graphics.draw(self.water.front, 0, 0, 0, self.scale, self.scale)
             love.graphics.setShader()
         end

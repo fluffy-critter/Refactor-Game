@@ -260,7 +260,13 @@ function Game:update(dt)
         self.faceTime = self.faceTime + dt
     end
 
-    self.monk.tiltX = math.pow(0.1, dt)*(self.monk.tiltX + input.x*dt)
+    local friction = 0.1
+
+    if util.sign(input.x) == -util.sign(self.monk.tiltX) then
+        friction = 0.001
+    end
+
+    self.monk.tiltX = math.pow(friction, dt)*(self.monk.tiltX + input.x*dt)
 
     local monkUp = geom.normalize({self.monk.tiltX, -0.5})
     self.monk.theta = math.atan(monkUp[1], -monkUp[2])

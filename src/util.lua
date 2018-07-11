@@ -380,5 +380,9 @@ function util.fairWrap(font, s, width)
     return outWidth, split
 end
 
+-- Calculate the sign of an input
+function util.sign(x)
+    return x > 0 and 1 or x < 0 and -1 or 0
+end
 
 return util

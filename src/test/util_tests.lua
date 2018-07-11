@@ -248,3 +248,9 @@ notion("runQueue", function()
     end
 
 end)
+
+notion("sign", function()
+    check(util.sign(1234)).is(1)
+    check(util.sign(0)).is(0)
+    check(util.sign(-12342)).is(-1)
+end)
