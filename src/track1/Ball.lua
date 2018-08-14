@@ -245,4 +245,8 @@ function Ball:draw()
     end
 end
 
+function Ball:getBoundingQuad()
+    return {self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r}
+end
+
 return Ball

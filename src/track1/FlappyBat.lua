@@ -136,6 +136,10 @@ function FlappyBat:postUpdate(dt)
     self.vy = self.vy + self.ay*dt
 end
 
+function FlappyBat:getBoundingCircle()
+    return {self.x, self.y, self.r}
+end
+
 function FlappyBat:checkHitBalls(balls)
     for _,ball in pairs(balls) do
         if not ball.isBullet then

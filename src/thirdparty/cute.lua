@@ -97,7 +97,7 @@ local runAllTests = function (headlessMode)
   print("running tests...")
   for _, test in ipairs(getTests()) do
     print(test.title)
-    local passed, errorMsg = pcall(test.run)
+    local passed, errorMsg = xpcall(test.run, debug.traceback)
     resetMinions()
     if (not passed) then
       foundFailingTest = true

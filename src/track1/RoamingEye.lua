@@ -192,7 +192,10 @@ function RoamingEye:postUpdate(dt)
             self.vy = self.vy - vy*self.recoil
         end)
     end
+end
 
+function RoamingEye:getBoundingCircle()
+    return {self.x, self.y, self.r}
 end
 
 function RoamingEye:checkHitBalls(balls)
