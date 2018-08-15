@@ -18,6 +18,7 @@ local FlappyBat = require 'track1.FlappyBat'
 local Spawner = require 'track1.Spawner'
 
 local EventQueue = require 'EventQueue'
+local QuadTree = require 'QuadTree'
 local geom = require 'geom'
 local util = require 'util'
 local gfx = require 'gfx'
@@ -156,6 +157,9 @@ function Game:init()
         self.shaders.waterRipple = shaders.load("track1/waterRipple.fs")
         self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     end
+
+    self.quadtree = QuadTree.new({left = 0, right = 1280, top = 0, bottom = 720})
+    self.buckets = {}
 
     self.bounds = {
         left = 32,
@@ -915,19 +919,44 @@ function Game:update(raw_dt)
         end
 
         for _,actor in pairs(self.actors) do
-            actor:preUpdate(dt, rawt)
+            local updated = actor:preUpdate(dt, rawt)
+            local prev = self.buckets[actor]
+
+            if updated or not prev then
+                local quad = actor:getAABB()
+                local node = self.quadtree:find(quad)
+                if node ~= prev then
+                    if prev then prev:remove(actor) end
+                    if node then node:insert(actor) end
+                    self.buckets[actor] = node
+                end
+            end
         end
 
-        -- TODO bucket the actors and only check actors that are in threatened buckets
-        -- because, seriously, this function takes like 90% of CPU time pretty often
-        for _,actor in pairs(self.actors) do
-            actor:checkHitBalls(self.balls)
+        local actorThreats = {}
+        for _,ball in ipairs(self.balls) do
+            local ballBound = ball:getAABB()
+            self.quadtree:visit(ballBound, function(item)
+                actorThreats[item] = (actorThreats[item] or {})
+                table.insert(actorThreats[item], ball)
+            end)
+        end
+        for actor,balls in pairs(actorThreats) do
+            actor:checkHitBalls(balls)
         end
 
         local function doPostUpdates(cur)
             util.runQueue(cur, function(thing)
                 thing:postUpdate(dt, rawt)
-                return not thing:isAlive()
+                if not thing:isAlive() then
+                    -- remove from the quadtree
+                    if self.buckets[thing] then
+                        self.buckets[thing]:remove(thing)
+                    end
+                    return true
+                else
+                    return false
+                end
             end)
         end
 
@@ -1034,9 +1063,32 @@ function Game:draw()
 
         -- love.graphics.line(0, self.paddle.y, 1280, self.paddle.y)
 
+        if false and config.debug then
+            local function drawQuadTree(tree)
+                love.graphics.rectangle("line", tree.left, tree.top, tree.right - tree.left, tree.bottom - tree.top)
+                for _,child in pairs(tree.children) do
+                    drawQuadTree(child)
+                end
+            end
+            drawQuadTree(self.quadtree)
+        end
+
         -- draw the actors
         for _,actor in pairs(self.actors) do
             actor:draw()
+            if config.debug then
+                local node = self.buckets[actor]
+                if node then
+                    love.graphics.rectangle("line", node.left, node.top, node.right - node.left, node.bottom - node.top)
+                    love.graphics.line(actor.x, actor.y, node.cx, node.cy)
+                else
+                    local circle = actor:getBoundingCircle()
+                    if circle then
+                        love.graphics.setColor(1,0,0)
+                        love.graphics.circle("line", unpack(circle))
+                    end
+                end
+            end
         end
 
         -- draw the balls

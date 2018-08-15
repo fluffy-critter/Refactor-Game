@@ -164,6 +164,8 @@ function RoamingEye:preUpdate(dt, rawt)
     self.y = self.y + dt*(self.vy + ay*dt/2)
     self.vx = self.vx + dt*ax
     self.vy = self.vy + dt*ay
+
+    return self:isAlive()
 end
 
 function RoamingEye:postUpdate(dt)
@@ -192,7 +194,14 @@ function RoamingEye:postUpdate(dt)
             self.vy = self.vy - vy*self.recoil
         end)
     end
+end
 
+function RoamingEye:getBoundingCircle()
+    return {self.x, self.y, self.r}
+end
+
+function RoamingEye:getAABB()
+    return {self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r}
 end
 
 function RoamingEye:checkHitBalls(balls)
