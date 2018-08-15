@@ -450,8 +450,6 @@ function love.load(args)
     for _,loop in ipairs(bgLoops) do
         loop:setLooping(true)
         loop:setVolume(0)
-        loop:play()
-        loop:seek(math.random()*loop:getDuration())
     end
 end
 
@@ -482,14 +480,13 @@ function love.update(dt)
     local updateStart = love.timer.getTime()
 
     if playing.state == PlayState.menu then
-        if menuVolume == 0 then
-            for _,loop in ipairs(bgLoops) do
-                loop:play()
-            end
-        end
         menuVolume = math.min(1, menuVolume + dt)
         for _,loop in ipairs(bgLoops) do
             loop:setVolume(menuVolume)
+            if not loop:isPlaying() then
+                loop:seek(math.random()*loop:getDuration())
+                loop:play()
+            end
         end
     end
 
@@ -676,6 +673,14 @@ function love.draw()
         love.graphics.setBlendMode("alpha")
         love.graphics.setFont(fonts.menu.versionText)
         love.graphics.printf("version " .. config.version, 0, 8, love.graphics.getWidth() - 8, "right")
+
+        if config.debug then
+            local pos = ""
+            for n,loop in ipairs(bgLoops) do
+                pos = pos .. string.format("[%d]%s:%.2f ", n, loop:isPlaying() and "p" or "s", loop:tell())
+            end
+            love.graphics.print(pos, 0, love.graphics.getHeight() - 16)
+        end
     end
 
     -- love.graphics.setColor(1,1,1,1)
