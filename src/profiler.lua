@@ -26,9 +26,9 @@ local targetTime = 0
 local contextTimes = {}
 
 local contextColors = {
-    update = {255,0,0,127},
-    draw = {0,255,0,127},
-    after = {0,0,255}
+    update = {1,0,0,0.5},
+    draw = {0,1,0,0.5},
+    after = {0,0,1}
 }
 
 local colors = {}
@@ -37,7 +37,7 @@ local function colorHash(str)
     for i = 1, #str do
         h = bit.bxor(bit.ror(h, 3), str:byte(i)*32452867)
     end
-    return {h % 256, math.floor(h/256) % 256, math.floor(h/65536) % 256}
+    return {(h/256) % 1, (h/65536) % 1, (h/16777216) % 1}
 end
 
 local lastTime
@@ -48,6 +48,7 @@ local function hook()
         local where = context .. ':' .. tostring(info.name) .. info.source .. ':' .. info.linedefined
         if not colors[where] then
             colors[where] = {
+                contextName = context,
                 context = contextColors[context],
                 id = colorHash(where)
             }
@@ -101,19 +102,23 @@ function profiler.draw()
     for k,count in util.spairs(stats.counts, function(t,a,b) return t[b] < t[a] end) do
         local h = dy * count
 
-        love.graphics.setColor(unpack(colors[k].context))
-        love.graphics.rectangle("fill", 0, y, 15, h)
-
-        if h > 8 then
-            love.graphics.setFont(font)
-            love.graphics.setColor(0,0,0)
-            love.graphics.print(k, 16, y+1)
-            love.graphics.setColor(255,255,255)
-            love.graphics.print(k, 14, y-1)
+        if colors[k].contextName ~= "after" then
+            love.graphics.setColor(unpack(colors[k].context))
+            love.graphics.rectangle("fill", 0, y, 8, h)
             love.graphics.setColor(unpack(colors[k].id))
-            love.graphics.print(k, 15, y)
+            love.graphics.rectangle("fill", 8, y, 7, h)
+
+            if h > 8 then
+                love.graphics.setFont(font)
+                love.graphics.setColor(0,0,0)
+                love.graphics.print(k, 16, y+1)
+                love.graphics.setColor(1,1,1)
+                love.graphics.print(k, 14, y-1)
+                love.graphics.setColor(unpack(colors[k].id))
+                love.graphics.print(k, 15, y)
+            end
+            y = y + h
         end
-        y = y + h
     end
 
     -- smoothing
