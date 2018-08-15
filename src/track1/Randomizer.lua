@@ -227,6 +227,8 @@ function Randomizer:preUpdate(_, dt)
             self.stateAge = 0
         end
     end
+
+    return true
 end
 
 function Randomizer:kill()
@@ -248,6 +250,13 @@ end
 
 function Randomizer:getBoundingCircle()
     return {self.x, self.y, math.sqrt((self.w*self.w + self.h*self.h)/4)}
+end
+
+function Randomizer:getAABB()
+    return {
+        self.x - self.w/2, self.y - self.h/2,
+        self.x + self.w/2, self.y + self.h/2
+    }
 end
 
 function Randomizer:onHitBall(nrm, ball)
