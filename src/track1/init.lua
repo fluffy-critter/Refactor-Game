@@ -579,7 +579,6 @@ function Game:setGameEvents()
             when = {0},
             what = function()
                 -- Test new things here!
-                spawnFuncs.mobs.flappyBat(1)
             end
         },
         {
@@ -920,20 +919,23 @@ function Game:update(raw_dt)
         end
 
         for _,actor in pairs(self.actors) do
-            actor:preUpdate(dt, rawt)
-            local quad = actor:getBoundingQuad()
-            local node = self.quadtree:find(quad)
+            local updated = actor:preUpdate(dt, rawt)
             local prev = self.buckets[actor]
-            if node ~= prev then
-                if prev then prev:remove(actor) end
-                if node then node:insert(actor) end
-                self.buckets[actor] = node
+
+            if updated or not prev then
+                local quad = actor:getAABB()
+                local node = self.quadtree:find(quad)
+                if node ~= prev then
+                    if prev then prev:remove(actor) end
+                    if node then node:insert(actor) end
+                    self.buckets[actor] = node
+                end
             end
         end
 
         local actorThreats = {}
         for _,ball in ipairs(self.balls) do
-            local ballBound = ball:getBoundingQuad()
+            local ballBound = ball:getAABB()
             self.quadtree:visit(ballBound, function(item)
                 actorThreats[item] = (actorThreats[item] or {})
                 table.insert(actorThreats[item], ball)

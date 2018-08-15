@@ -26,31 +26,6 @@ local geom = require 'geom'
 
 local Actor = {}
 
-function Actor:getBoundingQuad()
-    local bounds = self:getAABB()
-    if bounds then
-        return bounds
-    end
-
-    local poly = self:getPolygon()
-    if poly then
-        return geom.getAABB(poly)
-    end
-
-    local bcircle = self:getBoundingCircle()
-    if bcircle then
-        return {
-            bcircle[1] - bcircle[3],
-            bcircle[2] - bcircle[3],
-            bcircle[1] + bcircle[3],
-            bcircle[2] + bcircle[3]
-        }
-    end
-
-    print(self, "no bounding quad")
-    return nil
-end
-
 function Actor:checkHitBalls(balls)
     -- default implementation - test each ball against the bounding circle and then the polygon, memoizing as we go
     local poly, aabb, bcircle
@@ -110,6 +85,22 @@ function Actor:getBoundingCircle()
 end
 
 function Actor:getAABB()
+    -- default implementation tries to derive it from the polygon, then bounding circle
+    local poly = self:getPolygon()
+    if poly then
+        return geom.getAABB(poly)
+    end
+
+    local bcircle = self:getBoundingCircle()
+    if bcircle then
+        return {
+            bcircle[1] - bcircle[3],
+            bcircle[2] - bcircle[3],
+            bcircle[1] + bcircle[3],
+            bcircle[2] + bcircle[3]
+        }
+    end
+
     return nil
 end
 
@@ -118,7 +109,7 @@ function Actor:getPolygon()
 end
 
 function Actor:preUpdate(--[[dt]])
-    -- no default
+    -- no default. Should return true if the bounds are potentially changing.
 end
 
 function Actor:postUpdate(--[[dt]])

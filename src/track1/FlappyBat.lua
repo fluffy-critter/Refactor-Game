@@ -124,6 +124,7 @@ function FlappyBat:preUpdate(_, rawt)
         self.vy = self.flapVY
     end
 
+    return self:isAlive()
 end
 
 function FlappyBat:postUpdate(dt)
@@ -138,6 +139,10 @@ end
 
 function FlappyBat:getBoundingCircle()
     return {self.x, self.y, self.r}
+end
+
+function FlappyBat:getAABB()
+    return {self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r}
 end
 
 function FlappyBat:checkHitBalls(balls)
