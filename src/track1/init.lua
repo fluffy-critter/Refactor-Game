@@ -158,7 +158,7 @@ function Game:init()
         self.shaders.waterReflect = shaders.load("track1/waterReflect.fs")
     end
 
-    self.quadtree = QuadTree.new({left = 0, right = 1280, top = 0, bottom = 720})
+    self.quadtree = QuadTree.new({left = -32, right = 2048 - 32, top = -32, bottom = 2048 - 32})
     self.buckets = {}
 
     self.bounds = {

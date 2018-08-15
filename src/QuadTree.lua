@@ -37,7 +37,7 @@ function QuadTree:find(bounds)
     local left, right, top, bottom
 
     -- find left/right axis
-    if bounds[3] < self.cx then
+    if bounds[3] <= self.cx then
         child = 1
         left = self.left
         right = self.cx
@@ -51,7 +51,7 @@ function QuadTree:find(bounds)
 
     if child then
         -- We have an X split, so let's find the Y split
-        if bounds[4] < self.cy then
+        if bounds[4] <= self.cy then
             top = self.top
             bottom = self.cy
         elseif bounds[2] >= self.cy then
@@ -117,7 +117,7 @@ function QuadTree:visit(bounds, callback)
     -- Visit left children (1 and 3)
     if bounds[1] < self.cx then
         -- top
-        if self.children[1] and bounds[2] < self.cy then
+        if self.children[1] and bounds[2] <= self.cy then
             self.children[1]:visit(bounds, callback)
         end
         -- bottom
@@ -129,7 +129,7 @@ function QuadTree:visit(bounds, callback)
     -- Visit right children (2 and 4)
     if bounds[3] >= self.cx then
         -- top
-        if self.children[2] and bounds[2] < self.cy then
+        if self.children[2] and bounds[2] <= self.cy then
             self.children[2]:visit(bounds, callback)
         end
         -- bottom
