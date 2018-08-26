@@ -23,7 +23,8 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
     // distort the texture coordinate pseudo-spherically
     pos = pos*pow(r2, 0.9);
 
-    vec4 reflection = pow(r2, 5.)*Texel(env, center - reflectSize*reflect(vec3(0.,0.,1.), nrm).xy);
+    float r4 = r2*r2;
+    vec4 reflection = r4*r4*r2*Texel(env, center - reflectSize*reflect(vec3(0.,0.,1.), nrm).xy);
 
     return mask*(color*Texel(texture, (pos + vec2(1.0, 1.0))*0.5) + reflection);
 }

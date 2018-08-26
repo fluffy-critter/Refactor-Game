@@ -77,10 +77,10 @@ function QuadTree:find(bounds)
     local node = self.children[child]
     if not node then
         -- create a new child node
-        print("creating new node for child " .. child)
-        print("    our bounds", self.left, self.top, self.right, self.bottom)
-        print("    center", self.cx, self.cy)
-        print("    child bounds", left, top, right, bottom)
+        -- print("creating new node for child " .. child)
+        -- print("    our bounds", self.left, self.top, self.right, self.bottom)
+        -- print("    center", self.cx, self.cy)
+        -- print("    child bounds", left, top, right, bottom)
         node = QuadTree.new({
             parent = self,
             left = left,
