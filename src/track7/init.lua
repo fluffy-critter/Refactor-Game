@@ -130,7 +130,9 @@ function Game:init()
     self.soundpool = SoundPool.new()
     self.sounds = {
         coin = self.soundpool:load("track7/coin.ogg"),
-        gem = self.soundpool:load("track7/gem.ogg")
+        gem = self.soundpool:load("track7/gem.ogg"),
+        drop = self.soundpool:load("track7/drop.ogg"),
+        bounce = self.soundpool:load("track7/bounce.ogg")
     }
 
     -- parse the note event list
@@ -369,8 +371,23 @@ function Game:update(dt)
                 spriteSheet = self.itemSprites,
                 quads = self.itemQuads.coin,
                 frameSpeed = 20 + math.random(0, 20),
-                frameTime = math.random()*1000
+                frameTime = math.random()*1000,
+                pitch = math.random()*0.5 + 0.75,
+                onBounce = function(coin)
+                    coin.bounceCount = (coin.bounceCount or 0) + 1
+                    if coin.bounceCount < 10 then
+                        self.soundpool:play(self.sounds.bounce, function(sound)
+                            sound:setVolume(math.random()*math.min(1, coin.vx*coin.vx + coin.vy*coin.vy)/coin.bounceCount)
+                            sound:setPitch(coin.pitch)
+                        end)
+                    end
+                end
             }))
+
+            self.soundpool:play(self.sounds.drop, function(sound)
+                sound:setVolume(math.random()*0.25 + 0.25)
+                sound:setPitch(math.random()*0.2 + 0.9)
+            end)
         end
 
         -- offset to stop penetration
@@ -405,6 +422,7 @@ function Game:update(dt)
 
             local function playEcho(sound)
                 self.soundpool:play(sound, function(source)
+                    source:setVolume(util.smoothStep(math.min(1, self:musicPos() - now)))
                     source:setPitch(math.pow(2, (event.note - 60)/12))
                 end)
             end
