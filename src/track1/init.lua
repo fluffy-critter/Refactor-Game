@@ -73,12 +73,10 @@ function Game:setScale(scale)
     local w = math.floor(scale*1280 + 0.5)
     local h = math.floor(w*720/1280)
 
-    -- don't change if we're not adjusting by at least 50 pixels
+    -- don't change if we're not adjusting by at least one cadence
     if self.scale then
-        local oldW = self.scale*1280
-        local oldH = self.scale*720
-
-        if math.abs(oldW - w) < 50 and math.abs(oldH - h) < 50 then
+        local cadence = math.pow(4/3, 0.25)
+        if scale/self.scale < cadence and self.scale/scale < cadence then
             return scale
         end
     end
