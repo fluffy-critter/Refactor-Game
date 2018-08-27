@@ -17,6 +17,8 @@ local imagepool = require 'imagepool'
 local Coin = require 'track7.Coin'
 local Channel = require 'track7.Channel'
 
+local SoundPool = require 'SoundPool'
+
 local Game = {
     META = {
         tracknum = 7,
@@ -123,6 +125,12 @@ function Game:init()
 
     self.music = love.audio.newSource('track7/07-flight.mp3', 'static')
     -- self.music:setVolume(0)
+
+    self.soundpool = SoundPool.new()
+    self.sounds = {
+        coin = self.soundpool:load("track7/coin.ogg"),
+        gem = self.soundpool:load("track7/gem.ogg")
+    }
 
     -- parse the note event list
     local eventlist = love.filesystem.load('track7/events.lua')()
@@ -394,6 +402,12 @@ function Game:update(dt)
             local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
             local jump = 540*1.5*4
 
+            local function playEcho(sound)
+                self.soundpool:play(sound, function(source)
+                    source:setPitch(math.pow(2, (event.note - 60)/12))
+                end)
+            end
+
             local spawn = {
                 y = self.camera.y + 540,
                 x = self.bounds.center + self.bounds.width*(xpos*2 - 1)/2,
@@ -405,6 +419,9 @@ function Game:update(dt)
                 channel = self.channel,
                 onCollect = function()
                     self.score = self.score + 1
+
+                    playEcho(self.sounds.coin)
+
                     return true -- TODO fade out instead?
                 end,
                 spriteSheet = self.itemSprites,
@@ -437,6 +454,9 @@ function Game:update(dt)
 
                         -- TODO add poof effect actor
                     end
+
+                    -- play an echo of the original note
+                    playEcho(self.sounds.gem)
 
                     return true
                 end
