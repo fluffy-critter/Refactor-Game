@@ -70,6 +70,18 @@ function Coin:draw()
         love.graphics.circle("line", self.x, self.y, self.r)
     end
 
+    if self.spriteSheetMultiply and self.quadsMultiply then
+        local frame = math.floor(self.frameTime) % #self.quadsMultiply + 1
+        local quad = self.quadsMultiply[frame]
+        if not quad then
+            print("frame=" .. frame .. " frameSpeed=" .. self.frameSpeed)
+        end
+        local _,_,w,h = quad:getViewport()
+        love.graphics.setBlendMode("multiply", "premultiplied")
+        love.graphics.draw(self.spriteSheetMultiply, quad, self.x, self.y, 0,
+            self.r*2/self.baseSize, self.r*2/self.baseSize, w/2, h/2)
+    end
+
     if self.spriteSheet and self.quads then
         local frame = math.floor(self.frameTime) % #self.quads + 1
         local quad = self.quads[frame]
@@ -77,6 +89,7 @@ function Coin:draw()
             print("frame=" .. frame .. " frameSpeed=" .. self.frameSpeed)
         end
         local _,_,w,h = quad:getViewport()
+        love.graphics.setBlendMode("alpha", "alphamultiply")
         love.graphics.draw(self.spriteSheet, quad, self.x, self.y, 0,
             self.r*2/self.baseSize, self.r*2/self.baseSize, w/2, h/2)
     end
