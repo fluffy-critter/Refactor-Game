@@ -11,6 +11,8 @@ local util = require 'util'
 
 local QuadTree = {}
 
+local weakRef = {__mode="v"}
+
 function QuadTree.new(o)
     local self = o or {}
     setmetatable(self, {__index = QuadTree})
@@ -24,6 +26,7 @@ function QuadTree.new(o)
         children = {}
     })
 
+    setmetatable(self.children, weakRef)
     return self
 end
 
