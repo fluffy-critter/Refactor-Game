@@ -322,6 +322,9 @@ function Game:update(dt)
 
         c.y = c.y + (c.vy + 0.5*cameraAY*dt)*dt
         c.vy = c.vy + cameraAY*dt
+
+        love.audio.setPosition(0, c.y/1000, -0.1)
+        love.audio.setOrientation(0, 0, 1, 0, -1, 0)
     end
 
     self.channel:update(self.camera.y + 600, function()
@@ -372,13 +375,14 @@ function Game:update(dt)
                 quads = self.itemQuads.coin,
                 frameSpeed = 20 + math.random(0, 20),
                 frameTime = math.random()*1000,
-                pitch = math.random()*0.5 + 0.75,
+                pitch = math.pow(2, math.random()),
                 onBounce = function(coin)
                     coin.bounceCount = (coin.bounceCount or 0) + 1
                     if coin.bounceCount < 10 then
                         self.soundpool:play(self.sounds.bounce, function(sound)
-                            sound:setVolume(math.random()*math.min(1, coin.vx*coin.vx + coin.vy*coin.vy)/coin.bounceCount)
+                            sound:setVolume(math.min(1, coin.vx*coin.vx + coin.vy*coin.vy)/coin.bounceCount)
                             sound:setPitch(coin.pitch)
+                            sound:setPosition(coin.x/1000, coin.y/1000, 0)
                         end)
                     end
                 end
@@ -387,6 +391,7 @@ function Game:update(dt)
             self.soundpool:play(self.sounds.drop, function(sound)
                 sound:setVolume(math.random()*0.25 + 0.25)
                 sound:setPitch(math.random()*0.2 + 0.9)
+                sound:setPosition(self.monk.x/1000, self.monk.y/1000, 0)
             end)
         end
 
@@ -420,10 +425,11 @@ function Game:update(dt)
             local xpos = (event.note - self.bounds.minNote)/(self.bounds.maxNote - self.bounds.minNote)
             local jump = 540*1.5*4
 
-            local function playEcho(sound)
+            local function playEcho(sound, coin)
                 self.soundpool:play(sound, function(source)
                     source:setVolume(util.smoothStep(math.min(1, self:musicPos() - now)))
                     source:setPitch(math.pow(2, (event.note - 60)/12))
+                    source:setPosition(coin.x/1000, coin.y/1000, 0)
                 end)
             end
 
@@ -436,10 +442,10 @@ function Game:update(dt)
                 sprite = self.itemSprites,
                 quad = self.itemQuads.coin,
                 channel = self.channel,
-                onCollect = function()
+                onCollect = function(coin)
                     self.score = self.score + 1
 
-                    playEcho(self.sounds.coin)
+                    playEcho(self.sounds.coin, coin)
 
                     return true -- TODO fade out instead?
                 end,
@@ -456,7 +462,7 @@ function Game:update(dt)
                 spawn.quadsMultiply = self.gemQuads.mul
                 spawn.frameSpeed = spawn.frameSpeed*2
 
-                spawn.onCollect = function()
+                spawn.onCollect = function(coin)
                     self.score = self.score + 100
 
                     if #self.faces == 0 then
@@ -478,7 +484,7 @@ function Game:update(dt)
                     end
 
                     -- play an echo of the original note
-                    playEcho(self.sounds.gem)
+                    playEcho(self.sounds.gem, coin)
 
                     return true
                 end
@@ -496,7 +502,7 @@ function Game:update(dt)
 
         if actor.onCollect and geom.pointPointCollision(actor.x, actor.y, actor.r,
             self.monk.x, self.monk.y, self.monk.r) then
-            return actor:onCollect()
+            return actor:onCollect(actor)
         end
     end)
 end
