@@ -84,6 +84,7 @@ function Game:init()
 
     self.itemSprites, self.itemQuads = gfx.loadSprites('track7/sprites.png', 'track7/sprites.lua', {mipmaps=true})
     self.monkSprites, self.monkQuads = gfx.loadSprites('track7/monk.png', 'track7/monk.lua', {mipmaps=true})
+    self.gemSprites, self.gemQuads = gfx.loadSprites('track7/gems.png', 'track7/gems.lua', {mipmaps=true})
 
     self.camera = {
         y = 0,
@@ -431,7 +432,10 @@ function Game:update(dt)
             }
 
             if event.track == 3 then
-                spawn.quads = self.itemQuads.gem
+                spawn.spriteSheet = self.gemSprites
+                spawn.spriteSheetMultiply = self.gemSprites
+                spawn.quads = self.gemQuads.opaque
+                spawn.quadsMultiply = self.gemQuads.mul
                 spawn.frameSpeed = spawn.frameSpeed*2
 
                 spawn.onCollect = function()
