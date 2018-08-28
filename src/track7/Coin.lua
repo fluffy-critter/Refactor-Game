@@ -52,6 +52,10 @@ function Coin:update(dt, maxY)
 
             self.frameSpeed = util.clamp((self.frameSpeed + nrm[1]*10)*(newV + 100)/(oldV + 100)/self.elastic,
                 -60, 60)
+
+            if self.onBounce then
+                self:onBounce()
+            end
         end
     end
 
