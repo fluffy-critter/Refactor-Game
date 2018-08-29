@@ -362,7 +362,7 @@ function Game:update(dt)
         self.score = self.score - coins
         for _=1,coins do
             local theta = math.random()*2*math.pi
-            local mag = geom.vectorLength({self.monk.vx, self.monk.vy})
+            local mag = geom.vectorLength({self.monk.vx, self.monk.vy})*math.random()
             table.insert(self.actors, Coin.new({
                 x = self.monk.x,
                 y = self.monk.y,
