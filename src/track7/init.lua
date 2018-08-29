@@ -427,7 +427,7 @@ function Game:update(dt)
 
             local function playEcho(sound, coin)
                 self.soundpool:play(sound, function(source)
-                    source:setVolume(util.smoothStep(math.min(1, self:musicPos() - now)))
+                    source:setVolume(util.smoothStep(math.min(1, self:musicPos() - now + 0.2)))
                     source:setPitch(math.pow(2, (event.note - 60)/12))
                     source:setPosition(coin.x/1000, coin.y/1000, 0)
                 end)

@@ -234,7 +234,7 @@ function Game:init()
         color = {.5, 1, 1, 1},
         lives = 3,
         hitColor = {0, .5, 1, 1},
-        ay = 30,
+        ay = 100,
         minVelocity = 0,
         preUpdate = function(ball, dt)
             Ball.preUpdate(ball, dt)
