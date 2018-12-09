@@ -74,7 +74,7 @@ publish-jam: publish-precheck $$(JAM_CHANNELS)
 
 jam: love-jam osx-jam linux-jam win32-jam win64-jam
 
-publish-precheck: commit-check tests checks
+publish-precheck: commit-check tests checks clean
 
 publish-status:
 	butler status $(TARGET)
