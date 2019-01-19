@@ -17,10 +17,10 @@ NAME=Refactor
 BUNDLE_ID=biz.beesbuzz.Refactor
 
 # LOVE version to fetch and build against
-LOVE_VERSION=11.1
+LOVE_VERSION=11.2
 
 # Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
-BASEVERSION=0.3.5
+BASEVERSION=0.3.6
 
 # Determine the full version string based on the tag
 COMMITHASH=$(shell git rev-parse --short HEAD)
