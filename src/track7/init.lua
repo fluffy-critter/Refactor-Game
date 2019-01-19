@@ -249,6 +249,7 @@ function Game:init()
 end
 
 function Game:start()
+    love.audio.setDistanceModel("none")
 end
 
 function Game:onButtonPress(button)
