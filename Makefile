@@ -17,7 +17,7 @@ NAME=Refactor
 BUNDLE_ID=biz.beesbuzz.Refactor
 
 # LOVE version to fetch and build against
-LOVE_VERSION=11.2
+LOVE_VERSION=11.3
 
 # Version of the game - whenever this changes, set a tag for v$(BASEVERSION) for the revision base
 BASEVERSION=0.3.6
@@ -217,8 +217,8 @@ $(DEST)/deps/love.app: $(DEPS)/love/love-$(LOVE_VERSION)-macos.zip
 	touch $(@)
 
 # Windows build dependencies
-WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION).0-win32
-WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION).0-win64
+WIN32_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win32
+WIN64_ROOT=$(DEST)/deps/love-$(LOVE_VERSION)-win64
 
 $(WIN32_ROOT)/love.exe: $(DEPS)/love/love-$(LOVE_VERSION)-win32.zip
 	@echo BUILDING: $(@)
