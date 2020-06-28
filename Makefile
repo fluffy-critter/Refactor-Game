@@ -49,7 +49,7 @@ CHANNELS=love osx win32 win64 linux
 # don't remove secondary files
 .SECONDARY:
 
-publish-dep=$(DEST)/.published-$(GAME_VERSION)_$(1)
+publish-dep=$(DEST)/.pub-$(GAME_VERSION)_$(1)
 PUBLISH_CHANNELS=$(foreach tgt,$(CHANNELS),$(call publish-dep,$(tgt)))
 JAM_CHANNELS=$(foreach tgt,$(CHANNELS),$(call publish-dep,$(tgt)-jam))
 
@@ -74,7 +74,7 @@ publish-jam: publish-precheck $$(JAM_CHANNELS)
 
 jam: love-jam osx-jam linux-jam win32-jam win64-jam
 
-publish-precheck: commit-check tests checks clean
+publish-precheck: commit-check tests checks
 
 publish-status:
 	butler status $(TARGET)
@@ -126,8 +126,7 @@ $(DEST)/.distfiles-$(GAME_VERSION)_%: LICENSE $(wildcard distfiles/*)
 	done && \
 	touch $(@)
 
-
-$(DEST)/.published-$(GAME_VERSION)_%: staging-% $(DEST)/%/LICENSE
+$(DEST)/.pub-$(GAME_VERSION)_%: staging-% $(DEST)/%/LICENSE
 	butler push $(DEST)/$(lastword $(subst _, ,$(@))) $(TARGET):$(lastword $(subst _, ,$(@))) --userversion $(GAME_VERSION) && touch $(@)
 
 # hacky way to inject the distfiles content
