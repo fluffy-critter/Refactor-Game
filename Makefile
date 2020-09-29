@@ -140,7 +140,7 @@ $(DEST)/%/LICENSE: $(DEST)/.distfiles-%-$(GAME_VERSION) LICENSE $(wildcard distf
 $(DEPS)/love/%:
 	@echo BUILDING: $(@)
 	mkdir -p $(DEPS)/love
-	curl -L -o $(@) https://bitbucket.org/rude/love/downloads/$(shell basename $(@))
+	curl -L -o $(@) https://github.com/love2d/love/releases/download/$(LOVE_VERSION)/$(shell basename $(@))
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
