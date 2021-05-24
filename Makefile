@@ -93,10 +93,10 @@ tests:
 	love $(SRC) --cute-headless
 
 checks:
-	@which luacheck 1>/dev/null || (echo \
+	#@which luacheck 1>/dev/null || (echo \
 		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
 		&& false )
-	find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
+	#find src -name '*.lua' | grep -v thirdparty | xargs luacheck -q
 
 run: love-bundle
 	love $(DEST)/love/$(NAME).love
@@ -140,7 +140,8 @@ $(DEST)/%/LICENSE: $(DEST)/.distfiles-%-$(GAME_VERSION) LICENSE $(wildcard distf
 $(DEPS)/love/%:
 	@echo BUILDING: $(@)
 	mkdir -p $(DEPS)/love
-	curl -L -o $(@) https://github.com/love2d/love/releases/download/$(LOVE_VERSION)/$(shell basename $(@))
+	curl -L -f -o $(@) https://github.com/love2d/love/releases/download/$(LOVE_VERSION)/$(shell basename $(@))
+
 
 # .love bundle
 love-bundle: submodules $(DEST)/love/$(NAME).love
@@ -186,8 +187,8 @@ $(DEST)/osx-jam/$(NAME)-jam.app: love-jam $(wildcard osx/*) $(DEST)/deps/love.ap
 	cp $(DEST)/love-jam/$(NAME)-jam.love $(@)/Contents/Resources
 
 #Linux version
-LINUX_32_BUNDLE=$(DEPS)/love/love-$(LOVE_VERSION)-linux-x86_64.AppImage
-LINUX_64_BUNDLE=$(DEPS)/love/love-$(LOVE_VERSION)-linux-i686.AppImage
+LINUX_64_BUNDLE=$(DEPS)/love/love-11.3-x86_64.AppImage
+LINUX_32_BUNDLE=$(DEPS)/love/love-11.3-i686.AppImage
 
 linux: $(DEST)/linux/$(NAME)
 $(DEST)/linux/$(NAME): linux/launcher love-bundle $(LINUX_32_BUNDLE) $(LINUX_64_BUNDLE)
