@@ -1061,7 +1061,7 @@ function Game:draw()
 
         -- love.graphics.line(0, self.paddle.y, 1280, self.paddle.y)
 
-        if false and config.debug then
+        if true and config.debug then
             local function drawQuadTree(tree)
                 love.graphics.rectangle("line", tree.left, tree.top, tree.right - tree.left, tree.bottom - tree.top)
                 for _,child in pairs(tree.children) do

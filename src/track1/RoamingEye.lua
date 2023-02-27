@@ -328,7 +328,7 @@ function RoamingEye:drawPost()
             gfx.circle(true, self.x, self.y, self.r)
         end
 
-        if false and config.debug then
+        if true and config.debug then
             love.graphics.setColor(0,0,1,alpha)
             love.graphics.line(self.posX, self.posY, self.tgtX, self.tgtY)
             love.graphics.setColor(1,0,0,alpha)

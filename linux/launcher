@@ -3,9 +3,9 @@
 
 cd "$(dirname $0)"
 
-LOVE="bin/love-{LOVEVERSION}-linux-$(uname -m).AppImage"
+LOVE="bin/love-{LOVEVERSION}-$(uname -m).AppImage"
 if [ ! -f "$LOVE" ] ; then
-    LOVE="bin/love-{LOVEVERSION}-linux-i686.AppImage"
+    LOVE="bin/love-{LOVEVERSION}-i686.AppImage"
 fi
 
 $LOVE "$(pwd)/lib/{BUNDLENAME}"
